@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Tue Mar  4 12:27:53 CST 2008
-// $Id$
+// $Id: MuonTagProbeAnalyzer.cc,v 1.1 2008/04/02 19:59:03 neadam Exp $
 //
 //
 
@@ -44,7 +44,6 @@
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleCandidate.h"
 #include "DataFormats/HLTReco/interface/HLTFilterObject.h"
-#include "DataFormats/HLTReco/interface/HLTPerformanceInfo.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/RecoCandidate/interface/FitResult.h"
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"
@@ -862,15 +861,18 @@ MuonTagProbeAnalyzer::fillTagProbeInfo()
 	 LogWarning("Z") << "Could not extract tag muon cands with input tag " 
 			 << tagCandTags_[itype];
       }
-      for( int i=0; i<(int)taggedmuons->size(); ++i )
+      if( taggedmuons.isValid() )
       {
-	 const Track * trk = (*taggedmuons)[i].get<const Track *>();
-	 if( trk == 0 ) cout << "No track reference!" << endl;
-	 cout << "Has master clone? " << (*taggedmuons)[i].hasMasterClone() << endl;
-	 if( (*taggedmuons)[i].hasMasterClone() )
+	 for( int i=0; i<(int)taggedmuons->size(); ++i )
 	 {
-	    MuonRef muRef = ((*taggedmuons)[i].masterClone()).castTo<MuonRef>();
-	    cout << "Muon pt " << muRef->pt() << endl;
+	    const Track * trk = (*taggedmuons)[i].get<const Track *>();
+	    if( trk == 0 ) cout << "No track reference!" << endl;
+	    cout << "Has master clone? " << (*taggedmuons)[i].hasMasterClone() << endl;
+	    if( (*taggedmuons)[i].hasMasterClone() )
+	    {
+	       MuonRef muRef = ((*taggedmuons)[i].masterClone()).castTo<MuonRef>();
+	       cout << "Muon pt " << muRef->pt() << endl;
+	    }
 	 }
       }
 
