@@ -60,7 +60,7 @@ class MuonTagProbeAnalyzer : public edm::EDAnalyzer
       void fillZInfo();
       void fillVertexInfo();
 
-      bool MatchObjects( const reco::Candidate *hltObj, const reco::MuonRef& tagObj );
+      bool MatchObjects( reco::CandidateBaseRef hltObj, const reco::MuonRef& tagObj );
 
       // ----------member data ---------------------------
       const edm::Event* m_event;
@@ -105,7 +105,6 @@ class MuonTagProbeAnalyzer : public edm::EDAnalyzer
       edm::InputTag PvxtTag_;
 
       // Trigger parameters
-      edm::InputTag triggerEventTag_;
       edm::InputTag hltL1Tag_;
       edm::InputTag hltTag_;
       double delRMatchingCut_;
