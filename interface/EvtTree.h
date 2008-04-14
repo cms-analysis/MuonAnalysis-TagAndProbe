@@ -16,7 +16,7 @@
 //
 // Original Author: Nadia Adam
 //         Created:  Tue Oct 31 10:23:32 CST 2006
-// $Id$
+// $Id: EvtTree.h,v 1.1 2008/04/02 19:59:02 neadam Exp $
 //
 
 // system include files
@@ -113,30 +113,30 @@ class EvtTree
       float mu_phi[MAXNMU];
 
       // Information about the tag-probe muon pairs
-      int nrtp;
-      int   tp_type[MAXNPAIR];
-      int   tp_true[MAXNPAIR];
-      int   tp_ppass[MAXNPAIR];
-      int   tp_l1[MAXNPAIR];
-      int   tp_hlt[MAXNPAIR];
-      float tp_mass[MAXNPAIR];
-      float tp_p[MAXNPAIR];
-      float tp_pt[MAXNPAIR];
-      float tp_px[MAXNPAIR];
-      float tp_py[MAXNPAIR];
-      float tp_pz[MAXNPAIR];
-      float tp_e[MAXNPAIR];
-      float tp_et[MAXNPAIR];
-      float tp_dp[MAXNPAIR][2];
-      float tp_dpx[MAXNPAIR][2];
-      float tp_dpy[MAXNPAIR][2];
-      float tp_dpz[MAXNPAIR][2];
-      float tp_dpt[MAXNPAIR][2];
-      float tp_de[MAXNPAIR][2];
-      float tp_det[MAXNPAIR][2];
-      float tp_dq[MAXNPAIR][2];
-      float tp_deta[MAXNPAIR][2];
-      float tp_dphi[MAXNPAIR][2];
+      int nrtp;                   /* Total number of TP pairs stored in this event. */
+      int   tp_type[MAXNPAIR];    /* TP type, i.e. type of efficiency. */
+      int   tp_true[MAXNPAIR];    /* Is the TP pair a true Z? */
+      int   tp_ppass[MAXNPAIR];   /* Did the probe pass eff criteria? (if relevant) */
+      int   tp_l1[MAXNPAIR];      /* Did the tag cause a L1 trigger? */
+      int   tp_hlt[MAXNPAIR];     /* Did the tag cause a HLT trigger? */ 
+      float tp_mass[MAXNPAIR];    /* Invariant mass of the TP pair. */
+      float tp_p[MAXNPAIR];       /* Momentum of the TP pair. */
+      float tp_pt[MAXNPAIR];      /* Transverse momentum of the TP pair. */
+      float tp_px[MAXNPAIR];      /* X momentum of the TP pair. */
+      float tp_py[MAXNPAIR];      /* Y momentum of the TP pair. */
+      float tp_pz[MAXNPAIR];      /* Z momentum of the TP pair. */
+      float tp_e[MAXNPAIR];       /* Energy of the TP pair. */
+      float tp_et[MAXNPAIR];      /* Transverse energy of the TP pair. */
+      float tp_dp[MAXNPAIR][2];   /* Daughter muon momentum: [0]=Tag, [1]=Probe */
+      float tp_dpx[MAXNPAIR][2];  /* Daughter muon X momentum: [0]=Tag, [1]=Probe */
+      float tp_dpy[MAXNPAIR][2];  /* Daughter muon Y momentum: [0]=Tag, [1]=Probe */
+      float tp_dpz[MAXNPAIR][2];  /* Daughter muon Z momentum: [0]=Tag, [1]=Probe */
+      float tp_dpt[MAXNPAIR][2];  /* Daughter muon transverse momentum: [0]=Tag, [1]=Probe */
+      float tp_de[MAXNPAIR][2];   /* Daughter muon energy: [0]=Tag, [1]=Probe */
+      float tp_det[MAXNPAIR][2];  /* Daughter muon transverse energy: [0]=Tag, [1]=Probe */
+      float tp_dq[MAXNPAIR][2];   /* Daughter muon charge: [0]=Tag, [1]=Probe */
+      float tp_deta[MAXNPAIR][2]; /* Daughter muon eta: [0]=Tag, [1]=Probe */
+      float tp_dphi[MAXNPAIR][2]; /* Daughter muon phi: [0]=Tag, [1]=Probe */
 
       // Information about the true muon efficiency
       // From all generator level muons in the event
