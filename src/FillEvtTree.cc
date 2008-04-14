@@ -8,7 +8,7 @@
 //
 // Original Author: Nadia Adam 
 //         Created:  Tue Oct 31 10:23:53 CST 2006
-// $Id$
+// $Id: FillEvtTree.cc,v 1.1 2008/04/02 19:59:03 neadam Exp $
 //
 
 // system include files
@@ -81,7 +81,6 @@ FillEvtTree::init(std::string filename, EvtTree* treePtr) {
    m_tree->Branch("mc_pid",     &(m_treePtr->mc_pid),     "mc_pid[nmcpart][20]/I");
    m_tree->Branch("mc_pbc",     &(m_treePtr->mc_pbc),     "mc_pbc[nmcpart][20]/I");
    m_tree->Branch("mc_ppid",    &(m_treePtr->mc_ppid),    "mc_ppid[nmcpart][20]/I");
-   m_tree->Branch("mc_bc",      &(m_treePtr->mc_bc),      "mc_bc[nmcpart][20]/I");
    m_tree->Branch("mc_mass",    &(m_treePtr->mc_mass),    "mc_mass[nmcpart][20]/F");
    m_tree->Branch("mc_p",       &(m_treePtr->mc_p),       "mc_p[nmcpart][20]/F");
    m_tree->Branch("mc_px",      &(m_treePtr->mc_px),      "mc_px[nmcpart][20]/F");
