@@ -16,7 +16,7 @@
 //
 // Original Author: Nadia Adam
 //         Created:  Tue Oct 31 10:23:32 CST 2006
-// $Id: EvtTree.h,v 1.1 2008/04/02 19:59:02 neadam Exp $
+// $Id: EvtTree.h,v 1.2 2008/04/14 18:22:39 neadam Exp $
 //
 
 // system include files
@@ -95,23 +95,6 @@ class EvtTree
       float trk_vy[MAXNTRK];
       float trk_vz[MAXNTRK];
 
-      // Information about the reconstructed muons
-      int nrmu;
-      int   mu_id[MAXNMU];
-      int   mu_gbl[MAXNMU];
-      int   mu_sta[MAXNMU];
-      int   mu_trk[MAXNMU];
-      float mu_p[MAXNMU];
-      float mu_px[MAXNMU];
-      float mu_py[MAXNMU];
-      float mu_pz[MAXNMU];
-      float mu_pt[MAXNMU];
-      float mu_e[MAXNMU];
-      float mu_et[MAXNMU];
-      float mu_q[MAXNMU];
-      float mu_eta[MAXNMU];
-      float mu_phi[MAXNMU];
-
       // Information about the tag-probe muon pairs
       int nrtp;                   /* Total number of TP pairs stored in this event. */
       int   tp_type[MAXNPAIR];    /* TP type, i.e. type of efficiency. */
@@ -138,69 +121,34 @@ class EvtTree
       float tp_deta[MAXNPAIR][2]; /* Daughter muon eta: [0]=Tag, [1]=Probe */
       float tp_dphi[MAXNPAIR][2]; /* Daughter muon phi: [0]=Tag, [1]=Probe */
 
-      // Information about the true muon efficiency
+      // Information about the true muon/electron efficiency
       // From all generator level muons in the event
-      int ngmu;
-      int   gmu_tag[MAXNMU];
-      int   gmu_aprobe[MAXNMU];
-      int   gmu_pprobe[MAXNMU];
-      int   gmu_moid[MAXNMU];
-      int   gmu_gmid[MAXNMU];
-      float gmu_p[MAXNMU];
-      float gmu_px[MAXNMU];
-      float gmu_py[MAXNMU];
-      float gmu_pz[MAXNMU];
-      float gmu_pt[MAXNMU];
-      float gmu_e[MAXNMU];
-      float gmu_et[MAXNMU];
-      float gmu_q[MAXNMU];
-      float gmu_eta[MAXNMU];
-      float gmu_phi[MAXNMU];
-      float gmu_rp[MAXNMU];
-      float gmu_rpx[MAXNMU];
-      float gmu_rpy[MAXNMU];
-      float gmu_rpz[MAXNMU];
-      float gmu_rpt[MAXNMU];
-      float gmu_re[MAXNMU];
-      float gmu_ret[MAXNMU];
-      float gmu_rq[MAXNMU];
-      float gmu_reta[MAXNMU];
-      float gmu_rphi[MAXNMU];
-
-      // Information about muon pair "Z's"
-      // z_type specifies the type of Z tag-probe etc
-      int nrz;
-      int   z_type[MAXNPAIR];
-      int   z_true[MAXNPAIR];
-      int   z_tid1[MAXNPAIR];
-      int   z_tid2[MAXNPAIR];
-      float z_mass[MAXNPAIR];
-      float z_p[MAXNPAIR];
-      float z_pt[MAXNPAIR];
-      float z_px[MAXNPAIR];
-      float z_py[MAXNPAIR];
-      float z_pz[MAXNPAIR];
-      float z_e[MAXNPAIR];
-      int   z_vvalid[MAXNPAIR];
-      float z_vd0[MAXNPAIR];
-      float z_vx[MAXNPAIR];
-      float z_vy[MAXNPAIR];
-      float z_vz[MAXNPAIR];
-      float z_vdx[MAXNPAIR];
-      float z_vdy[MAXNPAIR];
-      float z_vdz[MAXNPAIR];
-      float z_vchi2[MAXNPAIR];
-      float z_vndof[MAXNPAIR];
-      float z_dp[MAXNPAIR][2];
-      float z_dpx[MAXNPAIR][2];
-      float z_dpy[MAXNPAIR][2];
-      float z_dpz[MAXNPAIR][2];
-      float z_dpt[MAXNPAIR][2];
-      float z_de[MAXNPAIR][2];
-      float z_det[MAXNPAIR][2];
-      float z_dq[MAXNPAIR][2];
-      float z_deta[MAXNPAIR][2];
-      float z_dphi[MAXNPAIR][2];
+      int ncnd;
+      int   cnd_tag[MAXNMU];
+      int   cnd_aprobe[MAXNMU];
+      int   cnd_pprobe[MAXNMU];
+      int   cnd_moid[MAXNMU];
+      int   cnd_gmid[MAXNMU];
+      float cnd_p[MAXNMU];
+      float cnd_px[MAXNMU];
+      float cnd_py[MAXNMU];
+      float cnd_pz[MAXNMU];
+      float cnd_pt[MAXNMU];
+      float cnd_e[MAXNMU];
+      float cnd_et[MAXNMU];
+      float cnd_q[MAXNMU];
+      float cnd_eta[MAXNMU];
+      float cnd_phi[MAXNMU];
+      float cnd_rp[MAXNMU];
+      float cnd_rpx[MAXNMU];
+      float cnd_rpy[MAXNMU];
+      float cnd_rpz[MAXNMU];
+      float cnd_rpt[MAXNMU];
+      float cnd_re[MAXNMU];
+      float cnd_ret[MAXNMU];
+      float cnd_rq[MAXNMU];
+      float cnd_reta[MAXNMU];
+      float cnd_rphi[MAXNMU];
 
 
       // Information about primary "Vtx's"
@@ -286,27 +234,6 @@ class EvtTree
 
 	 }
 
- 	 // Muons
-	 nrmu = 0;
-	 for( int ij = 0; ij<MAXNMU; ij++ )
-	 {
-	    mu_id[ij] = -999;
-	    mu_gbl[ij] = -999;
-	    mu_sta[ij] = -999;
-	    mu_trk[ij] = -999;
-	    mu_p[ij] = -999;
-	    mu_px[ij] = -999;
-	    mu_py[ij] = -999;
-	    mu_pz[ij] = -999;
-	    mu_pt[ij] = -999;
-	    mu_e[ij] = -999;
-	    mu_et[ij] = -999;
-	    mu_q[ij] = -999;
-	    mu_eta[ij] = -999;
-	    mu_phi[ij] = -999;
-
-	 }
-
 	 // Tag-probe muon pairs
 	 nrtp = 0;
 	 for( int ij=0; ij<MAXNPAIR; ++ij )
@@ -349,82 +276,34 @@ class EvtTree
 	 }
 
  	 // Muon Truth and Matching
-	 ngmu = 0;
+	 ncnd = 0;
 	 for( int ij = 0; ij<MAXNMU; ij++ )
 	 {
-	    gmu_tag[ij] = -999;
-	    gmu_aprobe[ij] = -999;
-	    gmu_pprobe[ij] = -999;
-	    gmu_moid[ij] = -999;
-	    gmu_gmid[ij] = -999;
-	    gmu_p[ij] = -999;
-	    gmu_px[ij] = -999;
-	    gmu_py[ij] = -999;
-	    gmu_pz[ij] = -999;
-	    gmu_pt[ij] = -999;
-	    gmu_e[ij] = -999;
-	    gmu_et[ij] = -999;
-	    gmu_q[ij] = -999;
-	    gmu_eta[ij] = -999;
-	    gmu_phi[ij] = -999;
-	    gmu_rp[ij] = -999;
-	    gmu_rpx[ij] = -999;
-	    gmu_rpy[ij] = -999;
-	    gmu_rpz[ij] = -999;
-	    gmu_rpt[ij] = -999;
-	    gmu_re[ij] = -999;
-	    gmu_ret[ij] = -999;
-	    gmu_rq[ij] = -999;
-	    gmu_reta[ij] = -999;
-	    gmu_rphi[ij] = -999;
-	 }
-
-	 nrz = 0;
-	 for( int iz = 0; iz<MAXNPAIR; ++iz )
-	 {
-	    z_type[iz] = -999;
-	    z_true[iz] = -999;
-	    z_tid1[iz] = -999;
-	    z_tid2[iz] = -999;
-	    z_mass[iz] = -999;
-	    z_p[iz] = -999;
-	    z_pt[iz] = -999;
-	    z_px[iz] = -999;
-	    z_py[iz] = -999;
-	    z_pz[iz] = -999;
-	    z_e[iz] = -999;
-	    z_vvalid[iz] = -999;
-	    z_vd0[iz] = -999;
-	    z_vx[iz] = -999;
-	    z_vy[iz] = -999;
-	    z_vz[iz] = -999;
-	    z_vdx[iz] = -999;
-	    z_vdy[iz] = -999;
-	    z_vdz[iz] = -999;
-	    z_vchi2[iz] = -999;
-	    z_vndof[iz] = -999;
-
-	    z_dp[iz][0] = -999;
-	    z_dpx[iz][0] = -999;
-	    z_dpy[iz][0] = -999;
-	    z_dpz[iz][0] = -999;
-	    z_dpt[iz][0] = -999;
-	    z_de[iz][0] = -999;
-	    z_det[iz][0] = -999;
-	    z_dq[iz][0] = -999;
-	    z_deta[iz][0] = -999;
-	    z_dphi[iz][0] = -999;
-
-	    z_dp[iz][1] = -999;
-	    z_dpx[iz][1] = -999;
-	    z_dpy[iz][1] = -999;
-	    z_dpz[iz][1] = -999;
-	    z_dpt[iz][1] = -999;
-	    z_de[iz][1] = -999;
-	    z_det[iz][1] = -999;
-	    z_dq[iz][1] = -999;
-	    z_deta[iz][1] = -999;
-	    z_dphi[iz][1] = -999;
+	    cnd_tag[ij] = -999;
+	    cnd_aprobe[ij] = -999;
+	    cnd_pprobe[ij] = -999;
+	    cnd_moid[ij] = -999;
+	    cnd_gmid[ij] = -999;
+	    cnd_p[ij] = -999;
+	    cnd_px[ij] = -999;
+	    cnd_py[ij] = -999;
+	    cnd_pz[ij] = -999;
+	    cnd_pt[ij] = -999;
+	    cnd_e[ij] = -999;
+	    cnd_et[ij] = -999;
+	    cnd_q[ij] = -999;
+	    cnd_eta[ij] = -999;
+	    cnd_phi[ij] = -999;
+	    cnd_rp[ij] = -999;
+	    cnd_rpx[ij] = -999;
+	    cnd_rpy[ij] = -999;
+	    cnd_rpz[ij] = -999;
+	    cnd_rpt[ij] = -999;
+	    cnd_re[ij] = -999;
+	    cnd_ret[ij] = -999;
+	    cnd_rq[ij] = -999;
+	    cnd_reta[ij] = -999;
+	    cnd_rphi[ij] = -999;
 	 }
 	 
 	 // reset "Vtx's to zero"

@@ -5,7 +5,7 @@
 <use name=FWCore/PluginManager>
 <use name=FWCore/ParameterSet>
 <use name=FWCore/ServiceRegistry>
-<use name=AnalysisDataFormats/Muon>
+<use name=AnalysisDataFormats/TagAndProbe>
 <use name=DataFormats/JetReco>
 <use name=DataFormats/TrackReco>
 <use name=DataFormats/EgammaReco>

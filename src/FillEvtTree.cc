@@ -8,7 +8,7 @@
 //
 // Original Author: Nadia Adam 
 //         Created:  Tue Oct 31 10:23:53 CST 2006
-// $Id: FillEvtTree.cc,v 1.1 2008/04/02 19:59:03 neadam Exp $
+// $Id: FillEvtTree.cc,v 1.2 2008/04/14 15:51:29 neadam Exp $
 //
 
 // system include files
@@ -114,23 +114,6 @@ FillEvtTree::init(std::string filename, EvtTree* treePtr) {
    m_tree->Branch("trk_vy",      &(m_treePtr->trk_vy),      "trk_vy[nrtrk]/F");
    m_tree->Branch("trk_vz",      &(m_treePtr->trk_vz),      "trk_vz[nrtrk]/F");
 
-   // Muons
-   m_tree->Branch("nrmu",       &(m_treePtr->nrmu),       "nrmu/I");
-   m_tree->Branch("mu_id",      &(m_treePtr->mu_id),      "mu_id[nrmu]/I");
-   m_tree->Branch("mu_gbl",     &(m_treePtr->mu_gbl),     "mu_gbl[nrmu]/I");
-   m_tree->Branch("mu_sta",     &(m_treePtr->mu_sta),     "mu_sta[nrmu]/I");
-   m_tree->Branch("mu_trk",     &(m_treePtr->mu_trk),     "mu_trk[nrmu]/I");
-   m_tree->Branch("mu_p",       &(m_treePtr->mu_p),       "mu_p[nrmu]/F");
-   m_tree->Branch("mu_px",      &(m_treePtr->mu_px),      "mu_px[nrmu]/F");
-   m_tree->Branch("mu_py",      &(m_treePtr->mu_py),      "mu_py[nrmu]/F");
-   m_tree->Branch("mu_pz",      &(m_treePtr->mu_pz),      "mu_pz[nrmu]/F");
-   m_tree->Branch("mu_pt",      &(m_treePtr->mu_pt),      "mu_pt[nrmu]/F");
-   m_tree->Branch("mu_e",       &(m_treePtr->mu_e),       "mu_e[nrmu]/F");
-   m_tree->Branch("mu_et",      &(m_treePtr->mu_et),      "mu_et[nrmu]/F");
-   m_tree->Branch("mu_q",       &(m_treePtr->mu_q),       "mu_q[nrmu]/F");
-   m_tree->Branch("mu_phi",     &(m_treePtr->mu_phi),     "mu_phi[nrmu]/F");
-   m_tree->Branch("mu_eta",     &(m_treePtr->mu_eta),     "mu_eta[nrmu]/F");
-
    // Tag-probe pairs
    m_tree->Branch("nrtp",       &(m_treePtr->nrtp),       "nrtp/I");
    m_tree->Branch("tp_true",    &(m_treePtr->tp_true),    "tp_true[nrtp]/I");
@@ -157,68 +140,33 @@ FillEvtTree::init(std::string filename, EvtTree* treePtr) {
    m_tree->Branch("tp_dphi",     &(m_treePtr->tp_dphi),     "tp_dphi[nrtp][2]/F");
    m_tree->Branch("tp_deta",     &(m_treePtr->tp_deta),     "tp_deta[nrtp][2]/F");
 
-   // Muon Efficiency
-   m_tree->Branch("ngmu",       &(m_treePtr->ngmu),       "ngmu/I");
-   m_tree->Branch("gmu_tag",    &(m_treePtr->gmu_tag),    "gmu_tag[ngmu]/I");
-   m_tree->Branch("gmu_aprobe", &(m_treePtr->gmu_aprobe), "gmu_aprobe[ngmu]/I");
-   m_tree->Branch("gmu_pprobe", &(m_treePtr->gmu_pprobe), "gmu_pprobe[ngmu]/I");
-   m_tree->Branch("gmu_moid",   &(m_treePtr->gmu_moid),   "gmu_moid[ngmu]/I");
-   m_tree->Branch("gmu_gmid",   &(m_treePtr->gmu_gmid),   "gmu_gmid[ngmu]/I");
-   m_tree->Branch("gmu_p",      &(m_treePtr->gmu_p),      "gmu_p[ngmu]/F");
-   m_tree->Branch("gmu_px",     &(m_treePtr->gmu_px),     "gmu_px[ngmu]/F");
-   m_tree->Branch("gmu_py",     &(m_treePtr->gmu_py),     "gmu_py[ngmu]/F");
-   m_tree->Branch("gmu_pz",     &(m_treePtr->gmu_pz),     "gmu_pz[ngmu]/F");
-   m_tree->Branch("gmu_pt",     &(m_treePtr->gmu_pt),     "gmu_pt[ngmu]/F");
-   m_tree->Branch("gmu_e",      &(m_treePtr->gmu_e),      "gmu_e[ngmu]/F");
-   m_tree->Branch("gmu_et",     &(m_treePtr->gmu_et),     "gmu_et[ngmu]/F");
-   m_tree->Branch("gmu_q",      &(m_treePtr->gmu_q),      "gmu_q[ngmu]/F");
-   m_tree->Branch("gmu_phi",    &(m_treePtr->gmu_phi),    "gmu_phi[ngmu]/F");
-   m_tree->Branch("gmu_eta",    &(m_treePtr->gmu_eta),    "gmu_eta[ngmu]/F");
-   m_tree->Branch("gmu_rp",     &(m_treePtr->gmu_rp),     "gmu_rp[ngmu]/F");
-   m_tree->Branch("gmu_rpx",    &(m_treePtr->gmu_rpx),    "gmu_rpx[ngmu]/F");
-   m_tree->Branch("gmu_rpy",    &(m_treePtr->gmu_rpy),    "gmu_rpy[ngmu]/F");
-   m_tree->Branch("gmu_rpz",    &(m_treePtr->gmu_rpz),    "gmu_rpz[ngmu]/F");
-   m_tree->Branch("gmu_rpt",    &(m_treePtr->gmu_rpt),    "gmu_rpt[ngmu]/F");
-   m_tree->Branch("gmu_re",     &(m_treePtr->gmu_re),     "gmu_re[ngmu]/F");
-   m_tree->Branch("gmu_ret",    &(m_treePtr->gmu_ret),    "gmu_ret[ngmu]/F");
-   m_tree->Branch("gmu_rq",     &(m_treePtr->gmu_rq),     "gmu_rq[ngmu]/F");
-   m_tree->Branch("gmu_rphi",   &(m_treePtr->gmu_rphi),   "gmu_rphi[ngmu]/F");
-   m_tree->Branch("gmu_reta",   &(m_treePtr->gmu_reta),   "gmu_reta[ngmu]/F");
-
-   // "Z's"
-   m_tree->Branch("nrz",       &(m_treePtr->nrz),       "nrz/I");
-   m_tree->Branch("z_type",    &(m_treePtr->z_type),    "z_type[nrz]/I");
-   m_tree->Branch("z_true",    &(m_treePtr->z_true),    "z_true[nrz]/I");
-   m_tree->Branch("z_tid1",    &(m_treePtr->z_tid1),    "z_tid1[nrz]/I");
-   m_tree->Branch("z_tid2",    &(m_treePtr->z_tid2),    "z_tid2[nrz]/I");
-   m_tree->Branch("z_p",       &(m_treePtr->z_p),       "z_p[nrz]/F");
-   m_tree->Branch("z_px",      &(m_treePtr->z_px),      "z_px[nrz]/F");
-   m_tree->Branch("z_py",      &(m_treePtr->z_py),      "z_py[nrz]/F");
-   m_tree->Branch("z_pz",      &(m_treePtr->z_pz),      "z_pz[nrz]/F");
-   m_tree->Branch("z_pt",      &(m_treePtr->z_pt),      "z_pt[nrz]/F");
-   m_tree->Branch("z_e",       &(m_treePtr->z_e),       "z_e[nrz]/F");
-   m_tree->Branch("z_mass",    &(m_treePtr->z_mass),    "z_mass[nrz]/F");
-   m_tree->Branch("z_vvalid",  &(m_treePtr->z_vvalid),  "z_vvalid[nrz]/I");
-   m_tree->Branch("z_vchi2",   &(m_treePtr->z_vchi2),   "z_vchi2[nrz]/F");
-   m_tree->Branch("z_vndof",   &(m_treePtr->z_vndof),   "z_vndof[nrz]/F");
-   m_tree->Branch("z_vd0",     &(m_treePtr->z_vd0),     "z_vd0[nrz]/F");
-   m_tree->Branch("z_vx",      &(m_treePtr->z_vx),      "z_vx[nrz]/F");
-   m_tree->Branch("z_vy",      &(m_treePtr->z_vy),      "z_vy[nrz]/F");
-   m_tree->Branch("z_vz",      &(m_treePtr->z_vz),      "z_vz[nrz]/F");
-   m_tree->Branch("z_vdx",     &(m_treePtr->z_vdx),     "z_vdx[nrz]/F");
-   m_tree->Branch("z_vdy",     &(m_treePtr->z_vdy),     "z_vdy[nrz]/F");
-   m_tree->Branch("z_vdz",     &(m_treePtr->z_vdz),     "z_vdz[nrz]/F");
-
-   m_tree->Branch("z_dp",       &(m_treePtr->z_dp),       "z_dp[nrz][2]/F");
-   m_tree->Branch("z_dpx",      &(m_treePtr->z_dpx),      "z_dpx[nrz][2]/F");
-   m_tree->Branch("z_dpy",      &(m_treePtr->z_dpy),      "z_dpy[nrz][2]/F");
-   m_tree->Branch("z_dpz",      &(m_treePtr->z_dpz),      "z_dpz[nrz][2]/F");
-   m_tree->Branch("z_dpt",      &(m_treePtr->z_dpt),      "z_dpt[nrz][2]/F");
-   m_tree->Branch("z_de",       &(m_treePtr->z_de),       "z_de[nrz][2]/F");
-   m_tree->Branch("z_det",      &(m_treePtr->z_det),      "z_det[nrz][2]/F");
-   m_tree->Branch("z_dq",       &(m_treePtr->z_dq),       "z_dq[nrz][2]/F");
-   m_tree->Branch("z_dphi",     &(m_treePtr->z_dphi),     "z_dphi[nrz][2]/F");
-   m_tree->Branch("z_deta",     &(m_treePtr->z_deta),     "z_deta[nrz][2]/F");
+   // True Candidate (usually electron/muon) Efficiency
+   m_tree->Branch("ncnd",       &(m_treePtr->ncnd),       "ncnd/I");
+   m_tree->Branch("cnd_tag",    &(m_treePtr->cnd_tag),    "cnd_tag[ncnd]/I");
+   m_tree->Branch("cnd_aprobe", &(m_treePtr->cnd_aprobe), "cnd_aprobe[ncnd]/I");
+   m_tree->Branch("cnd_pprobe", &(m_treePtr->cnd_pprobe), "cnd_pprobe[ncnd]/I");
+   m_tree->Branch("cnd_moid",   &(m_treePtr->cnd_moid),   "cnd_moid[ncnd]/I");
+   m_tree->Branch("cnd_gmid",   &(m_treePtr->cnd_gmid),   "cnd_gmid[ncnd]/I");
+   m_tree->Branch("cnd_p",      &(m_treePtr->cnd_p),      "cnd_p[ncnd]/F");
+   m_tree->Branch("cnd_px",     &(m_treePtr->cnd_px),     "cnd_px[ncnd]/F");
+   m_tree->Branch("cnd_py",     &(m_treePtr->cnd_py),     "cnd_py[ncnd]/F");
+   m_tree->Branch("cnd_pz",     &(m_treePtr->cnd_pz),     "cnd_pz[ncnd]/F");
+   m_tree->Branch("cnd_pt",     &(m_treePtr->cnd_pt),     "cnd_pt[ncnd]/F");
+   m_tree->Branch("cnd_e",      &(m_treePtr->cnd_e),      "cnd_e[ncnd]/F");
+   m_tree->Branch("cnd_et",     &(m_treePtr->cnd_et),     "cnd_et[ncnd]/F");
+   m_tree->Branch("cnd_q",      &(m_treePtr->cnd_q),      "cnd_q[ncnd]/F");
+   m_tree->Branch("cnd_phi",    &(m_treePtr->cnd_phi),    "cnd_phi[ncnd]/F");
+   m_tree->Branch("cnd_eta",    &(m_treePtr->cnd_eta),    "cnd_eta[ncnd]/F");
+   m_tree->Branch("cnd_rp",     &(m_treePtr->cnd_rp),     "cnd_rp[ncnd]/F");
+   m_tree->Branch("cnd_rpx",    &(m_treePtr->cnd_rpx),    "cnd_rpx[ncnd]/F");
+   m_tree->Branch("cnd_rpy",    &(m_treePtr->cnd_rpy),    "cnd_rpy[ncnd]/F");
+   m_tree->Branch("cnd_rpz",    &(m_treePtr->cnd_rpz),    "cnd_rpz[ncnd]/F");
+   m_tree->Branch("cnd_rpt",    &(m_treePtr->cnd_rpt),    "cnd_rpt[ncnd]/F");
+   m_tree->Branch("cnd_re",     &(m_treePtr->cnd_re),     "cnd_re[ncnd]/F");
+   m_tree->Branch("cnd_ret",    &(m_treePtr->cnd_ret),    "cnd_ret[ncnd]/F");
+   m_tree->Branch("cnd_rq",     &(m_treePtr->cnd_rq),     "cnd_rq[ncnd]/F");
+   m_tree->Branch("cnd_rphi",   &(m_treePtr->cnd_rphi),   "cnd_rphi[ncnd]/F");
+   m_tree->Branch("cnd_reta",   &(m_treePtr->cnd_reta),   "cnd_reta[ncnd]/F");
 
    // "Vtx's"
    m_tree->Branch("nvtx",       &(m_treePtr->nvtx),       "nvtx/I");
