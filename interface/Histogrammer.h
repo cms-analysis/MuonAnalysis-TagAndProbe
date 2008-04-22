@@ -33,6 +33,11 @@ class Histogrammer : public edm::EDAnalyzer{
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
+  int CreateHistogram(TH1F& Histo, int i);
+  int SaveHistogram(TH1F& Histo, int i);
+
+  void SideBandSubtraction(const TH1F* Total, TH1F*&Result, Double_t Peak, Double_t SD);
+
   std::vector<std::string> fileNames;
   std::vector<std::string> quantities;  
   std::vector<std::string> conditions;  
@@ -44,5 +49,8 @@ class Histogrammer : public edm::EDAnalyzer{
   std::vector<unsigned int> logY;
 
   TChain* fChain;
+  TH1F* Histograms;
+  
+  unsigned int vectorSize;
   
 };
