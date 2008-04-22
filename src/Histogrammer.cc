@@ -13,11 +13,11 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id$
+// $Id: Histogrammer.cc,v 1.1 2008/04/22 15:50:24 ahunt Exp $
 //
 //
 
-#include "MuonAnalysis/Histogrammer/interface/Histogrammer.h"
+#include "MuonAnalysis/TagAndProbe/interface/Histogrammer.h"
 
 Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
 {
