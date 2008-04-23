@@ -8,7 +8,7 @@
 //
 // Original Author: Nadia Adam 
 //         Created:  Tue Oct 31 10:23:53 CST 2006
-// $Id: FillEvtTree.cc,v 1.2 2008/04/14 15:51:29 neadam Exp $
+// $Id: FillEvtTree.cc,v 1.3 2008/04/21 14:02:04 neadam Exp $
 //
 
 // system include files
@@ -116,6 +116,7 @@ FillEvtTree::init(std::string filename, EvtTree* treePtr) {
 
    // Tag-probe pairs
    m_tree->Branch("nrtp",       &(m_treePtr->nrtp),       "nrtp/I");
+   m_tree->Branch("tp_type",    &(m_treePtr->tp_type),    "tp_type[nrtp]/I");
    m_tree->Branch("tp_true",    &(m_treePtr->tp_true),    "tp_true[nrtp]/I");
    m_tree->Branch("tp_ppass",   &(m_treePtr->tp_ppass),   "tp_ppass[nrtp]/I");
    m_tree->Branch("tp_l1",      &(m_treePtr->tp_l1),      "tp_l1[nrtp]/I");
