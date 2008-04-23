@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.1 2008/04/22 15:50:24 ahunt Exp $
+// $Id: Histogrammer.cc,v 1.3 2008/04/22 19:57:11 ahunt Exp $
 //
 //
 
@@ -31,34 +31,40 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
   XMin            = iConfig.getUntrackedParameter< std::vector<double> >("XMin");
   XMax            = iConfig.getUntrackedParameter< std::vector<double> >("XMax");
   logY            = iConfig.getUntrackedParameter< std::vector<unsigned int> >("logY");
+  
+  vectorSize = quantities.size();
+
+  Histograms = new TH1F[vectorSize];
+  NumEvents = new int[vectorSize];
 
   // Chain files together
   std::string tempString;
   fChain = new TChain("evttree");
 
+
   vector<string>::iterator it;
-  for( it=fileNames.begin(); it < fileNames.end(); it++){
+  int i;
+  for( it=fileNames.begin(), i = 0; it < fileNames.end(); it++, i++){
     tempString = *it;
     fChain->Add(tempString.c_str());
+    NumEvents[i] = fChain->GetEntries();
   }
-
-  vectorSize = quantities.size();
-
-  Histograms = new TH1F[vectorSize];
-
 }
 
 Histogrammer::~Histogrammer()
 {
   if (!fChain) return;
   delete fChain->GetCurrentFile();
+
+  delete [] Histograms;
+  delete [] NumEvents;
+
 }
 
 // ------------ method called to for each event  ------------
 void
 Histogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-  
   
   if(outputFileNames.size() != vectorSize){
     std::cout << "outputFileNames is not the same size as quantities" << std::endl;    
@@ -76,10 +82,40 @@ Histogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
     
     for(unsigned int i = 0; i < vectorSize; i++){
       CreateHistogram(Histograms[i], i);
-      SaveHistogram(Histograms[i], i);
+      SaveHistogram(Histograms[i], outputFileNames[i], logY[i]);
     }
   }
+  
+
+  SBSExample();
+
+ 
 }
+
+void Histogrammer::SBSExample(){
+
+  TH1F TPMassHistoSig("TPMassHistoSig", "", 200,0,200);
+  TH1F TPMassHistoBG("TPMassHistoBG", "", 200,0,200);
+  TH1F TPMassHistoTot("TPMassHistoTot", "", 200,0,200);
+  TH1F TPMassHistoSBS("TPMassHistoSBS","", 200,0,200);
+
+  fChain->Draw("tp_mass >> TPMassHistoSig","", "", NumEvents[0], 0);
+  fChain->Draw("tp_mass >> TPMassHistoBG", "", "", NumEvents[1] - NumEvents[0], NumEvents[0] + 1);
+  
+  const Double_t SigScale = 3918.0/NumEvents[0];
+
+  std::cout << "SigScale: " << SigScale << std::endl;
+
+  TPMassHistoTot.Add(&TPMassHistoSig, &TPMassHistoBG, SigScale, 1);
+  SideBandSubtraction(TPMassHistoTot, TPMassHistoSBS, 90, 2);
+
+  SaveHistogram(TPMassHistoSig, "TPMassHistoSig.png", 1);
+  SaveHistogram(TPMassHistoBG, "TPMassHistoBG.png", 1);
+  SaveHistogram(TPMassHistoTot, "TPMassHistoTot.png", 1);
+  SaveHistogram(TPMassHistoSBS, "TPMassHistoSBS.png", 1);
+
+}
+
 
 int Histogrammer::CreateHistogram(TH1F& Histo, int i){
   
@@ -103,35 +139,35 @@ int Histogrammer::CreateHistogram(TH1F& Histo, int i){
   return 0;
 }
 
-int Histogrammer::SaveHistogram(TH1F& Histo, int i){
+int Histogrammer::SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY = 0){
   
   TCanvas* c1 = new TCanvas("c1","c1",700,500);
   c1->GetPad(0)->SetTicks(1,1);
-  c1->SetLogy(logY[i]);
+  c1->SetLogy(LogY);
   
   Histo.Draw();
   
-  c1->SaveAs(outputFileNames[i].c_str());
+  c1->SaveAs(outFileName.c_str());
   
   delete c1;
 
   return 0;
 }
 
+void Histogrammer::SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD){
+  // Total Means signal plus background
 
-void Histogrammer::SideBandSubtraction(const TH1F* Total, TH1F* &Result, Double_t Peak, Double_t SD){
-
-  const Double_t BinWidth  = Total->GetXaxis()->GetBinWidth(1);
-  const Int_t nbins = Total->GetNbinsX();
-  const Double_t xmin = Total->GetXaxis()->GetXmin();
+  const Double_t BinWidth  = Total.GetXaxis()->GetBinWidth(1);
+  const Int_t nbins = Total.GetNbinsX();
+  const Double_t xmin = Total.GetXaxis()->GetXmin();
 
   const Int_t PeakBin = (Int_t)(Peak - xmin)/BinWidth + 1; // Peak
   const Double_t SDBin = SD/BinWidth; // Standard deviation
-  const Double_t I = 3*SDBin; // Interval
-  const Double_t D = 5*SDBin;  // Distance from peak
+  const Int_t I = 3*SDBin; // Interval
+  const Int_t D = 10*SDBin;  // Distance from peak
 
-  const Double_t IntegralRight = Total->Integral(PeakBin + D, PeakBin + D + I);
-  const Double_t IntegralLeft = Total->Integral(PeakBin - D - I, PeakBin - D);
+  const Double_t IntegralRight = Total.Integral(PeakBin + D, PeakBin + D + I);
+  const Double_t IntegralLeft = Total.Integral(PeakBin - D - I, PeakBin - D);
 
   std::cout << "Peak: " << Peak << " " << PeakBin << std::endl;
   std::cout << "SD: " << SD << " " << SDBin << std::endl;
@@ -143,10 +179,13 @@ void Histogrammer::SideBandSubtraction(const TH1F* Total, TH1F* &Result, Double_
 
   for(Int_t bin = 1; bin < (nbins + 1); bin++){
     SubValue = ((IntegralRight - IntegralLeft)/(2*D+I)*(bin - PeakBin - D - I/2.0) + IntegralRight)/I;
-    NewValue = Total->GetBinContent(bin)-SubValue;
-    std::cout << Total->GetBinContent(bin)  << " - " << SubValue <<  " = " << NewValue << std::endl;
+    if(SubValue < 0)
+      SubValue = 0;
+
+    NewValue = Total.GetBinContent(bin)-SubValue;
+    std::cout << Total.GetBinContent(bin)  << " - " << SubValue <<  " = " << NewValue << std::endl;
     if(NewValue > 0){
-      Result->SetBinContent(bin, NewValue);
+      Result.SetBinContent(bin, NewValue);
     }
   }
 }
