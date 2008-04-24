@@ -1,5 +1,7 @@
 <use name=root>
 <use name=rootmath>
+<use name=rootcore>
+<lib name=RooFit>
 <use name=FWCore/Framework>
 <use name=FWCore/MessageLogger>
 <use name=FWCore/PluginManager>
@@ -33,6 +35,8 @@
    <lib name=MuonAnalysisTagAndProbe>
    <use name=root>
    <use name=rootmath>
+   <use name=rootcore>
+   <use name=RooFit>
    <use name=FWCore/Framework>
    <use name=FWCore/PluginManager>
    <use name=FWCore/ParameterSet>
