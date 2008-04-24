@@ -3,8 +3,7 @@
 #include "RooRealProxy.h"
 #include "RooAbsReal.h"
 #include "TFile.h"
-#include "MyAnalyzer/RooAnalyzer/interface/RooCMSShapePdf.h"
-
+#include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
 
  RooCMSShapePdf::RooCMSShapePdf(const char *name, const char *title, 
                         RooAbsReal& _x,
