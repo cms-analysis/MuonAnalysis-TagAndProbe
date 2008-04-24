@@ -44,16 +44,17 @@ class Histogrammer : public edm::EDAnalyzer
       void CalculateEfficiencies();
       void SBSExample();
 
-      // Histogram drawing input variables
-      std::vector<std::string> fileNames;
-      std::vector<std::string> quantities;  
-      std::vector<std::string> conditions;  
-      std::vector<std::string> outputFileNames;
+      std::vector<std::string> fileNames_;
 
-      std::vector<unsigned int> XBins;
-      std::vector<double> XMax;
-      std::vector<double> XMin;
-      std::vector<unsigned int> logY;
+      // Histogram drawing input variables
+      std::vector<std::string> quantities_;  
+      std::vector<std::string> conditions_;  
+      std::vector<std::string> outputFileNames_;
+
+      std::vector<unsigned int> XBins_;
+      std::vector<double> XMax_;
+      std::vector<double> XMin_;
+      std::vector<unsigned int> logY_;
 
       std::vector<double> lumi_;
       std::vector<double> xsection_;
@@ -96,10 +97,10 @@ class Histogrammer : public edm::EDAnalyzer
       std::vector<double> numBkgFail_;       // Background events failing from fit
 
 
-      TChain* fChain;
-      TH1F* Histograms;
-      int* NumEvents;
+      TChain* fChain_;
+      TH1F* Histograms_;
+      int* NumEvents_;
   
-      unsigned int vectorSize;
+      unsigned int numQuantities_;
       bool doAnalyze_;
 };

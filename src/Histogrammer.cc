@@ -13,12 +13,15 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.5 2008/04/24 15:02:13 neadam Exp $
+// $Id: Histogrammer.cc,v 1.6 2008/04/24 18:39:12 neadam Exp $
 //
 //
 
 #include "MuonAnalysis/TagAndProbe/interface/Histogrammer.h"
 #include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
+
+
+// ROOT headers
 
 #include <TArrow.h>
 #include <TCanvas.h>
@@ -29,6 +32,8 @@
 #include <TLatex.h>
 #include <TString.h>
 #include <TStyle.h>
+
+// RooFit headers
 
 #include <RooAbsData.h>
 #include <RooAddPdf.h>
@@ -57,14 +62,16 @@ using namespace RooFit;
 Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
 {
 
-   fileNames       = iConfig.getUntrackedParameter< vector<string> >("inputFileNames");
-   quantities      = iConfig.getUntrackedParameter< vector<string> >("quantities"); 
-   conditions      = iConfig.getUntrackedParameter< vector<string> >("conditions"); 
-   outputFileNames = iConfig.getUntrackedParameter< vector<string> >("outputFileNames");
-   XBins           = iConfig.getUntrackedParameter< vector<unsigned int> >("XBins");
-   XMin            = iConfig.getUntrackedParameter< vector<double> >("XMin");
-   XMax            = iConfig.getUntrackedParameter< vector<double> >("XMax");
-   logY            = iConfig.getUntrackedParameter< vector<unsigned int> >("logY");
+   fileNames_       = iConfig.getUntrackedParameter< vector<string> >("inputFileNames");
+
+   // Histogrammer variables
+   quantities_      = iConfig.getUntrackedParameter< vector<string> >("quantities"); 
+   conditions_      = iConfig.getUntrackedParameter< vector<string> >("conditions"); 
+   outputFileNames_ = iConfig.getUntrackedParameter< vector<string> >("outputFileNames");
+   XBins_           = iConfig.getUntrackedParameter< vector<unsigned int> >("XBins");
+   XMin_            = iConfig.getUntrackedParameter< vector<double> >("XMin");
+   XMax_            = iConfig.getUntrackedParameter< vector<double> >("XMax");
+   logY_            = iConfig.getUntrackedParameter< vector<unsigned int> >("logY");
    
    // Normalization variables
    lumi_           = iConfig.getUntrackedParameter< vector<double> >("Luminosity");
@@ -147,60 +154,62 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    dNBFl.push_back(1000000.0);
    numBkgFail_      = iConfig.getUntrackedParameter< vector<double> >("NumBkgFail",dNBFl);
 
-   vectorSize = quantities.size();
-
-   Histograms = new TH1F[vectorSize];
-   NumEvents = new int[vectorSize];
+   
+   // Allocate space for histograms
+   numQuantities_ = quantities_.size();
+   Histograms_ = new TH1F[numQuantities_];
 
    // Chain files together
    std::string tempString;
-   fChain = new TChain("evttree");
+   fChain_ = new TChain("evttree");
+   NumEvents_ = new int[fileNames_.size()];
 
-   vector<string>::iterator it=fileNames.begin();
-   for( int i = 0; it < fileNames.end(); it++, i++)
+   vector<string>::iterator it=fileNames_.begin();
+   for( int i = 0; it < fileNames_.end(); it++, i++)
    {
       tempString = *it;
-      fChain->Add(tempString.c_str());
-      NumEvents[i] = fChain->GetEntries();
+      fChain_->Add(tempString.c_str());
+      NumEvents_[i] = fChain_->GetEntries();
    }
 
+   // Verify correct use of cfg
    doAnalyze_ = true;
-   if(outputFileNames.size() != vectorSize){
+   if(outputFileNames_.size() != numQuantities_){
       doAnalyze_ = false;
       cout << "outputFileNames is not the same size as quantities" << endl;    
-   }else if(conditions.size() != vectorSize){
+   }else if(conditions_.size() != numQuantities_){
       doAnalyze_ = false;
       cout << "conditions is not the same size as quantities" << endl;    
-   }else if(XBins.size() != vectorSize){
+   }else if(XBins_.size() != numQuantities_){
       doAnalyze_ = false;
       cout << "XBins is not the same size as quantities" << endl;    
-   }else if(XMax.size() != vectorSize){
+   }else if(XMax_.size() != numQuantities_){
       doAnalyze_ = false;
       cout << "XMax is not the same size as quantities" << endl;    
-   }else if(XMin.size() != vectorSize){
+   }else if(XMin_.size() != numQuantities_){
       doAnalyze_ = false;
       cout << "XMin is not the same size as quantities" << endl;    
-   }else if(logY.size() != vectorSize){
+   }else if(logY_.size() != numQuantities_){
       doAnalyze_ = false;
       cout << "logY is not the same size as quantities" << endl;    
    }
 
    // Set default lumi values to 10 pb^-1
-   if( lumi_.size() != fileNames.size() )
+   if( lumi_.size() != fileNames_.size() )
    {
-      if( lumi_.size() > fileNames.size() ) lumi_.clear();
-      for( int i=lumi_.size(); i<fileNames.size(); ++i ) lumi_.push_back(10.0);
+      if( lumi_.size() > fileNames_.size() ) lumi_.clear();
+      for(unsigned int i=lumi_.size(); i<fileNames_.size(); ++i ) lumi_.push_back(10.0);
    }
    // Set default cross-section values to 1000 pb
-   if( xsection_.size() != fileNames.size() )
+   if( xsection_.size() != fileNames_.size() )
    {
-      if( xsection_.size() > fileNames.size() ) xsection_.clear();
-      for( int i=xsection_.size(); i<fileNames.size(); ++i ) xsection_.push_back(1000.0);
+      if( xsection_.size() > fileNames_.size() ) xsection_.clear();
+      for(unsigned int i=xsection_.size(); i<fileNames_.size(); ++i ) xsection_.push_back(1000.0);
    }
 
    // Set the raw weights ... i.e. the number of events to
    // scale to ...
-   for( int i=0; i<lumi_.size(); ++i )
+   for(unsigned int i=0; i<lumi_.size(); ++i )
    {
       if( lumi_[i]>0.0 && xsection_[i]>0.0 ) weight_.push_back(lumi_[i]*xsection_[i]);
       else                                   weight_.push_back(1.0);
@@ -210,11 +219,18 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
 
 Histogrammer::~Histogrammer()
 {
-   if (!fChain) return;
-   delete fChain->GetCurrentFile();
-
-   delete [] Histograms;
-   delete [] NumEvents;
+  if (fChain_){
+    delete fChain_->GetCurrentFile();
+    fChain_ = 0;
+  }
+  if(Histograms_){
+    delete [] Histograms_; 
+    Histograms_ = 0;
+  }
+  if(NumEvents_){
+    delete [] NumEvents_;
+    NumEvents_ = 0;
+  }
 }
 
 // ------------ method called to for each event  ------------
@@ -222,13 +238,12 @@ void
 Histogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   
-  
    if( doAnalyze_ )
    {
-      for(unsigned int i = 0; i < vectorSize; i++)
+      for(unsigned int i = 0; i < numQuantities_; i++)
       {
-	 CreateHistogram(Histograms[i], i);
-	 SaveHistogram(Histograms[i], outputFileNames[i], logY[i]);
+	 CreateHistogram(Histograms_[i], i);
+	 SaveHistogram(Histograms_[i], outputFileNames_[i], logY_[i]);
       }
    }
 
@@ -248,13 +263,13 @@ int Histogrammer::CreateHistogram(TH1F& Histo, int i)
    HistoName << "Histo" << i;
 
    tempsstream.str(std::string());    
-   tempsstream << quantities[i] << " >>  " << HistoName.str();  
+   tempsstream << quantities_[i] << " >>  " << HistoName.str();  
 
-   if(fChain->FindBranch(quantities[i].substr(0,quantities[i].find("[")).c_str())){ 
-      Histo =  TH1F(HistoName.str().c_str(), "", XBins[i], XMin[i], XMax[i]);
-      fChain->Draw(tempsstream.str().c_str());
+   if(fChain_->FindBranch(quantities_[i].substr(0,quantities_[i].find("[")).c_str())){ 
+      Histo =  TH1F(HistoName.str().c_str(), "", XBins_[i], XMin_[i], XMax_[i]);
+      fChain_->Draw(tempsstream.str().c_str(), conditions_[i].c_str());
    }else{
-      std::cout << "Branch does not exist: " << quantities[i] << std::endl;
+      std::cout << "Branch does not exist: " << quantities_[i] << std::endl;
    }
 
    return 0;
@@ -291,8 +306,8 @@ void Histogrammer::SideBandSubtraction( const TH1F& Total, TH1F& Result,
    const Int_t nbins = Total.GetNbinsX();
    const Double_t xmin = Total.GetXaxis()->GetXmin();
 
-   const Int_t PeakBin = (Int_t)(Peak - xmin)/BinWidth + 1; // Peak
-   const Double_t SDBin = SD/BinWidth; // Standard deviation
+   const Int_t PeakBin = (Int_t)((Peak - xmin)/BinWidth + 1); // Peak
+   const Int_t SDBin = (Int_t)(SD/BinWidth); // Standard deviation
    const Int_t I = 3*SDBin; // Interval
    const Int_t D = 10*SDBin;  // Distance from peak
 
@@ -319,15 +334,19 @@ void Histogrammer::SideBandSubtraction( const TH1F& Total, TH1F& Result,
 // ************ Sideband Example ************ //
 void Histogrammer::SBSExample(){
 
-   TH1F TPMassHistoSig("TPMassHistoSig", "", 200,0,200);
-   TH1F TPMassHistoBG("TPMassHistoBG", "", 200,0,200);
-   TH1F TPMassHistoTot("TPMassHistoTot", "", 200,0,200);
-   TH1F TPMassHistoSBS("TPMassHistoSBS","", 200,0,200);
+  const Int_t SBSXBins = 200;
+  const Int_t SBSXMin = 0;
+  const Int_t SBSXMax = 200;
 
-   fChain->Draw("tp_mass >> TPMassHistoSig","", "", NumEvents[0], 0);
-   fChain->Draw("tp_mass >> TPMassHistoBG", "", "", NumEvents[1] - NumEvents[0], NumEvents[0] + 1);
+   TH1F TPMassHistoSig("TPMassHistoSig", "", SBSXBins, SBSXMin, SBSXMax);
+   TH1F TPMassHistoBG("TPMassHistoBG",   "", SBSXBins, SBSXMin, SBSXMax);
+   TH1F TPMassHistoTot("TPMassHistoTot", "", SBSXBins, SBSXMin, SBSXMax);
+   TH1F TPMassHistoSBS("TPMassHistoSBS", "", SBSXBins, SBSXMin, SBSXMax);
+
+   fChain_->Draw("tp_mass >> TPMassHistoSig","", "", NumEvents_[0], 0);
+   fChain_->Draw("tp_mass >> TPMassHistoBG", "", "", NumEvents_[1] - NumEvents_[0], NumEvents_[0] + 1);
   
-   const Double_t SigScale = weight_[0]/NumEvents[0];
+   const Double_t SigScale = weight_[0]/NumEvents_[0];
 
    std::cout << "SigScale: " << SigScale << std::endl;
 
@@ -335,7 +354,7 @@ void Histogrammer::SBSExample(){
    SideBandSubtraction(TPMassHistoTot, TPMassHistoSBS, 90, 2);
 
    SaveHistogram(TPMassHistoSig, "TPMassHistoSig.png", 1);
-   SaveHistogram(TPMassHistoBG, "TPMassHistoBG.png", 1);
+   SaveHistogram(TPMassHistoBG,  "TPMassHistoBG.png",  1);
    SaveHistogram(TPMassHistoTot, "TPMassHistoTot.png", 1);
    SaveHistogram(TPMassHistoSBS, "TPMassHistoSBS.png", 1);
 
@@ -466,8 +485,8 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
       // Count the number of passing and failing probes in the region
       // making sure we have enough to fit ...
       cout << "About to count the number of events" << endl;
-      int npassR = data->sumEntries("ProbePass==1");
-      int nfailR = data->sumEntries("ProbePass==0");
+      int npassR = (int)data->sumEntries("ProbePass==1");
+      int nfailR = (int)data->sumEntries("ProbePass==0");
       cout << "Num pass " << npassR << endl;
       cout << "Num fail " << nfailR << endl;
 
@@ -611,6 +630,7 @@ void Histogrammer::CalculateEfficiencies()
       // efficiency measurement in the input tree
       // Make a simple tree for fitting, and then
       // call the fitter.
+
       int tagprobe_type = 0;   // If more than one eff loop over this ...
 
       Int_t           nrtp;
@@ -629,21 +649,21 @@ void Histogrammer::CalculateEfficiencies()
       TBranch        *b_tp_dpt;   
       TBranch        *b_tp_deta;   
 
-      fChain->SetBranchAddress("nrtp", &nrtp, &b_nrtp);
-      fChain->SetBranchAddress("tp_true", tp_true, &b_tp_true);
-      fChain->SetBranchAddress("tp_type", tp_type, &b_tp_type);
-      fChain->SetBranchAddress("tp_ppass", tp_ppass, &b_tp_ppass);
-      fChain->SetBranchAddress("tp_mass", tp_mass, &b_tp_mass);
-      fChain->SetBranchAddress("tp_dpt", tp_dpt, &b_tp_dpt);
-      fChain->SetBranchAddress("tp_deta", tp_deta, &b_tp_deta);
+      fChain_->SetBranchAddress("nrtp", &nrtp, &b_nrtp);
+      fChain_->SetBranchAddress("tp_true", tp_true, &b_tp_true);
+      fChain_->SetBranchAddress("tp_type", tp_type, &b_tp_type);
+      fChain_->SetBranchAddress("tp_ppass", tp_ppass, &b_tp_ppass);
+      fChain_->SetBranchAddress("tp_mass", tp_mass, &b_tp_mass);
+      fChain_->SetBranchAddress("tp_dpt", tp_dpt, &b_tp_dpt);
+      fChain_->SetBranchAddress("tp_deta", tp_deta, &b_tp_deta);
 
-      fChain->SetBranchStatus("*",0);
-      fChain->SetBranchStatus("nrtp",1);
-      fChain->SetBranchStatus("tp_type",1);
-      fChain->SetBranchStatus("tp_ppass",1);
-      fChain->SetBranchStatus("tp_mass",1);
-      fChain->SetBranchStatus("tp_dpt",1);
-      fChain->SetBranchStatus("tp_deta",1);
+      fChain_->SetBranchStatus("*",0);
+      fChain_->SetBranchStatus("nrtp",1);
+      fChain_->SetBranchStatus("tp_type",1);
+      fChain_->SetBranchStatus("tp_ppass",1);
+      fChain_->SetBranchStatus("tp_mass",1);
+      fChain_->SetBranchStatus("tp_dpt",1);
+      fChain_->SetBranchStatus("tp_deta",1);
 
       // Make the simple fit tree
       int    ProbePass;
@@ -661,19 +681,19 @@ void Histogrammer::CalculateEfficiencies()
 
       int nFile = 0;
       Weight = 1.0;
-      if( NumEvents[nFile] > 0 ) Weight = weight_[nFile]/(double)NumEvents[nFile];
+      if( NumEvents_[nFile] > 0 ) Weight = weight_[nFile]/(double)NumEvents_[nFile];
       cout << "Filling fit tree with weight " << Weight << endl;
-      for( int i=0; i<fChain->GetEntries(); ++i )
+      for( int i=0; i<fChain_->GetEntries(); ++i )
       {
-	 fChain->GetEntry(i);
+	 fChain_->GetEntry(i);
 
 	 // If we pass a boundary, change the weight
-	 if( nFile<(int)fileNames.size() && i>=NumEvents[nFile] )
+	 if( nFile<(int)fileNames_.size() && i>=NumEvents_[nFile] )
 	 {
 	    ++nFile;
 	    if( lumi_[nFile] > 0.0 )
 	    {
-	       if( NumEvents[nFile] > 0 ) Weight = weight_[nFile]/(double)NumEvents[nFile];
+	       if( NumEvents_[nFile] > 0 ) Weight = weight_[nFile]/(double)NumEvents_[nFile];
 	    }
 	    else
 	    {
