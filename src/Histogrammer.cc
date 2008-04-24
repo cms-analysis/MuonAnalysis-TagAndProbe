@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.3 2008/04/22 19:57:11 ahunt Exp $
+// $Id: Histogrammer.cc,v 1.5 2008/04/24 15:02:13 neadam Exp $
 //
 //
 
@@ -611,10 +611,10 @@ void Histogrammer::CalculateEfficiencies()
       // efficiency measurement in the input tree
       // Make a simple tree for fitting, and then
       // call the fitter.
-      int tagprobe_type = 0;
+      int tagprobe_type = 0;   // If more than one eff loop over this ...
 
       Int_t           nrtp;
-      //Int_t           tp_type[100];
+      Int_t           tp_type[100];
       Int_t           tp_true[100];
       Int_t           tp_ppass[100];
       Float_t         tp_mass[100]; 
@@ -623,7 +623,7 @@ void Histogrammer::CalculateEfficiencies()
       
       TBranch        *b_nrtp;   
       TBranch        *b_tp_true;   
-      //TBranch        *b_tp_type;   
+      TBranch        *b_tp_type;   
       TBranch        *b_tp_ppass;   
       TBranch        *b_tp_mass;   
       TBranch        *b_tp_dpt;   
@@ -631,7 +631,7 @@ void Histogrammer::CalculateEfficiencies()
 
       fChain->SetBranchAddress("nrtp", &nrtp, &b_nrtp);
       fChain->SetBranchAddress("tp_true", tp_true, &b_tp_true);
-      //fChain->SetBranchAddress("tp_type", tp_type, &b_tp_type);
+      fChain->SetBranchAddress("tp_type", tp_type, &b_tp_type);
       fChain->SetBranchAddress("tp_ppass", tp_ppass, &b_tp_ppass);
       fChain->SetBranchAddress("tp_mass", tp_mass, &b_tp_mass);
       fChain->SetBranchAddress("tp_dpt", tp_dpt, &b_tp_dpt);
@@ -639,7 +639,7 @@ void Histogrammer::CalculateEfficiencies()
 
       fChain->SetBranchStatus("*",0);
       fChain->SetBranchStatus("nrtp",1);
-      //fChain->SetBranchStatus("tp_type",1);
+      fChain->SetBranchStatus("tp_type",1);
       fChain->SetBranchStatus("tp_ppass",1);
       fChain->SetBranchStatus("tp_mass",1);
       fChain->SetBranchStatus("tp_dpt",1);
@@ -684,7 +684,7 @@ void Histogrammer::CalculateEfficiencies()
 
 	 for( int n=0; n<nrtp; ++n )
 	 {
-	    //if( tp_type[n] != tagprobe_type ) continue;
+	    if( tp_type[n] != tagprobe_type ) continue;
 
 	    ProbePass = tp_ppass[n];
 	    Mass      = (double)tp_mass[n];
