@@ -8,7 +8,7 @@
 //
 // Original Author: Nadia Adam 
 //         Created:  Tue Oct 31 10:23:53 CST 2006
-// $Id: FillEvtTree.cc,v 1.3 2008/04/21 14:02:04 neadam Exp $
+// $Id: FillEvtTree.cc,v 1.4 2008/04/23 18:28:23 neadam Exp $
 //
 
 // system include files
@@ -143,6 +143,7 @@ FillEvtTree::init(std::string filename, EvtTree* treePtr) {
 
    // True Candidate (usually electron/muon) Efficiency
    m_tree->Branch("ncnd",       &(m_treePtr->ncnd),       "ncnd/I");
+   m_tree->Branch("cnd_type",   &(m_treePtr->cnd_type),   "cnd_type[ncnd]/I");
    m_tree->Branch("cnd_tag",    &(m_treePtr->cnd_tag),    "cnd_tag[ncnd]/I");
    m_tree->Branch("cnd_aprobe", &(m_treePtr->cnd_aprobe), "cnd_aprobe[ncnd]/I");
    m_tree->Branch("cnd_pprobe", &(m_treePtr->cnd_pprobe), "cnd_pprobe[ncnd]/I");

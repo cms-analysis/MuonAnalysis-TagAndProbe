@@ -16,7 +16,7 @@
 //
 // Original Author: Nadia Adam
 //         Created:  Tue Oct 31 10:23:32 CST 2006
-// $Id: EvtTree.h,v 1.2 2008/04/14 18:22:39 neadam Exp $
+// $Id: EvtTree.h,v 1.3 2008/04/21 14:02:04 neadam Exp $
 //
 
 // system include files
@@ -124,6 +124,7 @@ class EvtTree
       // Information about the true muon/electron efficiency
       // From all generator level muons in the event
       int ncnd;
+      int   cnd_type[MAXNMU];
       int   cnd_tag[MAXNMU];
       int   cnd_aprobe[MAXNMU];
       int   cnd_pprobe[MAXNMU];
