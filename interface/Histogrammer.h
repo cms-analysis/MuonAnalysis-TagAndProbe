@@ -39,9 +39,10 @@ class Histogrammer : public edm::EDAnalyzer
       int SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY);
 
       void SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD);
-      void ZllEffFitter( TTree &fitTree, std::string &fileName, std::string &bvar,
+      void ZllEffFitter( TTree *fitTree, std::string &fileName, std::string &bvar,
 			 int bnbins, double blow, double nhigh );
       void CalculateEfficiencies();
+      void CalculateMCTruthEfficiencies();
       void SBSExample();
 
       std::vector<std::string> fileNames_;
@@ -61,8 +62,11 @@ class Histogrammer : public edm::EDAnalyzer
       std::vector<double> weight_;
 
       // Fitting/Efficiency calculation inputs
-      bool calcEffsSB_;         // Calculate effs using SB subtraction for these TTrees?
-      bool calcEffsFitter_;     // Calculate effs using fitter for these TTrees?
+      int tagProbeType_;        // If more than one tag-probe type is stored select
+
+      bool calcEffsSB_;         // Calculate effs using SB subtraction for these TTrees
+      bool calcEffsFitter_;     // Calculate effs using fitter for these TTrees
+      bool calcEffsTruth_;      // Calculate effs using MC truth for these TTrees
 
       std::string fitFileName_; // Name of the root file to write eff info to
 
@@ -84,11 +88,11 @@ class Histogrammer : public edm::EDAnalyzer
       std::vector<double> signalWidthL_;     // Fit left width
       std::vector<double> signalWidthR_;     // Fit right width
 
-      double bifurGaussFrac_;                // Fraction of signal shape from bifur Gauss
+      std::vector<double> bifurGaussFrac_;   // Fraction of signal shape from bifur Gauss
 
-      double bkgAlpha_;                      // Fit background shape alpha
-      double bkgBeta_;                       // Fit background shape beta
-      double bkgPeak_;                       // Fit background shape peak
+      std::vector<double> bkgAlpha_;         // Fit background shape alpha
+      std::vector<double> bkgBeta_;          // Fit background shape beta
+      std::vector<double> bkgPeak_;          // Fit background shape peak
       std::vector<double> bkgGamma_;         // Fit background shape gamma
 
       std::vector<double> efficiency_;       // Signal efficiency from fit
@@ -103,4 +107,39 @@ class Histogrammer : public edm::EDAnalyzer
   
       unsigned int numQuantities_;
       bool doAnalyze_;
+
+      // Tree variables ... could use EvtTree class here
+      Int_t           nrtp_;
+      Int_t           tp_type_[100];
+      Int_t           tp_true_[100];
+      Int_t           tp_ppass_[100];
+      Float_t         tp_mass_[100]; 
+      Float_t         tp_dpt_[100][2];
+      Float_t         tp_deta_[100][2];
+      
+      TBranch        *b_nrtp_;   
+      TBranch        *b_tp_true_;   
+      TBranch        *b_tp_type_;   
+      TBranch        *b_tp_ppass_;   
+      TBranch        *b_tp_mass_;   
+      TBranch        *b_tp_dpt_;   
+      TBranch        *b_tp_deta_;   
+
+      Int_t           ncnd_;
+      Int_t           cnd_type_[100];
+      Int_t           cnd_tag_[100];
+      Int_t           cnd_pprobe_[100];
+      Int_t           cnd_aprobe_[100];
+      Float_t         cnd_pt_[100]; 
+      Float_t         cnd_eta_[100];
+      
+      TBranch        *b_ncnd_;   
+      TBranch        *b_cnd_type_;   
+      TBranch        *b_cnd_tag_;   
+      TBranch        *b_cnd_pprobe_;   
+      TBranch        *b_cnd_aprobe_;   
+      TBranch        *b_cnd_pt_;   
+      TBranch        *b_cnd_eta_;   
+
+
 };

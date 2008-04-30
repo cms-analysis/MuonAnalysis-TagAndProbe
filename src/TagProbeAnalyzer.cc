@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Tue Mar  4 12:27:53 CST 2008
-// $Id: TagProbeAnalyzer.cc,v 1.2 2008/04/14 19:21:42 neadam Exp $
+// $Id: TagProbeAnalyzer.cc,v 1.1 2008/04/21 14:02:04 neadam Exp $
 //
 //
 
@@ -765,192 +765,197 @@ TagProbeAnalyzer::fillTrueEffInfo()
 			<< genParticlesTag_;
    }
 
-   Handle<CandMatchMap> tagmatch;
-   try{ m_event->getByLabel(tagTruthMatchMapTags_[0],tagmatch); }
-   catch(...)
-   { 
-      LogWarning("Z") << "Could not extract muon match map "
-		      << "with input tag " << tagTruthMatchMapTags_[0];
-   }
-
-   Handle<CandMatchMap> apmatch;
-   try{ m_event->getByLabel(allProbeTruthMatchMapTags_[0],apmatch); }
-   catch(...)
-   { 
-      LogWarning("Z") << "Could not extract all probe match map "
-		      << "with input tag " << allProbeTruthMatchMapTags_[0];
-   }
-
-   Handle<CandMatchMap> ppmatch;
-   try{ m_event->getByLabel(passProbeTruthMatchMapTags_[0],ppmatch); }
-   catch(...)
-   { 
-      LogWarning("Z") << "Could not extract pass probe match map "
-		      << "with input tag " << passProbeTruthMatchMapTags_[0];
-   }
-   
-   // Fill some information about the muon efficiency
    int ngmc = 0;
+   // Fill some information about the muon efficiency
    if( genparticles.isValid() )
    {
-      for( unsigned int i=0; i<genparticles->size(); i++ )
+      for( int itype=0; itype<(int)tagProbeMapTags_.size(); ++itype )
       {
-	 if( ngmc >= EvtTree::MAXNMU ) break;
-
-	 int pdg_id = (*genparticles)[i].pdgId();
-
-	 // If this is not a muon keep going!
-	 if( abs( pdg_id ) != candPDGId_ ) continue;
-
-	 int moid  = -1;
-	 int gmoid = -1;
-	 const Candidate *mcand = (*genparticles)[i].mother();
-	 if( mcand != 0 )
-	 {
-	    moid = mcand->pdgId();
-	    if( mcand->pdgId() == pdg_id )
-	    {
-	       if( mcand->mother() != 0 )
-	       {
-		  const Candidate *gcand = mcand->mother();
-		  gmoid = gcand->pdgId();
-	       }
-	    }
+	 Handle<CandMatchMap> tagmatch;
+	 try{ m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch); }
+	 catch(...)
+	 { 
+	    LogWarning("Z") << "Could not extract muon match map "
+			    << "with input tag " << tagTruthMatchMapTags_[itype];
 	 }
 
-	 int ftag = 0;
-	 int fapb = 0;
-	 int fppb = 0;
-
-	 double p   = (*genparticles)[i].p();
-	 double px = (*genparticles)[i].px();
-	 double py = (*genparticles)[i].py();
-	 double pz = (*genparticles)[i].pz();
-	 double pt = (*genparticles)[i].pt();
-	 double e  = (*genparticles)[i].energy();
-	 double et  = (*genparticles)[i].et();
-	 double q  = (*genparticles)[i].charge();
-	 double phi = (*genparticles)[i].phi();
-	 double eta = (*genparticles)[i].eta();
-
-	 double rp   = 0;
-	 double rpx  = 0;
-	 double rpy  = 0;
-	 double rpz  = 0; 
-	 double rpt  = 0; 
-	 double re   = 0;
-	 double ret  = 0;
-	 double rq   = 0;
-	 double rphi = 0;
-	 double reta = 0;
-
-	 CandidateRef mcRef( genparticles, (size_t)i );
-	 if( tagmatch.isValid() )
-	 {
-	    CandMatchMap::const_iterator f = tagmatch->begin();
-	    for( ; f != tagmatch->end(); ++f )
-	    {
-	       const Candidate *mcMatchRef  = &*(f->val);
-
-	       if( &(*mcRef)==&(*mcMatchRef) ) 
-	       {
-		  ftag = 1;
-		  const Candidate *cnd = &*(f->key);
-		  rp   = cnd->p();
-		  rpx  = cnd->px();
-		  rpy  = cnd->py();
-		  rpz  = cnd->pz(); 
-		  rpt  = cnd->pt(); 
-		  re   = cnd->energy();
-		  ret  = cnd->et();
-		  rq   = cnd->charge();
-		  rphi = cnd->phi();
-		  reta = cnd->eta();
-	       }
-	    }
+	 Handle<CandMatchMap> apmatch;
+	 try{ m_event->getByLabel(allProbeTruthMatchMapTags_[itype],apmatch); }
+	 catch(...)
+	 { 
+	    LogWarning("Z") << "Could not extract all probe match map "
+			    << "with input tag " << allProbeTruthMatchMapTags_[itype];
 	 }
-	 if( apmatch.isValid() )
+
+	 Handle<CandMatchMap> ppmatch;
+	 try{ m_event->getByLabel(passProbeTruthMatchMapTags_[itype],ppmatch); }
+	 catch(...)
+	 { 
+	    LogWarning("Z") << "Could not extract pass probe match map "
+			    << "with input tag " << passProbeTruthMatchMapTags_[itype];
+	 }
+   
+	 for( unsigned int i=0; i<genparticles->size(); i++ )
 	 {
-	    CandMatchMap::const_iterator t = apmatch->begin();
-	    for( ; t != apmatch->end(); ++t )
+	    if( ngmc >= EvtTree::MAXNMU ) break;
+
+	    int pdg_id = (*genparticles)[i].pdgId();
+
+	    // If this is not a muon keep going!
+	    if( abs( pdg_id ) != candPDGId_ ) continue;
+
+	    int moid  = -1;
+	    int gmoid = -1;
+	    const Candidate *mcand = (*genparticles)[i].mother();
+	    if( mcand != 0 )
 	    {
-	       const Candidate *mcMatchRef  = &*(t->val);
-	       if( &(*mcRef)==&(*mcMatchRef) )
+	       moid = mcand->pdgId();
+	       if( mcand->pdgId() == pdg_id )
 	       {
-		  fppb = 1;
-		  if( ftag == 0 )
+		  if( mcand->mother() != 0 )
 		  {
-		     const Candidate *tmu = &*(t->key);
-		     rp   = tmu->p();
-		     rpx  = tmu->px();
-		     rpy  = tmu->py();
-		     rpz  = tmu->pz(); 
-		     rpt  = tmu->pt(); 
-		     re   = tmu->energy();
-		     ret  = tmu->et();
-		     rq   = tmu->charge();
-		     rphi = tmu->phi();
-		     reta = tmu->eta();
+		     const Candidate *gcand = mcand->mother();
+		     gmoid = gcand->pdgId();
 		  }
 	       }
 	    }
-	 }
-	 if( ppmatch.isValid() )
-	 {
-	    CandMatchMap::const_iterator t = ppmatch->begin();
-	    for( ; t != ppmatch->end(); ++t )
+
+	    int ftag = 0;
+	    int fapb = 0;
+	    int fppb = 0;
+
+	    double p   = (*genparticles)[i].p();
+	    double px = (*genparticles)[i].px();
+	    double py = (*genparticles)[i].py();
+	    double pz = (*genparticles)[i].pz();
+	    double pt = (*genparticles)[i].pt();
+	    double e  = (*genparticles)[i].energy();
+	    double et  = (*genparticles)[i].et();
+	    double q  = (*genparticles)[i].charge();
+	    double phi = (*genparticles)[i].phi();
+	    double eta = (*genparticles)[i].eta();
+
+	    double rp   = 0;
+	    double rpx  = 0;
+	    double rpy  = 0;
+	    double rpz  = 0; 
+	    double rpt  = 0; 
+	    double re   = 0;
+	    double ret  = 0;
+	    double rq   = 0;
+	    double rphi = 0;
+	    double reta = 0;
+
+	    CandidateRef mcRef( genparticles, (size_t)i );
+	    if( tagmatch.isValid() )
 	    {
-	       const Candidate *mcMatchRef  = &*(t->val);
-	       if( &(*mcRef)==&(*mcMatchRef) )
+	       CandMatchMap::const_iterator f = tagmatch->begin();
+	       for( ; f != tagmatch->end(); ++f )
 	       {
-		  fapb = 1;
-		  if( ftag == 0 && fppb == 0 )
+		  const Candidate *mcMatchRef  = &*(f->val);
+
+		  if( &(*mcRef)==&(*mcMatchRef) ) 
 		  {
-		     const Candidate *tmu = &*(t->key);
-		     rp   = tmu->p();
-		     rpx  = tmu->px();
-		     rpy  = tmu->py();
-		     rpz  = tmu->pz(); 
-		     rpt  = tmu->pt(); 
-		     re   = tmu->energy();
-		     ret  = tmu->et();
-		     rq   = tmu->charge();
-		     rphi = tmu->phi();
-		     reta = tmu->eta();
+		     ftag = 1;
+		     const Candidate *cnd = &*(f->key);
+		     rp   = cnd->p();
+		     rpx  = cnd->px();
+		     rpy  = cnd->py();
+		     rpz  = cnd->pz(); 
+		     rpt  = cnd->pt(); 
+		     re   = cnd->energy();
+		     ret  = cnd->et();
+		     rq   = cnd->charge();
+		     rphi = cnd->phi();
+		     reta = cnd->eta();
 		  }
 	       }
 	    }
+	    if( apmatch.isValid() )
+	    {
+	       CandMatchMap::const_iterator t = apmatch->begin();
+	       for( ; t != apmatch->end(); ++t )
+	       {
+		  const Candidate *mcMatchRef  = &*(t->val);
+		  if( &(*mcRef)==&(*mcMatchRef) )
+		  {
+		     fapb = 1;
+		     if( ftag == 0 )
+		     {
+			const Candidate *tmu = &*(t->key);
+			rp   = tmu->p();
+			rpx  = tmu->px();
+			rpy  = tmu->py();
+			rpz  = tmu->pz(); 
+			rpt  = tmu->pt(); 
+			re   = tmu->energy();
+			ret  = tmu->et();
+			rq   = tmu->charge();
+			rphi = tmu->phi();
+			reta = tmu->eta();
+		     }
+		  }
+	       }
+	    }
+	    if( ppmatch.isValid() )
+	    {
+	       CandMatchMap::const_iterator t = ppmatch->begin();
+	       for( ; t != ppmatch->end(); ++t )
+	       {
+		  const Candidate *mcMatchRef  = &*(t->val);
+		  if( &(*mcRef)==&(*mcMatchRef) )
+		  {
+		     fppb = 1;
+		     if( ftag == 0 && fapb == 0 )
+		     {
+			const Candidate *tmu = &*(t->key);
+			rp   = tmu->p();
+			rpx  = tmu->px();
+			rpy  = tmu->py();
+			rpz  = tmu->pz(); 
+			rpt  = tmu->pt(); 
+			re   = tmu->energy();
+			ret  = tmu->et();
+			rq   = tmu->charge();
+			rphi = tmu->phi();
+			reta = tmu->eta();
+		     }
+		  }
+	       }
+	    }
+
+	    m_evtTree.cnd_type[ngmc]    = itype;
+
+	    m_evtTree.cnd_tag[ngmc]    = ftag;
+	    m_evtTree.cnd_aprobe[ngmc] = fapb;
+	    m_evtTree.cnd_pprobe[ngmc] = fppb;
+	    m_evtTree.cnd_moid[ngmc] = moid;
+	    m_evtTree.cnd_gmid[ngmc] = gmoid;
+
+	    m_evtTree.cnd_p[ngmc] = p;
+	    m_evtTree.cnd_px[ngmc] = px;
+	    m_evtTree.cnd_py[ngmc] = py;
+	    m_evtTree.cnd_pz[ngmc] = pz;
+	    m_evtTree.cnd_pt[ngmc] = pt;
+	    m_evtTree.cnd_e[ngmc] = e;
+	    m_evtTree.cnd_et[ngmc] = et;
+	    m_evtTree.cnd_q[ngmc] = q;
+	    m_evtTree.cnd_phi[ngmc] = phi;
+	    m_evtTree.cnd_eta[ngmc] = eta;
+
+	    m_evtTree.cnd_rp[ngmc] = rp;
+	    m_evtTree.cnd_rpx[ngmc] = rpx;
+	    m_evtTree.cnd_rpy[ngmc] = rpy;
+	    m_evtTree.cnd_rpz[ngmc] = rpz;
+	    m_evtTree.cnd_rpt[ngmc] = rpt;
+	    m_evtTree.cnd_re[ngmc] = re;
+	    m_evtTree.cnd_ret[ngmc] = ret;
+	    m_evtTree.cnd_rq[ngmc] = rq;
+	    m_evtTree.cnd_rphi[ngmc] = rphi;
+	    m_evtTree.cnd_reta[ngmc] = reta;
+
+	    ngmc++;
 	 }
-
-	 m_evtTree.cnd_tag[ngmc]    = ftag;
-	 m_evtTree.cnd_aprobe[ngmc] = fapb;
-	 m_evtTree.cnd_pprobe[ngmc] = fppb;
-	 m_evtTree.cnd_moid[ngmc] = moid;
-	 m_evtTree.cnd_gmid[ngmc] = gmoid;
-
-	 m_evtTree.cnd_p[ngmc] = p;
-	 m_evtTree.cnd_px[ngmc] = px;
-	 m_evtTree.cnd_py[ngmc] = py;
-	 m_evtTree.cnd_pz[ngmc] = pz;
-	 m_evtTree.cnd_pt[ngmc] = pt;
-	 m_evtTree.cnd_e[ngmc] = e;
-	 m_evtTree.cnd_et[ngmc] = et;
-	 m_evtTree.cnd_q[ngmc] = q;
-	 m_evtTree.cnd_phi[ngmc] = phi;
-	 m_evtTree.cnd_eta[ngmc] = eta;
-
-	 m_evtTree.cnd_rp[ngmc] = rp;
-	 m_evtTree.cnd_rpx[ngmc] = rpx;
-	 m_evtTree.cnd_rpy[ngmc] = rpy;
-	 m_evtTree.cnd_rpz[ngmc] = rpz;
-	 m_evtTree.cnd_rpt[ngmc] = rpt;
-	 m_evtTree.cnd_re[ngmc] = re;
-	 m_evtTree.cnd_ret[ngmc] = ret;
-	 m_evtTree.cnd_rq[ngmc] = rq;
-	 m_evtTree.cnd_rphi[ngmc] = rphi;
-	 m_evtTree.cnd_reta[ngmc] = reta;
-
-	 ngmc++;
       }
    }
    m_evtTree.ncnd = ngmc;
@@ -970,7 +975,6 @@ TagProbeAnalyzer::fillVertexInfo()
    {
       LogWarning("Z") << "Could not extract Primery Vertex with input tag " 
 			<< PvxtTag_ << endl;
-
    }
 
    int nVx(0);

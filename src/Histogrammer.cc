@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.6 2008/04/24 18:39:12 neadam Exp $
+// $Id: Histogrammer.cc,v 1.7 2008/04/24 19:45:09 ahunt Exp $
 //
 //
 
@@ -45,6 +45,7 @@
 #include <RooChi2Var.h>
 #include <RooDataSet.h>
 #include <RooDataHist.h>
+#include <RooFitResult.h>
 #include <RooGenericPdf.h>
 #include <RooGlobalFunc.h>
 #include <RooLandau.h>
@@ -78,8 +79,11 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    xsection_       = iConfig.getUntrackedParameter< vector<double> >("CrossSection");
 
    // Efficiency input variables
+   tagProbeType_   = iConfig.getUntrackedParameter< int >("TagProbeType",0);
+
    calcEffsSB_     = iConfig.getUntrackedParameter< bool >("CalculateEffSideBand",false);
    calcEffsFitter_ = iConfig.getUntrackedParameter< bool >("CalculateEffFitter",false);
+   calcEffsTruth_  = iConfig.getUntrackedParameter< bool >("CalculateEffTruth",false);
 
    fitFileName_    = iConfig.getUntrackedParameter< string >("FitFileName","fitfile.root");
 
@@ -122,11 +126,21 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    dSigWR.push_back(2.0);
    signalWidthR_    = iConfig.getUntrackedParameter< vector<double> >("SignalWidthR",dSigWR);
    
-   bifurGaussFrac_  = iConfig.getUntrackedParameter< double >("BifurGaussFrac",0.71);
+   vector<double> dBGF;
+   dBGF.push_back(0.87);
+   dBGF.push_back(0.0);
+   dBGF.push_back(1.0);
+   bifurGaussFrac_  = iConfig.getUntrackedParameter< vector<double> >("BifurGaussFrac",dBGF);
 
-   bkgAlpha_        = iConfig.getUntrackedParameter< double >("BkgAlpha",0.67);
-   bkgBeta_         = iConfig.getUntrackedParameter< double >("BkgBeta",0.05);
-   bkgPeak_         = iConfig.getUntrackedParameter< double >("BkgPeak",91.1876);
+   vector<double> dBAl;
+   dBAl.push_back(63.0);
+   bkgAlpha_        = iConfig.getUntrackedParameter< vector<double> >("BkgAlpha",dBAl);
+   vector<double> dBBt;
+   dBBt.push_back(0.001);
+   bkgBeta_         = iConfig.getUntrackedParameter< vector<double> >("BkgBeta",dBBt);
+   vector<double> dBPk;
+   dBPk.push_back(91.1876);
+   bkgPeak_         = iConfig.getUntrackedParameter< vector<double> >("BkgPeak",dBPk);
    vector<double> dBGam;
    dBGam.push_back(0.08);
    dBGam.push_back(0.0);
@@ -170,6 +184,42 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
       tempString = *it;
       fChain_->Add(tempString.c_str());
       NumEvents_[i] = fChain_->GetEntries();
+   }
+
+   fChain_->SetBranchStatus("*",0);
+   if( calcEffsFitter_ )
+   {
+      fChain_->SetBranchAddress("nrtp", &nrtp_, &b_nrtp_);
+      fChain_->SetBranchAddress("tp_true", tp_true_, &b_tp_true_);
+      fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
+      fChain_->SetBranchAddress("tp_ppass", tp_ppass_, &b_tp_ppass_);
+      fChain_->SetBranchAddress("tp_mass", tp_mass_, &b_tp_mass_);
+      fChain_->SetBranchAddress("tp_dpt", tp_dpt_, &b_tp_dpt_);
+      fChain_->SetBranchAddress("tp_deta", tp_deta_, &b_tp_deta_);
+      
+      fChain_->SetBranchStatus("nrtp",1);
+      fChain_->SetBranchStatus("tp_type",1);
+      fChain_->SetBranchStatus("tp_ppass",1);
+      fChain_->SetBranchStatus("tp_mass",1);
+      fChain_->SetBranchStatus("tp_dpt",1);
+      fChain_->SetBranchStatus("tp_deta",1);
+   }
+   if( calcEffsTruth_ )
+   {
+      fChain_->SetBranchAddress("ncnd", &ncnd_, &b_ncnd_);
+      fChain_->SetBranchAddress("cnd_tag", cnd_tag_, &b_cnd_tag_);
+      fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
+      fChain_->SetBranchAddress("cnd_pprobe", cnd_pprobe_, &b_cnd_pprobe_);
+      fChain_->SetBranchAddress("cnd_aprobe", cnd_aprobe_, &b_cnd_aprobe_);
+      fChain_->SetBranchAddress("cnd_pt", cnd_pt_, &b_cnd_pt_);
+      fChain_->SetBranchAddress("cnd_eta", cnd_eta_, &b_cnd_eta_);
+
+      fChain_->SetBranchStatus("ncnd",1);
+      fChain_->SetBranchStatus("cnd_type",1);
+      fChain_->SetBranchStatus("cnd_pprobe",1);
+      fChain_->SetBranchStatus("cnd_aprobe",1);
+      fChain_->SetBranchStatus("cnd_pt",1);
+      fChain_->SetBranchStatus("cnd_eta",1);
    }
 
    // Verify correct use of cfg
@@ -247,7 +297,7 @@ Histogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
       }
    }
 
-   if( calcEffsSB_ || calcEffsFitter_ ) CalculateEfficiencies();
+   CalculateEfficiencies();
    //SBSExample();
 }
 
@@ -363,14 +413,14 @@ void Histogrammer::SBSExample(){
 
 
 // ********** Z -> l+l- Fitter ********** //
-void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
+void Histogrammer::ZllEffFitter( TTree *fitTree, string &fileName, string &bvar,
 				 int bnbins, double blow, double bhigh )
 {
-   string fmode = "RECREATE";
-   if( bvar == "Eta" ) fmode = "UPDATE";
-   TFile outRootFile(fileName.c_str(),fmode.c_str());
+   TFile outRootFile(fileName.c_str(),"UPDATE");
    outRootFile.cd();
-   //fitTree.Write();
+
+   //return;
+   cout << "Here in Zll fitter" << endl;
    
    string hname = "heff_" + bvar;
    string htitle = "Efficiency vs " + bvar;
@@ -382,7 +432,8 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
    {
 
       // The fit variable - lepton invariant mass
-      RooRealVar Mass("Mass","Invariant Lepton Mass", massLow_, massHigh_, "GeV");
+      RooRealVar Mass("Mass","Invariant Di-Lepton Mass", massLow_, massHigh_, "GeV/c^{2}");
+      Mass.setBins(massNbins_);
 
       // The binning variable
       string bunits = "";
@@ -393,20 +444,69 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
 
       // The weighting
       RooRealVar Weight("Weight","Weight",0.0,10000.0);
+
+      // Make the category variable that defines the two fits,
+      // namely whether the probe passes or fails the eff criteria.
+      RooCategory ProbePass("ProbePass","sample");
+      ProbePass.defineType("pass",1);
+      ProbePass.defineType("fail",0);  
+
+      cout << "Made fit variables" << endl;
+
+      // Add the TTree as our data set ... with the weight in case 
+      // we are using chained MC
+      //RooDataSet* data = new RooDataSet("fitData","fitData",fitTree,
+      //				RooArgSet(ProbePass,Mass,Pt,Weight),"","");
+      // Above command doesn't work in root 5.18 (lovely) so we have this
+      // silly workaround with TChain for now
+      RooDataSet* data = new RooDataSet("fitData","fitData",fitTree,
+					RooArgSet(ProbePass,Mass,Pt,Weight));
+
+
+      //data->get()->Print();
+      data->setWeightVar("Weight");
+      data->get()->Print();
+
+      cout << "Made dataset" << endl;
+
+      RooDataHist *bdata = new RooDataHist("bdata","Binned Data",
+					   RooArgList(Mass,ProbePass),*data);
  
       // ********** Construct signal shape PDF ********** //
 
       // Signal PDF variables
-      RooRealVar signalMean("signalMean","signalMean",
-			    signalMean_[0],signalMean_[1],signalMean_[2]);
-      RooRealVar signalWidth("signalWidth","signalWidth",
-			     signalWidth_[0],signalWidth_[1],signalWidth_[2]);
-      RooRealVar signalSigma("signalSigma","signalSigma",
-			     signalSigma_[0],signalSigma_[1],signalSigma_[2]);
-      RooRealVar signalWidthL("signalWidthL","signalWidthL",
-			      signalWidthL_[0],signalWidthL_[1],signalWidthL_[2]);
-      RooRealVar signalWidthR("signalWidthR","signalWidthR",
-			      signalWidthR_[0],signalWidthR_[1],signalWidthR_[2]);
+      RooRealVar signalMean("signalMean","signalMean",signalMean_[0]);
+      RooRealVar signalWidth("signalWidth","signalWidth",signalWidth_[0]);
+      RooRealVar signalSigma("signalSigma","signalSigma",signalSigma_[0]);
+      RooRealVar signalWidthL("signalWidthL","signalWidthL",signalWidthL_[0]);
+      RooRealVar signalWidthR("signalWidthR","signalWidthR",signalWidthR_[0]);
+
+      // If the user has set a range, make the variable float
+      if( signalMean_.size() == 3 )
+      {
+	 signalMean.setRange(signalMean_[1],signalMean_[2]);
+	 signalMean.setConstant(false);
+      }
+      if( signalWidth_.size() == 3 )
+      {
+	 signalWidth.setRange(signalWidth_[1],signalWidth_[2]);
+	 signalWidth.setConstant(false);
+      }
+      if( signalSigma_.size() == 3 )
+      {
+	 signalSigma.setRange(signalSigma_[1],signalSigma_[2]);
+	 signalSigma.setConstant(false);
+      }
+      if( signalWidthL_.size() == 3 )
+      {
+	 signalWidthL.setRange(signalWidthL_[1],signalWidthL_[2]);
+	 signalWidthL.setConstant(false);
+      }
+      if( signalWidthR_.size() == 3 )
+      {
+	 signalWidthR.setRange(signalWidthR_[1],signalWidthR_[2]);
+	 signalWidthR.setConstant(false);
+      }
   
       // Voigtian
       RooVoigtian signalVoigtPdf("signalVoigtPdf", "signalVoigtPdf", 
@@ -417,50 +517,93 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
 					Mass, signalMean, signalWidthL, signalWidthR);
 
       // Bifurcated Gaussian fraction
-      RooRealVar fBifurGauss("fBifurGauss","fBifurGauss",bifurGaussFrac_);
+      RooRealVar bifurGaussFrac("bifurGaussFrac","bifurGaussFrac",bifurGaussFrac_[0]);
+      if( bifurGaussFrac_.size() == 3 )
+      {
+	 bifurGaussFrac.setRange(bifurGaussFrac_[1],bifurGaussFrac_[2]);
+	 bifurGaussFrac.setConstant(false);
+      } 
 
       // The total signal PDF
       RooAddPdf  signalShapePdf("signalShapePdf", "signalShapePdf",
-				signalVoigtPdf,signalGaussBifurPdf,fBifurGauss);
+				signalVoigtPdf,signalGaussBifurPdf,bifurGaussFrac);
 
       // ********** Construct background shape PDF ********** //
 
       // Background PDF variables
-      RooRealVar bkgAlpha("bkgAlpha","bkgAlpha",bkgAlpha_);
-      RooRealVar bkgBeta("bkgBeta","bkgBeta",bkgBeta_);
-      RooRealVar bkgGamma("bkgGamma","bkgGamma",bkgGamma_[0],bkgGamma_[1],bkgGamma_[2]);
-      RooRealVar bkgPeak("bkgPeak","bkgPeak",bkgPeak_);
+      RooRealVar bkgAlpha("bkgAlpha","bkgAlpha",bkgAlpha_[0]);
+      RooRealVar bkgBeta("bkgBeta","bkgBeta",bkgBeta_[0]);
+      RooRealVar bkgGamma("bkgGamma","bkgGamma",bkgGamma_[0]);
+      RooRealVar bkgPeak("bkgPeak","bkgPeak",bkgPeak_[0]);
+
+      // If the user has specified a range, let the bkg shape 
+      // variables float in the fit
+      if( bkgAlpha_.size() == 3 )
+      {
+	 bkgAlpha.setRange(bkgAlpha_[1],bkgAlpha_[2]);
+	 bkgAlpha.setConstant(false);
+      }
+      if( bkgBeta_.size() == 3 )
+      {
+	 bkgBeta.setRange(bkgBeta_[1],bkgBeta_[2]);
+	 bkgBeta.setConstant(false);
+      }
+      if( bkgGamma_.size() == 3 )
+      {
+	 bkgGamma.setRange(bkgGamma_[1],bkgGamma_[2]);
+	 bkgGamma.setConstant(false);
+      }
+      if( bkgPeak_.size() == 3 )
+      {
+	 bkgPeak.setRange(bkgPeak_[1],bkgPeak_[2]);
+	 bkgPeak.setConstant(false);
+      }
 
       // CMS Background shape
       RooCMSShapePdf bkgShapePdf("bkgShapePdf","bkgShapePdf", 
-				 Mass,bkgAlpha,bkgBeta,bkgGamma,signalMean) ;
+				 Mass,bkgAlpha,bkgBeta,bkgGamma,bkgPeak);
 
-      // Now define some efficiency variables  
-      RooRealVar efficiency("efficiency","efficiency",
-			    efficiency_[0],efficiency_[1],efficiency_[2]);
-      RooRealVar nSig("nSig","nSig",
-		      numSignal_[0],numSignal_[1],numSignal_[2]);
-      RooRealVar nBkgpass("nBkgpass","nBkgpass",
-			  numBkgPass_[0],numBkgPass_[1],numBkgPass_[2]);
-      RooRealVar nBkgfail("nBkgfail","nBkgfail",
-			  numBkgFail_[0],numBkgFail_[1],numBkgFail_[2]);
+      // Now define some efficiency/yield variables  
+      RooRealVar efficiency("efficiency","efficiency",efficiency_[0]);
+      RooRealVar numSignal("numSignal","numSignal",numSignal_[0]);
+      RooRealVar numBkgPass("numBkgPass","numBkgPass",numBkgPass_[0]);
+      RooRealVar numBkgFail("numBkgFail","numBkgFail",numBkgFail_[0]);
 
-      RooFormulaVar nSigpass("nSigpass","nSig*efficiency", RooArgList(nSig,efficiency) );
-      RooFormulaVar nSigfail("nSigfail","nSig*(1.0 - efficiency)", RooArgList(nSig,efficiency) );
+      // If ranges are specifed these are floating variables
+      if( efficiency_.size() == 3 )
+      {
+	 efficiency.setRange(efficiency_[1],efficiency_[2]);
+	 efficiency.setConstant(false);
+      }
+      if( numSignal_.size() == 3 )
+      {
+	 numSignal.setRange(numSignal_[1],numSignal_[2]);
+	 numSignal.setConstant(false);
+      }
+      if( numBkgPass_.size() == 3 )
+      {
+	 numBkgPass.setRange(numBkgPass_[1],numBkgPass_[2]);
+	 numBkgPass.setConstant(false);
+      }
+      if( numBkgFail_.size() == 3 )
+      {
+	 numBkgFail.setRange(numBkgFail_[1],numBkgFail_[2]);
+	 numBkgFail.setConstant(false);
+      }
+      
+
+      RooFormulaVar numSigPass("numSigPass","numSignal*efficiency", 
+			       RooArgList(numSignal,efficiency) );
+      RooFormulaVar numSigFail("numSigFail","numSignal*(1.0 - efficiency)", 
+			       RooArgList(numSignal,efficiency) );
 
       RooArgList componentspass(signalShapePdf,bkgShapePdf);
-      RooArgList yieldspass(nSigpass, nBkgpass);
+      RooArgList yieldspass(numSigPass, numBkgPass);
       RooArgList componentsfail(signalShapePdf,bkgShapePdf);
-      RooArgList yieldsfail(nSigfail, nBkgfail);	  
+      RooArgList yieldsfail(numSigFail, numBkgFail);	  
 
       RooAddPdf sumpass("sumpass","fixed extended sum pdf",componentspass,yieldspass);
       RooAddPdf sumfail("sumfail","fixed extended sum pdf",componentsfail, yieldsfail);
-
-      // Make the category variable that defines the two fits,
-      // namely whether the probe passes or fails the eff criteria.
-      RooCategory ProbePass("ProbePass","sample");
-      ProbePass.defineType("pass",1);
-      ProbePass.defineType("fail",0);  
   
       // The total simultaneous fit ...
       RooSimultaneous totalPdf("totalPdf","totalPdf",ProbePass);
@@ -470,17 +613,6 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
       ProbePass.setLabel("fail");
       totalPdf.addPdf(sumfail,ProbePass.getLabel());
       totalPdf.Print();
-
-      // Add the TTree as our data set ... with the weight in case 
-      // we are using chained MC
-      RooDataSet* data = new RooDataSet("fitData","fitData",&fitTree,
-					RooArgSet(ProbePass,Mass,Pt,Weight));
-      data->get()->Print();
-      data->setWeightVar("Weight");
-      data->get()->Print();
-
-      RooDataHist *bdata = new RooDataHist("bdata","Binned Data",
-					   RooArgList(Mass,ProbePass),*data);
 
       // Count the number of passing and failing probes in the region
       // making sure we have enough to fit ...
@@ -503,7 +635,8 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
 
 	 if (pdf && dset && dset->numEntries(kTRUE)!=0.) 
 	 {               
-	    cout << "GOF Entries " << dset->numEntries() << " " <<type->GetName() << std::endl;
+	    cout << "GOF Entries " << dset->numEntries() << " " 
+		 << type->GetName() << std::endl;
 	    if( (string)type->GetName() == "pass" ) 
 	    {
 	       npassR = dset->numEntries(); 
@@ -525,21 +658,24 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
 
       // ********* Do the Actual Fit ********** //  
       RooFitResult *fitResult = 0;
-      //RooNLLVar nll("nll","nll",totalPdf,*data,kTRUE);
+      //RooNLLVar nll("nll","nll",totalPdf,*bdata,kTRUE);
       //RooMinuit m(nll);
-      RooChi2Var chi2("chi2","chi2",totalPdf,*bdata,DataError(RooAbsData::SumW2));
+      RooChi2Var chi2("chi2","chi2",totalPdf,*bdata,
+		      DataError(RooAbsData::SumW2),Extended(kTRUE));
       RooMinuit m(chi2);
       m.setErrorLevel(0.5); // <<< HERE
-      //m.setStrategy(2);
-      //m.hesse();
+      m.setStrategy(2);
+      m.hesse();
       m.migrad();
-      //m.hesse();
-      //m.minos();
+      m.hesse();
+      m.minos();
       fitResult = m.save();
 
-      std::cout << "Signal yield: " << nSig.getVal() << " +- "
-		<< nSig.getError() << " + " << nSig.getAsymErrorHi()
-		<<" - "<< nSig.getAsymErrorLo() << std::endl;
+      fitResult->Print("v");
+
+      std::cout << "Signal yield: " << numSignal.getVal() << " +- "
+		<< numSignal.getError() << " + " << numSignal.getAsymErrorHi()
+		<<" - "<< numSignal.getAsymErrorLo() << std::endl;
       std::cout << "Efficiency: "<< efficiency.getVal() << " +- "
 		<< efficiency.getError() << " + " << efficiency.getAsymErrorHi()
 		<<" + "<< efficiency.getAsymErrorLo() << std::endl;
@@ -550,7 +686,33 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
 
       // ********** Make and save Canvas for the plots ********** //
       outRootFile.cd();
-      
+
+      int font_num = 42;
+      double font_size = 0.05;
+
+      TStyle fitStyle("fitStyle","Style for Fit Plots");
+      fitStyle.Reset("Plain");
+      fitStyle.SetFillColor(10);
+      fitStyle.SetTitleFillColor(10);
+      fitStyle.SetTitleStyle(0000);
+      fitStyle.SetStatColor(10);
+      fitStyle.SetErrorX(0);
+      fitStyle.SetEndErrorSize(10);
+      fitStyle.SetPadBorderMode(0);
+      fitStyle.SetFrameBorderMode(0);
+      //fitStyle.SetOptTitle(0);
+
+      fitStyle.SetTitleFont(font_num);
+      fitStyle.SetTitleFontSize(font_size);
+      fitStyle.SetTitleFont(font_num, "XYZ");
+      fitStyle.SetTitleSize(font_size, "XYZ");
+      fitStyle.SetTitleXOffset(0.9);
+      fitStyle.SetTitleYOffset(1.05);
+      fitStyle.SetLabelFont(font_num, "XYZ");
+      fitStyle.SetLabelOffset(0.007, "XYZ");
+      fitStyle.SetLabelSize(font_size, "XYZ");
+      fitStyle.cd();
+
       ostringstream oss;
       oss << bin;
       string cname = "c_" + bvar + "_" + oss.str();
@@ -562,8 +724,8 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
       lhs->Divide(2,1);
       lhs->cd(1);
 
-      RooPlot* frame1 = Mass.frame(60);
-      frame1->SetTitle("");
+      RooPlot* frame1 = Mass.frame();
+      frame1->SetTitle("Passing Tag-Probes");
       frame1->SetName("pass");
       data->plotOn(frame1,Cut("ProbePass==1"));
       ProbePass.setLabel("pass");
@@ -576,8 +738,8 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
       //frame1->Write();
 
       lhs->cd(2);
-      RooPlot* frame2 = Mass.frame(60);
-      frame2->SetTitle("");
+      RooPlot* frame2 = Mass.frame();
+      frame2->SetTitle("Failing Tag-Probes");
       frame2->SetName("fail");
       data->plotOn(frame2,Cut("ProbePass==0"));
       ProbePass.setLabel("fail");
@@ -590,8 +752,8 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
       //frame2->Write();
 
       c->cd(2);
-      RooPlot* frame3 = Mass.frame(60);
-      frame3->SetTitle("");
+      RooPlot* frame3 = Mass.frame();
+      frame3->SetTitle("All Tag-Probes");
       frame3->SetName("total");
       data->plotOn(frame3);
       totalPdf.plotOn(frame3,ProjWData(Mass,*data));
@@ -609,6 +771,9 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
       c->Write();
 
       std::cout << " Stop 1 " << std::endl;
+
+      delete data;
+      delete bdata;
    }
 
    outRootFile.cd();
@@ -624,46 +789,14 @@ void Histogrammer::ZllEffFitter( TTree &fitTree, string &fileName, string &bvar,
 // ********** Get the efficiency from this TTree ********** //
 void Histogrammer::CalculateEfficiencies()
 {
+   if( calcEffsTruth_ ) CalculateMCTruthEfficiencies();
+
    if( calcEffsFitter_ )
    {
       // Loop over the number of different types of 
       // efficiency measurement in the input tree
       // Make a simple tree for fitting, and then
       // call the fitter.
-
-      int tagprobe_type = 0;   // If more than one eff loop over this ...
-
-      Int_t           nrtp;
-      Int_t           tp_type[100];
-      Int_t           tp_true[100];
-      Int_t           tp_ppass[100];
-      Float_t         tp_mass[100]; 
-      Float_t         tp_dpt[100][2];
-      Float_t         tp_deta[100][2];
-      
-      TBranch        *b_nrtp;   
-      TBranch        *b_tp_true;   
-      TBranch        *b_tp_type;   
-      TBranch        *b_tp_ppass;   
-      TBranch        *b_tp_mass;   
-      TBranch        *b_tp_dpt;   
-      TBranch        *b_tp_deta;   
-
-      fChain_->SetBranchAddress("nrtp", &nrtp, &b_nrtp);
-      fChain_->SetBranchAddress("tp_true", tp_true, &b_tp_true);
-      fChain_->SetBranchAddress("tp_type", tp_type, &b_tp_type);
-      fChain_->SetBranchAddress("tp_ppass", tp_ppass, &b_tp_ppass);
-      fChain_->SetBranchAddress("tp_mass", tp_mass, &b_tp_mass);
-      fChain_->SetBranchAddress("tp_dpt", tp_dpt, &b_tp_dpt);
-      fChain_->SetBranchAddress("tp_deta", tp_deta, &b_tp_deta);
-
-      fChain_->SetBranchStatus("*",0);
-      fChain_->SetBranchStatus("nrtp",1);
-      fChain_->SetBranchStatus("tp_type",1);
-      fChain_->SetBranchStatus("tp_ppass",1);
-      fChain_->SetBranchStatus("tp_mass",1);
-      fChain_->SetBranchStatus("tp_dpt",1);
-      fChain_->SetBranchStatus("tp_deta",1);
 
       // Make the simple fit tree
       int    ProbePass;
@@ -672,12 +805,12 @@ void Histogrammer::CalculateEfficiencies()
       double Eta;
       double Weight;
 
-      TTree fitTree("fitter_tree","Tree For Fitting",1);
-      fitTree.Branch("ProbePass",&ProbePass,"ProbePass/I");
-      fitTree.Branch("Mass",     &Mass,     "Mass/D");
-      fitTree.Branch("Pt",       &Pt,       "Pt/D");
-      fitTree.Branch("Eta",      &Eta,      "Eta/D");
-      fitTree.Branch("Weight",   &Weight,   "Weight/D");
+      TTree *fitTree = new TTree("fitter_tree","Tree For Fitting",1);
+      fitTree->Branch("ProbePass",&ProbePass,"ProbePass/I");
+      fitTree->Branch("Mass",     &Mass,     "Mass/D");
+      fitTree->Branch("Pt",       &Pt,       "Pt/D");
+      fitTree->Branch("Eta",      &Eta,      "Eta/D");
+      fitTree->Branch("Weight",   &Weight,   "Weight/D");
 
       int nFile = 0;
       Weight = 1.0;
@@ -702,18 +835,27 @@ void Histogrammer::CalculateEfficiencies()
 	    cout << "Filling fit tree with weight " << Weight << endl;
 	 }
 
-	 for( int n=0; n<nrtp; ++n )
+	 for( int n=0; n<nrtp_; ++n )
 	 {
-	    if( tp_type[n] != tagprobe_type ) continue;
+	    if( tp_type_[n] != tagProbeType_ ) continue;
 
-	    ProbePass = tp_ppass[n];
-	    Mass      = (double)tp_mass[n];
-	    Pt        = (double)tp_dpt[n][1];
-	    Eta       = (double)tp_deta[n][1];
+	    ProbePass = tp_ppass_[n];
+	    Mass      = (double)tp_mass_[n];
+	    Pt        = (double)tp_dpt_[n][1];
+	    Eta       = (double)tp_deta_[n][1];
 
-	    fitTree.Fill();
+	    fitTree->Fill();
 	 }
       }
+
+      // Write the new TTree to the file for storage
+      string fmode = "UPDATE";
+      if( !calcEffsTruth_ ) fmode = "RECREATE";
+      TFile outRootFile(fitFileName_.c_str(),fmode.c_str());
+      outRootFile.cd();
+      cout << "Writing tree" << endl; 
+      fitTree->Write(); 
+      outRootFile.Close();
 
       // We have filled the simple tree ... call the fitter
       string binnedVar = "Pt";
@@ -726,8 +868,73 @@ void Histogrammer::CalculateEfficiencies()
    if( calcEffsSB_ )
    {
       // Need to fill this function
-      return;
    }
+
+   return;
+}
+// ******************************************************** //
+
+// ********** Get the true efficiency from this TTree ********** //
+void Histogrammer::CalculateMCTruthEfficiencies()
+{
+   // Loop over the number of different types of 
+   // efficiency measurement in the input tree
+   // Make a simple tree for fitting, and then
+   // call the fitter.
+   cout << "HEre in MC truth" << endl;
+
+   // The Pt and Eta histograms
+   TH1F ptPass("hptpass","Pt Pass",ptNbins_,ptLow_,ptHigh_);
+   TH1F ptAll("hptall","Pt All",ptNbins_,ptLow_,ptHigh_);
+
+   TH1F etaPass("hetapass","Eta Pass",etaNbins_,etaLow_,etaHigh_);
+   TH1F etaAll("hetaall","Eta All",etaNbins_,etaLow_,etaHigh_);
+
+   //for( int i=0; i<fChain_->GetEntries(); ++i )
+   for( int i=0; i<NumEvents_[0]; ++i )
+   {
+      fChain_->GetEntry(i);
+
+      for( int n=0; n<ncnd_; ++n )
+      {
+	 if( cnd_type_[n] != tagProbeType_ ) continue;
+	 
+	 // These are swapped for now because of an old bug
+	 if( cnd_aprobe_[n] == 1 && cnd_pprobe_[n] == 1 )
+	 {
+	    ptPass.Fill(cnd_pt_[n]);
+	    etaPass.Fill(cnd_eta_[n]);
+	 }
+	 if( cnd_aprobe_[n] == 1 )
+	 {
+	    ptAll.Fill(cnd_pt_[n]);
+	    etaAll.Fill(cnd_eta_[n]);
+	 }
+      }
+   }
+
+   TFile outRootFile(fitFileName_.c_str(),"RECREATE");
+   outRootFile.cd();
+   cout << "Writing MC Truth Eff hists!" << endl; 
+
+   string hname = "truth_eff_Pt";
+   string htitle = "Efficiency vs Pt";
+   TH1F pteffhist(hname.c_str(),htitle.c_str(),ptNbins_,ptLow_,ptHigh_);
+   pteffhist.Sumw2();
+   pteffhist.Divide(&ptPass,&ptAll,1.0,1.0,"B");
+   pteffhist.Write();
+
+   outRootFile.cd();
+   hname = "truth_eff_Eta";
+   htitle = "Efficiency vs Eta";
+   TH1F etaeffhist(hname.c_str(),htitle.c_str(),etaNbins_,etaLow_,etaHigh_);
+   etaeffhist.Sumw2();
+   etaeffhist.Divide(&etaPass,&etaAll,1.0,1.0,"B");
+   etaeffhist.Write();
+
+   outRootFile.Close();
+
+   return;
 }
 // ******************************************************** //
 
