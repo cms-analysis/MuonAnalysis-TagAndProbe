@@ -13,13 +13,12 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.7 2008/04/24 19:45:09 ahunt Exp $
+// $Id: Histogrammer.cc,v 1.8 2008/04/30 15:30:40 neadam Exp $
 //
 //
 
 #include "MuonAnalysis/TagAndProbe/interface/Histogrammer.h"
 #include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
-
 
 // ROOT headers
 
@@ -98,6 +97,11 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    etaNbins_       = iConfig.getUntrackedParameter< int >("NumBinsEta",20);
    etaLow_         = iConfig.getUntrackedParameter< double >("EtaLow",-2.4);
    etaHigh_        = iConfig.getUntrackedParameter< double >("EtaHigh",2.4);
+
+   // SBS
+
+   SBSPeak_     = iConfig.getUntrackedParameter< double >("SBSPeak",90);
+   SBSStanDev_  = iConfig.getUntrackedParameter< double >("SBSStanDev",2);
 
    // Fitter variables
    vector<double> dSigM;
@@ -187,18 +191,18 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    }
 
    fChain_->SetBranchStatus("*",0);
-   if( calcEffsFitter_ )
+   if( calcEffsFitter_ || calcEffsSB_ )
    {
       fChain_->SetBranchAddress("nrtp", &nrtp_, &b_nrtp_);
       fChain_->SetBranchAddress("tp_true", tp_true_, &b_tp_true_);
-      fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
+      // fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
       fChain_->SetBranchAddress("tp_ppass", tp_ppass_, &b_tp_ppass_);
       fChain_->SetBranchAddress("tp_mass", tp_mass_, &b_tp_mass_);
       fChain_->SetBranchAddress("tp_dpt", tp_dpt_, &b_tp_dpt_);
       fChain_->SetBranchAddress("tp_deta", tp_deta_, &b_tp_deta_);
       
       fChain_->SetBranchStatus("nrtp",1);
-      fChain_->SetBranchStatus("tp_type",1);
+      //fChain_->SetBranchStatus("tp_type",1);
       fChain_->SetBranchStatus("tp_ppass",1);
       fChain_->SetBranchStatus("tp_mass",1);
       fChain_->SetBranchStatus("tp_dpt",1);
@@ -208,14 +212,14 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    {
       fChain_->SetBranchAddress("ncnd", &ncnd_, &b_ncnd_);
       fChain_->SetBranchAddress("cnd_tag", cnd_tag_, &b_cnd_tag_);
-      fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
+      //fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
       fChain_->SetBranchAddress("cnd_pprobe", cnd_pprobe_, &b_cnd_pprobe_);
       fChain_->SetBranchAddress("cnd_aprobe", cnd_aprobe_, &b_cnd_aprobe_);
       fChain_->SetBranchAddress("cnd_pt", cnd_pt_, &b_cnd_pt_);
       fChain_->SetBranchAddress("cnd_eta", cnd_eta_, &b_cnd_eta_);
 
       fChain_->SetBranchStatus("ncnd",1);
-      fChain_->SetBranchStatus("cnd_type",1);
+      //fChain_->SetBranchStatus("cnd_type",1);
       fChain_->SetBranchStatus("cnd_pprobe",1);
       fChain_->SetBranchStatus("cnd_aprobe",1);
       fChain_->SetBranchStatus("cnd_pt",1);
@@ -345,6 +349,143 @@ int Histogrammer::SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY
 }
 // ***************************************************** //
 
+// ****************** Zll Eff Side band subtraction *************
+
+
+void Histogrammer::ZllEffSBS( string &fileName, string &bvar, int bnbins, double blow, double bhigh )
+{
+
+  string fmode = "UPDATE";
+  if( !calcEffsTruth_  && !calcEffsFitter_) fmode = "RECREATE";
+  TFile outRootFile(fileName.c_str(),fmode.c_str());
+  outRootFile.cd();
+  
+   //return;
+   cout << "***** Here in Zll sideband subtraction ******" << endl;
+   
+   string hname = "heff_sbs_" + bvar;
+   string htitle = "SBS Efficiency vs " + bvar;
+
+   stringstream condition;
+   stringstream histoName;
+   stringstream histoTitle;;
+
+   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,blow,bhigh);
+
+   double bwidth = (bhigh-blow)/(double)bnbins;
+
+   TH1F* PassProbes;
+   TH1F* FailProbes;
+
+   TH1F* SBSPassProbes;
+   TH1F* SBSFailProbes;
+
+   const int XBinsSBS = massNbins_;
+   const int XMinSBS = massLow_;
+   const int XMaxSBS = massHigh_;
+
+   double Mean = SBSPeak_;
+   double SD = SBSPeak_;
+
+   for( int bin=0; bin<bnbins; ++bin )
+   {
+ 
+      // The binning variable
+      string bunits = "";
+      double lowEdge = blow + (double)bin*bwidth;
+      double highEdge = lowEdge + bwidth;
+      if( bvar == "Pt" ) bunits = "GeV";
+
+      // Passing Probes
+      condition.str(std::string());
+      if(bvar == "Pt"){
+	condition  << "(tp_ppass == 1) && (tp_dpt[][1] > " <<  lowEdge << ") && (tp_dpt[][1] < " << highEdge << ")";
+      }else if(bvar == "Eta"){
+	condition  << "(tp_ppass == 1) && (tp_deta[][1] > " <<  lowEdge << ") && (tp_deta[][1] < " << highEdge << ")";
+      }
+      histoName.str(std::string());
+      histoName << "PassProbes_" << bvar << "_" << bin;
+      histoTitle.str(std::string());
+      histoTitle << "Passing Probes - " << lowEdge << " < " << bvar << " < " << highEdge;
+      PassProbes = new TH1F(histoName.str().c_str(), histoTitle.str().c_str(), XBinsSBS, XMinSBS, XMaxSBS); 
+      fChain_->Draw(("tp_mass >> " + histoName.str()).c_str(), condition.str().c_str() );
+
+      // Failing Probes
+      condition.str(std::string());
+      if(bvar == "Pt"){
+	condition  << "(tp_ppass == 0) && (tp_dpt[][1] > " <<  lowEdge << ") && (tp_dpt[][1] < " << highEdge << ")";
+      }else if(bvar == "Eta"){
+	condition  << "(tp_ppass == 0) && (tp_deta[][1] > " <<  lowEdge << ") && (tp_deta[][1] < " << highEdge << ")";
+      }
+      histoName.str(std::string());
+      histoName << "FailProbes_" <<  bvar << "_" << bin;
+      histoTitle.str(std::string());
+      histoTitle << "Failing Probes - " << lowEdge << " < " << bvar << " < " << highEdge;
+      FailProbes = new TH1F(histoName.str().c_str(), histoTitle.str().c_str(), XBinsSBS, XMinSBS, XMaxSBS); 
+      fChain_->Draw(("tp_mass >> " + histoName.str()).c_str(), condition.str().c_str());
+
+      // SBS Passing  Probes
+      histoName.str(std::string());
+      histoName << "SBSPassProbes_" << bvar << "_" << bin;
+      histoTitle.str(std::string());
+      histoTitle << "Passing Probes SBS - "  << lowEdge << " < " << bvar << " < " << highEdge;
+      SBSPassProbes = new TH1F(histoName.str().c_str(), histoTitle.str().c_str(), XBinsSBS, XMinSBS, XMaxSBS); 
+
+      // SBS Failing Probes
+      histoName.str(std::string());
+      histoName << "SBSFailProbes_" << bvar << "_" << bin; 
+      histoTitle.str(std::string());
+      histoTitle << "Failing Probes SBS - "  << lowEdge << " < " << bvar << " < " << highEdge;
+      SBSFailProbes = new TH1F(histoName.str().c_str(), histoTitle.str().c_str(), XBinsSBS, XMinSBS, XMaxSBS); 
+
+      // Perform side band subtraction
+
+      SideBandSubtraction(*PassProbes, *SBSPassProbes, Mean, SD);
+      SideBandSubtraction(*FailProbes, *SBSFailProbes, Mean, SD);
+
+      // Count the number of passing and failing probes in the region
+      cout << "About to count the number of events" << endl;
+      double npassR = SBSPassProbes->Integral("width");
+      double nfailR = SBSFailProbes->Integral("width");
+
+      if((npassR + nfailR) != 0){
+	Double_t eff = npassR/(npassR + nfailR);
+	Double_t effErr = sqrt(npassR * nfailR / (npassR + nfailR))/(npassR + nfailR);
+
+	cout << "Num pass " << npassR << endl;
+	cout << "Num fail " << nfailR << endl;
+	cout << "Eff " << eff << endl;
+	cout << "Eff error " << effErr << endl;
+	sleep(2);
+
+	// Fill the efficiency hist
+	effhist.SetBinContent(bin+1,eff);
+	effhist.SetBinError(bin+1,effErr);
+      }else {
+	cout << " no probes " << endl;
+      }
+
+
+      // ********** Make and save Canvas for the plots ********** //
+
+      outRootFile.cd();
+
+      PassProbes->Write();
+      FailProbes->Write();
+
+      SBSPassProbes->Write();
+      SBSFailProbes->Write();
+   }
+
+   
+   outRootFile.cd();
+   effhist.Write();
+
+   outRootFile.Close();
+
+   return;
+
+}
 
 // ********* Do sideband subtraction on the requested histogram ********* //
 void Histogrammer::SideBandSubtraction( const TH1F& Total, TH1F& Result, 
@@ -410,7 +551,6 @@ void Histogrammer::SBSExample(){
 
 }
 // ******************************************** //
-
 
 // ********** Z -> l+l- Fitter ********** //
 void Histogrammer::ZllEffFitter( TTree *fitTree, string &fileName, string &bvar,
@@ -837,7 +977,7 @@ void Histogrammer::CalculateEfficiencies()
 
 	 for( int n=0; n<nrtp_; ++n )
 	 {
-	    if( tp_type_[n] != tagProbeType_ ) continue;
+	   //if( tp_type_[n] != tagProbeType_ ) continue;
 
 	    ProbePass = tp_ppass_[n];
 	    Mass      = (double)tp_mass_[n];
@@ -867,7 +1007,14 @@ void Histogrammer::CalculateEfficiencies()
 
    if( calcEffsSB_ )
    {
-      // Need to fill this function
+     std::cout << "*** Entering sideband subtraction ****" << std::endl;
+
+      // We have filled the simple tree ... call side band subtraction
+      string binnedVar = "Pt";
+      ZllEffSBS(  fitFileName_, binnedVar, ptNbins_, ptLow_, ptHigh_ );
+      binnedVar = "Eta";
+      ZllEffSBS(  fitFileName_, binnedVar, etaNbins_, etaLow_, etaHigh_ );
+
    }
 
    return;
@@ -897,15 +1044,15 @@ void Histogrammer::CalculateMCTruthEfficiencies()
 
       for( int n=0; n<ncnd_; ++n )
       {
-	 if( cnd_type_[n] != tagProbeType_ ) continue;
+	//if( cnd_type_[n] != tagProbeType_ ) continue;
 	 
 	 // These are swapped for now because of an old bug
-	 if( cnd_aprobe_[n] == 1 && cnd_pprobe_[n] == 1 )
+	 if( cnd_pprobe_[n] == 1 && cnd_aprobe_[n] == 1 )
 	 {
 	    ptPass.Fill(cnd_pt_[n]);
 	    etaPass.Fill(cnd_eta_[n]);
 	 }
-	 if( cnd_aprobe_[n] == 1 )
+	 if( cnd_pprobe_[n] == 1 )
 	 {
 	    ptAll.Fill(cnd_pt_[n]);
 	    etaAll.Fill(cnd_eta_[n]);

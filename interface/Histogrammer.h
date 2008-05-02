@@ -39,8 +39,12 @@ class Histogrammer : public edm::EDAnalyzer
       int SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY);
 
       void SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD);
+    
       void ZllEffFitter( TTree *fitTree, std::string &fileName, std::string &bvar,
 			 int bnbins, double blow, double nhigh );
+      void ZllEffSBS( std::string &fileName, std::string &bvar,
+			 int bnbins, double blow, double nhigh );
+
       void CalculateEfficiencies();
       void CalculateMCTruthEfficiencies();
       void SBSExample();
@@ -82,6 +86,7 @@ class Histogrammer : public edm::EDAnalyzer
       double etaLow_;           // Lower bound for eta eff range
       double etaHigh_;          // Upper bound for eta eff range
 
+
       std::vector<double> signalMean_;       // Fit mean
       std::vector<double> signalWidth_;      // Fit width
       std::vector<double> signalSigma_;      // Fit sigma
@@ -100,6 +105,9 @@ class Histogrammer : public edm::EDAnalyzer
       std::vector<double> numBkgPass_;       // Background events passing from fit
       std::vector<double> numBkgFail_;       // Background events failing from fit
 
+
+      double SBSPeak_;
+      double SBSStanDev_;
 
       TChain* fChain_;
       TH1F* Histograms_;
