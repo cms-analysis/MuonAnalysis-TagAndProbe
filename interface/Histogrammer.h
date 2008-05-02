@@ -42,12 +42,11 @@ class Histogrammer : public edm::EDAnalyzer
     
       void ZllEffFitter( TTree *fitTree, std::string &fileName, std::string &bvar,
 			 int bnbins, double blow, double nhigh );
-      void ZllEffSBS( std::string &fileName, std::string &bvar,
+      void ZllEffSBS( TTree *fitTree, std::string &fileName, std::string &bvar,
 			 int bnbins, double blow, double nhigh );
 
       void CalculateEfficiencies();
       void CalculateMCTruthEfficiencies();
-      void SBSExample();
 
       std::vector<std::string> fileNames_;
 
