@@ -65,9 +65,6 @@ class TagProbeAnalyzer : public edm::EDAnalyzer
       int ProbePassProbeOverlap( const reco::CandidateRef& probe, 
 				 edm::Handle<reco::CandidateCollection>& passprobes );
 
-      bool MatchObjects( reco::CandidateBaseRef hltObj, 
-			 const reco::CandidateRef& tagObj );
-
       bool MatchObjects( const reco::Candidate *hltObj, 
 			 const reco::CandidateRef& tagObj );
 
@@ -111,6 +108,7 @@ class TagProbeAnalyzer : public edm::EDAnalyzer
       edm::InputTag PvxtTag_;
 
       // Trigger parameters
+      edm::InputTag triggerEventTag_;
       edm::InputTag hltL1Tag_;
       edm::InputTag hltTag_;
       double delRMatchingCut_;

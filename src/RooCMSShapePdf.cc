@@ -1,5 +1,6 @@
 
 #include "RooAbsPdf.h"
+#include "RooMath.h"
 #include "RooRealProxy.h"
 #include "RooAbsReal.h"
 #include "TFile.h"
@@ -37,7 +38,8 @@
  { 
   // ENTER EXPRESSION IN TERMS OF VARIABLE ARGUMENTS HERE 
 
-  Double_t erf = TMath::Erfc((alpha - x) * beta);
+  //Double_t erf = TMath::Erfc((alpha - x) * beta);
+  Double_t erf = RooMath::erfc((alpha - x) * beta);
   Double_t u = (x - peak)*gamma;
 
   if(u < -70) u = 1e20;

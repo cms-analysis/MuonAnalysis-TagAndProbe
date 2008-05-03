@@ -16,7 +16,7 @@
 //
 // Original Author: Nadia Adam
 //         Created:  Tue Oct 31 10:23:32 CST 2006
-// $Id: EvtTree.h,v 1.3 2008/04/21 14:02:04 neadam Exp $
+// $Id: EvtTree.h,v 1.2 2008/04/14 18:22:39 neadam Exp $
 //
 
 // system include files
@@ -280,6 +280,7 @@ class EvtTree
 	 ncnd = 0;
 	 for( int ij = 0; ij<MAXNMU; ij++ )
 	 {
+	    cnd_type[ij] = -999;
 	    cnd_tag[ij] = -999;
 	    cnd_aprobe[ij] = -999;
 	    cnd_pprobe[ij] = -999;

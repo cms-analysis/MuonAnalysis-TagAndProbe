@@ -13,12 +13,13 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.10 2008/05/02 17:28:55 ahunt Exp $
+// $Id: Histogrammer.cc,v 1.7 2008/04/24 19:45:09 ahunt Exp $
 //
 //
 
 #include "MuonAnalysis/TagAndProbe/interface/Histogrammer.h"
 #include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
+
 
 // ROOT headers
 
@@ -99,7 +100,6 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    etaHigh_        = iConfig.getUntrackedParameter< double >("EtaHigh",2.4);
 
    // SBS
-
    SBSPeak_     = iConfig.getUntrackedParameter< double >("SBSPeak",90);
    SBSStanDev_  = iConfig.getUntrackedParameter< double >("SBSStanDev",2);
 
@@ -172,6 +172,7 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    dNBFl.push_back(1000000.0);
    numBkgFail_      = iConfig.getUntrackedParameter< vector<double> >("NumBkgFail",dNBFl);
 
+   
    // Allocate space for histograms
    numQuantities_ = quantities_.size();
    Histograms_ = new TH1F[numQuantities_];
@@ -190,18 +191,18 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    }
 
    fChain_->SetBranchStatus("*",0);
-   if( calcEffsFitter_ || calcEffsSB_ )
+   if( calcEffsFitter_ )
    {
       fChain_->SetBranchAddress("nrtp", &nrtp_, &b_nrtp_);
       fChain_->SetBranchAddress("tp_true", tp_true_, &b_tp_true_);
-      fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
+      //fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
       fChain_->SetBranchAddress("tp_ppass", tp_ppass_, &b_tp_ppass_);
       fChain_->SetBranchAddress("tp_mass", tp_mass_, &b_tp_mass_);
       fChain_->SetBranchAddress("tp_dpt", tp_dpt_, &b_tp_dpt_);
       fChain_->SetBranchAddress("tp_deta", tp_deta_, &b_tp_deta_);
       
       fChain_->SetBranchStatus("nrtp",1);
-      fChain_->SetBranchStatus("tp_type",1);
+      //fChain_->SetBranchStatus("tp_type",1);
       fChain_->SetBranchStatus("tp_ppass",1);
       fChain_->SetBranchStatus("tp_mass",1);
       fChain_->SetBranchStatus("tp_dpt",1);
@@ -211,14 +212,14 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    {
       fChain_->SetBranchAddress("ncnd", &ncnd_, &b_ncnd_);
       fChain_->SetBranchAddress("cnd_tag", cnd_tag_, &b_cnd_tag_);
-      fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
+      //fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
       fChain_->SetBranchAddress("cnd_pprobe", cnd_pprobe_, &b_cnd_pprobe_);
       fChain_->SetBranchAddress("cnd_aprobe", cnd_aprobe_, &b_cnd_aprobe_);
       fChain_->SetBranchAddress("cnd_pt", cnd_pt_, &b_cnd_pt_);
       fChain_->SetBranchAddress("cnd_eta", cnd_eta_, &b_cnd_eta_);
 
       fChain_->SetBranchStatus("ncnd",1);
-      fChain_->SetBranchStatus("cnd_type",1);
+      //fChain_->SetBranchStatus("cnd_type",1);
       fChain_->SetBranchStatus("cnd_pprobe",1);
       fChain_->SetBranchStatus("cnd_aprobe",1);
       fChain_->SetBranchStatus("cnd_pt",1);
@@ -267,6 +268,7 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
       if( lumi_[i]>0.0 && xsection_[i]>0.0 ) weight_.push_back(lumi_[i]*xsection_[i]);
       else                                   weight_.push_back(1.0);
    }
+
 }
 
 Histogrammer::~Histogrammer()
@@ -300,7 +302,6 @@ Histogrammer::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    CalculateEfficiencies();
-   //SBSExample();
 }
 
 // ******* Create the user requested histograms ******** //
@@ -526,6 +527,8 @@ void Histogrammer::ZllEffFitter( TTree *fitTree, string &fileName, string &bvar,
 {
    TFile outRootFile(fileName.c_str(),"UPDATE");
    outRootFile.cd();
+   TChain *nFitTree = new TChain();
+   nFitTree->Add((fileName+"/fitter_tree").c_str());
 
    //return;
    cout << "Here in Zll fitter" << endl;
@@ -567,7 +570,7 @@ void Histogrammer::ZllEffFitter( TTree *fitTree, string &fileName, string &bvar,
       //				RooArgSet(ProbePass,Mass,Pt,Weight),"","");
       // Above command doesn't work in root 5.18 (lovely) so we have this
       // silly workaround with TChain for now
-      RooDataSet* data = new RooDataSet("fitData","fitData",fitTree,
+      RooDataSet* data = new RooDataSet("fitData","fitData",(TTree*)nFitTree,
 					RooArgSet(ProbePass,Mass,Pt,Weight));
 
 
@@ -1012,19 +1015,29 @@ void Histogrammer::CalculateMCTruthEfficiencies()
 
       for( int n=0; n<ncnd_; ++n )
       {
-	 if( cnd_type_[n] != tagProbeType_ ) continue;
+	 //if( cnd_type_[n] != tagProbeType_ ) continue;
 	 
 	 // These are swapped for now because of an old bug
-	 if( cnd_aprobe_[n] == 1 && cnd_pprobe_[n] == 1 )
+	 if( cnd_pprobe_[n] == 1 && cnd_aprobe_[n] == 1 )
 	 {
 	    ptPass.Fill(cnd_pt_[n]);
 	    etaPass.Fill(cnd_eta_[n]);
 	 }
-	 if( cnd_aprobe_[n] == 1 )
+	 if( cnd_pprobe_[n] == 1 )
 	 {
 	    ptAll.Fill(cnd_pt_[n]);
 	    etaAll.Fill(cnd_eta_[n]);
 	 }
+// 	 if( cnd_aprobe_[n] == 1 && cnd_pprobe_[n] == 1 )
+// 	 {
+// 	    ptPass.Fill(cnd_pt_[n]);
+// 	    etaPass.Fill(cnd_eta_[n]);
+// 	 }
+// 	 if( cnd_aprobe_[n] == 1 )
+// 	 {
+// 	    ptAll.Fill(cnd_pt_[n]);
+// 	    etaAll.Fill(cnd_eta_[n]);
+// 	 }
       }
    }
 
@@ -1052,7 +1065,6 @@ void Histogrammer::CalculateMCTruthEfficiencies()
    return;
 }
 // ******************************************************** //
-
 
 // ------------ method called once each job just before starting event loop  ------------
 void 

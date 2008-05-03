@@ -39,12 +39,10 @@ class Histogrammer : public edm::EDAnalyzer
       int SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY);
 
       void SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD);
-    
       void ZllEffFitter( TTree *fitTree, std::string &fileName, std::string &bvar,
 			 int bnbins, double blow, double nhigh );
       void ZllEffSBS( TTree *fitTree, std::string &fileName, std::string &bvar,
 			 int bnbins, double blow, double nhigh );
-
       void CalculateEfficiencies();
       void CalculateMCTruthEfficiencies();
 
@@ -67,8 +65,8 @@ class Histogrammer : public edm::EDAnalyzer
       // Fitting/Efficiency calculation inputs
       int tagProbeType_;        // If more than one tag-probe type is stored select
 
-      bool calcEffsSB_;         // Calculate effs using SB subtraction for these TTrees
-      bool calcEffsFitter_;     // Calculate effs using fitter for these TTrees
+      bool calcEffsSB_;         // Calculate effs using SB subtraction for these TTrees?
+      bool calcEffsFitter_;     // Calculate effs using fitter for these TTrees?
       bool calcEffsTruth_;      // Calculate effs using MC truth for these TTrees
 
       std::string fitFileName_; // Name of the root file to write eff info to
@@ -84,7 +82,6 @@ class Histogrammer : public edm::EDAnalyzer
       int etaNbins_;            // Number of eta eff bins
       double etaLow_;           // Lower bound for eta eff range
       double etaHigh_;          // Upper bound for eta eff range
-
 
       std::vector<double> signalMean_;       // Fit mean
       std::vector<double> signalWidth_;      // Fit width
@@ -104,9 +101,8 @@ class Histogrammer : public edm::EDAnalyzer
       std::vector<double> numBkgPass_;       // Background events passing from fit
       std::vector<double> numBkgFail_;       // Background events failing from fit
 
-
-      double SBSPeak_;
-      double SBSStanDev_;
+      double SBSPeak_;                       // Sideband sub peak
+      double SBSStanDev_;                    // Sideband sub standard deviation
 
       TChain* fChain_;
       TH1F* Histograms_;
@@ -147,6 +143,4 @@ class Histogrammer : public edm::EDAnalyzer
       TBranch        *b_cnd_aprobe_;   
       TBranch        *b_cnd_pt_;   
       TBranch        *b_cnd_eta_;   
-
-
 };

@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Tue Mar  4 12:27:53 CST 2008
-// $Id: TagProbeAnalyzer.cc,v 1.1 2008/04/21 14:02:04 neadam Exp $
+// $Id: TagProbeAnalyzer.cc,v 1.2 2008/04/14 19:21:42 neadam Exp $
 //
 //
 
@@ -42,12 +42,18 @@
 #include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/HepMCCandidate/interface/GenParticleCandidate.h"
-#include "DataFormats/HLTReco/interface/HLTFilterObject.h"
+#include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
+#include "DataFormats/HLTReco/interface/TriggerFilterObjectWithRefs.h"
+#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
+#include "DataFormats/L1Trigger/interface/L1MuonParticleFwd.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/RecoCandidate/interface/FitResult.h"
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidateIsolation.h"
 #include "DataFormats/RecoCandidate/interface/RecoCandidate.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
+#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "DataFormats/VertexReco/interface/Vertex.h"
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
@@ -62,6 +68,8 @@
 #include "TrackingTools/Records/interface/TransientTrackRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 
+#define DEBUGLVL 0
+
 //
 // class decleration
 //
@@ -72,6 +80,8 @@
 using namespace std; 
 using namespace reco; 
 using namespace edm;
+using namespace l1extra;
+using namespace trigger;
 
 //
 // static data member definitions
@@ -215,7 +225,11 @@ TagProbeAnalyzer::TagProbeAnalyzer(const ParameterSet& iConfig)
    } 
    // ************************************ //
 
-   // HLT
+   // Trigger
+   const edm::InputTag dTriggerEventTag("triggerSummaryRAW");
+   triggerEventTag_ = 
+      iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",dTriggerEventTag);
+
    const edm::InputTag dHLTL1Tag("SingleMuIsoLevel1Seed");
    hltL1Tag_ = iConfig.getUntrackedParameter<edm::InputTag>("hltL1Tag",dHLTL1Tag);
 
@@ -326,30 +340,35 @@ void
 TagProbeAnalyzer::fillTriggerInfo()
 {
    
-   // L1 Info
-   Handle<HLTFilterObjectWithRefs> l1MuonTrg;
-   try{ m_event->getByLabel(hltL1Tag_,l1MuonTrg); } 
+   // Trigger Info
+   Handle<TriggerEventWithRefs> trgEvent;
+   try{ m_event->getByLabel(triggerEventTag_,trgEvent); } 
    catch (...) 
    { 
-      LogWarning("Z") << "Could not extract HLT L1 object with tag "
-		      << hltL1Tag_;
+      LogWarning("TagAndProbe") << "Could not extract trigger event summary "
+				<< "with tag " << triggerEventTag_;
    }
-
-   // HLT Info
-   Handle<HLTFilterObjectWithRefs> hltMuonTrg;
-   try{ m_event->getByLabel(hltTag_,hltMuonTrg); } 
-   catch (...) 
-   { 
-      cout << "Could not extract HLT object!!" << endl;
-      LogWarning("Z") << "Could not extract HLT object with tag "
-		      << hltTag_;
-   }
-
+   
    m_evtTree.nl1 = 0;
-   if( l1MuonTrg.isValid() ) m_evtTree.nl1 = l1MuonTrg->size(); 
-
    m_evtTree.nhlt = 0;
-   if( hltMuonTrg.isValid() ) m_evtTree.nhlt = hltMuonTrg->size(); 
+   if( trgEvent.isValid() )
+   {
+      vector< L1MuonParticleRef > muonL1CandRefs;
+      size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
+      if( l1index < trgEvent->size() )
+      {
+	 trgEvent->getObjects( l1index, trigger::TriggerL1Mu, muonL1CandRefs );
+	 m_evtTree.nl1 = muonL1CandRefs.size(); 
+      }
+
+      vector< RecoChargedCandidateRef > muonCandRefs;
+      size_type index = trgEvent->filterIndex(hltTag_.label());
+      if( index < trgEvent->size() )
+      {
+	 trgEvent->getObjects( index, trigger::TriggerMuon, muonCandRefs );
+	 m_evtTree.nhlt = muonCandRefs.size(); 
+      }
+   }
 }
 // ****************************************************************** //
 
@@ -564,22 +583,13 @@ void
 TagProbeAnalyzer::fillTagProbeInfo()
 {
 
-   // L1 Info
-   Handle<HLTFilterObjectWithRefs> l1MuonTrg;
-   try{ m_event->getByLabel(hltL1Tag_,l1MuonTrg); } 
+   // Trigger Info
+   Handle<TriggerEventWithRefs> trgEvent;
+   try{ m_event->getByLabel(triggerEventTag_,trgEvent); } 
    catch (...) 
    { 
-      LogWarning("Z") << "Could not extract HLT L1 object with tag "
-		      << hltL1Tag_;
-   }
-
-   // HLT Info
-   Handle<HLTFilterObjectWithRefs> hltMuonTrg;
-   try{ m_event->getByLabel(hltTag_,hltMuonTrg); } 
-   catch (...) 
-   { 
-      LogWarning("Z") << "Could not extract HLT object with tag "
-		      << hltTag_;
+      LogWarning("Z") << "Could not extract trigger event summary "
+		      << "with tag " << triggerEventTag_;
    }
 
    // Fill some information about the tag & probe collections
@@ -631,7 +641,6 @@ TagProbeAnalyzer::fillTagProbeInfo()
 
 	    const CandidateRef &tag = tpItr->key;
 	    const CandidateRefVector &probes = tpItr->val;
-	    //cout << "Tag key " << tag.key() << endl;
 
 	    // If there are two probes with the tag continue
 	    if( probes.size() > 1 ) continue;
@@ -653,24 +662,35 @@ TagProbeAnalyzer::fillTagProbeInfo()
 
 	    // Did this tag cause a L1 and/or HLT trigger?
 	    bool l1Trigger = false;
-	    if( l1MuonTrg.isValid() )
-	    {
-	       int npart = l1MuonTrg->size();
-	       for(int ipart = 0; ipart != npart; ++ipart)
-	       { 
-		  l1Trigger = MatchObjects( l1MuonTrg->getParticleRef(ipart), tag );
-		  if( l1Trigger ) break;
-	       }
-	    }
-
 	    bool hltTrigger = false;
-	    if( hltMuonTrg.isValid() )
+	    if( trgEvent.isValid() )
 	    {
-	       int npart = hltMuonTrg->size();
-	       for(int ipart = 0; ipart != npart; ++ipart)
-	       { 
-		  hltTrigger = MatchObjects( hltMuonTrg->getParticleRef(ipart), tag );
-		  if( hltTrigger ) break;
+	       vector< L1MuonParticleRef > muonL1CandRefs;
+	       size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
+	       if( l1index < trgEvent->size() )
+	       {
+		  trgEvent->getObjects( l1index, trigger::TriggerL1Mu, muonL1CandRefs );
+		  int npart = muonL1CandRefs.size();
+		  for(int ipart = 0; ipart != npart; ++ipart)
+		  { 
+		     const L1MuonParticle* l1mu = (muonL1CandRefs[ipart]).get();
+		     l1Trigger = MatchObjects( (const Candidate*)l1mu, tag );
+		     if( l1Trigger ) break;
+		  }
+	       }
+
+	       vector< RecoChargedCandidateRef > muonCandRefs;
+	       size_type index = trgEvent->filterIndex(hltTag_.label());
+	       if( index < trgEvent->size() )
+	       {
+		  trgEvent->getObjects( index, trigger::TriggerMuon, muonCandRefs );
+		  int npart = muonCandRefs.size();
+		  for(int ipart = 0; ipart != npart; ++ipart)
+		  { 
+		     const RecoChargedCandidate* muon = (muonCandRefs[ipart]).get();
+		     hltTrigger = MatchObjects( (const Candidate*)muon, tag );
+		     if( hltTrigger ) break;
+		  }
 	       }
 	    }
 
@@ -1031,6 +1051,7 @@ TagProbeAnalyzer::fillVertexInfo()
 }
 // ************************************************************** //
 
+
 // ***************** Are Candidates from a Z? ******************** //
 bool TagProbeAnalyzer::CandFromZ( const reco::CandidateRef& cand, 
 				  edm::Handle<reco::CandMatchMap>& matches )
@@ -1132,20 +1153,8 @@ int TagProbeAnalyzer::ProbePassProbeOverlap( const CandidateRef& probe,
 
    return ppass;
 }
+// ************************************************************ //
 
-
-// ***************** Trigger object matching ******************** //
-bool TagProbeAnalyzer::MatchObjects( CandidateBaseRef hltObj, const CandidateRef& tagObj )
-{
-   double tEta = tagObj->eta();
-   double tPhi = tagObj->phi();
-   double hEta = hltObj->eta();
-   double hPhi = hltObj->phi();
-
-   double dRval = deltaR(tEta, tPhi, hEta, hPhi);
-   return ( dRval < delRMatchingCut_ );
-}
-// ************************************************************** //
 
 // ***************** Trigger object matching ******************** //
 bool TagProbeAnalyzer::MatchObjects( const Candidate *hltObj, 
