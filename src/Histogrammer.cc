@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.7 2008/04/24 19:45:09 ahunt Exp $
+// $Id: Histogrammer.cc,v 1.12 2008/05/03 12:28:14 neadam Exp $
 //
 //
 
@@ -195,14 +195,14 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    {
       fChain_->SetBranchAddress("nrtp", &nrtp_, &b_nrtp_);
       fChain_->SetBranchAddress("tp_true", tp_true_, &b_tp_true_);
-      //fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
+      fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
       fChain_->SetBranchAddress("tp_ppass", tp_ppass_, &b_tp_ppass_);
       fChain_->SetBranchAddress("tp_mass", tp_mass_, &b_tp_mass_);
       fChain_->SetBranchAddress("tp_dpt", tp_dpt_, &b_tp_dpt_);
       fChain_->SetBranchAddress("tp_deta", tp_deta_, &b_tp_deta_);
       
       fChain_->SetBranchStatus("nrtp",1);
-      //fChain_->SetBranchStatus("tp_type",1);
+      fChain_->SetBranchStatus("tp_type",1);
       fChain_->SetBranchStatus("tp_ppass",1);
       fChain_->SetBranchStatus("tp_mass",1);
       fChain_->SetBranchStatus("tp_dpt",1);
@@ -212,14 +212,14 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    {
       fChain_->SetBranchAddress("ncnd", &ncnd_, &b_ncnd_);
       fChain_->SetBranchAddress("cnd_tag", cnd_tag_, &b_cnd_tag_);
-      //fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
+      fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
       fChain_->SetBranchAddress("cnd_pprobe", cnd_pprobe_, &b_cnd_pprobe_);
       fChain_->SetBranchAddress("cnd_aprobe", cnd_aprobe_, &b_cnd_aprobe_);
       fChain_->SetBranchAddress("cnd_pt", cnd_pt_, &b_cnd_pt_);
       fChain_->SetBranchAddress("cnd_eta", cnd_eta_, &b_cnd_eta_);
 
       fChain_->SetBranchStatus("ncnd",1);
-      //fChain_->SetBranchStatus("cnd_type",1);
+      fChain_->SetBranchStatus("cnd_type",1);
       fChain_->SetBranchStatus("cnd_pprobe",1);
       fChain_->SetBranchStatus("cnd_aprobe",1);
       fChain_->SetBranchStatus("cnd_pt",1);
@@ -1015,29 +1015,19 @@ void Histogrammer::CalculateMCTruthEfficiencies()
 
       for( int n=0; n<ncnd_; ++n )
       {
-	 //if( cnd_type_[n] != tagProbeType_ ) continue;
+	 if( cnd_type_[n] != tagProbeType_ ) continue;
 	 
 	 // These are swapped for now because of an old bug
-	 if( cnd_pprobe_[n] == 1 && cnd_aprobe_[n] == 1 )
+	 if( cnd_aprobe_[n] == 1 && cnd_pprobe_[n] == 1 )
 	 {
 	    ptPass.Fill(cnd_pt_[n]);
 	    etaPass.Fill(cnd_eta_[n]);
 	 }
-	 if( cnd_pprobe_[n] == 1 )
+	 if( cnd_aprobe_[n] == 1 )
 	 {
 	    ptAll.Fill(cnd_pt_[n]);
 	    etaAll.Fill(cnd_eta_[n]);
 	 }
-// 	 if( cnd_aprobe_[n] == 1 && cnd_pprobe_[n] == 1 )
-// 	 {
-// 	    ptPass.Fill(cnd_pt_[n]);
-// 	    etaPass.Fill(cnd_eta_[n]);
-// 	 }
-// 	 if( cnd_aprobe_[n] == 1 )
-// 	 {
-// 	    ptAll.Fill(cnd_pt_[n]);
-// 	    etaAll.Fill(cnd_eta_[n]);
-// 	 }
       }
    }
 
