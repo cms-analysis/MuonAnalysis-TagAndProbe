@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.9 2008/05/02 08:24:30 ahunt Exp $
+// $Id: Histogrammer.cc,v 1.10 2008/05/02 17:28:55 ahunt Exp $
 //
 //
 
@@ -378,8 +378,8 @@ void Histogrammer::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar, in
    TH1F* SBSFailProbes;
 
    const int XBinsSBS = massNbins_;
-   const int XMinSBS = massLow_;
-   const int XMaxSBS = massHigh_;
+   const double XMinSBS = massLow_;
+   const double XMaxSBS = massHigh_;
 
    double Mean = SBSPeak_;
    double SD = SBSPeak_;
