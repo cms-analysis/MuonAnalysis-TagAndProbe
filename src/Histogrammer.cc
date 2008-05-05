@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: Histogrammer.cc,v 1.12 2008/05/03 12:28:14 neadam Exp $
+// $Id: Histogrammer.cc,v 1.13 2008/05/03 12:32:50 neadam Exp $
 //
 //
 
@@ -190,17 +190,25 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
       NumEvents_[i] = fChain_->GetEntries();
    }
 
+   fChain_->SetBranchAddress("nrtp", &nrtp_, &b_nrtp_);
+   fChain_->SetBranchAddress("tp_true", tp_true_, &b_tp_true_);
+   fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
+   fChain_->SetBranchAddress("tp_ppass", tp_ppass_, &b_tp_ppass_);
+   fChain_->SetBranchAddress("tp_mass", tp_mass_, &b_tp_mass_);
+   fChain_->SetBranchAddress("tp_dpt", tp_dpt_, &b_tp_dpt_);
+   fChain_->SetBranchAddress("tp_deta", tp_deta_, &b_tp_deta_);
+
+   fChain_->SetBranchAddress("ncnd", &ncnd_, &b_ncnd_);
+   fChain_->SetBranchAddress("cnd_tag", cnd_tag_, &b_cnd_tag_);
+   fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
+   fChain_->SetBranchAddress("cnd_pprobe", cnd_pprobe_, &b_cnd_pprobe_);
+   fChain_->SetBranchAddress("cnd_aprobe", cnd_aprobe_, &b_cnd_aprobe_);
+   fChain_->SetBranchAddress("cnd_pt", cnd_pt_, &b_cnd_pt_);
+   fChain_->SetBranchAddress("cnd_eta", cnd_eta_, &b_cnd_eta_);
+
    fChain_->SetBranchStatus("*",0);
-   if( calcEffsFitter_ )
+   if( calcEffsFitter_ || calcEffsSB_ )
    {
-      fChain_->SetBranchAddress("nrtp", &nrtp_, &b_nrtp_);
-      fChain_->SetBranchAddress("tp_true", tp_true_, &b_tp_true_);
-      fChain_->SetBranchAddress("tp_type", tp_type_, &b_tp_type_);
-      fChain_->SetBranchAddress("tp_ppass", tp_ppass_, &b_tp_ppass_);
-      fChain_->SetBranchAddress("tp_mass", tp_mass_, &b_tp_mass_);
-      fChain_->SetBranchAddress("tp_dpt", tp_dpt_, &b_tp_dpt_);
-      fChain_->SetBranchAddress("tp_deta", tp_deta_, &b_tp_deta_);
-      
       fChain_->SetBranchStatus("nrtp",1);
       fChain_->SetBranchStatus("tp_type",1);
       fChain_->SetBranchStatus("tp_ppass",1);
@@ -210,14 +218,6 @@ Histogrammer::Histogrammer(const edm::ParameterSet& iConfig)
    }
    if( calcEffsTruth_ )
    {
-      fChain_->SetBranchAddress("ncnd", &ncnd_, &b_ncnd_);
-      fChain_->SetBranchAddress("cnd_tag", cnd_tag_, &b_cnd_tag_);
-      fChain_->SetBranchAddress("cnd_type", cnd_type_, &b_cnd_type_);
-      fChain_->SetBranchAddress("cnd_pprobe", cnd_pprobe_, &b_cnd_pprobe_);
-      fChain_->SetBranchAddress("cnd_aprobe", cnd_aprobe_, &b_cnd_aprobe_);
-      fChain_->SetBranchAddress("cnd_pt", cnd_pt_, &b_cnd_pt_);
-      fChain_->SetBranchAddress("cnd_eta", cnd_eta_, &b_cnd_eta_);
-
       fChain_->SetBranchStatus("ncnd",1);
       fChain_->SetBranchStatus("cnd_type",1);
       fChain_->SetBranchStatus("cnd_pprobe",1);
@@ -456,7 +456,6 @@ void Histogrammer::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar, in
 	cout << "Num fail " << nfailR << endl;
 	cout << "Eff " << eff << endl;
 	cout << "Eff error " << effErr << endl;
-	sleep(2);
 
 	// Fill the efficiency hist
 	effhist.SetBinContent(bin+1,eff);
