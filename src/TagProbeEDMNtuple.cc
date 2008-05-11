@@ -59,9 +59,6 @@
 #include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "PhysicsTools/HepMCCandAlgos/interface/MCCandMatcher.h"
-#include "RecoVertex/KalmanVertexFit/interface/KalmanVertexFitter.h"
-#include "RecoVertex/VertexPrimitives/interface/ConvertError.h"
-#include "RecoVertex/VertexPrimitives/interface/TransientVertex.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 #include "SimTracker/Records/interface/TrackAssociatorRecord.h"
 #include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
@@ -235,7 +232,7 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
 
    // If the user has requested information about specific MC particle
    // types we will store this in the event also
-   for( int i=0; i<mcParticles_.size(); ++i )
+   for( int i=0; i<(int)mcParticles_.size(); ++i )
    {
       stringstream nstream;
       nstream << "MC" << mcParticles_[i];
@@ -481,7 +478,7 @@ void TagProbeEDMNtuple::fillMCInfo()
    
 	    // Loop over particles and extract any that the user has asked to
 	    // be stored
-	    for( int j=0; j<mcParticles_.size(); ++j )
+	    for( int j=0; j<(int)mcParticles_.size(); ++j )
 	    {
 	       stringstream nstream;
 	       nstream << "MC" << mcParticles_[j];

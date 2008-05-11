@@ -76,10 +76,10 @@ TagProbeAnalysis::TagProbeAnalysis(const edm::ParameterSet& iConfig)
    
    // Normalization variables
    vector< double > dLumi;
-   for( int i=0; i<fileNames_.size(); ++i ) dLumi.push_back(-1.0);
+   for( int i=0; i<(int)fileNames_.size(); ++i ) dLumi.push_back(-1.0);
    lumi_           = iConfig.getUntrackedParameter< vector<double> >("Luminosity",dLumi);
    vector< double > dXS;
-   for( int i=0; i<fileNames_.size(); ++i ) dXS.push_back(-1.0);
+   for( int i=0; i<(int)fileNames_.size(); ++i ) dXS.push_back(-1.0);
    xsection_       = iConfig.getUntrackedParameter< vector<double> >("CrossSection",dXS);
 
    // Efficiency input variables
