@@ -69,7 +69,7 @@ class TagProbeEDMNtuple : public edm::EDProducer
 			 const reco::CandidateRef& tagObj );
       
       // ----------member data ---------------------------
-      const edm::Event* m_event;
+      edm::Event* m_event;
       const edm::EventSetup* m_setup;
 
       // Type of Cands (used for matching and PDGId)
@@ -106,83 +106,7 @@ class TagProbeEDMNtuple : public edm::EDProducer
       double delRMatchingCut_;
       
       // MC parameter
-      bool isMC_;
-
-      // Private EDM Ntuple variables
-      std::auto_ptr< int > run_;
-      std::auto_ptr< int > event_;
-
-      std::auto_ptr< int > nl1_;
-      std::auto_ptr< int > nhlt_;
-
-      std::auto_ptr< int > nrtp_;
-      std::auto_ptr< std::vector<int> > tp_type_;
-      std::auto_ptr< std::vector<int> > tp_true_;
-      std::auto_ptr< std::vector<int> > tp_ppass_;
-      std::auto_ptr< std::vector<int> > tp_l1_;  
-      std::auto_ptr< std::vector<int> > tp_hlt_; 
-
-      std::auto_ptr< std::vector<float> > tp_mass_;
-      std::auto_ptr< std::vector<float> > tp_p_;  
-      std::auto_ptr< std::vector<float> > tp_pt_; 
-      std::auto_ptr< std::vector<float> > tp_px_; 
-      std::auto_ptr< std::vector<float> > tp_py_; 
-      std::auto_ptr< std::vector<float> > tp_pz_; 
-      std::auto_ptr< std::vector<float> > tp_e_;  
-      std::auto_ptr< std::vector<float> > tp_et_; 
-
-      std::auto_ptr< std::vector<float> > tp_tag_p_;   
-      std::auto_ptr< std::vector<float> > tp_tag_px_;  
-      std::auto_ptr< std::vector<float> > tp_tag_py_;  
-      std::auto_ptr< std::vector<float> > tp_tag_pz_;  
-      std::auto_ptr< std::vector<float> > tp_tag_pt_;  
-      std::auto_ptr< std::vector<float> > tp_tag_e_;   
-      std::auto_ptr< std::vector<float> > tp_tag_et_;  
-      std::auto_ptr< std::vector<float> > tp_tag_q_;   
-      std::auto_ptr< std::vector<float> > tp_tag_eta_; 
-      std::auto_ptr< std::vector<float> > tp_tag_phi_; 
-
-      std::auto_ptr< std::vector<float> > tp_probe_p_;   
-      std::auto_ptr< std::vector<float> > tp_probe_px_;  
-      std::auto_ptr< std::vector<float> > tp_probe_py_;  
-      std::auto_ptr< std::vector<float> > tp_probe_pz_;  
-      std::auto_ptr< std::vector<float> > tp_probe_pt_;  
-      std::auto_ptr< std::vector<float> > tp_probe_e_;   
-      std::auto_ptr< std::vector<float> > tp_probe_et_;  
-      std::auto_ptr< std::vector<float> > tp_probe_q_;   
-      std::auto_ptr< std::vector<float> > tp_probe_eta_; 
-      std::auto_ptr< std::vector<float> > tp_probe_phi_; 
-
-      std::auto_ptr< int > ncnd_;
-      std::auto_ptr< std::vector<int> > cnd_type_;   
-      std::auto_ptr< std::vector<int> > cnd_tag_;    
-      std::auto_ptr< std::vector<int> > cnd_aprobe_; 
-      std::auto_ptr< std::vector<int> > cnd_pprobe_; 
-      std::auto_ptr< std::vector<int> > cnd_moid_;   
-      std::auto_ptr< std::vector<int> > cnd_gmid_;   
-
-      std::auto_ptr< std::vector<float> > cnd_p_;   
-      std::auto_ptr< std::vector<float> > cnd_pt_;  
-      std::auto_ptr< std::vector<float> > cnd_px_;  
-      std::auto_ptr< std::vector<float> > cnd_py_;  
-      std::auto_ptr< std::vector<float> > cnd_pz_;  
-      std::auto_ptr< std::vector<float> > cnd_e_;   
-      std::auto_ptr< std::vector<float> > cnd_et_;  
-      std::auto_ptr< std::vector<float> > cnd_q_;   
-      std::auto_ptr< std::vector<float> > cnd_eta_; 
-      std::auto_ptr< std::vector<float> > cnd_phi_; 
-
-      std::auto_ptr< std::vector<float> > cnd_rp_;   
-      std::auto_ptr< std::vector<float> > cnd_rpt_;  
-      std::auto_ptr< std::vector<float> > cnd_rpx_;  
-      std::auto_ptr< std::vector<float> > cnd_rpy_;  
-      std::auto_ptr< std::vector<float> > cnd_rpz_;  
-      std::auto_ptr< std::vector<float> > cnd_re_;   
-      std::auto_ptr< std::vector<float> > cnd_ret_;  
-      std::auto_ptr< std::vector<float> > cnd_rq_;   
-      std::auto_ptr< std::vector<float> > cnd_reta_; 
-      std::auto_ptr< std::vector<float> > cnd_rphi_; 
-      
+      bool isMC_;      
 };
 
 #endif

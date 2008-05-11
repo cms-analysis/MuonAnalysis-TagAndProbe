@@ -233,6 +233,47 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    produces< int >( "nl1" ).setBranchAlias( "nL1" );
    produces< int >( "nhlt" ).setBranchAlias( "nHLT" );
 
+   // If the user has requested information about specific MC particle
+   // types we will store this in the event also
+   for( int i=0; i<mcParticles_.size(); ++i )
+   {
+      stringstream nstream;
+      nstream << "MC" << mcParticles_[i];
+      string prefix = nstream.str();
+
+      string name = "n"+prefix;
+      produces< int >(name.c_str()).setBranchAlias(name.c_str());
+
+      name = prefix+"ppid";
+      produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"pbc";
+      produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"pid";
+      produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"bc";
+      produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
+
+      name = prefix+"mass";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"p";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"pt";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"px";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"py";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"pz";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"e";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"eta";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+      name = prefix+"phi";
+      produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
+ 
+   }
+
    produces< int >( "nrTP" ).setBranchAlias( "nrTP" );
    produces< std::vector<int> >( "TPtype" ).setBranchAlias( "TPtype" );
    produces< std::vector<int> >( "TPtrue" ).setBranchAlias( "TPtrue" );
@@ -328,85 +369,14 @@ TagProbeEDMNtuple::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    m_event = &iEvent;
    m_setup = &iSetup;
 
-   run_.reset( new int );
-   event_.reset( new int );
-
-   nl1_.reset( new int );
-   nhlt_.reset( new int );
-
-   nrtp_.reset( new int );
-   tp_type_.reset( new vector<int> );
-   tp_true_.reset( new vector<int> );
-   tp_ppass_.reset( new vector<int> );
-   tp_l1_.reset( new vector<int> );  
-   tp_hlt_.reset( new vector<int> ); 
-
-   tp_mass_.reset( new vector<float> );
-   tp_p_.reset( new vector<float> );  
-   tp_pt_.reset( new vector<float> ); 
-   tp_px_.reset( new vector<float> ); 
-   tp_py_.reset( new vector<float> ); 
-   tp_pz_.reset( new vector<float> ); 
-   tp_e_.reset( new vector<float> );  
-   tp_et_.reset( new vector<float> ); 
-
-   tp_tag_p_.reset( new vector<float> );   
-   tp_tag_px_.reset( new vector<float> );  
-   tp_tag_py_.reset( new vector<float> );  
-   tp_tag_pz_.reset( new vector<float> );  
-   tp_tag_pt_.reset( new vector<float> );  
-   tp_tag_e_.reset( new vector<float> );   
-   tp_tag_et_.reset( new vector<float> );  
-   tp_tag_q_.reset( new vector<float> );   
-   tp_tag_eta_.reset( new vector<float> ); 
-   tp_tag_phi_.reset( new vector<float> ); 
-
-   tp_probe_p_.reset( new vector<float> );   
-   tp_probe_px_.reset( new vector<float> );  
-   tp_probe_py_.reset( new vector<float> );  
-   tp_probe_pz_.reset( new vector<float> );  
-   tp_probe_pt_.reset( new vector<float> );  
-   tp_probe_e_.reset( new vector<float> );   
-   tp_probe_et_.reset( new vector<float> );  
-   tp_probe_q_.reset( new vector<float> );   
-   tp_probe_eta_.reset( new vector<float> ); 
-   tp_probe_phi_.reset( new vector<float> ); 
-
-   ncnd_.reset( new int );
-   cnd_type_.reset( new vector<int> );   
-   cnd_tag_.reset( new vector<int> );    
-   cnd_aprobe_.reset( new vector<int> ); 
-   cnd_pprobe_.reset( new vector<int> ); 
-   cnd_moid_.reset( new vector<int> );   
-   cnd_gmid_.reset( new vector<int> );   
-
-   cnd_p_.reset( new vector<float> );   
-   cnd_pt_.reset( new vector<float> );  
-   cnd_px_.reset( new vector<float> );  
-   cnd_py_.reset( new vector<float> );  
-   cnd_pz_.reset( new vector<float> );  
-   cnd_e_.reset( new vector<float> );   
-   cnd_et_.reset( new vector<float> );  
-   cnd_q_.reset( new vector<float> );   
-   cnd_eta_.reset( new vector<float> ); 
-   cnd_phi_.reset( new vector<float> ); 
-
-   cnd_rp_.reset( new vector<float> );   
-   cnd_rpt_.reset( new vector<float> );  
-   cnd_rpx_.reset( new vector<float> );  
-   cnd_rpy_.reset( new vector<float> );  
-   cnd_rpz_.reset( new vector<float> );  
-   cnd_re_.reset( new vector<float> );   
-   cnd_ret_.reset( new vector<float> );  
-   cnd_rq_.reset( new vector<float> );   
-   cnd_reta_.reset( new vector<float> ); 
-   cnd_rphi_.reset( new vector<float> ); 
-
    // Fill the run and event number information
    fillRunEventInfo();
 
    // Fill event level trigger info
    fillTriggerInfo();
+
+   // Fill MC Information
+   fillMCInfo();
 
    // Fill Tag-Probe Info
    fillTagProbeInfo();
@@ -414,86 +384,7 @@ TagProbeEDMNtuple::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    // Fill Efficiency Info for true muons
    fillTrueEffInfo();
 
-   // Put the objects into the event
-   iEvent.put( run_, "run" );
-   iEvent.put( event_, "event" );
-
-   iEvent.put( nl1_, "nl1" );
-   iEvent.put( nhlt_, "nhlt" );
-
-   iEvent.put( nrtp_, "nrTP" );
-
-   iEvent.put( tp_type_, "TPtype" );
-   iEvent.put( tp_true_, "TPtrue" );
-   iEvent.put( tp_ppass_, "TPppass" );
-   iEvent.put( tp_l1_, "TPl1" );  
-   iEvent.put( tp_hlt_, "TPhlt" ); 
-
-   iEvent.put( tp_mass_, "TPmass" );
-   iEvent.put( tp_p_, "TPp" );  
-   iEvent.put( tp_pt_, "TPpt" ); 
-   iEvent.put( tp_px_, "TPpx" ); 
-   iEvent.put( tp_py_, "TPpy" ); 
-   iEvent.put( tp_pz_, "TPpz" ); 
-   iEvent.put( tp_e_, "TPe" );  
-   iEvent.put( tp_et_, "TPet" ); 
-
-   iEvent.put( tp_tag_p_, "TPTagp" );   
-   iEvent.put( tp_tag_px_, "TPTagpx" );  
-   iEvent.put( tp_tag_py_, "TPTagpy" );  
-   iEvent.put( tp_tag_pz_, "TPTagpz" );  
-   iEvent.put( tp_tag_pt_, "TPTagpt" );  
-   iEvent.put( tp_tag_e_, "TPTage" );   
-   iEvent.put( tp_tag_et_, "TPTaget" );  
-   iEvent.put( tp_tag_q_, "TPTagq" );   
-   iEvent.put( tp_tag_eta_, "TPTageta" ); 
-   iEvent.put( tp_tag_phi_, "TPTagphi" ); 
-
-   iEvent.put( tp_probe_p_, "TPProbep" );   
-   iEvent.put( tp_probe_px_, "TPProbepx" );  
-   iEvent.put( tp_probe_py_, "TPProbepy" );  
-   iEvent.put( tp_probe_pz_, "TPProbepz" );  
-   iEvent.put( tp_probe_pt_, "TPProbept" );  
-   iEvent.put( tp_probe_e_, "TPProbee" );   
-   iEvent.put( tp_probe_et_, "TPProbeet" );  
-   iEvent.put( tp_probe_q_, "TPProbeq" );   
-   iEvent.put( tp_probe_eta_, "TPProbeeta" ); 
-   iEvent.put( tp_probe_phi_, "TPProbephi" ); 
-
-   iEvent.put( ncnd_, "nCnd" );
-
-   iEvent.put( cnd_type_, "Cndtype" );
-   iEvent.put( cnd_tag_, "Cndtag" );
-   iEvent.put( cnd_aprobe_, "Cndaprobe" );
-   iEvent.put( cnd_pprobe_, "Cndpprobe" );  
-   iEvent.put( cnd_moid_, "Cndmoid" ); 
-   iEvent.put( cnd_gmid_, "Cndgmid" ); 
-
-   iEvent.put( cnd_p_, "Cndp" );  
-   iEvent.put( cnd_pt_, "Cndpt" ); 
-   iEvent.put( cnd_px_, "Cndpx" ); 
-   iEvent.put( cnd_py_, "Cndpy" ); 
-   iEvent.put( cnd_pz_, "Cndpz" ); 
-   iEvent.put( cnd_e_, "Cnde" );  
-   iEvent.put( cnd_et_, "Cndet" ); 
-   iEvent.put( cnd_q_, "Cndq" );  
-   iEvent.put( cnd_eta_, "Cndeta" ); 
-   iEvent.put( cnd_phi_, "Cndphi" ); 
-
-   iEvent.put( cnd_rp_, "Cndrp" );  
-   iEvent.put( cnd_rpt_, "Cndrpt" ); 
-   iEvent.put( cnd_rpx_, "Cndrpx" ); 
-   iEvent.put( cnd_rpy_, "Cndrpy" ); 
-   iEvent.put( cnd_rpz_, "Cndrpz" ); 
-   iEvent.put( cnd_re_, "Cndre" );  
-   iEvent.put( cnd_ret_, "Cndret" ); 
-   iEvent.put( cnd_rq_, "Cndrq" );  
-   iEvent.put( cnd_reta_, "Cndreta" ); 
-   iEvent.put( cnd_rphi_, "Cndrphi" ); 
-
-
-   return;
- 
+   return; 
 }
 
 // ------------ method called once each job just before starting event loop  ------------
@@ -516,11 +407,14 @@ TagProbeEDMNtuple::endJob() {
 void
 TagProbeEDMNtuple::fillRunEventInfo()
 {
-   int run = m_event->id().run();
-   int event = m_event->id().event();
+   auto_ptr< int > run_( new int );
+   auto_ptr< int > event_( new int );
 
-   *run_ = run;
-   *event_ = event;
+   *run_ = m_event->id().run();
+   *event_ = m_event->id().event();
+
+   m_event->put( run_, "run" );
+   m_event->put( event_, "event" );
 }
 // ****************************************************************** //
 
@@ -528,6 +422,8 @@ TagProbeEDMNtuple::fillRunEventInfo()
 void
 TagProbeEDMNtuple::fillTriggerInfo()
 {
+   auto_ptr<int> nl1_( new int );
+   auto_ptr<int> nhlt_( new int );
    
    // Trigger Info
    Handle<TriggerEventWithRefs> trgEvent;
@@ -558,15 +454,229 @@ TagProbeEDMNtuple::fillTriggerInfo()
 	 *nhlt_ = muonCandRefs.size(); 
       }
    }
+
+   m_event->put( nl1_, "nl1" );
+   m_event->put( nhlt_, "nhlt" );
 }
 // ****************************************************************** //
 
+// ********************* Fill MC Info *********************** //
+void TagProbeEDMNtuple::fillMCInfo()
+{
+   // Extract the MC information from the frame, if we are running on MC
+   if( isMC_ )
+   {      
+      vector< Handle< HepMCProduct > > EvtHandles ;
+      m_event->getManyByType( EvtHandles ) ;
+   
+      // Loop over all MC products
+      for ( unsigned int i=0; (i<EvtHandles.size() && mcParticles_.size()>0); i++ )
+      {
+	 if( i>0 ) continue;
+
+	 if ( EvtHandles[i].isValid() )
+	 {
+	    // Get the event
+	    const HepMC::GenEvent* Evt = EvtHandles[i]->GetEvent() ;
+   
+	    // Loop over particles and extract any that the user has asked to
+	    // be stored
+	    for( int j=0; j<mcParticles_.size(); ++j )
+	    {
+	       stringstream nstream;
+	       nstream << "MC" << mcParticles_[j];
+	       string prefix = nstream.str();
+
+	       auto_ptr< int > nmc_( new int );
+
+	       auto_ptr< vector<int> > mc_ppid_( new vector<int> );
+	       auto_ptr< vector<int> > mc_pbc_( new vector<int> );
+	       auto_ptr< vector<int> > mc_pid_( new vector<int> );
+	       auto_ptr< vector<int> > mc_bc_( new vector<int> );
+
+	       auto_ptr< vector<float> > mc_mass_( new vector<float> );
+	       auto_ptr< vector<float> > mc_p_( new vector<float> );
+	       auto_ptr< vector<float> > mc_pt_( new vector<float> );
+	       auto_ptr< vector<float> > mc_px_( new vector<float> );
+	       auto_ptr< vector<float> > mc_py_( new vector<float> );
+	       auto_ptr< vector<float> > mc_pz_( new vector<float> );
+	       auto_ptr< vector<float> > mc_e_( new vector<float> );
+	       auto_ptr< vector<float> > mc_eta_( new vector<float> );
+	       auto_ptr< vector<float> > mc_phi_( new vector<float> );
+
+	       int nmc = 0;
+
+	       HepMC::GenEvent::particle_const_iterator Part = Evt->particles_begin();
+	       HepMC::GenEvent::particle_const_iterator PartEnd = Evt->particles_end();
+	       for(; Part != PartEnd; Part++ )
+	       {
+		  int pdg = (*Part)->pdg_id();
+	       
+		  if( abs(pdg) == mcParticles_[j] )
+		  {
+		     HepMC::FourVector p4 = (*Part)->momentum();
+
+		     int    pid = pdg;
+		     int    barcode = (*Part)->barcode();
+		     double p   = p4.mag();
+		     double px = p4.px();
+		     double py = p4.py();
+		     double pz = p4.pz();
+		     double pt = p4.perp();
+		     double e  = p4.e();
+		     double phi = p4.phi() ;
+		     double eta = -log(tan(p4.theta()/2.));
+		     double mass = e*e - p*p;
+		     if( mass > 0 ) mass = sqrt(mass);
+		     else           mass = -sqrt(fabs(mass));
+
+		     // Get the parent barcode (in general there
+		     // can be more than one parent, but for now
+		     // we will just take the first).
+		     int parent_pi = 0;
+		     int parent_bc = 0;
+		     HepMC::GenVertex *pvtx = (*Part)->production_vertex();
+		     
+		     // Loop over the particles in this vertex
+		     if( pvtx != NULL )
+		     {
+			if( (*pvtx).particles_in_size() > 0 )
+			{
+			   HepMC::GenVertex::particles_in_const_iterator pIt = 
+			      (*pvtx).particles_in_const_begin();
+			   parent_pi = (*pIt)->pdg_id(); 
+			   parent_bc = (*pIt)->barcode();
+			}
+		     }
+
+		     int num_lep = 0;
+		     if( abs(pdg) == 23 )
+		     {
+			HepMC::GenVertex *evtx = (*Part)->end_vertex();
+			
+			// Loop over the particles in this vertex
+			if( evtx != NULL )
+			{
+			   if( (*evtx).particles_out_size() > 0 )
+			   {
+			      HepMC::GenVertex::particles_out_const_iterator pIt = 
+				 (*evtx).particles_out_const_begin();
+			      for( ; pIt != (*evtx).particles_out_const_end(); pIt++ )
+			      {
+				 if( abs((*pIt)->pdg_id()) >= 11 && 
+				 abs((*pIt)->pdg_id()) <= 14 ) 
+				 {
+				    ++num_lep;
+				 }
+			      }
+			   }
+			}
+		     }
+		     if( abs(mcParticles_[j]) == 23 && num_lep == 0 ) continue;
+
+		     // Check for the parents if required
+		     if( mcParents_[j] != 0 && abs(parent_pi) != mcParents_[j] ) continue;
+
+		     // set the tree values
+		     mc_pbc_->push_back( parent_bc );
+		     mc_ppid_->push_back( parent_pi );
+		     mc_bc_->push_back( barcode );
+		     mc_pid_->push_back( pid );
+		     mc_p_->push_back( p );
+		     mc_mass_->push_back( mass );
+		     mc_px_->push_back( px );
+		     mc_py_->push_back( py );
+		     mc_pz_->push_back( pz );
+		     mc_pt_->push_back( pt );
+		     mc_e_->push_back( e );
+		     mc_phi_->push_back( phi );
+		     mc_eta_->push_back( eta );
+
+		     nmc++;
+		  }
+	       }
+
+	       // Insert these particles into the event!!
+	       string name = "n"+prefix;
+	       nmc_.reset( new int(nmc) );
+	       m_event->put( nmc_, name.c_str());
+
+	       name = prefix+"ppid";
+	       m_event->put( mc_ppid_, name.c_str());
+	       name = prefix+"pbc";
+	       m_event->put( mc_pbc_, name.c_str());
+	       name = prefix+"pid";
+	       m_event->put( mc_pid_, name.c_str());
+	       name = prefix+"bc";
+	       m_event->put( mc_bc_, name.c_str());
+
+	       name = prefix+"mass";
+	       m_event->put( mc_mass_, name.c_str());
+	       name = prefix+"p";
+	       m_event->put( mc_p_, name.c_str());
+	       name = prefix+"pt";
+	       m_event->put( mc_pt_, name.c_str());
+	       name = prefix+"px";
+	       m_event->put( mc_px_, name.c_str());
+	       name = prefix+"py";
+	       m_event->put( mc_py_, name.c_str());
+	       name = prefix+"pz";
+	       m_event->put( mc_pz_, name.c_str());
+	       name = prefix+"e";
+	       m_event->put( mc_e_, name.c_str());
+	       name = prefix+"eta";
+	       m_event->put( mc_eta_, name.c_str());
+	       name = prefix+"phi";
+	       m_event->put( mc_phi_, name.c_str());
+	    }
+	 }
+      }
+   }
+}
+// ********************************************************** //
 
 
 // ********************* Fill Tag-Probe Info *********************** //
 void
 TagProbeEDMNtuple::fillTagProbeInfo()
 {
+   auto_ptr<int> nrtp_( new int );
+   auto_ptr< vector<int> > tp_type_( new vector<int> );
+   auto_ptr< vector<int> > tp_true_( new vector<int> );
+   auto_ptr< vector<int> > tp_ppass_( new vector<int> );
+   auto_ptr< vector<int> > tp_l1_( new vector<int> );  
+   auto_ptr< vector<int> > tp_hlt_( new vector<int> ); 
+
+   auto_ptr< vector<float> > tp_mass_( new vector<float> );
+   auto_ptr< vector<float> > tp_p_( new vector<float> );  
+   auto_ptr< vector<float> > tp_pt_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_px_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_py_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_pz_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_e_( new vector<float> );  
+   auto_ptr< vector<float> > tp_et_( new vector<float> ); 
+
+   auto_ptr< vector<float> > tp_tag_p_( new vector<float> );   
+   auto_ptr< vector<float> > tp_tag_px_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_py_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_pz_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_pt_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_e_( new vector<float> );   
+   auto_ptr< vector<float> > tp_tag_et_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_q_( new vector<float> );   
+   auto_ptr< vector<float> > tp_tag_eta_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_tag_phi_( new vector<float> ); 
+
+   auto_ptr< vector<float> > tp_probe_p_( new vector<float> );   
+   auto_ptr< vector<float> > tp_probe_px_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_py_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_pz_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_pt_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_e_( new vector<float> );   
+   auto_ptr< vector<float> > tp_probe_et_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_q_( new vector<float> );   
+   auto_ptr< vector<float> > tp_probe_eta_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_probe_phi_( new vector<float> ); 
 
    // Trigger Info
    Handle<TriggerEventWithRefs> trgEvent;
@@ -749,6 +859,46 @@ TagProbeEDMNtuple::fillTagProbeInfo()
       }
    }
    nrtp_.reset( new int(nrtp) );
+
+   m_event->put( nrtp_, "nrTP" );
+
+   m_event->put( tp_type_, "TPtype" );
+   m_event->put( tp_true_, "TPtrue" );
+   m_event->put( tp_ppass_, "TPppass" );
+   m_event->put( tp_l1_, "TPl1" );  
+   m_event->put( tp_hlt_, "TPhlt" ); 
+
+   m_event->put( tp_mass_, "TPmass" );
+   m_event->put( tp_p_, "TPp" );  
+   m_event->put( tp_pt_, "TPpt" ); 
+   m_event->put( tp_px_, "TPpx" ); 
+   m_event->put( tp_py_, "TPpy" ); 
+   m_event->put( tp_pz_, "TPpz" ); 
+   m_event->put( tp_e_, "TPe" );  
+   m_event->put( tp_et_, "TPet" ); 
+
+   m_event->put( tp_tag_p_, "TPTagp" );   
+   m_event->put( tp_tag_px_, "TPTagpx" );  
+   m_event->put( tp_tag_py_, "TPTagpy" );  
+   m_event->put( tp_tag_pz_, "TPTagpz" );  
+   m_event->put( tp_tag_pt_, "TPTagpt" );  
+   m_event->put( tp_tag_e_, "TPTage" );   
+   m_event->put( tp_tag_et_, "TPTaget" );  
+   m_event->put( tp_tag_q_, "TPTagq" );   
+   m_event->put( tp_tag_eta_, "TPTageta" ); 
+   m_event->put( tp_tag_phi_, "TPTagphi" ); 
+
+   m_event->put( tp_probe_p_, "TPProbep" );   
+   m_event->put( tp_probe_px_, "TPProbepx" );  
+   m_event->put( tp_probe_py_, "TPProbepy" );  
+   m_event->put( tp_probe_pz_, "TPProbepz" );  
+   m_event->put( tp_probe_pt_, "TPProbept" );  
+   m_event->put( tp_probe_e_, "TPProbee" );   
+   m_event->put( tp_probe_et_, "TPProbeet" );  
+   m_event->put( tp_probe_q_, "TPProbeq" );   
+   m_event->put( tp_probe_eta_, "TPProbeeta" ); 
+   m_event->put( tp_probe_phi_, "TPProbephi" ); 
+
 }
 // ******************************************************************* //
 
@@ -757,6 +907,35 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 void
 TagProbeEDMNtuple::fillTrueEffInfo()
 {
+   auto_ptr<int> ncnd_( new int );
+   auto_ptr< vector<int> > cnd_type_( new vector<int> );   
+   auto_ptr< vector<int> > cnd_tag_( new vector<int> );    
+   auto_ptr< vector<int> > cnd_aprobe_( new vector<int> ); 
+   auto_ptr< vector<int> > cnd_pprobe_( new vector<int> ); 
+   auto_ptr< vector<int> > cnd_moid_( new vector<int> );   
+   auto_ptr< vector<int> > cnd_gmid_( new vector<int> );   
+
+   auto_ptr< vector<float> > cnd_p_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_pt_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_px_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_py_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_pz_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_e_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_et_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_q_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_eta_( new vector<float> ); 
+   auto_ptr< vector<float> > cnd_phi_( new vector<float> ); 
+
+   auto_ptr< vector<float> > cnd_rp_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_rpt_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_rpx_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_rpy_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_rpz_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_re_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_ret_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_rq_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_reta_( new vector<float> ); 
+   auto_ptr< vector<float> > cnd_rphi_( new vector<float> ); 
 
    // Should change this to get the eff info for all types of tag-probe!!
    Handle<CandidateCollection> genparticles;
@@ -960,6 +1139,36 @@ TagProbeEDMNtuple::fillTrueEffInfo()
    }
    ncnd_.reset( new int(ncnd) );
 
+   m_event->put( ncnd_, "nCnd" );
+
+   m_event->put( cnd_type_, "Cndtype" );
+   m_event->put( cnd_tag_, "Cndtag" );
+   m_event->put( cnd_aprobe_, "Cndaprobe" );
+   m_event->put( cnd_pprobe_, "Cndpprobe" );  
+   m_event->put( cnd_moid_, "Cndmoid" ); 
+   m_event->put( cnd_gmid_, "Cndgmid" ); 
+
+   m_event->put( cnd_p_, "Cndp" );  
+   m_event->put( cnd_pt_, "Cndpt" ); 
+   m_event->put( cnd_px_, "Cndpx" ); 
+   m_event->put( cnd_py_, "Cndpy" ); 
+   m_event->put( cnd_pz_, "Cndpz" ); 
+   m_event->put( cnd_e_, "Cnde" );  
+   m_event->put( cnd_et_, "Cndet" ); 
+   m_event->put( cnd_q_, "Cndq" );  
+   m_event->put( cnd_eta_, "Cndeta" ); 
+   m_event->put( cnd_phi_, "Cndphi" ); 
+
+   m_event->put( cnd_rp_, "Cndrp" );  
+   m_event->put( cnd_rpt_, "Cndrpt" ); 
+   m_event->put( cnd_rpx_, "Cndrpx" ); 
+   m_event->put( cnd_rpy_, "Cndrpy" ); 
+   m_event->put( cnd_rpz_, "Cndrpz" ); 
+   m_event->put( cnd_re_, "Cndre" );  
+   m_event->put( cnd_ret_, "Cndret" ); 
+   m_event->put( cnd_rq_, "Cndrq" );  
+   m_event->put( cnd_reta_, "Cndreta" ); 
+   m_event->put( cnd_rphi_, "Cndrphi" ); 
 }
 // *********************************************************************** //
 
