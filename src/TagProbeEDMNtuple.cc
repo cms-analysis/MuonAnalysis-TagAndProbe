@@ -241,105 +241,103 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
       string name = "n"+prefix;
       produces< int >(name.c_str()).setBranchAlias(name.c_str());
 
-      name = prefix+"ppid";
+      name = prefix+"ppid"; /* Particle PDGId of parent. */
       produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"pbc";
+      name = prefix+"pbc";  /* Particle barcode of parent. */
       produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"pid";
+      name = prefix+"pid";  /* Particle PDGId. */
       produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"bc";
+      name = prefix+"bc";   /* Particle barcode. */
       produces< vector<int> >(name.c_str()).setBranchAlias(name.c_str());
 
-      name = prefix+"mass";
+      name = prefix+"mass"; /* Particle mass. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"p";
+      name = prefix+"p";    /* Particle momentum. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"pt";
+      name = prefix+"pt";   /* Particle transverse momentum. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"px";
+      name = prefix+"px";   /* Particle x-momentum. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"py";
+      name = prefix+"py";   /* Particle y-momentum. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"pz";
+      name = prefix+"pz";   /* Particle z-momentum. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"e";
+      name = prefix+"e";    /* Particle energy. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"eta";
+      name = prefix+"eta";  /* Particle psuedorapidity. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
-      name = prefix+"phi";
+      name = prefix+"phi";  /* Particle phi. */
       produces< vector<float> >(name.c_str()).setBranchAlias(name.c_str());
  
    }
 
-   produces< int >( "nrTP" ).setBranchAlias( "nrTP" );
-   produces< std::vector<int> >( "TPtype" ).setBranchAlias( "TPtype" );
-   produces< std::vector<int> >( "TPtrue" ).setBranchAlias( "TPtrue" );
-   produces< std::vector<int> >( "TPppass" ).setBranchAlias( "TPppass" );
-   produces< std::vector<int> >( "TPl1" ).setBranchAlias( "TPl1" );
-   produces< std::vector<int> >( "TPhlt" ).setBranchAlias( "TPhlt" );
+   produces< int >( "nrTP" ).setBranchAlias( "nrTP" );                    /* Number of Tag-Probe entries */
+   produces< std::vector<int> >( "TPtype" ).setBranchAlias( "TPtype" );   /* Type of eff measurement for these TP's */
+   produces< std::vector<int> >( "TPtrue" ).setBranchAlias( "TPtrue" );   /* Is this a true Z candidate? (If MC) */
+   produces< std::vector<int> >( "TPppass" ).setBranchAlias( "TPppass" ); /* Is this a passing probe? */ 
+   produces< std::vector<int> >( "TPl1" ).setBranchAlias( "TPl1" );       /* Is the tag matched to a L1 trigger? */
+   produces< std::vector<int> >( "TPhlt" ).setBranchAlias( "TPhlt" );     /* Is the tag matched to a HL trigger? */
 
-   produces<std::vector<float> >( "TPmass" ).setBranchAlias( "TPmass" );
-   produces<std::vector<float> >( "TPp"    ).setBranchAlias( "TPp"    );
-   produces<std::vector<float> >( "TPpt"   ).setBranchAlias( "TPpt"   );
-   produces<std::vector<float> >( "TPpx"   ).setBranchAlias( "TPpx"   );
-   produces<std::vector<float> >( "TPpy"   ).setBranchAlias( "TPpy"   );
-   produces<std::vector<float> >( "TPpz"   ).setBranchAlias( "TPpz"   );
-   produces<std::vector<float> >( "TPe"    ).setBranchAlias( "TPe"    );
-   produces<std::vector<float> >( "TPet"   ).setBranchAlias( "TPet"   );
+   produces<std::vector<float> >( "TPmass" ).setBranchAlias( "TPmass" );  /* Tag-Probe invariant mass. */
+   produces<std::vector<float> >( "TPp"    ).setBranchAlias( "TPp"    );  /* Tag-Probe momentum. */
+   produces<std::vector<float> >( "TPpt"   ).setBranchAlias( "TPpt"   );  /* Tag-Probe transverse momentum. */
+   produces<std::vector<float> >( "TPpx"   ).setBranchAlias( "TPpx"   );  /* Tag-Probe x-momentum. */
+   produces<std::vector<float> >( "TPpy"   ).setBranchAlias( "TPpy"   );  /* Tag-Probe y-momentum. */
+   produces<std::vector<float> >( "TPpz"   ).setBranchAlias( "TPpz"   );  /* Tag-Probe z-momentum. */
+   produces<std::vector<float> >( "TPe"    ).setBranchAlias( "TPe"    );  /* Tag-Probe energy. */
+   produces<std::vector<float> >( "TPet"   ).setBranchAlias( "TPet"   );  /* Tag-Probe transverse energy. */
 
-   produces<std::vector<float> >( "TPTagp"   ).setBranchAlias( "TPTagp"   );
-   produces<std::vector<float> >( "TPTagpx"  ).setBranchAlias( "TPTagpx"  );
-   produces<std::vector<float> >( "TPTagpy"  ).setBranchAlias( "TPTagpy"  );
-   produces<std::vector<float> >( "TPTagpz"  ).setBranchAlias( "TPTagpz"  );
-   produces<std::vector<float> >( "TPTagpt"  ).setBranchAlias( "TPTagpt"  );
-   produces<std::vector<float> >( "TPTage"   ).setBranchAlias( "TPTage"   );
-   produces<std::vector<float> >( "TPTaget"  ).setBranchAlias( "TPTaget"  );
-   produces<std::vector<float> >( "TPTagq"   ).setBranchAlias( "TPTagq"   );
-   produces<std::vector<float> >( "TPTageta" ).setBranchAlias( "TPTageta" );
-   produces<std::vector<float> >( "TPTagphi" ).setBranchAlias( "TPTagphi" );
+   produces<std::vector<float> >( "TPTagp"   ).setBranchAlias( "TPTagp"   ); /* Tag momentum. */
+   produces<std::vector<float> >( "TPTagpx"  ).setBranchAlias( "TPTagpx"  ); /* Tag x-momentum. */
+   produces<std::vector<float> >( "TPTagpy"  ).setBranchAlias( "TPTagpy"  ); /* Tag y-momentum. */
+   produces<std::vector<float> >( "TPTagpz"  ).setBranchAlias( "TPTagpz"  ); /* Tag z-momentum. */
+   produces<std::vector<float> >( "TPTagpt"  ).setBranchAlias( "TPTagpt"  ); /* Tag transverse momentum. */
+   produces<std::vector<float> >( "TPTage"   ).setBranchAlias( "TPTage"   ); /* Tag energy. */
+   produces<std::vector<float> >( "TPTaget"  ).setBranchAlias( "TPTaget"  ); /* Tag transverse energy. */
+   produces<std::vector<float> >( "TPTagq"   ).setBranchAlias( "TPTagq"   ); /* Tag charge. */
+   produces<std::vector<float> >( "TPTageta" ).setBranchAlias( "TPTageta" ); /* Tag pseudorapidity. */
+   produces<std::vector<float> >( "TPTagphi" ).setBranchAlias( "TPTagphi" ); /* Tag phi. */                 
 
-   produces<std::vector<float> >( "TPProbep"   ).setBranchAlias( "TPProbep"   );
-   produces<std::vector<float> >( "TPProbepx"  ).setBranchAlias( "TPProbepx"  );
-   produces<std::vector<float> >( "TPProbepy"  ).setBranchAlias( "TPProbepy"  );
-   produces<std::vector<float> >( "TPProbepz"  ).setBranchAlias( "TPProbepz"  );
-   produces<std::vector<float> >( "TPProbept"  ).setBranchAlias( "TPProbept"  );
-   produces<std::vector<float> >( "TPProbee"   ).setBranchAlias( "TPProbee"   );
-   produces<std::vector<float> >( "TPProbeet"  ).setBranchAlias( "TPProbeet"  );
-   produces<std::vector<float> >( "TPProbeq"   ).setBranchAlias( "TPProbeq"   );
-   produces<std::vector<float> >( "TPProbeeta" ).setBranchAlias( "TPProbeeta" );
-   produces<std::vector<float> >( "TPProbephi" ).setBranchAlias( "TPProbephi" );
+   produces<std::vector<float> >( "TPProbep"   ).setBranchAlias( "TPProbep"   ); /* Probe momentum. */            
+   produces<std::vector<float> >( "TPProbepx"  ).setBranchAlias( "TPProbepx"  ); /* Probe x-momentum. */          
+   produces<std::vector<float> >( "TPProbepy"  ).setBranchAlias( "TPProbepy"  ); /* Probe y-momentum. */          
+   produces<std::vector<float> >( "TPProbepz"  ).setBranchAlias( "TPProbepz"  ); /* Probe z-momentum. */          
+   produces<std::vector<float> >( "TPProbept"  ).setBranchAlias( "TPProbept"  ); /* Probe transverse momentum. */ 
+   produces<std::vector<float> >( "TPProbee"   ).setBranchAlias( "TPProbee"   ); /* Probe energy. */              
+   produces<std::vector<float> >( "TPProbeet"  ).setBranchAlias( "TPProbeet"  ); /* Probe transverse energy. */   
+   produces<std::vector<float> >( "TPProbeq"   ).setBranchAlias( "TPProbeq"   ); /* Probe charge. */              
+   produces<std::vector<float> >( "TPProbeeta" ).setBranchAlias( "TPProbeeta" ); /* Probe pseudorapidity. */      
+   produces<std::vector<float> >( "TPProbephi" ).setBranchAlias( "TPProbephi" ); /* Probe phi. */                 
 
-   produces< int >( "nCnd" ).setBranchAlias( "nCnd" );
-   produces< std::vector<int> >( "Cndtype" ).setBranchAlias( "Cndtype" );
-   produces< std::vector<int> >( "Cndtag" ).setBranchAlias( "Cndtag" );
-   produces< std::vector<int> >( "Cndaprobe" ).setBranchAlias( "Cndaprobe" );
-   produces< std::vector<int> >( "Cndpprobe" ).setBranchAlias( "Cndpprobe" );
-   produces< std::vector<int> >( "Cndmoid" ).setBranchAlias( "Cndmoid" );
-   produces< std::vector<int> >( "Cndgmid" ).setBranchAlias( "Cndgmid" );
+   produces< int >( "nCnd" ).setBranchAlias( "nCnd" );                        /* Number of true daughter cands. */
+   produces< std::vector<int> >( "Cndtype" ).setBranchAlias( "Cndtype" );     /* Type of eff measurement. */
+   produces< std::vector<int> >( "Cndtag" ).setBranchAlias( "Cndtag" );       /* Is this cand matched to a tag? */
+   produces< std::vector<int> >( "Cndaprobe" ).setBranchAlias( "Cndaprobe" ); /* Is this cand matched to any probe? */
+   produces< std::vector<int> >( "Cndpprobe" ).setBranchAlias( "Cndpprobe" ); /* Is this cand matched to a passing probe? */
+   produces< std::vector<int> >( "Cndmoid" ).setBranchAlias( "Cndmoid" );     /* PDGId of candidates mother. */
+   produces< std::vector<int> >( "Cndgmid" ).setBranchAlias( "Cndgmid" );     /* PDGId of candidates grandmother. */
 
-   produces<std::vector<float> >( "Cndp" ).setBranchAlias( "Cndp" );
-   produces<std::vector<float> >( "Cndpt" ).setBranchAlias( "Cndpt" );
-   produces<std::vector<float> >( "Cndpx" ).setBranchAlias( "Cndpx" );
-   produces<std::vector<float> >( "Cndpy" ).setBranchAlias( "Cndpy" );
-   produces<std::vector<float> >( "Cndpz" ).setBranchAlias( "Cndpz" );
-   produces<std::vector<float> >( "Cnde" ).setBranchAlias( "Cnde" );
-   produces<std::vector<float> >( "Cndet" ).setBranchAlias( "Cndet" );
-   produces<std::vector<float> >( "Cndq" ).setBranchAlias( "Cndq" );
-   produces<std::vector<float> >( "Cndeta" ).setBranchAlias( "Cndeta" );
-   produces<std::vector<float> >( "Cndphi" ).setBranchAlias( "Cndphi" );
+   produces<std::vector<float> >( "Cndp" ).setBranchAlias( "Cndp" );     /* Candidate momentum. */     
+   produces<std::vector<float> >( "Cndpt" ).setBranchAlias( "Cndpt" );   /* Candidate transverse momentum. */
+   produces<std::vector<float> >( "Cndpx" ).setBranchAlias( "Cndpx" );   /* Candidate x-momentum. */
+   produces<std::vector<float> >( "Cndpy" ).setBranchAlias( "Cndpy" );   /* Candidate y-momentum. */
+   produces<std::vector<float> >( "Cndpz" ).setBranchAlias( "Cndpz" );   /* Candidate z-momentum. */
+   produces<std::vector<float> >( "Cnde" ).setBranchAlias( "Cnde" );     /* Candidate energy. */
+   produces<std::vector<float> >( "Cndet" ).setBranchAlias( "Cndet" );   /* Candidate transverse energy. */
+   produces<std::vector<float> >( "Cndq" ).setBranchAlias( "Cndq" );     /* Candidate charge. */
+   produces<std::vector<float> >( "Cndeta" ).setBranchAlias( "Cndeta" ); /* Candidate pesudorapidity. */
+   produces<std::vector<float> >( "Cndphi" ).setBranchAlias( "Cndphi" ); /* Candidate phi. */                   
 
-   produces<std::vector<float> >( "Cndrp" ).setBranchAlias( "Cndrp" );
-   produces<std::vector<float> >( "Cndrpt" ).setBranchAlias( "Cndrpt" );
-   produces<std::vector<float> >( "Cndrpx" ).setBranchAlias( "Cndrpx" );
-   produces<std::vector<float> >( "Cndrpy" ).setBranchAlias( "Cndrpy" );
-   produces<std::vector<float> >( "Cndrpz" ).setBranchAlias( "Cndrpz" );
-   produces<std::vector<float> >( "Cndre" ).setBranchAlias( "Cndre" );
-   produces<std::vector<float> >( "Cndret" ).setBranchAlias( "Cndret" );
-   produces<std::vector<float> >( "Cndrq" ).setBranchAlias( "Cndrq" );
-   produces<std::vector<float> >( "Cndreta" ).setBranchAlias( "Cndreta" );
-   produces<std::vector<float> >( "Cndrphi" ).setBranchAlias( "Cndrphi" );
-
-
+   produces<std::vector<float> >( "Cndrp" ).setBranchAlias( "Cndrp" );    /* Candidate reco momentum. */            
+   produces<std::vector<float> >( "Cndrpt" ).setBranchAlias( "Cndrpt" );  /* Candidate reco transverse momentum. */ 
+   produces<std::vector<float> >( "Cndrpx" ).setBranchAlias( "Cndrpx" );  /* Candidate reco x-momentum. */          
+   produces<std::vector<float> >( "Cndrpy" ).setBranchAlias( "Cndrpy" );  /* Candidate reco y-momentum. */          
+   produces<std::vector<float> >( "Cndrpz" ).setBranchAlias( "Cndrpz" );  /* Candidate reco z-momentum. */          
+   produces<std::vector<float> >( "Cndre" ).setBranchAlias( "Cndre" );	  /* Candidate reco energy. */              
+   produces<std::vector<float> >( "Cndret" ).setBranchAlias( "Cndret" );  /* Candidate reco transverse energy. */   
+   produces<std::vector<float> >( "Cndrq" ).setBranchAlias( "Cndrq" );	  /* Candidate reco charge. */              
+   produces<std::vector<float> >( "Cndreta" ).setBranchAlias( "Cndreta" ); /* Candidate reco pesudorapidity. */
+   produces<std::vector<float> >( "Cndrphi" ).setBranchAlias( "Cndrphi" ); /* Candidate reco phi. */           
 }
 
 
