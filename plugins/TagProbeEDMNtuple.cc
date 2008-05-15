@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.4 2008/05/11 12:32:12 neadam Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.1 2008/05/15 09:49:20 neadam Exp $
 //
 //
 
@@ -354,8 +354,6 @@ TagProbeEDMNtuple::~TagProbeEDMNtuple()
 void
 TagProbeEDMNtuple::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
-   cout << "Here in muon efficiency producer ..." << endl;
-
    // Set the private event & setup pointers
    m_event = &iEvent;
    m_setup = &iSetup;
@@ -748,7 +746,6 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 
 	    // If both tag and probe are from Z .. set to true
 	    if( tagFromZ && probeFromZ ) tptrue = 1;
-	    cout << "Is true Z? " << tptrue << endl;
 
 	    // Is this probe in the set that pass the efficiency criteria?
 	    int ppass = ProbePassProbeOverlap(vprobes[0].first,passprobemuons);
