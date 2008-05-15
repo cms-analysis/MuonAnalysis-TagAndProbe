@@ -16,7 +16,7 @@
 //
 // Original Author:  
 //         Created:  Mon May  5 09:05:35 CDT 2008
-// $Id$
+// $Id: TagProbeEDMNtuple.h,v 1.2 2008/05/11 11:56:29 neadam Exp $
 //
 
 // system include files
@@ -27,6 +27,8 @@
 #include "DataFormats/Math/interface/Point3D.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
 #include "DataFormats/Candidate/interface/CandMatchMap.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticle.h"
+#include "DataFormats/HepMCCandidate/interface/GenParticleFwd.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
@@ -43,6 +45,8 @@
 class TagProbeEDMNtuple : public edm::EDProducer 
 {
    public:
+      typedef edm::Ref< reco::CandidateView > CandViewRef;
+
       explicit TagProbeEDMNtuple(const edm::ParameterSet&);
       ~TagProbeEDMNtuple();
 
@@ -59,14 +63,14 @@ class TagProbeEDMNtuple : public edm::EDProducer
       void fillTagProbeInfo();
       void fillTrueEffInfo();
 
-      bool CandFromZ( const reco::CandidateRef& cand, 
-		      edm::Handle<reco::CandMatchMap>& matchMap );
+      bool CandFromZ( reco::GenParticleRef mcRef );
 
-      int ProbePassProbeOverlap( const reco::CandidateRef& probe, 
-				 edm::Handle<reco::CandidateCollection>& passprobes );
+      int ProbePassProbeOverlap( const reco::CandidateBaseRef& probe, 
+				 edm::Handle<reco::CandidateView>& passprobes );
 
       bool MatchObjects( const reco::Candidate *hltObj, 
-			 const reco::CandidateRef& tagObj );
+			 const reco::CandidateBaseRef& tagObj,
+			 bool exact = true );
       
       // ----------member data ---------------------------
       edm::Event* m_event;
@@ -103,7 +107,10 @@ class TagProbeEDMNtuple : public edm::EDProducer
       edm::InputTag triggerEventTag_;
       edm::InputTag hltL1Tag_;
       edm::InputTag hltTag_;
+
+      // Matching parameters
       double delRMatchingCut_;
+      double delPtRelMatchingCut_;
       
       // MC parameter
       bool isMC_;      

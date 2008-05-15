@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id$
+// $Id: TagProbeEDMNtuple.cc,v 1.4 2008/05/11 12:32:12 neadam Exp $
 //
 //
 
@@ -23,12 +23,12 @@
 
 // user include files
 #include "MuonAnalysis/TagAndProbe/interface/TagProbeEDMNtuple.h"
+#include "MuonAnalysis/TagAndProbe/interface/CandidateAssociation.h"
 
-#include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/Framework/interface/TriggerNamesService.h"
+#include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
-#include "AnalysisDataFormats/TagAndProbe/interface/CandidateAssociation.h"
-#include "DataFormats/BTauReco/interface/JetTag.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Common/interface/AssociationMap.h"
 #include "DataFormats/Common/interface/HLTPathStatus.h"
@@ -39,9 +39,7 @@
 #include "DataFormats/EgammaCandidates/interface/ElectronIsolationAssociation.h"
 #include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
 #include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectronFwd.h"
-#include "DataFormats/EgammaCandidates/interface/Photon.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
-#include "DataFormats/HepMCCandidate/interface/GenParticleCandidate.h"
 #include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
 #include "DataFormats/HLTReco/interface/TriggerFilterObjectWithRefs.h"
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
@@ -55,15 +53,9 @@
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
-#include "DataFormats/VertexReco/interface/Vertex.h"
-#include "DataFormats/VertexReco/interface/VertexFwd.h"
 #include "Math/GenVector/VectorUtil.h"
 #include "PhysicsTools/HepMCCandAlgos/interface/MCCandMatcher.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
-#include "SimTracker/Records/interface/TrackAssociatorRecord.h"
-#include "TrackingTools/TransientTrack/interface/TransientTrackBuilder.h"
-#include "TrackingTools/Records/interface/TransientTrackRecord.h"
-#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
 
 //
 // constants, enums and typedefs
@@ -83,6 +75,8 @@ using namespace trigger;
 //
 TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
 {
+   cout << "Here in TagProbeEDMNtuple init!" << endl;
+   
    candType_ = iConfig.getUntrackedParameter<string>("tagProbeType","Muon");
    candPDGId_ = 13;
    if( candType_ != "Muon" ) candPDGId_ = 11;
@@ -125,7 +119,7 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    const edm::InputTag dBlankTag("Blank");
 
    // ********** Candidate collections ********** //
-   const edm::InputTag dGenParticlesTag("genParticleCandidates");
+   const edm::InputTag dGenParticlesTag("genParticles");
    genParticlesTag_ = iConfig.getUntrackedParameter<edm::InputTag>(
       "genParticlesTag",dGenParticlesTag);
 
@@ -210,7 +204,7 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    } 
    // ************************************ //
 
-   // Trigger
+   // **************** Trigger ******************* //
    const edm::InputTag dTriggerEventTag("triggerSummaryRAW");
    triggerEventTag_ = 
       iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",dTriggerEventTag);
@@ -222,13 +216,15 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    hltTag_ = iConfig.getUntrackedParameter<edm::InputTag>("hltTag",dHLTTag);
 
    delRMatchingCut_ = iConfig.getUntrackedParameter<double>("triggerDelRMatch",0.15);
+   delPtRelMatchingCut_ = iConfig.getUntrackedParameter<double>("triggerDelPtRelMatch",0.15);
+   // ******************************************** //
 
-   //register your products
-   produces< int >( "run" ).setBranchAlias( "Run" );
-   produces< int >( "event" ).setBranchAlias( "Event" );
+   // ******* Register the output products ******* //
+   produces< int >( "run" ).setBranchAlias( "Run" );     /* Run number */
+   produces< int >( "event" ).setBranchAlias( "Event" ); /* Event number */
 
-   produces< int >( "nl1" ).setBranchAlias( "nL1" );
-   produces< int >( "nhlt" ).setBranchAlias( "nHLT" );
+   produces< int >( "nl1" ).setBranchAlias( "nL1" );     /* Number of L1 triggers. */
+   produces< int >( "nhlt" ).setBranchAlias( "nHLT" );   /* Number of HLT triggers. */
 
    // If the user has requested information about specific MC particle
    // types we will store this in the event also
@@ -687,7 +683,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    for( int itype=0; itype<(int)tagProbeMapTags_.size(); ++itype )
    {
       // Tag-Probes
-      Handle<CandCandAssociationCollection> tagprobes;
+      Handle<CandViewCandViewAssociation> tagprobes;
       try{ m_event->getByLabel(tagProbeMapTags_[itype],tagprobes); }
       catch(...)
       { 
@@ -696,7 +692,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
       }
 
       // Tag MC Truth Match Maps
-      Handle<CandMatchMap> tagmatch;
+      Handle<GenParticleMatch> tagmatch;
       try{ m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch); }
       catch(...)
       { 
@@ -705,7 +701,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
       }
 
       // Truth match for probe
-      Handle<CandMatchMap> allprobematch;
+      Handle<GenParticleMatch> allprobematch;
       try{ m_event->getByLabel(allProbeTruthMatchMapTags_[itype],allprobematch); }
       catch(...)
       { 
@@ -713,8 +709,17 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 			 << "with input tag " << allProbeTruthMatchMapTags_[itype];
       }
 
+      // Tag Candidates
+      Handle<CandidateView> tagmuons;
+      try{ m_event->getByLabel(tagCandTags_[itype],tagmuons); }
+      catch(...)
+      { 
+	 LogWarning("Z") << "Could not extract tag muon cands with input tag " 
+			 << tagCandTags_[itype];
+      }
+
       // Passing Probe Candidates
-      Handle<CandidateCollection> passprobemuons;
+      Handle<CandidateView> passprobemuons;
       try{ m_event->getByLabel(passProbeCandTags_[itype],passprobemuons); }
       catch(...)
       { 
@@ -724,29 +729,29 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 
       if( tagprobes.isValid() )
       {
-	 CandCandAssociationCollection::const_iterator tpItr = tagprobes->begin();
+	 CandViewCandViewAssociation::const_iterator tpItr = tagprobes->begin();
 	 for( ; tpItr != tagprobes->end(); ++tpItr )
 	 {
-	    const CandidateRef &tag = tpItr->key;
-	    const CandidateRefVector &probes = tpItr->val;
+	    const CandidateBaseRef &tag = tpItr->key;
+	    vector< pair<CandidateBaseRef,double> > vprobes = (*tagprobes)[tag];
 
 	    // If there are two probes with the tag continue
-	    if( probes.size() > 1 ) continue;
+	    if( vprobes.size() > 1 ) continue;
 
-	    math::XYZTLorentzVector tpP4 = tag->p4() + probes[0]->p4();
+	    math::XYZTLorentzVector tpP4 = tag->p4() + (vprobes[0].first)->p4();
 
 	    // Is this Tag-Probe pair from a true Z?
 	    // See if both the daughters are matched.
 	    int tptrue = 0;
-	    bool tagFromZ   = CandFromZ(tag,tagmatch);
-	    bool probeFromZ = CandFromZ(probes[0],allprobematch);
+ 	    bool tagFromZ   = CandFromZ((*tagmatch)[tag]);
+ 	    bool probeFromZ = CandFromZ((*allprobematch)[vprobes[0].first]);
 
 	    // If both tag and probe are from Z .. set to true
 	    if( tagFromZ && probeFromZ ) tptrue = 1;
 	    cout << "Is true Z? " << tptrue << endl;
 
 	    // Is this probe in the set that pass the efficiency criteria?
-	    int ppass = ProbePassProbeOverlap(probes[0],passprobemuons);
+	    int ppass = ProbePassProbeOverlap(vprobes[0].first,passprobemuons);
 
 	    // Did this tag cause a L1 and/or HLT trigger?
 	    bool l1Trigger = false;
@@ -762,7 +767,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 		  for(int ipart = 0; ipart != npart; ++ipart)
 		  { 
 		     const L1MuonParticle* l1mu = (muonL1CandRefs[ipart]).get();
-		     l1Trigger = MatchObjects( (const Candidate*)l1mu, tag );
+		     l1Trigger = MatchObjects( (const Candidate*)l1mu, tag, false );
 		     if( l1Trigger ) break;
 		  }
 	       }
@@ -776,7 +781,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 		  for(int ipart = 0; ipart != npart; ++ipart)
 		  { 
 		     const RecoChargedCandidate* muon = (muonCandRefs[ipart]).get();
-		     hltTrigger = MatchObjects( (const Candidate*)muon, tag );
+		     hltTrigger = MatchObjects( (const Candidate*)muon, tag, false );
 		     if( hltTrigger ) break;
 		  }
 	       }
@@ -827,16 +832,16 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    tp_tag_eta_->push_back(  deta );
 	    tp_tag_phi_->push_back(  dphi );
 
-	    dp   = probes[0]->p();
-	    dpx  = probes[0]->px();
-	    dpy  = probes[0]->py();
-	    dpz  = probes[0]->pz();
-	    dpt  = probes[0]->pt();
-	    de   = probes[0]->energy();
-	    det  = probes[0]->et();
-	    dq   = probes[0]->charge();
-	    deta = probes[0]->eta();
-	    dphi = probes[0]->phi();
+	    dp   = (vprobes[0].first)->p();
+	    dpx  = (vprobes[0].first)->px();
+	    dpy  = (vprobes[0].first)->py();
+	    dpz  = (vprobes[0].first)->pz();
+	    dpt  = (vprobes[0].first)->pt();
+	    de   = (vprobes[0].first)->energy();
+	    det  = (vprobes[0].first)->et();
+	    dq   = (vprobes[0].first)->charge();
+	    deta = (vprobes[0].first)->eta();
+	    dphi = (vprobes[0].first)->phi();
 
 	    tp_probe_p_->push_back(    dp );
 	    tp_probe_px_->push_back(   dpx );
@@ -933,7 +938,7 @@ TagProbeEDMNtuple::fillTrueEffInfo()
    auto_ptr< vector<float> > cnd_rphi_( new vector<float> ); 
 
    // Should change this to get the eff info for all types of tag-probe!!
-   Handle<CandidateCollection> genparticles;
+   Handle<GenParticleCollection> genparticles;
    try{ m_event->getByLabel(genParticlesTag_,genparticles); }
    catch(...)
    { 
@@ -947,7 +952,7 @@ TagProbeEDMNtuple::fillTrueEffInfo()
    {
       for( int itype=0; itype<(int)tagProbeMapTags_.size(); ++itype )
       {
-	 Handle<CandMatchMap> tagmatch;
+	 Handle<GenParticleMatch> tagmatch;
 	 try{ m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch); }
 	 catch(...)
 	 { 
@@ -955,7 +960,31 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 			    << "with input tag " << tagTruthMatchMapTags_[itype];
 	 }
 
-	 Handle<CandMatchMap> apmatch;
+	 Handle<CandidateView> tags;
+	 try{ m_event->getByLabel(tagCandTags_[itype],tags); }
+	 catch(...)
+	 { 
+	    LogWarning("Z") << "Could not extract tag candidates "
+			    << "with input tag " << tagCandTags_[itype];
+	 }
+
+	 Handle<CandidateView> aprobes;
+	 try{ m_event->getByLabel(allProbeCandTags_[itype],aprobes); }
+	 catch(...)
+	 { 
+	    LogWarning("Z") << "Could not extract probe candidates "
+			    << "with input tag " << allProbeCandTags_[itype];
+	 }
+
+	 Handle<CandidateView> pprobes;
+	 try{ m_event->getByLabel(passProbeCandTags_[itype],pprobes); }
+	 catch(...)
+	 { 
+	    LogWarning("Z") << "Could not extract passing probe candidates "
+			    << "with input tag " << passProbeCandTags_[itype];
+	 }
+
+	 Handle<GenParticleMatch> apmatch;
 	 try{ m_event->getByLabel(allProbeTruthMatchMapTags_[itype],apmatch); }
 	 catch(...)
 	 { 
@@ -963,7 +992,7 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 			    << "with input tag " << allProbeTruthMatchMapTags_[itype];
 	 }
 
-	 Handle<CandMatchMap> ppmatch;
+	 Handle<GenParticleMatch> ppmatch;
 	 try{ m_event->getByLabel(passProbeTruthMatchMapTags_[itype],ppmatch); }
 	 catch(...)
 	 { 
@@ -1020,18 +1049,21 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 	    double rphi = 0;
 	    double reta = 0;
 
-	    CandidateRef mcRef( genparticles, (size_t)i );
+	    GenParticleRef mcRef( genparticles, (size_t)i );
 	    if( tagmatch.isValid() )
 	    {
-	       CandMatchMap::const_iterator f = tagmatch->begin();
-	       for( ; f != tagmatch->end(); ++f )
+	       // Loop over the tag muons
+	       CandidateView::const_iterator f = tags->begin();
+	       for( ; f != tags->end(); ++f )
 	       {
-		  const Candidate *mcMatchRef  = &*(f->val);
+		  unsigned int index = f - tags->begin();
+		  CandidateBaseRef tagRef = tags->refAt(index);
+		  GenParticleRef mcMatchRef = (*tagmatch)[tagRef];
 
 		  if( &(*mcRef)==&(*mcMatchRef) ) 
 		  {
 		     ftag = 1;
-		     const Candidate *cnd = &*(f->key);
+		     const Candidate *cnd = tagRef.get();
 		     rp   = cnd->p();
 		     rpx  = cnd->px();
 		     rpy  = cnd->py();
@@ -1047,84 +1079,92 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 	    }
 	    if( apmatch.isValid() )
 	    {
-	       CandMatchMap::const_iterator t = apmatch->begin();
-	       for( ; t != apmatch->end(); ++t )
+	       // Loop over the tag muons
+	       CandidateView::const_iterator f = aprobes->begin();
+	       for( ; f != aprobes->end(); ++f )
 	       {
-		  const Candidate *mcMatchRef  = &*(t->val);
-		  if( &(*mcRef)==&(*mcMatchRef) )
+		  unsigned int index = f - aprobes->begin();
+		  CandidateBaseRef tagRef = aprobes->refAt(index);
+		  GenParticleRef mcMatchRef = (*apmatch)[tagRef];
+
+		  if( &(*mcRef)==&(*mcMatchRef) ) 
 		  {
 		     fapb = 1;
 		     if( ftag == 0 )
 		     {
-			const Candidate *tmu = &*(t->key);
-			rp   = tmu->p();
-			rpx  = tmu->px();
-			rpy  = tmu->py();
-			rpz  = tmu->pz(); 
-			rpt  = tmu->pt(); 
-			re   = tmu->energy();
-			ret  = tmu->et();
-			rq   = tmu->charge();
-			rphi = tmu->phi();
-			reta = tmu->eta();
+			const Candidate *cnd = tagRef.get();
+			rp   = cnd->p();
+			rpx  = cnd->px();
+			rpy  = cnd->py();
+			rpz  = cnd->pz(); 
+			rpt  = cnd->pt(); 
+			re   = cnd->energy();
+			ret  = cnd->et();
+			rq   = cnd->charge();
+			rphi = cnd->phi();
+			reta = cnd->eta();
 		     }
 		  }
 	       }
 	    }
 	    if( ppmatch.isValid() )
 	    {
-	       CandMatchMap::const_iterator t = ppmatch->begin();
-	       for( ; t != ppmatch->end(); ++t )
+	       // Loop over the tag muons
+	       CandidateView::const_iterator f = pprobes->begin();
+	       for( ; f != pprobes->end(); ++f )
 	       {
-		  const Candidate *mcMatchRef  = &*(t->val);
-		  if( &(*mcRef)==&(*mcMatchRef) )
+		  unsigned int index = f - pprobes->begin();
+		  CandidateBaseRef tagRef = pprobes->refAt(index);
+		  GenParticleRef mcMatchRef = (*ppmatch)[tagRef];
+
+		  if( &(*mcRef)==&(*mcMatchRef) ) 
 		  {
 		     fppb = 1;
 		     if( ftag == 0 && fapb == 0 )
 		     {
-			const Candidate *tmu = &*(t->key);
-			rp   = tmu->p();
-			rpx  = tmu->px();
-			rpy  = tmu->py();
-			rpz  = tmu->pz(); 
-			rpt  = tmu->pt(); 
-			re   = tmu->energy();
-			ret  = tmu->et();
-			rq   = tmu->charge();
-			rphi = tmu->phi();
-			reta = tmu->eta();
+			const Candidate *cnd = tagRef.get();
+			rp   = cnd->p();
+			rpx  = cnd->px();
+			rpy  = cnd->py();
+			rpz  = cnd->pz(); 
+			rpt  = cnd->pt(); 
+			re   = cnd->energy();
+			ret  = cnd->et();
+			rq   = cnd->charge();
+			rphi = cnd->phi();
+			reta = cnd->eta();
 		     }
 		  }
 	       }
 	    }
 
-	    cnd_type_->push_back(     itype );
+	    cnd_type_->push_back( itype );
 
-	    cnd_tag_->push_back(     ftag );
-	    cnd_aprobe_->push_back(  fapb );
-	    cnd_pprobe_->push_back(  fppb );
-	    cnd_moid_->push_back(  moid );
-	    cnd_gmid_->push_back(  gmoid );
+	    cnd_tag_->push_back(    ftag );
+	    cnd_aprobe_->push_back( fapb );
+	    cnd_pprobe_->push_back( fppb );
+	    cnd_moid_->push_back(   moid );
+	    cnd_gmid_->push_back(   gmoid );
 
-	    cnd_p_->push_back(  p );
+	    cnd_p_->push_back(   p );
 	    cnd_px_->push_back(  px );
 	    cnd_py_->push_back(  py );
 	    cnd_pz_->push_back(  pz );
 	    cnd_pt_->push_back(  pt );
-	    cnd_e_->push_back(  e );
+	    cnd_e_->push_back(   e );
 	    cnd_et_->push_back(  et );
-	    cnd_q_->push_back(  q );
+	    cnd_q_->push_back(   q );
 	    cnd_phi_->push_back(  phi );
 	    cnd_eta_->push_back(  eta );
 
-	    cnd_rp_->push_back(  rp );
+	    cnd_rp_->push_back(   rp );
 	    cnd_rpx_->push_back(  rpx );
 	    cnd_rpy_->push_back(  rpy );
 	    cnd_rpz_->push_back(  rpz );
 	    cnd_rpt_->push_back(  rpt );
-	    cnd_re_->push_back(  re );
+	    cnd_re_->push_back(   re );
 	    cnd_ret_->push_back(  ret );
-	    cnd_rq_->push_back(  rq );
+	    cnd_rq_->push_back(   rq );
 	    cnd_rphi_->push_back(  rphi );
 	    cnd_reta_->push_back(  reta );
 
@@ -1168,44 +1208,29 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 // *********************************************************************** //
 
 // ***************** Are Candidates from a Z? ******************** //
-bool TagProbeEDMNtuple::CandFromZ( const reco::CandidateRef& cand, 
-				   edm::Handle<reco::CandMatchMap>& matches )
+bool TagProbeEDMNtuple::CandFromZ( GenParticleRef mcRef )
 {
    bool isFromZ = false;
 
-   if( matches.isValid() )
+   if( mcRef.isNonnull() )
    {
-      CandMatchMap::const_iterator f = matches->begin();
-      for( ; f != matches->end(); ++f )
+      //cout << "Id " << mcMatchRef->pdgId() << endl;
+      int moid = -99;
+      int gmoid = -99;
+      const Candidate *mcand = mcRef->mother();
+      if( mcand != 0 )
       {
-	 const Candidate *matchRef = &*(f->key);
-	 if( &(*cand)==&(*matchRef) ) 
+	 moid = mcand->pdgId();
+	 if( mcand->pdgId() == mcRef->pdgId() )
 	 {
-	    //const Candidate *mcMatchRef  = &*(f->val);
-	    CandidateRef mcMatchRef  = f->val;
-		  
-	    if( mcMatchRef.isNonnull() )
+	    if( mcand->mother() != 0 )
 	    {
-	       //cout << "Id " << mcMatchRef->pdgId() << endl;
-	       int moid = -99;
-	       int gmoid = -99;
-	       const Candidate *mcand = mcMatchRef->mother();
-	       if( mcand != 0 )
-	       {
-		  moid = mcand->pdgId();
-		  if( mcand->pdgId() == mcMatchRef->pdgId() )
-		  {
-		     if( mcand->mother() != 0 )
-		     {
-			const Candidate *gcand = mcand->mother();
-			gmoid = gcand->pdgId();
-		     }
-		  }
-	       }
-	       if( moid == 23 || gmoid == 23 ) isFromZ = true;
+	       const Candidate *gcand = mcand->mother();
+	       gmoid = gcand->pdgId();
 	    }
 	 }
       }
+      if( moid == 23 || gmoid == 23 ) isFromZ = true;
    }
 
    return isFromZ;
@@ -1213,57 +1238,17 @@ bool TagProbeEDMNtuple::CandFromZ( const reco::CandidateRef& cand,
 // *************************************************************** //
 
 // ***************** Does this probe pass? ******************** //
-int TagProbeEDMNtuple::ProbePassProbeOverlap( const CandidateRef& probe, 
-					      Handle<CandidateCollection>& passprobes )
+int TagProbeEDMNtuple::ProbePassProbeOverlap( const CandidateBaseRef& probe, 
+					      Handle<CandidateView>& passprobes )
 {
    int ppass = 0;
-   if( candType_ == "Muon" )
+   if( passprobes.isValid() )
    {
-      MuonRef probeRef;
-      if( probe->hasMasterClone() )
+      for( int ipp=0; ipp<(int)passprobes->size(); ++ipp )
       {
-	 probeRef = (probe->masterClone()).castTo<MuonRef>();
-      }
-      if( passprobes.isValid() && probeRef.isNonnull() )
-      {
-	 for( int ipp=0; ipp<(int)passprobes->size(); ++ipp )
-	 {
-	    bool isOverlap = false;
-
-	    MuonRef ppRef;
-	    if( (*passprobes)[ipp].hasMasterClone() )
-	    {
-	       ppRef = ((*passprobes)[ipp].masterClone()).castTo<MuonRef>();
-	    }
-	    if( ppRef.isNonnull() )
-	    {
-	       if( (ppRef->track()).isNonnull() && 
-		   (probeRef->track()).isNonnull() && 
-		   ppRef->track() == probeRef->track() )
-		  isOverlap = true;
-	       if( (ppRef->standAloneMuon()).isNonnull() && 
-		   (probeRef->standAloneMuon()).isNonnull() && 
-		   ppRef->standAloneMuon() == probeRef->standAloneMuon() )
-		  isOverlap = true;
-	       if( (ppRef->combinedMuon()).isNonnull() && 
-		   (probeRef->combinedMuon()).isNonnull() && 
-		   ppRef->combinedMuon() == probeRef->combinedMuon() )
-		  isOverlap = true;
-	       if( isOverlap ) ppass = 1;
-	    }
-	 } 
-      }
-   }
-   else
-   {
-      if( passprobes.isValid() )
-      {
-	 for( int ipp=0; ipp<(int)passprobes->size(); ++ipp )
-	 {
-	    bool isOverlap = MatchObjects(&((*passprobes)[ipp]),probe);
-	    if( isOverlap ) ppass = 1;
-	 } 
-      }      
+	 bool isOverlap = MatchObjects(&((*passprobes)[ipp]),probe);
+	 if( isOverlap ) ppass = 1;
+      } 
    }
 
    return ppass;
@@ -1273,17 +1258,26 @@ int TagProbeEDMNtuple::ProbePassProbeOverlap( const CandidateRef& probe,
 
 // ***************** Trigger object matching ******************** //
 bool TagProbeEDMNtuple::MatchObjects( const Candidate *hltObj, 
-				      const CandidateRef& tagObj )
+				      const reco::CandidateBaseRef& tagObj,
+				      bool exact )
 {
    double tEta = tagObj->eta();
    double tPhi = tagObj->phi();
+   double tPt  = tagObj->pt();
    double hEta = hltObj->eta();
    double hPhi = hltObj->phi();
+   double hPt  = hltObj->pt();
 
    double dRval = deltaR(tEta, tPhi, hEta, hPhi);
-   return ( dRval < delRMatchingCut_ );
+   double dPtRel = 999.0;
+   if( tPt > 0.0 ) dPtRel = fabs( hPt - tPt )/tPt;
+
+   // If we are comparing two objects for which the candidates should
+   // be exactly the same, cut hard. Otherwise take cuts from user.
+   if( exact ) return ( dRval < 1e-3 && dPtRel < 1e-3 );
+   else        return ( dRval < delRMatchingCut_ && dPtRel < delPtRelMatchingCut_ );
 }
 // ************************************************************** //
 
 //define this as a plug-in
-//DEFINE_FWK_MODULE(TagProbeEDMNtuple);
+DEFINE_FWK_MODULE(TagProbeEDMNtuple);

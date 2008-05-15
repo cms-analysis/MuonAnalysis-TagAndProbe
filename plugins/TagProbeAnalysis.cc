@@ -13,10 +13,11 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeAnalysis.cc,v 1.14 2008/05/05 10:59:58 neadam Exp $
+// $Id: TagProbeAnalysis.cc,v 1.2 2008/05/11 12:10:45 neadam Exp $
 //
 //
 
+#include "FWCore/Framework/interface/MakerMacros.h"
 #include "MuonAnalysis/TagAndProbe/interface/TagProbeAnalysis.h"
 #include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
 
@@ -1113,4 +1114,5 @@ TagProbeAnalysis::endJob()
 }
 
 //define this as a plug-in
+DEFINE_FWK_MODULE( TagProbeAnalysis );
 

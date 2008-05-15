@@ -13,17 +13,19 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Wed Apr 16 09:46:30 CDT 2008
-// $Id$
+// $Id: TagProbeProducer.cc,v 1.2 2008/05/03 12:28:14 neadam Exp $
 //
 //
 
 
 // User includes
 #include "MuonAnalysis/TagAndProbe/interface/TagProbeProducer.h"
-#include "AnalysisDataFormats/TagAndProbe/interface/CandidateAssociation.h"
+#include "MuonAnalysis/TagAndProbe/interface/CandidateAssociation.h"
+
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/MuonReco/interface/MuonFwd.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "Math/GenVector/VectorUtil.h"
 
@@ -52,7 +54,7 @@ TagProbeProducer::TagProbeProducer(const edm::ParameterSet& iConfig)
 
    requireOS_       = iConfig.getUntrackedParameter<bool>("RequireOS",true);
 
-   produces<reco::CandCandAssociationCollection>();
+   produces<reco::CandViewCandViewAssociation>();
 }
 
 
@@ -72,13 +74,13 @@ TagProbeProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
    using namespace edm;
    using namespace reco;
+   using namespace std;
 
    // We need the output Muon association collection to fill
-   std::auto_ptr<CandCandAssociationCollection> 
-      muonTPCollection( new CandCandAssociationCollection );
- 
+   auto_ptr<CandViewCandViewAssociation> muonTPCollection( new CandViewCandViewAssociation );
+
    // Read in the tag muons
-   edm::Handle<CandidateCollection> tags;
+   Handle< CandidateView > tags;
    try{ iEvent.getByLabel( tagCollection_, tags ); }
    catch(...)
    {
@@ -87,7 +89,7 @@ TagProbeProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    }
 
    // Read in the probe muons
-   edm::Handle<CandidateCollection> probes;
+   Handle< CandidateView > probes;
    try{ iEvent.getByLabel( probeCollection_, probes ); }
    catch(...)
    {
@@ -99,36 +101,32 @@ TagProbeProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
    // Loop over Tag and associate with Probes
    if( tags.isValid() && probes.isValid() )
    {
-      int itag = 0;
-      CandidateCollection::const_iterator tag = (*tags).begin();
-      for( ; tag != (*tags).end(); ++tag ) 
-      {  
-	 CandidateRef tagRef(tags,itag);
-	 ++itag;
+      const RefToBaseVector<Candidate>& vtags = tags->refVector();
+      const RefToBaseVector<Candidate>& vprobes = probes->refVector();
 
+      int itag = 0;
+      RefToBaseVector<Candidate>::const_iterator tag = vtags.begin();
+      for( ; tag != vtags.end(); ++tag, ++itag ) 
+      {  
 	 int iprobe = 0;
-	 CandidateCollection::const_iterator probe = (*probes).begin();
-	 for( ; probe != (*probes).end(); ++probe ) 
+	 RefToBaseVector<Candidate>::const_iterator probe = vprobes.begin();
+	 for( ; probe != vprobes.end(); ++probe, ++iprobe ) 
 	 {
-	    CandidateRef probeRef(probes,iprobe);
-	    ++iprobe;
-	    
 	    // Tag-Probe invariant mass cut
-	    double invMass = ROOT::Math::VectorUtil::InvariantMass(tag->p4(), probe->p4());
+	    double invMass = ROOT::Math::VectorUtil::InvariantMass((*tag)->p4(), (*probe)->p4());
 	    if( invMass < massMinCut_ ) continue;
 	    if( invMass > massMaxCut_ ) continue;
 
 	    // Tag-Probe deltaR cut
-	    double delR = deltaR<double>(tag->eta(),tag->phi(),probe->eta(),probe->phi());
+	    double delR = deltaR<double>((*tag)->eta(),(*tag)->phi(),(*probe)->eta(),(*probe)->phi());
 	    if( delR < delRMinCut_ ) continue;
 	    if( delR > delRMaxCut_ ) continue;
 
 	    // Tag-Probe opposite sign
-	    int sign = tag->charge() * probe->charge();
+	    int sign = (*tag)->charge() * (*probe)->charge();
 	    if( requireOS_ && sign > 0 ) continue;
 
-            muonTPCollection->insert( tagRef, probeRef );
-
+            muonTPCollection->insert( vtags[itag], make_pair(vprobes[iprobe],invMass) );
 	 }	 
       }
    }
@@ -149,4 +147,4 @@ TagProbeProducer::endJob() {
 }
 
 //define this as a plug-in
-//DEFINE_FWK_MODULE(TagProbeProducer);
+DEFINE_FWK_MODULE(TagProbeProducer);

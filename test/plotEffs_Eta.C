@@ -19,9 +19,9 @@
    heff_Eta->SetMaximum(1.05);
    heff_Eta->SetMarkerStyle(kFullCircle);
    heff_Eta->SetMarkerSize(0.5);
-   heff_Eta->GetXaxis()->SetTitle("p_{T} (GeV/c);");
+   heff_Eta->GetXaxis()->SetTitle("#eta");
    heff_Eta->GetYaxis()->SetTitle("Efficiency");
-   heff_Eta->SetTitle("Efficiency vs p_{T}");
+   heff_Eta->SetTitle("Efficiency vs Pseudorapidity");
    heff_Eta->SetStats(kFALSE);
    heff_Eta->Draw();
 
