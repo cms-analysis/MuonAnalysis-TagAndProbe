@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.1 2008/05/15 09:49:20 neadam Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.2 2008/05/15 09:59:55 neadam Exp $
 //
 //
 
@@ -29,6 +29,7 @@
 #include "FWCore/Framework/interface/TriggerNamesService.h"
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
 #include "FWCore/ServiceRegistry/interface/Service.h"
+#include "DataFormats/Candidate/interface/Particle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Common/interface/AssociationMap.h"
 #include "DataFormats/Common/interface/HLTPathStatus.h"
@@ -455,63 +456,59 @@ void TagProbeEDMNtuple::fillMCInfo()
    // Extract the MC information from the frame, if we are running on MC
    if( isMC_ )
    {      
-      vector< Handle< HepMCProduct > > EvtHandles ;
-      m_event->getManyByType( EvtHandles ) ;
-   
-      // Loop over all MC products
-      for ( unsigned int i=0; (i<EvtHandles.size() && mcParticles_.size()>0); i++ )
+      Handle<GenParticleCollection> genparticles;
+      try{ m_event->getByLabel(genParticlesTag_,genparticles); }
+      catch(...)
+      { 
+	 LogWarning("Z") << "Could not extract gen particles with input tag " 
+			 << genParticlesTag_;
+      }
+
+      if( genparticles.isValid() )
       {
-	 if( i>0 ) continue;
-
-	 if ( EvtHandles[i].isValid() )
-	 {
-	    // Get the event
-	    const HepMC::GenEvent* Evt = EvtHandles[i]->GetEvent() ;
    
-	    // Loop over particles and extract any that the user has asked to
-	    // be stored
-	    for( int j=0; j<(int)mcParticles_.size(); ++j )
+	 // Loop over particles and extract any that the user has asked to
+	 // be stored
+	 for( int j=0; j<(int)mcParticles_.size(); ++j )
+	 {
+	    stringstream nstream;
+	    nstream << "MC" << mcParticles_[j];
+	    string prefix = nstream.str();
+
+	    auto_ptr< int > nmc_( new int );
+	 
+	    auto_ptr< vector<int> > mc_ppid_( new vector<int> );
+	    auto_ptr< vector<int> > mc_pbc_( new vector<int> );
+	    auto_ptr< vector<int> > mc_pid_( new vector<int> );
+	    auto_ptr< vector<int> > mc_bc_( new vector<int> );
+
+	    auto_ptr< vector<float> > mc_mass_( new vector<float> );
+	    auto_ptr< vector<float> > mc_p_( new vector<float> );
+	    auto_ptr< vector<float> > mc_pt_( new vector<float> );
+	    auto_ptr< vector<float> > mc_px_( new vector<float> );
+	    auto_ptr< vector<float> > mc_py_( new vector<float> );
+	    auto_ptr< vector<float> > mc_pz_( new vector<float> );
+	    auto_ptr< vector<float> > mc_e_( new vector<float> );
+	    auto_ptr< vector<float> > mc_eta_( new vector<float> );
+	    auto_ptr< vector<float> > mc_phi_( new vector<float> );
+
+	    int nmc = 0;
+
+	    for( unsigned int i=0; i<genparticles->size(); i++ )
 	    {
-	       stringstream nstream;
-	       nstream << "MC" << mcParticles_[j];
-	       string prefix = nstream.str();
-
-	       auto_ptr< int > nmc_( new int );
-
-	       auto_ptr< vector<int> > mc_ppid_( new vector<int> );
-	       auto_ptr< vector<int> > mc_pbc_( new vector<int> );
-	       auto_ptr< vector<int> > mc_pid_( new vector<int> );
-	       auto_ptr< vector<int> > mc_bc_( new vector<int> );
-
-	       auto_ptr< vector<float> > mc_mass_( new vector<float> );
-	       auto_ptr< vector<float> > mc_p_( new vector<float> );
-	       auto_ptr< vector<float> > mc_pt_( new vector<float> );
-	       auto_ptr< vector<float> > mc_px_( new vector<float> );
-	       auto_ptr< vector<float> > mc_py_( new vector<float> );
-	       auto_ptr< vector<float> > mc_pz_( new vector<float> );
-	       auto_ptr< vector<float> > mc_e_( new vector<float> );
-	       auto_ptr< vector<float> > mc_eta_( new vector<float> );
-	       auto_ptr< vector<float> > mc_phi_( new vector<float> );
-
-	       int nmc = 0;
-
-	       HepMC::GenEvent::particle_const_iterator Part = Evt->particles_begin();
-	       HepMC::GenEvent::particle_const_iterator PartEnd = Evt->particles_end();
-	       for(; Part != PartEnd; Part++ )
-	       {
-		  int pdg = (*Part)->pdg_id();
+	       int pdg = (*genparticles)[i].pdgId();
 	       
 		  if( abs(pdg) == mcParticles_[j] )
 		  {
-		     HepMC::FourVector p4 = (*Part)->momentum();
+		     Particle::LorentzVector p4 = (*genparticles)[i].p4();
 
 		     int    pid = pdg;
-		     int    barcode = (*Part)->barcode();
+		     int    barcode = 0;
 		     double p   = p4.mag();
 		     double px = p4.px();
 		     double py = p4.py();
 		     double pz = p4.pz();
-		     double pt = p4.perp();
+		     double pt = p4.pt();
 		     double e  = p4.e();
 		     double phi = p4.phi() ;
 		     double eta = -log(tan(p4.theta()/2.));
@@ -524,44 +521,19 @@ void TagProbeEDMNtuple::fillMCInfo()
 		     // we will just take the first).
 		     int parent_pi = 0;
 		     int parent_bc = 0;
-		     HepMC::GenVertex *pvtx = (*Part)->production_vertex();
-		     
-		     // Loop over the particles in this vertex
-		     if( pvtx != NULL )
+		     const Candidate *mcand = (*genparticles)[i].mother();
+		     if( mcand != 0 )
 		     {
-			if( (*pvtx).particles_in_size() > 0 )
+			parent_pi = mcand->pdgId();
+			if( mcand->pdgId() == pdg )
 			{
-			   HepMC::GenVertex::particles_in_const_iterator pIt = 
-			      (*pvtx).particles_in_const_begin();
-			   parent_pi = (*pIt)->pdg_id(); 
-			   parent_bc = (*pIt)->barcode();
-			}
-		     }
-
-		     int num_lep = 0;
-		     if( abs(pdg) == 23 )
-		     {
-			HepMC::GenVertex *evtx = (*Part)->end_vertex();
-			
-			// Loop over the particles in this vertex
-			if( evtx != NULL )
-			{
-			   if( (*evtx).particles_out_size() > 0 )
+			   if( mcand->mother() != 0 )
 			   {
-			      HepMC::GenVertex::particles_out_const_iterator pIt = 
-				 (*evtx).particles_out_const_begin();
-			      for( ; pIt != (*evtx).particles_out_const_end(); pIt++ )
-			      {
-				 if( abs((*pIt)->pdg_id()) >= 11 && 
-				 abs((*pIt)->pdg_id()) <= 14 ) 
-				 {
-				    ++num_lep;
-				 }
-			      }
+			      const Candidate *gcand = mcand->mother();
+			      parent_pi = gcand->pdgId();
 			   }
 			}
 		     }
-		     if( abs(mcParticles_[j]) == 23 && num_lep == 0 ) continue;
 
 		     // Check for the parents if required
 		     if( mcParents_[j] != 0 && abs(parent_pi) != mcParents_[j] ) continue;
@@ -583,41 +555,40 @@ void TagProbeEDMNtuple::fillMCInfo()
 
 		     nmc++;
 		  }
-	       }
-
-	       // Insert these particles into the event!!
-	       string name = "n"+prefix;
-	       nmc_.reset( new int(nmc) );
-	       m_event->put( nmc_, name.c_str());
-
-	       name = prefix+"ppid";
-	       m_event->put( mc_ppid_, name.c_str());
-	       name = prefix+"pbc";
-	       m_event->put( mc_pbc_, name.c_str());
-	       name = prefix+"pid";
-	       m_event->put( mc_pid_, name.c_str());
-	       name = prefix+"bc";
-	       m_event->put( mc_bc_, name.c_str());
-
-	       name = prefix+"mass";
-	       m_event->put( mc_mass_, name.c_str());
-	       name = prefix+"p";
-	       m_event->put( mc_p_, name.c_str());
-	       name = prefix+"pt";
-	       m_event->put( mc_pt_, name.c_str());
-	       name = prefix+"px";
-	       m_event->put( mc_px_, name.c_str());
-	       name = prefix+"py";
-	       m_event->put( mc_py_, name.c_str());
-	       name = prefix+"pz";
-	       m_event->put( mc_pz_, name.c_str());
-	       name = prefix+"e";
-	       m_event->put( mc_e_, name.c_str());
-	       name = prefix+"eta";
-	       m_event->put( mc_eta_, name.c_str());
-	       name = prefix+"phi";
-	       m_event->put( mc_phi_, name.c_str());
 	    }
+
+	    // Insert these particles into the event!!
+	    string name = "n"+prefix;
+	    nmc_.reset( new int(nmc) );
+	    m_event->put( nmc_, name.c_str());
+
+	    name = prefix+"ppid";
+	    m_event->put( mc_ppid_, name.c_str());
+	    name = prefix+"pbc";
+	    m_event->put( mc_pbc_, name.c_str());
+	    name = prefix+"pid";
+	    m_event->put( mc_pid_, name.c_str());
+	    name = prefix+"bc";
+	    m_event->put( mc_bc_, name.c_str());
+
+	    name = prefix+"mass";
+	    m_event->put( mc_mass_, name.c_str());
+	    name = prefix+"p";
+	    m_event->put( mc_p_, name.c_str());
+	    name = prefix+"pt";
+	    m_event->put( mc_pt_, name.c_str());
+	    name = prefix+"px";
+	    m_event->put( mc_px_, name.c_str());
+	    name = prefix+"py";
+	    m_event->put( mc_py_, name.c_str());
+	    name = prefix+"pz";
+	    m_event->put( mc_pz_, name.c_str());
+	    name = prefix+"e";
+	    m_event->put( mc_e_, name.c_str());
+	    name = prefix+"eta";
+	    m_event->put( mc_eta_, name.c_str());
+	    name = prefix+"phi";
+	    m_event->put( mc_phi_, name.c_str());
 	 }
       }
    }
