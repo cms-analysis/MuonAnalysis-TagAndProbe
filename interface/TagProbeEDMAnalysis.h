@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id$
+// $Id: TagProbeEDMAnalysis.h,v 1.1 2008/05/16 14:58:31 neadam Exp $
 //
 
 // system include files
@@ -47,10 +47,8 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       int SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY);
 
       void SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD);
-      void ZllEffFitter( TTree *fitTree, std::string &fileName, std::string &bvar,
-			 int bnbins, double blow, double nhigh );
-      void ZllEffSBS( TTree *fitTree, std::string &fileName, std::string &bvar,
-			 int bnbins, double blow, double nhigh );
+      void ZllEffFitter( std::string &fileName, std::string &bvar, std::vector<double> bins );
+      void ZllEffSBS( std::string &fileName, std::string &bvar, std::vector<double> bins );
       void CalculateEfficiencies();
       void CalculateMCTruthEfficiencies();
 
@@ -83,13 +81,15 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       double massLow_;          // Lower bound for fit range
       double massHigh_;         // Upper bound for fit range
       
-      int ptNbins_;             // Number of pt eff bins
-      double ptLow_;            // Lower bound for pt eff range
-      double ptHigh_;           // Upper bound for pt eff range
+      int ptNbins_;                 // Number of pt eff bins
+      double ptLow_;                // Lower bound for pt eff range
+      double ptHigh_;               // Upper bound for pt eff range
+      std::vector<double> ptBins_;  // Bin boundaries for Pt if non-uniform desired
 
-      int etaNbins_;            // Number of eta eff bins
-      double etaLow_;           // Lower bound for eta eff range
-      double etaHigh_;          // Upper bound for eta eff range
+      int etaNbins_;                // Number of eta eff bins
+      double etaLow_;               // Lower bound for eta eff range
+      double etaHigh_;              // Upper bound for eta eff range
+      std::vector<double> etaBins_; // Bin boundaries for Pt if non-uniform desired
 
       std::vector<double> signalMean_;       // Fit mean
       std::vector<double> signalWidth_;      // Fit width

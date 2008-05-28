@@ -13,7 +13,7 @@
 //
 // Original Author:  "Nadia Adam"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeEDMAnalysis.cc,v 1.1 2008/05/15 09:49:20 neadam Exp $
+// $Id: TagProbeEDMAnalysis.cc,v 1.1 2008/05/16 14:58:31 neadam Exp $
 //
 //
 
@@ -89,13 +89,40 @@ TagProbeEDMAnalysis::TagProbeEDMAnalysis(const edm::ParameterSet& iConfig)
    massLow_        = iConfig.getUntrackedParameter< double >("MassLow",0.0);
    massHigh_       = iConfig.getUntrackedParameter< double >("MassHigh",100.0);
 
+   vector< double > dBins;
+
    ptNbins_        = iConfig.getUntrackedParameter< int >("NumBinsPt",20);
    ptLow_          = iConfig.getUntrackedParameter< double >("PtLow",0.0);
    ptHigh_         = iConfig.getUntrackedParameter< double >("PtHigh",100.0);
+   ptBins_         = iConfig.getUntrackedParameter< vector<double> >("PtBinBoundaries",dBins);
 
    etaNbins_       = iConfig.getUntrackedParameter< int >("NumBinsEta",20);
    etaLow_         = iConfig.getUntrackedParameter< double >("EtaLow",-2.4);
    etaHigh_        = iConfig.getUntrackedParameter< double >("EtaHigh",2.4);
+   etaBins_        = iConfig.getUntrackedParameter< vector<double> >("EtaBinBoundaries",dBins);
+
+   // Set up the bins for the eff histograms ...
+   if( ptBins_.size() == 0 ) 
+   {
+      // User didn't set bin boundaries, so use even binning
+      double bwidth = (ptHigh_-ptLow_)/(double)ptNbins_;
+      for( int i=0; i<=ptNbins_; ++i )
+      {
+	 double low_edge = ptLow_+(double)i*bwidth;
+	 ptBins_.push_back(low_edge);
+      }
+   }
+   if( etaBins_.size() == 0 ) 
+   {
+      // User didn't set bin boundaries, so use even binning
+      double bwidth = (etaHigh_-etaLow_)/(double)etaNbins_;
+      for( int i=0; i<=etaNbins_; ++i )
+      {
+	 double low_edge = etaLow_+(double)i*bwidth;
+	 etaBins_.push_back(low_edge);
+      }
+   }
+
 
    // SBS
    SBSPeak_     = iConfig.getUntrackedParameter< double >("SBSPeak",90);
@@ -211,6 +238,7 @@ TagProbeEDMAnalysis::TagProbeEDMAnalysis(const edm::ParameterSet& iConfig)
    outRootFile_->cd();
 
    // Make the simple fit tree
+   gROOT->cd();
    fitTree_ = new TTree("fitter_tree","Tree For Fitting",1);
    fitTree_->Branch("ProbePass",&ProbePass_,"ProbePass/I");
    fitTree_->Branch("Mass",     &Mass_,     "Mass/D");
@@ -219,22 +247,22 @@ TagProbeEDMAnalysis::TagProbeEDMAnalysis(const edm::ParameterSet& iConfig)
    fitTree_->Branch("Weight",   &Weight_,   "Weight/D");
    
 
-   ptPass_ = new TH1F("hptpass","Pt Pass",ptNbins_,ptLow_,ptHigh_);
-   ptAll_  = new TH1F("hptall","Pt All",ptNbins_,ptLow_,ptHigh_);
+   ptPass_ = new TH1F("hptpass","Pt Pass",ptBins_.size()-1,&ptBins_[0]);
+   ptAll_  = new TH1F("hptall","Pt All",ptBins_.size()-1,&ptBins_[0]);
 
-   etaPass_ = new TH1F("hetapass","Eta Pass",etaNbins_,etaLow_,etaHigh_);
-   etaAll_ = new TH1F("hetaall","Eta All",etaNbins_,etaLow_,etaHigh_);
+   etaPass_ = new TH1F("hetapass","Eta Pass",etaBins_.size()-1,&etaBins_[0]);
+   etaAll_ = new TH1F("hetaall","Eta All",etaBins_.size()-1,&etaBins_[0]);
 
 }
 
 TagProbeEDMAnalysis::~TagProbeEDMAnalysis()
 {
    // Clean up
-   if (fitTree_)
-   {
-      delete fitTree_->GetCurrentFile();
-      fitTree_ = 0;
-   }
+//    if (fitTree_)
+//    {
+//       if( calcEffsFitter_ || calcEffsSB_ ) delete fitTree_->GetCurrentFile();
+//       fitTree_ = 0;
+//    }
 
    if( ptPass_  ) delete ptPass_;
    if( ptAll_   ) delete ptAll_;
@@ -395,14 +423,15 @@ int TagProbeEDMAnalysis::SaveHistogram(TH1F& Histo, std::string outFileName, Int
 // ***************************************************** //
 
 // ****************** Zll Eff Side band subtraction *************
-void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar, 
-                                  int bnbins, double blow, double bhigh )
+void TagProbeEDMAnalysis::ZllEffSBS( string &fileName, string &bvar, vector< double > bins )
 {
 
-  outRootFile_->cd();
+   outRootFile_->cd();
+   fitTree_->SetDirectory(outRootFile_);
   
    //return;
    cout << "***** Here in Zll sideband subtraction ******" << endl;
+   cout << "Number of entries " << fitTree_->GetEntries() << endl;
    
    string hname = "heff_sbs_" + bvar;
    string htitle = "SBS Efficiency vs " + bvar;
@@ -411,9 +440,10 @@ void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &b
    stringstream histoName;
    stringstream histoTitle;;
 
-   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,blow,bhigh);
-
-   double bwidth = (bhigh-blow)/(double)bnbins;
+   int bnbins = bins.size()-1;
+   cout << "There are " << bnbins << " bins " << endl;
+   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,&bins[0]);
+   for( int bin=0; bin<bnbins; ++bin ) cout << "Bin low edge " << effhist.GetBinLowEdge(bin+1) << endl;
 
    TH1F* PassProbes;
    TH1F* FailProbes;
@@ -433,8 +463,8 @@ void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &b
  
       // The binning variable
       string bunits = "";
-      double lowEdge = blow + (double)bin*bwidth;
-      double highEdge = lowEdge + bwidth;
+      double lowEdge = bins[bin];
+      double highEdge = bins[bin+1];
       if( bvar == "Pt" ) bunits = "GeV";
 
       // Passing Probes
@@ -450,7 +480,8 @@ void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &b
       histoTitle << "Passing Probes - " << lowEdge << " < " << bvar << " < " << highEdge;
       PassProbes = new TH1F(histoName.str().c_str(), histoTitle.str().c_str(), XBinsSBS, XMinSBS, XMaxSBS); 
       PassProbes->Sumw2();
-      fitTree->Draw(("Mass >> " + histoName.str()).c_str(), condition.str().c_str() );
+      PassProbes->SetDirectory(outRootFile_);
+      fitTree_->Draw(("Mass >> " + histoName.str()).c_str(), condition.str().c_str() );
 
       // Failing Probes
       condition.str(std::string());
@@ -465,7 +496,8 @@ void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &b
       histoTitle << "Failing Probes - " << lowEdge << " < " << bvar << " < " << highEdge;
       FailProbes = new TH1F(histoName.str().c_str(), histoTitle.str().c_str(), XBinsSBS, XMinSBS, XMaxSBS); 
       FailProbes->Sumw2();
-      fitTree->Draw(("Mass >> " + histoName.str()).c_str(), condition.str().c_str());
+      FailProbes->SetDirectory(outRootFile_);
+      fitTree_->Draw(("Mass >> " + histoName.str()).c_str(), condition.str().c_str());
 
       // SBS Passing  Probes
       histoName.str(std::string());
@@ -484,7 +516,6 @@ void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &b
       SBSFailProbes->Sumw2();
 
       // Perform side band subtraction
-
       SideBandSubtraction(*PassProbes, *SBSPassProbes, Mean, SD);
       SideBandSubtraction(*FailProbes, *SBSFailProbes, Mean, SD);
 
@@ -514,11 +545,9 @@ void TagProbeEDMAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &b
 
       PassProbes->Write();
       FailProbes->Write();
-
       SBSPassProbes->Write();
       SBSFailProbes->Write();
    }
-
    
    outRootFile_->cd();
    effhist.Write();
@@ -563,8 +592,7 @@ void TagProbeEDMAnalysis::SideBandSubtraction( const TH1F& Total, TH1F& Result,
 // ********************************************************************** //
 
 // ********** Z -> l+l- Fitter ********** //
-void TagProbeEDMAnalysis::ZllEffFitter( TTree *fitTree, string &fileName, string &bvar,
-					int bnbins, double blow, double bhigh )
+void TagProbeEDMAnalysis::ZllEffFitter( string &fileName, string &bvar, vector< double > bins )
 {
    outRootFile_->cd();
    TChain *nFitTree = new TChain();
@@ -575,9 +603,9 @@ void TagProbeEDMAnalysis::ZllEffFitter( TTree *fitTree, string &fileName, string
    
    string hname = "heff_" + bvar;
    string htitle = "Efficiency vs " + bvar;
-   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,blow,bhigh);
-
-   double bwidth = (bhigh-blow)/(double)bnbins;
+   int bnbins = bins.size()-1;
+   cout << "The number of bins is " << bnbins << endl;
+   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,&bins[0]);
 
    for( int bin=0; bin<bnbins; ++bin )
    {
@@ -588,8 +616,8 @@ void TagProbeEDMAnalysis::ZllEffFitter( TTree *fitTree, string &fileName, string
 
       // The binning variable
       string bunits = "";
-      double lowEdge = blow + (double)bin*bwidth;
-      double highEdge = lowEdge + bwidth;
+      double lowEdge = bins[bin];
+      double highEdge = bins[bin+1];
       if( bvar == "Pt" ) bunits = "GeV";
       RooRealVar Pt(bvar.c_str(),bvar.c_str(),lowEdge,highEdge,bunits.c_str());
 
@@ -956,7 +984,7 @@ void TagProbeEDMAnalysis::CalculateMCTruthEfficiencies()
 
    string hname = "truth_eff_Pt";
    string htitle = "Efficiency vs Pt";
-   TH1F pteffhist(hname.c_str(),htitle.c_str(),ptNbins_,ptLow_,ptHigh_);
+   TH1F pteffhist(hname.c_str(),htitle.c_str(),ptBins_.size()-1,&ptBins_[0]);
    pteffhist.Sumw2();
    pteffhist.Divide(ptPass_,ptAll_,1.0,1.0,"B");
    pteffhist.Write();
@@ -964,7 +992,7 @@ void TagProbeEDMAnalysis::CalculateMCTruthEfficiencies()
    outRootFile_->cd();
    hname = "truth_eff_Eta";
    htitle = "Efficiency vs Eta";
-   TH1F etaeffhist(hname.c_str(),htitle.c_str(),etaNbins_,etaLow_,etaHigh_);
+   TH1F etaeffhist(hname.c_str(),htitle.c_str(),etaBins_.size()-1,&etaBins_[0]);
    etaeffhist.Sumw2();
    etaeffhist.Divide(etaPass_,etaAll_,1.0,1.0,"B");
    etaeffhist.Write();
@@ -976,6 +1004,7 @@ void TagProbeEDMAnalysis::CalculateMCTruthEfficiencies()
 // ********** Get the efficiency from this TTree ********** //
 void TagProbeEDMAnalysis::CalculateEfficiencies()
 {
+
    if( calcEffsTruth_ ) 
    {
       CalculateMCTruthEfficiencies();
@@ -986,23 +1015,27 @@ void TagProbeEDMAnalysis::CalculateEfficiencies()
       cout << "Entries in fit tree ... " << fitTree_->GetEntries() << endl;
       fitTree_->Write();
 
+      cout << "There are " << ptBins_.size()-1 << " Pt bins." << endl;
+
       if( calcEffsFitter_ )
       {
 	 // We have filled the simple tree ... call the fitter
 	 string binnedVar = "Pt";
-	 ZllEffFitter( fitTree_, fitFileName_, binnedVar, ptNbins_, ptLow_, ptHigh_ );
+	 ZllEffFitter( fitFileName_, binnedVar, ptBins_);
 	 binnedVar = "Eta";
-	 ZllEffFitter( fitTree_, fitFileName_, binnedVar, etaNbins_, etaLow_, etaHigh_ );
+	 ZllEffFitter( fitFileName_, binnedVar, etaBins_ );
       }
-      
+
       if( calcEffsSB_ )
       {
 	 // We have filled the simple tree ... call side band subtraction
 	 string binnedVar = "Pt";
-	 ZllEffSBS( fitTree_,  fitFileName_, binnedVar, ptNbins_, ptLow_, ptHigh_ );
+	 ZllEffSBS(  fitFileName_, binnedVar, ptBins_ );
 	 binnedVar = "Eta";
-	 ZllEffSBS( fitTree_,  fitFileName_, binnedVar, etaNbins_, etaLow_, etaHigh_ );	  
+	 ZllEffSBS(  fitFileName_, binnedVar, etaBins_ );	  
       }
+
+      
    }
 
    return;
