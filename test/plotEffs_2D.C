@@ -11,14 +11,14 @@
    TFile *_file0 = TFile::Open("muon_eff_test.root");
    _file0.cd();
    
-   TH2F *heff_Pt_Eta = (TH2F*)_file0->Get("heff_Pt_Eta");
-   TH2F *heff_sbs_Pt_Eta = (TH2F*)_file0->Get("heff_sbs_Pt_Eta");
+   TH2F *fit_eff_Pt_Eta = (TH2F*)_file0->Get("fit_eff_Pt_Eta");
+   TH2F *sbs_eff_Pt_Eta = (TH2F*)_file0->Get("sbs_eff_Pt_Eta");
    TH2F *truth_eff_Pt_Eta = (TH2F*)_file0->Get("truth_eff_Pt_Eta");
 
    // For each eta bin plot vs pt
    TCanvas *c[100];
 
-   for( int ybin=1; ybin<=heff_Pt_Eta->GetNbinsY(); ++ybin )
+   for( int ybin=1; ybin<=fit_eff_Pt_Eta->GetNbinsY(); ++ybin )
    {
       char cname[100];
       sprintf( cname, "cy%d", ybin );
@@ -27,10 +27,10 @@
 
       char hname[100];
       sprintf( hname, "hy_%d", ybin );
-      TH1D *h = heff_Pt_Eta->ProjectionX(hname,ybin,ybin);
+      TH1D *h = fit_eff_Pt_Eta->ProjectionX(hname,ybin,ybin);
       char hname_sbs[100];
       sprintf( hname_sbs, "hy_sbs_%d", ybin );
-      TH1D *h_sbs = heff_sbs_Pt_Eta->ProjectionX(hname_sbs,ybin,ybin);
+      TH1D *h_sbs = sbs_eff_Pt_Eta->ProjectionX(hname_sbs,ybin,ybin);
       char hname_truth[100];
       sprintf( hname_truth, "hy_truth_%d", ybin );
       TH1D *h_truth = truth_eff_Pt_Eta->ProjectionX(hname_truth,ybin,ybin);
@@ -67,7 +67,7 @@
    }
 
    TCanvas *cx[100];
-   for( int xbin=1; xbin<=heff_Pt_Eta->GetNbinsX(); ++xbin )
+   for( int xbin=1; xbin<=fit_eff_Pt_Eta->GetNbinsX(); ++xbin )
    {
       char cname[100];
       sprintf( cname, "cx%d", xbin );
@@ -76,10 +76,10 @@
 
       char hname[100];
       sprintf( hname, "hx_%d", xbin );
-      TH1D *h = heff_Pt_Eta->ProjectionY(hname,xbin,xbin);
+      TH1D *h = fit_eff_Pt_Eta->ProjectionY(hname,xbin,xbin);
       char hname_sbs[100];
       sprintf( hname_sbs, "hx_sbs_%d", xbin );
-      TH1D *h_sbs = heff_sbs_Pt_Eta->ProjectionY(hname_sbs,xbin,xbin);
+      TH1D *h_sbs = sbs_eff_Pt_Eta->ProjectionY(hname_sbs,xbin,xbin);
       char hname_truth[100];
       sprintf( hname_truth, "hx_truth_%d", xbin );
       TH1D *h_truth = truth_eff_Pt_Eta->ProjectionY(hname_truth,xbin,xbin);

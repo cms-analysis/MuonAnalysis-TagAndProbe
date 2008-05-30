@@ -11,25 +11,25 @@
    TFile *_file0 = TFile::Open("muon_eff_test.root");
    _file0.cd();
    
-   TH1F *heff_Eta = (TH1F*)_file0->Get("heff_Eta");
-   TH1F *heff_sbs_Eta = (TH1F*)_file0->Get("heff_sbs_Eta");
+   TH1F *fit_eff_Eta = (TH1F*)_file0->Get("fit_eff_Eta");
+   TH1F *sbs_eff_Eta = (TH1F*)_file0->Get("sbs_eff_Eta");
    TH1F *truth_eff_Eta = (TH1F*)_file0->Get("truth_eff_Eta");
 
-   heff_Eta->SetMinimum(0.9);
-   heff_Eta->SetMaximum(1.05);
-   heff_Eta->SetMarkerStyle(kFullCircle);
-   heff_Eta->SetMarkerSize(0.5);
-   heff_Eta->GetXaxis()->SetTitle("#eta");
-   heff_Eta->GetYaxis()->SetTitle("Efficiency");
-   heff_Eta->SetTitle("Efficiency vs Pseudorapidity");
-   heff_Eta->SetStats(kFALSE);
-   heff_Eta->Draw();
+   fit_eff_Eta->SetMinimum(0.9);
+   fit_eff_Eta->SetMaximum(1.05);
+   fit_eff_Eta->SetMarkerStyle(kFullCircle);
+   fit_eff_Eta->SetMarkerSize(0.5);
+   fit_eff_Eta->GetXaxis()->SetTitle("#eta");
+   fit_eff_Eta->GetYaxis()->SetTitle("Efficiency");
+   fit_eff_Eta->SetTitle("Efficiency vs Pseudorapidity");
+   fit_eff_Eta->SetStats(kFALSE);
+   fit_eff_Eta->Draw();
 
-   heff_sbs_Eta->SetMarkerColor(kBlue);
-   heff_sbs_Eta->SetMarkerStyle(kFullCircle);
-   heff_sbs_Eta->SetMarkerSize(0.5);
-   heff_sbs_Eta->SetLineColor(kBlue);
-   heff_sbs_Eta->Draw("same");
+   sbs_eff_Eta->SetMarkerColor(kBlue);
+   sbs_eff_Eta->SetMarkerStyle(kFullCircle);
+   sbs_eff_Eta->SetMarkerSize(0.5);
+   sbs_eff_Eta->SetLineColor(kBlue);
+   sbs_eff_Eta->Draw("same");
 
    truth_eff_Eta->SetMarkerColor(kRed);
    truth_eff_Eta->SetMarkerStyle(kFullCircle);
@@ -39,8 +39,8 @@
 
 
    TLegend t(0.65,0.78,0.95,0.98);
-   t.AddEntry("heff_Eta","Fit Result");
-   t.AddEntry("heff_sbs_Eta","SB Sub Result");
+   t.AddEntry("fit_eff_Eta","Fit Result");
+   t.AddEntry("sbs_eff_Eta","SB Sub Result");
    t.AddEntry("truth_eff_Eta","MC Truth");
    t.Draw();
 }
