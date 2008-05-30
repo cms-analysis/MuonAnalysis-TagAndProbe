@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id: TagProbeEDMAnalysis.h,v 1.1 2008/05/16 14:58:31 neadam Exp $
+// $Id: TagProbeEDMAnalysis.h,v 1.2 2008/05/28 19:32:28 neadam Exp $
 //
 
 // system include files
@@ -31,6 +31,7 @@
 #include <TFile.h>
 #include <TCanvas.h>
 #include <TH1F.h>
+#include <TH2F.h>
 #include <TTree.h>
 
 class TagProbeEDMAnalysis : public edm::EDAnalyzer
@@ -48,9 +49,16 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
 
       void SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD);
       void ZllEffFitter( std::string &fileName, std::string &bvar, std::vector<double> bins );
+      void ZllEffFitter2D( std::string &fileName, std::string &bvar1, std::vector<double> bins1,
+			   std::string &bvar2, std::vector<double> bins2 );
       void ZllEffSBS( std::string &fileName, std::string &bvar, std::vector<double> bins );
+      void ZllEffSBS2D( std::string &fileName, std::string &bvar1, std::vector<double> bins1,
+			std::string &bvar2, std::vector<double> bins2 );
+
+      void ZllEffMCTruth();
+      void ZllEffMCTruth2D();
+
       void CalculateEfficiencies();
-      void CalculateMCTruthEfficiencies();
 
       // Histogram drawing input variables
       std::vector<std::string> quantities_;  
@@ -76,20 +84,25 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       std::string fitFileName_; // Name of the root file to write eff info to
 
       bool unbinnedFit_;        // Do a binned/unbinned fit
+      bool do2DFit_;            // Do the 2D fit as well
       
       int massNbins_;           // Number of bins in the fit
       double massLow_;          // Lower bound for fit range
       double massHigh_;         // Upper bound for fit range
       
-      int ptNbins_;                 // Number of pt eff bins
-      double ptLow_;                // Lower bound for pt eff range
-      double ptHigh_;               // Upper bound for pt eff range
-      std::vector<double> ptBins_;  // Bin boundaries for Pt if non-uniform desired
+      std::string var1Name_;          // Name of variable one (default pt)
+      std::string var1NameUp_;        // Name of variable one uppercase (default Pt)
+      int var1Nbins_;                 // Number of var1 eff bins
+      double var1Low_;                // Lower bound for var1 eff range
+      double var1High_;               // Upper bound for var1 eff range
+      std::vector<double> var1Bins_;  // Bin boundaries for var1 if non-uniform desired
 
-      int etaNbins_;                // Number of eta eff bins
-      double etaLow_;               // Lower bound for eta eff range
-      double etaHigh_;              // Upper bound for eta eff range
-      std::vector<double> etaBins_; // Bin boundaries for Pt if non-uniform desired
+      std::string var2Name_;         // Name of variable two (default eta)
+      std::string var2NameUp_;       // Name of variable two uppercase (default Eta)
+      int var2Nbins_;                // Number of var2 eff bins
+      double var2Low_;               // Lower bound for var2 eff range
+      double var2High_;              // Upper bound for var2 eff range
+      std::vector<double> var2Bins_; // Bin boundaries for var2 if non-uniform desired
 
       std::vector<double> signalMean_;       // Fit mean
       std::vector<double> signalWidth_;      // Fit width
@@ -116,15 +129,18 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       TTree *fitTree_;
       int    ProbePass_;
       double Mass_;
-      double Pt_;
-      double Eta_;
+      double Var1_;
+      double Var2_;
       double Weight_;
 
-      TH1F *ptPass_;
-      TH1F *ptAll_;
+      TH1F *var1Pass_;
+      TH1F *var1All_;
       
-      TH1F *etaPass_;
-      TH1F *etaAll_;
+      TH1F *var2Pass_;
+      TH1F *var2All_;
+
+      TH2F *var1var2Pass_;
+      TH2F *var1var2All_;
 
       TH1F* Histograms_;
       int* NumEvents_;
