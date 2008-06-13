@@ -26,7 +26,6 @@
 <use name=TrackingTools/TransientTrack>
 <use name=DataFormats/BTauReco>
 <use name=RecoBTag/MCTools>
-<use name=RecoEgamma/EgammaIsolationAlgos>
 <use name=SimDataFormats/HepMCProduct>
 <use name=rootrflx>
 <export>
