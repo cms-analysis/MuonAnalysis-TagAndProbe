@@ -9,6 +9,7 @@
 #include "DataFormats/Common/interface/Handle.h"
 #include "DataFormats/Candidate/interface/Candidate.h"
 #include "DataFormats/Candidate/interface/CandidateFwd.h"
+#include "DataFormats/Candidate/interface/OverlapChecker.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/Common/interface/Ref.h"
 #include "DataFormats/Common/interface/RefVector.h"
@@ -68,47 +69,78 @@ MatchedProbeMaker<T>::~MatchedProbeMaker(){}
 template< typename T >
 void MatchedProbeMaker<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
+  LogDebug("MatchedProbeMaker");
+ 
+  using namespace edm;
+  using namespace reco;
+
   std::auto_ptr< edm::RefVector< collection > > outputCollection_matched( new edm::RefVector< collection > );
   std::auto_ptr< edm::RefVector< collection > > outputCollection_unmatched(new edm::RefVector< collection > );
   
   // Get the candidates from the event
   edm::Handle< edm::RefVector< collection > > Cands;
-  iEvent.getByLabel(m_candidateSource,Cands);
-
+  bool bool1 = iEvent.getByLabel(m_candidateSource,Cands);
+  LogTrace("MatchedProbeMaker") << " Cands exist: " << bool1;
+  if(bool1) LogTrace("MatchedProbeMaker") << " with " << Cands->size() << " entries";
+  
+  // Get the references from the event (the probes)
+  //edm::Handle< edm::RefVector< collection > > Refs;
+  edm::Handle< reco::CandidateView > Refs;
+  bool bool2 = iEvent.getByLabel(m_referenceSource,Refs);
+  LogTrace("MatchedProbeMaker") << " Refs exist: " << bool2;
+  if(bool2) LogTrace("MatchedProbeMaker") << " with " << Refs->size() << " entries";
+  
   // Get the resolution matching map from the event
   edm::Handle<reco::CandViewMatchMap> ResMatchMap;
-  iEvent.getByLabel(m_resMatchMapSource,ResMatchMap);
+  bool bool3 = iEvent.getByLabel(m_resMatchMapSource,ResMatchMap);
+  LogTrace("MatchedProbeMaker") << " Map exist: " << bool3;
+  if(bool3) LogTrace("MatchedProbeMaker") << " with " << ResMatchMap->size() << " entries"; 
   
-  //std::cout<< "Cands size " << Cands->size() << std::endl;
-  //std::cout<< "Map size " << ResMatchMap->size() << std::endl;
-
-  // Loop over the candidates looking for a match
-  for (unsigned i=0; i<Cands->size(); i++)
-  {
-     const edm::Ref< collection > CandRef = (*Cands)[i];
-
-     reco::CandidateBaseRef candBaseRef( CandRef );
-
-     // Loop over match map
-     reco::CandViewMatchMap::const_iterator f = ResMatchMap->find( candBaseRef );
-     if( f!=ResMatchMap->end() )
-     {
-	//std::cout << "Match found" << std::endl;
+  if(bool3){
+    // Loop over the candidates looking for a match
+    for (unsigned i=0; i<Cands->size(); i++) {
+      const edm::Ref< collection > CandRef = (*Cands)[i];      
+      reco::CandidateBaseRef candBaseRef( CandRef );
+      
+      // Loop over match map
+      reco::CandViewMatchMap::const_iterator f = ResMatchMap->find( candBaseRef );
+      if( f!=ResMatchMap->end() ) {
 	outputCollection_matched->push_back(CandRef);      
-     }
-     else 
-     {
-	//std::cout<< "Match not found" << std::endl;
+      } else {
 	outputCollection_unmatched->push_back(CandRef);      
-     }
-  }  
-
-  //iEvent.put(outputCollection_matched,"matched");
-  //iEvent.put(outputCollection_unmatched,"unmatched");
-
+      }
+    }
+  } else {
+    OverlapChecker overlap;
+    
+    // Loop over the candidates looking for a match
+    for (unsigned i=0; i<Cands->size(); i++) {      
+      const edm::Ref< collection > CandRef = (*Cands)[i];
+      //RefToBase<Candidate> CandRef(Cands, i);
+      reco::CandidateBaseRef candBaseRef( CandRef );
+      
+      bool ppass = false;
+      
+      for (unsigned j=0; j<Refs->size(); j++) {
+	//const edm::Ref< collection > RefRef = (*Refs)[j];
+	RefToBase<Candidate> RefRef(Refs, j);
+	reco::CandidateBaseRef refBaseRef( RefRef );
+	
+	if(overlap(*CandRef,*RefRef)) {
+	  LogTrace("MatchedProbeMaker") << " Candidate OVERLAP! ";
+	  ppass = true; 
+	}
+      }
+      
+      if( ppass ) outputCollection_matched->push_back(CandRef);
+      else outputCollection_unmatched->push_back(CandRef);
+    }  
+  }
+  
+  LogTrace("MatchedProbeMaker") << " OverlapCandidates: " << outputCollection_matched->size();
   if( matched_ ) iEvent.put( outputCollection_matched );
   else           iEvent.put( outputCollection_unmatched );
-
+  
 }
 
 // ------------ method called once each job just before starting event loop  ------------
