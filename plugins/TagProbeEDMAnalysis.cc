@@ -13,14 +13,13 @@
 //
 // Original Author:  "Nadia Adam"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeEDMAnalysis.cc,v 1.2 2008/05/28 19:32:27 neadam Exp $
+// $Id: TagProbeEDMAnalysis.cc,v 1.3 2008/05/30 19:38:46 neadam Exp $
 //
 //
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "MuonAnalysis/TagAndProbe/interface/TagProbeEDMAnalysis.h"
 #include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
-
 
 // ROOT headers
 
@@ -489,9 +488,6 @@ void TagProbeEDMAnalysis::ZllEffSBS( string &fileName, string &bvar, vector< dou
    const double XMinSBS = massLow_;
    const double XMaxSBS = massHigh_;
 
-   double Mean = SBSPeak_;
-   double SD = SBSPeak_;
-
    for( int bin=0; bin<bnbins; ++bin )
    {
  
@@ -546,13 +542,13 @@ void TagProbeEDMAnalysis::ZllEffSBS( string &fileName, string &bvar, vector< dou
       SBSFailProbes->Sumw2();
 
       // Perform side band subtraction
-      SideBandSubtraction(*PassProbes, *SBSPassProbes, Mean, SD);
-      SideBandSubtraction(*FailProbes, *SBSFailProbes, Mean, SD);
+      SideBandSubtraction(*PassProbes, *SBSPassProbes, SBSPeak_, SBSStanDev_);
+      SideBandSubtraction(*FailProbes, *SBSFailProbes, SBSPeak_, SBSStanDev_);
 
       // Count the number of passing and failing probes in the region
       cout << "About to count the number of events" << endl;
-      double npassR = SBSPassProbes->Integral("width");
-      double nfailR = SBSFailProbes->Integral("width");
+      double npassR = SBSPassProbes->Integral();
+      double nfailR = SBSFailProbes->Integral();
 
       if((npassR + nfailR) != 0){
 	Double_t eff = npassR/(npassR + nfailR);
@@ -577,6 +573,12 @@ void TagProbeEDMAnalysis::ZllEffSBS( string &fileName, string &bvar, vector< dou
       FailProbes->Write();
       SBSPassProbes->Write();
       SBSFailProbes->Write();
+
+      delete PassProbes;
+      delete FailProbes;
+      delete SBSPassProbes;
+      delete SBSFailProbes;
+
    }
    
    outRootFile_->cd();
@@ -621,10 +623,7 @@ void TagProbeEDMAnalysis::ZllEffSBS2D( string &fileName, string &bvar1, vector< 
    const double XMinSBS = massLow_;
    const double XMaxSBS = massHigh_;
 
-   double Mean = SBSPeak_;
-   double SD = SBSPeak_;
-
-   for( int bin1=0; bin1<bnbins1; ++bin1 )
+   for( int bin1 = 0; bin1 < bnbins1; ++bin1 )
    {
       double lowEdge1 = bins1[bin1];
       double highEdge1 = bins1[bin1+1];
@@ -695,13 +694,13 @@ void TagProbeEDMAnalysis::ZllEffSBS2D( string &fileName, string &bvar1, vector< 
 	 SBSFailProbes->Sumw2();
 
 	 // Perform side band subtraction
-	 SideBandSubtraction(*PassProbes, *SBSPassProbes, Mean, SD);
-	 SideBandSubtraction(*FailProbes, *SBSFailProbes, Mean, SD);
+	 SideBandSubtraction(*PassProbes, *SBSPassProbes, SBSPeak_, SBSStanDev_);
+	 SideBandSubtraction(*FailProbes, *SBSFailProbes, SBSPeak_, SBSStanDev_);
 
 	 // Count the number of passing and failing probes in the region
 	 cout << "About to count the number of events" << endl;
-	 double npassR = SBSPassProbes->Integral("width");
-	 double nfailR = SBSFailProbes->Integral("width");
+	 double npassR = SBSPassProbes->Integral();
+	 double nfailR = SBSFailProbes->Integral();
 
 	 if((npassR + nfailR) != 0){
 	    Double_t eff = npassR/(npassR + nfailR);
@@ -726,6 +725,12 @@ void TagProbeEDMAnalysis::ZllEffSBS2D( string &fileName, string &bvar1, vector< 
 	 FailProbes->Write();
 	 SBSPassProbes->Write();
 	 SBSFailProbes->Write();
+
+	 delete PassProbes;
+	 delete FailProbes;
+	 delete SBSPassProbes;
+	 delete SBSFailProbes;
+
       }
    }
    
@@ -754,20 +759,23 @@ void TagProbeEDMAnalysis::SideBandSubtraction( const TH1F& Total, TH1F& Result,
    const Double_t IntegralRight = Total.Integral(PeakBin + D, PeakBin + D + I);
    const Double_t IntegralLeft = Total.Integral(PeakBin - D - I, PeakBin - D);
 
-   Double_t SubValue = 0.0;
-   Double_t NewValue = 0.0;
+   double SubValue = 0.0;
+   double NewValue = 0.0;
+
+   const double Slope     = (IntegralRight - IntegralLeft)/(double)((2*D + I )*(I+1));
+   const double Intercept = IntegralLeft/(double)(I+1) - ((double)PeakBin - (double)D - (double)I/2.0)*Slope;
 
    for(Int_t bin = 1; bin < (nbins + 1); bin++){
-      SubValue = ((IntegralRight - IntegralLeft)/(2*D+I)*(bin - PeakBin - D - I/2.0) + IntegralRight)/I;
+      SubValue = Slope*bin + Intercept;
       if(SubValue < 0)
-	 SubValue = 0;
+         SubValue = 0;
 
       NewValue = Total.GetBinContent(bin)-SubValue;
       if(NewValue > 0){
-	 Result.SetBinContent(bin, NewValue);
+         Result.SetBinContent(bin, NewValue);
       }
    }
-   Result.SetEntries(Result.Integral("width"));
+   Result.SetEntries(Result.Integral());
 }
 // ********************************************************************** //
 
