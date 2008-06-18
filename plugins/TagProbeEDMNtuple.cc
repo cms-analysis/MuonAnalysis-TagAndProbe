@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.2 2008/05/15 09:59:55 neadam Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.3 2008/05/22 19:30:00 neadam Exp $
 //
 //
 
@@ -46,6 +46,8 @@
 #include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
 #include "DataFormats/L1Trigger/interface/L1MuonParticle.h"
 #include "DataFormats/L1Trigger/interface/L1MuonParticleFwd.h"
+#include "DataFormats/L1Trigger/interface/L1EmParticle.h"
+#include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
 #include "DataFormats/Math/interface/deltaR.h"
 #include "DataFormats/RecoCandidate/interface/FitResult.h"
 #include "DataFormats/RecoCandidate/interface/RecoEcalCandidate.h"
@@ -81,6 +83,11 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    candType_ = iConfig.getUntrackedParameter<string>("tagProbeType","Muon");
    candPDGId_ = 13;
    if( candType_ != "Muon" ) candPDGId_ = 11;
+
+
+   checkExactOverlap_ = iConfig.getUntrackedParameter<bool> (
+      "checkExactOverlap", true );
+
 
    // Get the id's of any MC particles to store.
    vector<int> defaultPIDs;
@@ -429,19 +436,29 @@ TagProbeEDMNtuple::fillTriggerInfo()
    if( trgEvent.isValid() )
    {
       vector< L1MuonParticleRef > muonL1CandRefs;
+      vector< L1EmParticleRef   > emL1CandRefs;
       size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
+
       if( l1index < trgEvent->size() )
       {
-	 trgEvent->getObjects( l1index, trigger::TriggerL1Mu, muonL1CandRefs );
-	 *nl1_ = muonL1CandRefs.size(); 
+	if( candType_ == "Muon" ) {
+	  trgEvent->getObjects( l1index, trigger::TriggerL1Mu, muonL1CandRefs );
+	  *nl1_ = muonL1CandRefs.size(); 
+	}
+	 else {
+	   trgEvent->getObjects( l1index, trigger::TriggerL1IsoEG, emL1CandRefs );
+	   *nl1_ = emL1CandRefs.size(); 
+	 }
       }
 
-      vector< RecoChargedCandidateRef > muonCandRefs;
+      vector< RecoChargedCandidateRef > theCandRefs;
       size_type index = trgEvent->filterIndex(hltTag_.label());
       if( index < trgEvent->size() )
       {
-	 trgEvent->getObjects( index, trigger::TriggerMuon, muonCandRefs );
-	 *nhlt_ = muonCandRefs.size(); 
+	if( candType_ == "Muon" )
+	  trgEvent->getObjects( index, trigger::TriggerMuon, theCandRefs );
+	else trgEvent->getObjects( index, trigger::TriggerElectron, theCandRefs );
+	 *nhlt_ = theCandRefs.size(); 
       }
    }
 
@@ -724,9 +741,13 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    // Did this tag cause a L1 and/or HLT trigger?
 	    bool l1Trigger = false;
 	    bool hltTrigger = false;
+
+
 	    if( trgEvent.isValid() )
 	    {
 	       vector< L1MuonParticleRef > muonL1CandRefs;
+	       vector< L1EmParticleRef   > emL1CandRefs;
+
 	       size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
 	       if( l1index < trgEvent->size() )
 	       {
@@ -740,16 +761,19 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 		  }
 	       }
 
-	       vector< RecoChargedCandidateRef > muonCandRefs;
+	       vector< RecoChargedCandidateRef > theCandRefs;
 	       size_type index = trgEvent->filterIndex(hltTag_.label());
 	       if( index < trgEvent->size() )
 	       {
-		  trgEvent->getObjects( index, trigger::TriggerMuon, muonCandRefs );
-		  int npart = muonCandRefs.size();
+		 if( candType_ == "Muon" )
+		   trgEvent->getObjects( index, trigger::TriggerMuon, theCandRefs );
+		 else trgEvent->getObjects( index, trigger::TriggerElectron, theCandRefs );
+
+		  int npart = theCandRefs.size();
 		  for(int ipart = 0; ipart != npart; ++ipart)
 		  { 
-		     const RecoChargedCandidate* muon = (muonCandRefs[ipart]).get();
-		     hltTrigger = MatchObjects( (const Candidate*)muon, tag, false );
+		     const RecoChargedCandidate* thecand = (theCandRefs[ipart]).get();
+		     hltTrigger = MatchObjects( (const Candidate*)thecand, tag, false );
 		     if( hltTrigger ) break;
 		  }
 	       }
@@ -1214,7 +1238,8 @@ int TagProbeEDMNtuple::ProbePassProbeOverlap( const CandidateBaseRef& probe,
    {
       for( int ipp=0; ipp<(int)passprobes->size(); ++ipp )
       {
-	 bool isOverlap = MatchObjects(&((*passprobes)[ipp]),probe);
+	 bool isOverlap = MatchObjects(&((*passprobes)[ipp]),
+				       probe,checkExactOverlap_);
 	 if( isOverlap ) ppass = 1;
       } 
    }

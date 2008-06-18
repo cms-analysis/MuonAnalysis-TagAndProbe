@@ -16,7 +16,7 @@
 //
 // Original Author:  
 //         Created:  Mon May  5 09:05:35 CDT 2008
-// $Id: TagProbeEDMNtuple.h,v 1.2 2008/05/11 11:56:29 neadam Exp $
+// $Id: TagProbeEDMNtuple.h,v 1.3 2008/05/15 09:49:19 neadam Exp $
 //
 
 // system include files
@@ -114,6 +114,9 @@ class TagProbeEDMNtuple : public edm::EDProducer
       
       // MC parameter
       bool isMC_;      
+
+      // whether to use exact Delta_R matching in ProbePassProbeOverlap 
+      bool checkExactOverlap_;
 };
 
 #endif

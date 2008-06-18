@@ -120,43 +120,42 @@ bool eTriggerCandProducer::TriggerDecision(edm::Event &event,
   // Did this tag cause a L1 and/or HLT trigger?
   bool boolDecision = false;
   
-   if( trgEvent.isValid() )
-     {
+  if( trgEvent.isValid() ) {
 
-       bool l1Trigger = true;
-       bool hltTrigger = true;
+    bool l1Trigger = false;
+    bool hltTrigger = false;
        
-       // L1 Trigger
-       vector< L1EmParticleRef   > emL1CandRefs;
-       size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
-       if( l1index < trgEvent->size() ) {
-	 trgEvent->getObjects( l1index, trigger::TriggerL1IsoEG, emL1CandRefs );
-	 int npart = emL1CandRefs.size();
-	 for(int ipart = 0; ipart != npart; ++ipart) { 
-	   const L1EmParticle* l1e = (emL1CandRefs[ipart]).get();
-	   l1Trigger = MatchObjects( (const Candidate*)l1e, electron);
-	   if( l1Trigger ) break;
-	 }
-       }
+    // L1 Trigger
+    vector< L1EmParticleRef   > emL1CandRefs;
+    size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
+    if( l1index < trgEvent->size() ) {
+      trgEvent->getObjects( l1index, trigger::TriggerL1IsoEG, emL1CandRefs );
+      int npart = emL1CandRefs.size();
+      for(int ipart = 0; ipart != npart; ++ipart) { 
+	const L1EmParticle* l1e = (emL1CandRefs[ipart]).get();
+	l1Trigger = MatchObjects( (const Candidate*)l1e, electron);
+	if( l1Trigger ) break;
+      }
+    }
        
 
-       // HLT Trigger
-       vector< RecoChargedCandidateRef > theCandRefs;
-       size_type index = trgEvent->filterIndex(hltTag_.label());
-       if( index < trgEvent->size() ) {
-	 trgEvent->getObjects( index, trigger::TriggerElectron, theCandRefs );
-	 int npart = theCandRefs.size();
-	 for(int ipart = 0; ipart != npart; ++ipart) { 
-	   const RecoChargedCandidate* thecand = (theCandRefs[ipart]).get();
-	   hltTrigger = MatchObjects( (const Candidate*)thecand, electron);
-	   if( hltTrigger ) break;
-	 }
-       }
+    // HLT Trigger
+    vector< RecoChargedCandidateRef > theCandRefs;
+    size_type index = trgEvent->filterIndex(hltTag_.label());
+    if( index < trgEvent->size() ) {
+      trgEvent->getObjects( index, trigger::TriggerElectron, theCandRefs );
+      int npart = theCandRefs.size();
+      for(int ipart = 0; ipart != npart; ++ipart) { 
+	const RecoChargedCandidate* thecand = (theCandRefs[ipart]).get();
+	hltTrigger = MatchObjects( (const Candidate*)thecand, electron);
+	if( hltTrigger ) break;
+      }
+    }
 
-       boolDecision = l1Trigger && hltTrigger;
-     }
+    boolDecision = l1Trigger || hltTrigger;
+  }
    
-   return boolDecision;
+  return boolDecision;
 }
 
 
