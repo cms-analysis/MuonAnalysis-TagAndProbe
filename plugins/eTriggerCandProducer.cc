@@ -1,25 +1,13 @@
 #include "MuonAnalysis/TagAndProbe/interface/eTriggerCandProducer.h"
-#include "DataFormats/Common/interface/HLTPathStatus.h"
-#include "DataFormats/Common/interface/RefToBase.h"
-#include "DataFormats/Common/interface/TriggerResults.h"
-#include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
-#include "DataFormats/HLTReco/interface/TriggerFilterObjectWithRefs.h"
-#include "DataFormats/HLTReco/interface/TriggerTypeDefs.h"
-#include "DataFormats/L1Trigger/interface/L1EmParticle.h"
-#include "DataFormats/L1Trigger/interface/L1EmParticleFwd.h"
+#include <cmath>
 #include "DataFormats/Math/interface/deltaR.h"
-#include "DataFormats/RecoCandidate/interface/RecoChargedCandidate.h"
-#include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
-
 #include "FWCore/MessageLogger/interface/MessageLogger.h"
+#include "FWCore/ServiceRegistry/interface/Service.h"
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include <string>
-
-using namespace std; 
-using namespace reco; 
-using namespace edm;
-using namespace l1extra;
-using namespace trigger;
+#include "HLTrigger/HLTcore/interface/TriggerSummaryAnalyzerAOD.h"
+#include "HLTrigger/HLTcore/interface/TriggerSummaryAnalyzerRAW.h"
+#include "DataFormats/HLTReco/interface/TriggerEvent.h"
 
 
 eTriggerCandProducer::eTriggerCandProducer(const edm::ParameterSet& iConfig )
@@ -28,17 +16,16 @@ eTriggerCandProducer::eTriggerCandProducer(const edm::ParameterSet& iConfig )
   _inputProducer = iConfig.getParameter<std::string>("InputProducer");
 
    // **************** Trigger ******************* //
-   const edm::InputTag dTriggerEventTag("triggerSummaryRAW");
+   const edm::InputTag dTriggerEventTag("hltTriggerSummaryAOD");
    triggerEventTag_ = 
-      iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",dTriggerEventTag);
+      iConfig.getUntrackedParameter<edm::InputTag>("triggerEventTag",
+						   dTriggerEventTag);
 
-   const edm::InputTag dHLTL1Tag("l1IsoElectronPixelSeeds");
-   hltL1Tag_ = iConfig.getUntrackedParameter<edm::InputTag>("hltL1Tag",dHLTL1Tag);
-
-   const edm::InputTag dHLTTag("HLTElectronPixelMatchFilter");
+   const edm::InputTag dHLTTag("hltL1NonIsoHLTNonIsoSingleElectronEt15TrackIsolFilter");
    hltTag_ = iConfig.getUntrackedParameter<edm::InputTag>("hltTag",dHLTTag);
 
-   delRMatchingCut_ = iConfig.getUntrackedParameter<double>("triggerDelRMatch",0.15);
+   delRMatchingCut_ = iConfig.getUntrackedParameter<double>("triggerDelRMatch",
+							    0.15);
    // ******************************************** //
 
 
@@ -62,10 +49,19 @@ eTriggerCandProducer::~eTriggerCandProducer()
 
 // ------------ method called to produce the data  ------------
 
-void eTriggerCandProducer::produce(edm::Event &event, const edm::EventSetup &eventSetup)
+void eTriggerCandProducer::produce(edm::Event &event, 
+				   const edm::EventSetup &eventSetup)
 {
+
+  using namespace std;
+  using namespace edm;
+  using namespace reco;
+  using namespace trigger;
+
+
    // Create the output collection
-   std::auto_ptr<reco::GsfElectronCollection> outCol(new reco::GsfElectronCollection);
+   std::auto_ptr<reco::GsfElectronCollection> 
+     outCol(new reco::GsfElectronCollection);
 
 
 
@@ -77,9 +73,58 @@ void eTriggerCandProducer::produce(edm::Event &event, const edm::EventSetup &eve
    }
    catch(cms::Exception &ex)
    {
-      edm::LogError("GsfElectron ") << "Error! Can't get collection " << _inputProducer;
+      edm::LogError("GsfElectron ") << "Error! Can't get collection " << 
+	_inputProducer;
       throw ex;
    }
+
+   
+   // Trigger Info
+   edm::Handle<trigger::TriggerEvent> trgEvent;
+   event.getByLabel(triggerEventTag_,trgEvent);
+
+   // Some sanity checks
+   if (not trgEvent.isValid()) {
+     edm::LogInfo("info")<< "********NO TRIGGER INFO*********** ";
+     return;
+   }
+
+   // find how many relevant
+   const size_type index = trgEvent->filterIndex(hltTag_.label());
+   if( !(index < trgEvent->sizeFilters())) {
+     edm::LogInfo("info")<< "********NO TRIGGER INFO*********** ";
+     return;
+   }
+
+   // find how many objects there are
+   const trigger::Keys& KEYS(trgEvent->filterKeys(index));
+   const size_type nK(KEYS.size());
+   // loop over these objects to see whether they match
+   const trigger::TriggerObjectCollection& TOC = trgEvent->getObjects();
+     
+
+   ///// /////// For debugging /////////////////////
+//    const size_type nF(trgEvent->sizeFilters());
+//    if(nF < index)
+//      edm::LogInfo("info")<< "**** TRIGGER index is larger than MAX *****";
+//      cout << "Number of TriggerFilters: " << nF << endl;
+//      cout << "The Filters: #, label, #ids/#keys, the id/key pairs" << endl;
+//      for (size_type iF=0; iF!=nF; ++iF) {
+//        const Vids& VIDS (trgEvent->filterIds(iF));
+//        const Keys& KEYS(trgEvent->filterKeys(iF));
+//        const size_type nI(VIDS.size());
+//        const size_type nK(KEYS.size());
+//        cout << iF << " " << trgEvent->filterLabel(iF)
+// 	    << " " << nI << "/" << nK
+// 	    << " the pairs: ";
+//        const size_type n(max(nI,nK));
+//        for (size_type i=0; i!=n; ++i) {
+// 	 cout << " " << VIDS[i] << "/" << KEYS[i];
+//        }
+//        cout << endl;
+//        assert (nI==nK);
+//      }
+   ///// //////////////////////////////////////////////////
 
 
 
@@ -87,11 +132,24 @@ void eTriggerCandProducer::produce(edm::Event &event, const edm::EventSetup &eve
    for(unsigned int i = 0; i < eleCandidatesHandle->size(); ++i) {
      // Get cut decision for each electron
      edm::Ref<reco::GsfElectronCollection> electronRef(eleCandidatesHandle, i);
-
      reco::GsfElectron electron = *electronRef;
-     bool boolDecision = TriggerDecision(event, electron);
 
-     if(boolDecision) outCol->push_back(*electronRef);
+
+     // Did this tag cause a HLT trigger?
+     bool hltTrigger = false;
+
+
+     for(int ipart = 0; ipart != nK; ++ipart) { 
+
+       const trigger::TriggerObject& TO = TOC[KEYS[ipart]];	
+       double dRval = deltaR((float)electron.eta(), (float)electron.phi(), 
+			     TO.eta(), TO.phi());	
+       hltTrigger = (abs(TO.id())==11) && (dRval < delRMatchingCut_);
+       if( hltTrigger ) break;
+     }       
+
+
+     if(hltTrigger) outCol->push_back(*electronRef);
    } 
 
    event.put(outCol);
@@ -103,89 +161,11 @@ void eTriggerCandProducer::produce(edm::Event &event, const edm::EventSetup &eve
 
 
 
-// ***************** Trigger object matching ******************** //
-bool eTriggerCandProducer::TriggerDecision(edm::Event &event, 
-					   reco::GsfElectron& electron) {
-
-
-  // Trigger Info
-  Handle<TriggerEventWithRefs> trgEvent;
-  try{ event.getByLabel(triggerEventTag_,trgEvent); } 
-  catch (...) { 
-    LogWarning("TagAndProbe") << "Could not extract trigger event summary "
-			      << "with tag " << triggerEventTag_;
-  }
-  
-
-  // Did this tag cause a L1 and/or HLT trigger?
-  bool boolDecision = false;
-  
-  if( trgEvent.isValid() ) {
-
-    bool l1Trigger = false;
-    bool hltTrigger = false;
-       
-    // L1 Trigger
-    vector< L1EmParticleRef   > emL1CandRefs;
-    size_type l1index = trgEvent->filterIndex(hltL1Tag_.label());
-    if( l1index < trgEvent->size() ) {
-      trgEvent->getObjects( l1index, trigger::TriggerL1IsoEG, emL1CandRefs );
-      int npart = emL1CandRefs.size();
-      for(int ipart = 0; ipart != npart; ++ipart) { 
-	const L1EmParticle* l1e = (emL1CandRefs[ipart]).get();
-	l1Trigger = MatchObjects( (const Candidate*)l1e, electron);
-	if( l1Trigger ) break;
-      }
-    }
-       
-
-    // HLT Trigger
-    vector< RecoChargedCandidateRef > theCandRefs;
-    size_type index = trgEvent->filterIndex(hltTag_.label());
-    if( index < trgEvent->size() ) {
-      trgEvent->getObjects( index, trigger::TriggerElectron, theCandRefs );
-      int npart = theCandRefs.size();
-      for(int ipart = 0; ipart != npart; ++ipart) { 
-	const RecoChargedCandidate* thecand = (theCandRefs[ipart]).get();
-	hltTrigger = MatchObjects( (const Candidate*)thecand, electron);
-	if( hltTrigger ) break;
-      }
-    }
-
-    boolDecision = l1Trigger || hltTrigger;
-  }
-   
-  return boolDecision;
-}
 
 
 
 
-
-// ***************** Trigger object matching ******************** //
-bool eTriggerCandProducer::MatchObjects( const Candidate *hltObj, 
-					 const reco::GsfElectron& tagObj)
-{
-   double tEta = tagObj.eta();
-   double tPhi = tagObj.phi();
-   double hEta = hltObj->eta();
-   double hPhi = hltObj->phi();
-
-   double dRval = deltaR(tEta, tPhi, hEta, hPhi);
-
-   return ( dRval < delRMatchingCut_);
-}
-// ************************************************************** //
-
-
-
-
-
-
-
-
-
-// ------------ method called once each job just before starting event loop  ---
+// ---- method called once each job just before starting event loop  ---
 
 
 
