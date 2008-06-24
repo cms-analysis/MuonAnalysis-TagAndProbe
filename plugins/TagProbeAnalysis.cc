@@ -13,7 +13,7 @@
 //
 // Original Author:  "Adam Hunt"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeAnalysis.cc,v 1.2 2008/05/11 12:10:45 neadam Exp $
+// $Id: TagProbeAnalysis.cc,v 1.1 2008/05/15 09:49:20 neadam Exp $
 //
 //
 
@@ -99,13 +99,17 @@ TagProbeAnalysis::TagProbeAnalysis(const edm::ParameterSet& iConfig)
    massLow_        = iConfig.getUntrackedParameter< double >("MassLow",0.0);
    massHigh_       = iConfig.getUntrackedParameter< double >("MassHigh",100.0);
 
+   vector< double > dBins;
+
    ptNbins_        = iConfig.getUntrackedParameter< int >("NumBinsPt",20);
    ptLow_          = iConfig.getUntrackedParameter< double >("PtLow",0.0);
    ptHigh_         = iConfig.getUntrackedParameter< double >("PtHigh",100.0);
+   ptBins_         = iConfig.getUntrackedParameter< vector<double> >("PtBinBoundaries",dBins);
 
    etaNbins_       = iConfig.getUntrackedParameter< int >("NumBinsEta",20);
    etaLow_         = iConfig.getUntrackedParameter< double >("EtaLow",-2.4);
    etaHigh_        = iConfig.getUntrackedParameter< double >("EtaHigh",2.4);
+   etaBins_        = iConfig.getUntrackedParameter< vector<double> >("EtaBinBoundaries",dBins);
 
    // SBS
    SBSPeak_     = iConfig.getUntrackedParameter< double >("SBSPeak",90);
@@ -377,7 +381,7 @@ int TagProbeAnalysis::SaveHistogram(TH1F& Histo, std::string outFileName, Int_t 
 
 // ****************** Zll Eff Side band subtraction *************
 void TagProbeAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar, 
-                                  int bnbins, double blow, double bhigh )
+                                  vector< double > bins )
 {
 
   string fmode = "UPDATE";
@@ -394,9 +398,8 @@ void TagProbeAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar
    stringstream histoName;
    stringstream histoTitle;;
 
-   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,blow,bhigh);
-
-   double bwidth = (bhigh-blow)/(double)bnbins;
+   int bnbins = bins.size();
+   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,&bins[0]);
 
    TH1F* PassProbes;
    TH1F* FailProbes;
@@ -408,16 +411,13 @@ void TagProbeAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar
    const double XMinSBS = massLow_;
    const double XMaxSBS = massHigh_;
 
-   double Mean = SBSPeak_;
-   double SD = SBSPeak_;
-
    for( int bin=0; bin<bnbins; ++bin )
    {
  
       // The binning variable
       string bunits = "";
-      double lowEdge = blow + (double)bin*bwidth;
-      double highEdge = lowEdge + bwidth;
+      double lowEdge = bins[bin];
+      double highEdge = bins[bin+1];
       if( bvar == "Pt" ) bunits = "GeV";
 
       // Passing Probes
@@ -468,13 +468,13 @@ void TagProbeAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar
 
       // Perform side band subtraction
 
-      SideBandSubtraction(*PassProbes, *SBSPassProbes, Mean, SD);
-      SideBandSubtraction(*FailProbes, *SBSFailProbes, Mean, SD);
+      SideBandSubtraction(*PassProbes, *SBSPassProbes, SBSPeak_, SBSStanDev_);
+      SideBandSubtraction(*FailProbes, *SBSFailProbes, SBSPeak_, SBSStanDev_);
 
       // Count the number of passing and failing probes in the region
       cout << "About to count the number of events" << endl;
-      double npassR = SBSPassProbes->Integral("width");
-      double nfailR = SBSFailProbes->Integral("width");
+      double npassR = SBSPassProbes->Integral();
+      double nfailR = SBSFailProbes->Integral();
 
       if((npassR + nfailR) != 0){
 	Double_t eff = npassR/(npassR + nfailR);
@@ -513,8 +513,8 @@ void TagProbeAnalysis::ZllEffSBS( TTree* fitTree, string &fileName, string &bvar
 }
 
 // ********* Do sideband subtraction on the requested histogram ********* //
-void TagProbeAnalysis::SideBandSubtraction( const TH1F& Total, TH1F& Result, 
-  					    Double_t Peak, Double_t SD)
+void TagProbeAnalysis::SideBandSubtraction( const TH1F& Total, TH1F& Result,
+                                               Double_t Peak, Double_t SD)
 {
    // Total Means signal plus background
 
@@ -530,26 +530,29 @@ void TagProbeAnalysis::SideBandSubtraction( const TH1F& Total, TH1F& Result,
    const Double_t IntegralRight = Total.Integral(PeakBin + D, PeakBin + D + I);
    const Double_t IntegralLeft = Total.Integral(PeakBin - D - I, PeakBin - D);
 
-   Double_t SubValue = 0.0;
-   Double_t NewValue = 0.0;
+   double SubValue = 0.0;
+   double NewValue = 0.0;
+
+   const double Slope     = (IntegralRight - IntegralLeft)/(double)((2*D + I )*(I+1));
+   const double Intercept = IntegralLeft/(double)(I+1) - ((double)PeakBin - (double)D - (double)I/2.0)*Slope;
 
    for(Int_t bin = 1; bin < (nbins + 1); bin++){
-      SubValue = ((IntegralRight - IntegralLeft)/(2*D+I)*(bin - PeakBin - D - I/2.0) + IntegralRight)/I;
+      SubValue = Slope*bin + Intercept;
       if(SubValue < 0)
-	 SubValue = 0;
+         SubValue = 0;
 
       NewValue = Total.GetBinContent(bin)-SubValue;
       if(NewValue > 0){
-	 Result.SetBinContent(bin, NewValue);
+         Result.SetBinContent(bin, NewValue);
       }
    }
-   Result.SetEntries(Result.Integral("width"));
+   Result.SetEntries(Result.Integral());
 }
 // ********************************************************************** //
 
 // ********** Z -> l+l- Fitter ********** //
 void TagProbeAnalysis::ZllEffFitter( TTree *fitTree, string &fileName, string &bvar,
-                                     int bnbins, double blow, double bhigh )
+                                     vector< double > bins )
 {
    TFile outRootFile(fileName.c_str(),"UPDATE");
    outRootFile.cd();
@@ -561,9 +564,10 @@ void TagProbeAnalysis::ZllEffFitter( TTree *fitTree, string &fileName, string &b
    
    string hname = "heff_" + bvar;
    string htitle = "Efficiency vs " + bvar;
-   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,blow,bhigh);
+   int bnbins = bins.size();
+   cout << "The number of bins is " << bnbins << endl;
+   TH1F effhist(hname.c_str(),htitle.c_str(),bnbins,&bins[0]);
 
-   double bwidth = (bhigh-blow)/(double)bnbins;
 
    for( int bin=0; bin<bnbins; ++bin )
    {
@@ -574,8 +578,8 @@ void TagProbeAnalysis::ZllEffFitter( TTree *fitTree, string &fileName, string &b
 
       // The binning variable
       string bunits = "";
-      double lowEdge = blow + (double)bin*bwidth;
-      double highEdge = lowEdge + bwidth;
+      double lowEdge = bins[bin];
+      double highEdge = bins[bin+1];
       if( bvar == "Pt" ) bunits = "GeV";
       RooRealVar Pt(bvar.c_str(),bvar.c_str(),lowEdge,highEdge,bunits.c_str());
 
@@ -1007,22 +1011,45 @@ void TagProbeAnalysis::CalculateEfficiencies()
       fitTree->Write(); 
       outRootFile.Close();
 
+      // Set up the bins for the eff histograms ...
+      if( ptBins_.size() == 0 ) 
+      {
+	 // User didn't set bin boundaries, so use even binning
+	 double bwidth = (ptHigh_-ptLow_)/(double)ptNbins_;
+	 for( int i=0; i<=ptNbins_; ++i )
+	 {
+	    double low_edge = ptLow_+(double)i*bwidth;
+	    ptBins_.push_back(low_edge);
+	 }
+      }
+      if( etaBins_.size() == 0 ) 
+      {
+	 // User didn't set bin boundaries, so use even binning
+	 double bwidth = (etaHigh_-etaLow_)/(double)etaNbins_;
+	 for( int i=0; i<=etaNbins_; ++i )
+	 {
+	    double low_edge = etaLow_+(double)i*bwidth;
+	    etaBins_.push_back(low_edge);
+	 }
+      }
+
+      cout << "There are " << ptBins_.size() << " Pt bins." << endl;
       if( calcEffsFitter_ )
       {
 	// We have filled the simple tree ... call the fitter
 	string binnedVar = "Pt";
-	ZllEffFitter( fitTree, fitFileName_, binnedVar, ptNbins_, ptLow_, ptHigh_ );
+	ZllEffFitter( fitTree, fitFileName_, binnedVar, ptBins_ );
 	binnedVar = "Eta";
-	ZllEffFitter( fitTree, fitFileName_, binnedVar, etaNbins_, etaLow_, etaHigh_ );
+	ZllEffFitter( fitTree, fitFileName_, binnedVar, etaBins_ );
       }
 
       if( calcEffsSB_ )
       {
 	 // We have filled the simple tree ... call side band subtraction
 	 string binnedVar = "Pt";
-	 ZllEffSBS( fitTree,  fitFileName_, binnedVar, ptNbins_, ptLow_, ptHigh_ );
+	 ZllEffSBS( fitTree,  fitFileName_, binnedVar, ptBins_ );
 	 binnedVar = "Eta";
-	 ZllEffSBS( fitTree,  fitFileName_, binnedVar, etaNbins_, etaLow_, etaHigh_ );	  
+	 ZllEffSBS( fitTree,  fitFileName_, binnedVar, etaBins_ );	  
       }
    }
 

@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id: TagProbeEDMAnalysis.h,v 1.2 2008/05/28 19:32:28 neadam Exp $
+// $Id: TagProbeEDMAnalysis.h,v 1.3 2008/05/30 19:38:46 neadam Exp $
 //
 
 // system include files
@@ -48,10 +48,12 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       int SaveHistogram(TH1F& Histo, std::string outFileName, Int_t LogY);
 
       void SideBandSubtraction(const TH1F& Total, TH1F& Result, Double_t Peak, Double_t SD);
-      void ZllEffFitter( std::string &fileName, std::string &bvar, std::vector<double> bins );
+      void ZllEffFitter( std::string &fileName, std::string &bvar, std::vector<double> bins,
+			 std::string &bvar2, double bvar2Lo, double bvar2Hi );
       void ZllEffFitter2D( std::string &fileName, std::string &bvar1, std::vector<double> bins1,
 			   std::string &bvar2, std::vector<double> bins2 );
-      void ZllEffSBS( std::string &fileName, std::string &bvar, std::vector<double> bins );
+      void ZllEffSBS( std::string &fileName, std::string &bvar, std::vector<double> bins,
+		      std::string &bvar2, double bvar2Lo, double bvar2Hi );
       void ZllEffSBS2D( std::string &fileName, std::string &bvar1, std::vector<double> bins1,
 			std::string &bvar2, std::vector<double> bins2 );
 
@@ -80,8 +82,6 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       bool calcEffsSB_;         // Calculate effs using SB subtraction for these TTrees?
       bool calcEffsFitter_;     // Calculate effs using fitter for these TTrees?
       bool calcEffsTruth_;      // Calculate effs using MC truth for these TTrees
-
-      std::string fitFileName_; // Name of the root file to write eff info to
 
       bool unbinnedFit_;        // Do a binned/unbinned fit
       bool do2DFit_;            // Do the 2D fit as well
@@ -124,6 +124,10 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
 
       double SBSPeak_;                       // Sideband sub peak
       double SBSStanDev_;                    // Sideband sub standard deviation
+
+      std::string mode_;                     // Mode of operation (Normal,Read,Write)  
+      std::string fitFileName_;              // Name of the root file to write to
+      std::vector<std::string> readFiles_;   // Files to read from ... if mode == READ
 
       TFile *outRootFile_;
       TTree *fitTree_;
