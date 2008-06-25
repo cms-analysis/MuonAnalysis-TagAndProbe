@@ -1,0 +1,98 @@
+
+
+    include "PhysicsTools/HepMCCandAlgos/data/genParticles.cfi"
+
+    // Make the charged candidate collections from tracks
+    module allTracks = TrackViewCandidateProducer {
+      InputTag src = generalTracks
+      string particleType = "mu+"
+      string cut = "pt > 0"
+    }
+
+    module staTracks = TrackViewCandidateProducer {
+      InputTag src = standAloneMuons:UpdatedAtVtx
+      string particleType = "mu+"
+      string cut = "pt > 0"
+    }
+
+    // Make the input candidate collections
+    module tagCands = MuonRefSelector {
+       InputTag src = muons
+       string cut = "isGlobalMuon > 0 & pt > 20.0"
+    }
+
+    // Standalone muon tracks (probes)
+    module staProbCands = RecoChargedCandidateRefSelector {
+	InputTag src = staTracks
+	string cut = "pt > 10.0"
+    }
+
+    // Tracker muons (to be matched)
+    module trackerCands = RecoChargedCandidateRefSelector {
+	InputTag src = allTracks
+	string cut = "pt > 10.0" 
+    }
+
+    // Match track and stand alone candidates
+    // to get the passing probe candidates
+    module StaTkMap = TrivialDeltaRViewMatcher  {
+	InputTag src = staProbeCands
+	InputTag matched = trackerCands
+	double distMin = 0.3
+    } 
+
+    // Use the producer to get a list of matched candidates
+    module StaTkMatched = RecoChargedCandidateMatchedProbeMaker { 
+	untracked InputTag CandidateSource   = staProbeCands
+	untracked InputTag ResMatchMapSource = StaTkMap
+	untracked InputTag ReferenceSource   = trackerCands
+	untracked bool Matched = true
+    }
+
+    module StaTkUnmatched = RecoChargedCandidateMatchedProbeMaker { 
+	untracked InputTag CandidateSource   = staProbeCands
+	untracked InputTag ResMatchMapSource = StaTkMap
+	untracked InputTag ReferenceSource   = trackerCands
+	untracked bool Matched = false
+    }
+
+    // Make the tag probe association map
+    module muonTagProbeMap = TagProbeProducer {
+       InputTag TagCollection = tagCands
+       InputTag ProbeCollection = staProbeCands
+
+       untracked double MassMinCut = 50.0
+       untracked double MassMaxCut = 120.0
+    }
+
+    // find generator particles matching by DeltaR
+    module tagMuonMatch = MCTruthDeltaRMatcherNew {
+      InputTag src = tagCands
+      InputTag matched = genParticles
+      double distMin = 0.25
+      vint32 pdgId = { 13 }
+    }
+
+    module allProbeMuonMatch = MCTruthDeltaRMatcherNew {
+      InputTag src = staProbeCands
+      InputTag matched = genParticles
+      double distMin = 0.25
+      vint32 pdgId = { 13 }
+    }
+
+    module passProbeMuonMatch = MCTruthDeltaRMatcherNew {
+      InputTag src = StaTkMatched
+      InputTag matched = genParticles
+      double distMin = 0.25
+      vint32 pdgId = { 13 }
+    }
+
+    sequence muon_cands = { 
+                            genParticles &
+                            allTracks & staTracks,
+			    tagCands & trackerCands & staProbeCands,
+			    StaTkMap, 
+			    StaTkMatched & StaTkUnmatched &
+			    muonTagProbeMap & 
+			    tagMuonMatch & allProbeMuonMatch & passProbeMuonMatch 
+    }
