@@ -13,14 +13,13 @@
 //
 // Original Author:  "Nadia Adam"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeEDMAnalysis.cc,v 1.3 2008/05/30 19:38:46 neadam Exp $
+// $Id: TagProbeEDMAnalysis.cc,v 1.5 2008/06/24 22:58:22 ahunt Exp $
 //
 //
 
 #include "FWCore/Framework/interface/MakerMacros.h"
 #include "MuonAnalysis/TagAndProbe/interface/TagProbeEDMAnalysis.h"
 #include "MuonAnalysis/TagAndProbe/interface/RooCMSShapePdf.h"
-#include "MuonAnalysis/TagAndProbe/interface/RooCMSSignalShapePdf.h"
 
 
 // ROOT headers
@@ -47,7 +46,6 @@
 #include <RooChi2Var.h>
 #include <RooDataSet.h>
 #include <RooDataHist.h>
-#include <RooExponential.h>
 #include <RooFitResult.h>
 #include <RooGenericPdf.h>
 #include <RooGlobalFunc.h>
@@ -84,6 +82,8 @@ TagProbeEDMAnalysis::TagProbeEDMAnalysis(const edm::ParameterSet& iConfig)
    calcEffsSB_     = iConfig.getUntrackedParameter< bool >("CalculateEffSideBand",false);
    calcEffsFitter_ = iConfig.getUntrackedParameter< bool >("CalculateEffFitter",false);
    calcEffsTruth_  = iConfig.getUntrackedParameter< bool >("CalculateEffTruth",false);
+   
+   truthParentId_  = iConfig.getUntrackedParameter< int >("MCTruthParentId",23);
 
    // Type of fit
    unbinnedFit_    = iConfig.getUntrackedParameter< bool >("UnbinnedFit",false);
@@ -418,7 +418,7 @@ TagProbeEDMAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	 {
 	    if( (*cnd_type)[i] != tagProbeType_ ) continue;
 	    
-	    if( !( (*cnd_gmid)[i] == 23 ) ) continue;
+	    if( truthParentId_ != 0 && !( fabs((*cnd_gmid)[i]) == truthParentId_ ) ) continue;
 	    
 	    bool inVar1Range = false;
 	    if( (*cnd_var1)[i] > var1Bins_[0] &&
