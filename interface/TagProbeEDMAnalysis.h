@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id: TagProbeEDMAnalysis.h,v 1.3 2008/05/30 19:38:46 neadam Exp $
+// $Id: TagProbeEDMAnalysis.h,v 1.4 2008/06/24 22:58:22 ahunt Exp $
 //
 
 // system include files
@@ -82,6 +82,9 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
       bool calcEffsSB_;         // Calculate effs using SB subtraction for these TTrees?
       bool calcEffsFitter_;     // Calculate effs using fitter for these TTrees?
       bool calcEffsTruth_;      // Calculate effs using MC truth for these TTrees
+
+      int truthParentId_;       // Set the parent id for the truch calculation, use 23 for 
+                                // signal Z, 0 for no parent requirement
 
       bool unbinnedFit_;        // Do a binned/unbinned fit
       bool do2DFit_;            // Do the 2D fit as well
