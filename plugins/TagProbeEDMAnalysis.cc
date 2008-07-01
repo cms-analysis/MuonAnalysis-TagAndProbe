@@ -13,7 +13,7 @@
 //
 // Original Author:  "Nadia Adam"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeEDMAnalysis.cc,v 1.5 2008/06/24 22:58:22 ahunt Exp $
+// $Id: TagProbeEDMAnalysis.cc,v 1.6 2008/06/25 02:22:28 neadam Exp $
 //
 //
 
@@ -332,28 +332,34 @@ TagProbeEDMAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    {
       // Get the TP variables to fill the fitter tree ...
       Handle< vector<int> > tp_type;
-      try{ iEvent.getByLabel("TPEdm","TPtype",tp_type); }
-      catch (...){ cout << "No TPtype in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","TPtype",tp_type) ) {
+         cout << "No TPtype in Tree!" << endl; 
+      }
 
       Handle< vector<int> > tp_true;
-      try{ iEvent.getByLabel("TPEdm","TPtrue",tp_true); }
-      catch (...){ cout << "No TPtrue in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","TPtrue",tp_true) ) {
+         cout << "No TPtrue in Tree!" << endl; 
+      }
       
       Handle< vector<int> > tp_ppass;
-      try{ iEvent.getByLabel("TPEdm","TPppass",tp_ppass); }
-      catch (...){ cout << "No TPppass in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","TPppass",tp_ppass) ) {
+         cout << "No TPppass in Tree!" << endl; 
+      }
       
       Handle< vector<float> > tp_mass;
-      try{ iEvent.getByLabel("TPEdm","TPmass",tp_mass); }
-      catch (...){ cout << "No TPmass in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","TPmass",tp_mass) ) {
+         cout << "No TPmass in Tree!" << endl; 
+      }
 
       Handle< vector<float> > tp_probe_var1;
-      try{ iEvent.getByLabel("TPEdm",("TPProbe"+var1Name_).c_str(),tp_probe_var1); }
-      catch (...){ cout << "No TPProbe"+var1Name_+" in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm",("TPProbe"+var1Name_).c_str(),tp_probe_var1) ) {
+         cout << "No TPProbe"+var1Name_+" in Tree!" << endl; 
+      }
       
       Handle< vector<float> > tp_probe_var2;
-      try{ iEvent.getByLabel("TPEdm",("TPProbe"+var2Name_).c_str(),tp_probe_var2); }
-      catch (...){ cout << "No TPProbe"+var2Name_+" in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm",("TPProbe"+var2Name_).c_str(),tp_probe_var2) ) {
+         cout << "No TPProbe"+var2Name_+" in Tree!" << endl; 
+      }
       
       outRootFile_->cd();
 
@@ -380,36 +386,44 @@ TagProbeEDMAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
    {
       // Get the Cnd variable for the MC truth ...
       Handle< vector<int> > cnd_type;
-      try{ iEvent.getByLabel("TPEdm","Cndtype",cnd_type); }
-      catch (...){ cout << "No Cndtype in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","Cndtype",cnd_type) ) {
+         cout << "No Cndtype in Tree!" << endl; 
+      }
 
       Handle< vector<int> > cnd_tag;
-      try{ iEvent.getByLabel("TPEdm","Cndtag",cnd_tag); }
-      catch (...){ cout << "No Cndtag in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","Cndtag",cnd_tag) ) {
+         cout << "No Cndtag in Tree!" << endl; 
+      }
 
       Handle< vector<int> > cnd_aprobe;
-      try{ iEvent.getByLabel("TPEdm","Cndaprobe",cnd_aprobe); }
-      catch (...){ cout << "No Cndaprobe in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","Cndaprobe",cnd_aprobe) ) {
+         cout << "No Cndaprobe in Tree!" << endl; 
+      }
 
       Handle< vector<int> > cnd_pprobe;
-      try{ iEvent.getByLabel("TPEdm","Cndpprobe",cnd_pprobe); }
-      catch (...){ cout << "No Cndpprobe in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","Cndpprobe",cnd_pprobe) ) {
+         cout << "No Cndpprobe in Tree!" << endl; 
+      }
 
       Handle< vector<int> > cnd_moid;
-      try{ iEvent.getByLabel("TPEdm","Cndmoid",cnd_moid); }
-      catch (...){ cout << "No Cndmoid in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","Cndmoid",cnd_moid) ) {
+         cout << "No Cndmoid in Tree!" << endl; 
+      }
 
       Handle< vector<int> > cnd_gmid;
-      try{ iEvent.getByLabel("TPEdm","Cndgmid",cnd_gmid); }
-      catch (...){ cout << "No Cndgmid in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm","Cndgmid",cnd_gmid) ) {
+         cout << "No Cndgmid in Tree!" << endl; 
+      }
 
       Handle< vector<float> > cnd_var1;
-      try{ iEvent.getByLabel("TPEdm",("Cnd"+var1Name_).c_str(),cnd_var1); }
-      catch (...){ cout << "No Cnd"+var1Name_+" in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm",("Cnd"+var1Name_).c_str(),cnd_var1) ) {
+         cout << "No Cnd"+var1Name_+" in Tree!" << endl; 
+      }
 
       Handle< vector<float> > cnd_var2;
-      try{ iEvent.getByLabel("TPEdm",("Cnd"+var2Name_).c_str(),cnd_var2); }
-      catch (...){ cout << "No Cnd"+var2Name_+" in Tree!" << endl; }
+      if ( !iEvent.getByLabel("TPEdm",("Cnd"+var2Name_).c_str(),cnd_var2) ) {
+         cout << "No Cnd"+var2Name_+" in Tree!" << endl; 
+      }
 
       if( cnd_type.isValid() )
       {
@@ -457,8 +471,9 @@ TagProbeEDMAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 	     quantities_[i] == "Event" )
 	 {
 	    Handle< int > h;
-	    try{ iEvent.getByLabel("TPEdm",quantities_[i].c_str(),h); }
-	    catch (...){ cout << "No "+quantities_[i]+" in Tree!" << endl; }
+	    if ( !iEvent.getByLabel("TPEdm",quantities_[i].c_str(),h) ) { 
+	       cout << "No "+quantities_[i]+" in Tree!" << endl; 
+            }
 	    if( h.isValid() ) Histograms_[i].Fill(*h);
 	 }
 	 // vector<int>
@@ -476,16 +491,18 @@ TagProbeEDMAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
 		  quantities_[i].find("bc") != string::npos )
 	 {
 	    Handle< vector<int> > h;
-	    try{ iEvent.getByLabel("TPEdm",quantities_[i].c_str(),h); }
-	    catch (...){ cout << "No "+quantities_[i]+" in Tree!" << endl; }
+	    if ( !iEvent.getByLabel("TPEdm",quantities_[i].c_str(),h) ) {
+	        cout << "No "+quantities_[i]+" in Tree!" << endl; 
+            }
 	    if( h.isValid() ) for( int n=0; n<(int)h->size(); ++n ) Histograms_[i].Fill((*h)[n]);
 	 }
 	 // vector< float >
 	 else
 	 {
 	    Handle< vector<float> > h;
-	    try{ iEvent.getByLabel("TPEdm",quantities_[i].c_str(),h); }
-	    catch (...){ cout << "No "+quantities_[i]+" in Tree!" << endl; }
+	    if ( !iEvent.getByLabel("TPEdm",quantities_[i].c_str(),h) ) {
+	        cout << "No "+quantities_[i]+" in Tree!" << endl; 
+            }
 	    if( h.isValid() ) for( int n=0; n<(int)h->size(); ++n ) Histograms_[i].Fill((*h)[n]);
 	 }
       }

@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.3 2008/05/22 19:30:00 neadam Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.4 2008/06/18 20:55:02 kalanand Exp $
 //
 //
 
@@ -424,9 +424,7 @@ TagProbeEDMNtuple::fillTriggerInfo()
    
    // Trigger Info
    Handle<TriggerEventWithRefs> trgEvent;
-   try{ m_event->getByLabel(triggerEventTag_,trgEvent); } 
-   catch (...) 
-   { 
+   if ( !m_event->getByLabel(triggerEventTag_,trgEvent) ) {
       LogWarning("TagAndProbe") << "Could not extract trigger event summary "
 				<< "with tag " << triggerEventTag_;
    }
@@ -474,9 +472,7 @@ void TagProbeEDMNtuple::fillMCInfo()
    if( isMC_ )
    {      
       Handle<GenParticleCollection> genparticles;
-      try{ m_event->getByLabel(genParticlesTag_,genparticles); }
-      catch(...)
-      { 
+      if ( !m_event->getByLabel(genParticlesTag_,genparticles) ) {
 	 LogWarning("Z") << "Could not extract gen particles with input tag " 
 			 << genParticlesTag_;
       }
@@ -657,9 +653,7 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 
    // Trigger Info
    Handle<TriggerEventWithRefs> trgEvent;
-   try{ m_event->getByLabel(triggerEventTag_,trgEvent); } 
-   catch (...) 
-   { 
+   if ( !m_event->getByLabel(triggerEventTag_,trgEvent) ) {
       LogWarning("Z") << "Could not extract trigger event summary "
 		      << "with tag " << triggerEventTag_;
    }
@@ -670,45 +664,35 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    {
       // Tag-Probes
       Handle<CandViewCandViewAssociation> tagprobes;
-      try{ m_event->getByLabel(tagProbeMapTags_[itype],tagprobes); }
-      catch(...)
-      { 
+      if ( !m_event->getByLabel(tagProbeMapTags_[itype],tagprobes) ) {
 	 LogWarning("Z") << "Could not extract tag-probe map with input tag " 
 			 << tagProbeMapTags_[itype];
       }
 
       // Tag MC Truth Match Maps
       Handle<GenParticleMatch> tagmatch;
-      try{ m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch); }
-      catch(...)
-      { 
+      if ( !m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch) ) {
 	 LogWarning("Z") << "Could not extract muon tag match map "
 			 << "with input tag " << tagTruthMatchMapTags_[itype];
       }
 
       // Truth match for probe
       Handle<GenParticleMatch> allprobematch;
-      try{ m_event->getByLabel(allProbeTruthMatchMapTags_[itype],allprobematch); }
-      catch(...)
-      { 
+      if ( !m_event->getByLabel(allProbeTruthMatchMapTags_[itype],allprobematch) ) {
 	 LogWarning("Z") << "Could not extract muon allprobe match map "
 			 << "with input tag " << allProbeTruthMatchMapTags_[itype];
       }
 
       // Tag Candidates
       Handle<CandidateView> tagmuons;
-      try{ m_event->getByLabel(tagCandTags_[itype],tagmuons); }
-      catch(...)
-      { 
+      if ( !m_event->getByLabel(tagCandTags_[itype],tagmuons) ) {
 	 LogWarning("Z") << "Could not extract tag muon cands with input tag " 
 			 << tagCandTags_[itype];
       }
 
       // Passing Probe Candidates
       Handle<CandidateView> passprobemuons;
-      try{ m_event->getByLabel(passProbeCandTags_[itype],passprobemuons); }
-      catch(...)
-      { 
+      if ( !m_event->getByLabel(passProbeCandTags_[itype],passprobemuons) ) {
 	 LogWarning("Z") << "Could not extract tag muon cands with input tag " 
 			 << passProbeCandTags_[itype];
       }
@@ -931,9 +915,7 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 
    // Should change this to get the eff info for all types of tag-probe!!
    Handle<GenParticleCollection> genparticles;
-   try{ m_event->getByLabel(genParticlesTag_,genparticles); }
-   catch(...)
-   { 
+   if ( !m_event->getByLabel(genParticlesTag_,genparticles) ) {
       LogWarning("Z") << "Could not extract gen particles with input tag " 
 			<< genParticlesTag_;
    }
@@ -945,49 +927,37 @@ TagProbeEDMNtuple::fillTrueEffInfo()
       for( int itype=0; itype<(int)tagProbeMapTags_.size(); ++itype )
       {
 	 Handle<GenParticleMatch> tagmatch;
-	 try{ m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch); }
-	 catch(...)
-	 { 
+	 if ( !m_event->getByLabel(tagTruthMatchMapTags_[itype],tagmatch) ) {
 	    LogWarning("Z") << "Could not extract muon match map "
 			    << "with input tag " << tagTruthMatchMapTags_[itype];
 	 }
 
 	 Handle<CandidateView> tags;
-	 try{ m_event->getByLabel(tagCandTags_[itype],tags); }
-	 catch(...)
-	 { 
+	 if ( !m_event->getByLabel(tagCandTags_[itype],tags) ) {
 	    LogWarning("Z") << "Could not extract tag candidates "
 			    << "with input tag " << tagCandTags_[itype];
 	 }
 
 	 Handle<CandidateView> aprobes;
-	 try{ m_event->getByLabel(allProbeCandTags_[itype],aprobes); }
-	 catch(...)
-	 { 
+	 if ( !m_event->getByLabel(allProbeCandTags_[itype],aprobes) ) {
 	    LogWarning("Z") << "Could not extract probe candidates "
 			    << "with input tag " << allProbeCandTags_[itype];
 	 }
 
 	 Handle<CandidateView> pprobes;
-	 try{ m_event->getByLabel(passProbeCandTags_[itype],pprobes); }
-	 catch(...)
-	 { 
+	 if ( !m_event->getByLabel(passProbeCandTags_[itype],pprobes) ) {
 	    LogWarning("Z") << "Could not extract passing probe candidates "
 			    << "with input tag " << passProbeCandTags_[itype];
 	 }
 
 	 Handle<GenParticleMatch> apmatch;
-	 try{ m_event->getByLabel(allProbeTruthMatchMapTags_[itype],apmatch); }
-	 catch(...)
-	 { 
+	 if ( !m_event->getByLabel(allProbeTruthMatchMapTags_[itype],apmatch) ) {
 	    LogWarning("Z") << "Could not extract all probe match map "
 			    << "with input tag " << allProbeTruthMatchMapTags_[itype];
 	 }
 
 	 Handle<GenParticleMatch> ppmatch;
-	 try{ m_event->getByLabel(passProbeTruthMatchMapTags_[itype],ppmatch); }
-	 catch(...)
-	 { 
+	 if ( !m_event->getByLabel(passProbeTruthMatchMapTags_[itype],ppmatch) ) {
 	    LogWarning("Z") << "Could not extract pass probe match map "
 			    << "with input tag " << passProbeTruthMatchMapTags_[itype];
 	 }

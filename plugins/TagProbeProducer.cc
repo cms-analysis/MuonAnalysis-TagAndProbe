@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Wed Apr 16 09:46:30 CDT 2008
-// $Id: TagProbeProducer.cc,v 1.2 2008/05/03 12:28:14 neadam Exp $
+// $Id: TagProbeProducer.cc,v 1.1 2008/05/15 09:49:20 neadam Exp $
 //
 //
 
@@ -81,18 +81,14 @@ TagProbeProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
    // Read in the tag muons
    Handle< CandidateView > tags;
-   try{ iEvent.getByLabel( tagCollection_, tags ); }
-   catch(...)
-   {
+   if ( !iEvent.getByLabel( tagCollection_, tags ) ) {
       LogWarning("TagProbe") << "Could not extract tag muons with input tag "
 				 << tagCollection_;
    }
 
    // Read in the probe muons
    Handle< CandidateView > probes;
-   try{ iEvent.getByLabel( probeCollection_, probes ); }
-   catch(...)
-   {
+   if ( !iEvent.getByLabel( probeCollection_, probes ) ) {
       LogWarning("TagProbe") << "Could not extract probe muons with input tag "
 				 << probeCollection_;
    }
