@@ -13,7 +13,11 @@
 //
 // Original Author:  "Nadia Adam"
 //         Created:  Sun Apr 20 10:35:25 CDT 2008
-// $Id: TagProbeEDMAnalysis.cc,v 1.6 2008/06/25 02:22:28 neadam Exp $
+//
+// Kalanand Mishra: July 1, 2008 
+// Added a configurable option "useRecoVarsForTruthMatchedCands" 
+// (default == 'false') to use reconstructed or detector values 
+// (instead of MC generated values) for var1 and var2 when doing MC truth efficiencies.
 //
 //
 
@@ -107,10 +111,20 @@ TagProbeEDMAnalysis::TagProbeEDMAnalysis(const edm::ParameterSet& iConfig)
    var2High_       = iConfig.getUntrackedParameter< double >("Var2High",2.4);
    var2Bins_       = iConfig.getUntrackedParameter< vector<double> >("Var2BinBoundaries",dBins);
 
+
+   // If want to use reconstructed or detector values (instead of MC generated values) 
+   // of var1 and var2 when doing MC truth efficiencies (i.e., when "calcEffsTruth==true").
+   useRecoVarsForTruthMatchedCands_ = 
+     iConfig.getUntrackedParameter< bool >("useRecoVarsForTruthMatchedCands",false);
+
+
    // Check that the names of the variables are okay ...
    if( !( var1Name_ == "pt" || var1Name_ == "p"   || var1Name_ == "px" ||
 	  var1Name_ == "py" || var1Name_ == "pz"  || var1Name_ == "e"  ||
-	  var1Name_ == "et" || var1Name_ == "eta" || var1Name_ == "phi" ) )
+	  var1Name_ == "et" || var1Name_ == "eta" || var1Name_ == "phi" || 
+	  var1Name_ == "ptDet" || var1Name_ == "pDet"   || var1Name_ == "pxDet" ||
+	  var1Name_ == "pyDet" || var1Name_ == "pzDet"  || var1Name_ == "eDet"  ||
+	  var1Name_ == "etDet" || var1Name_ == "etaDet" || var1Name_ == "phiDet") )
    {
       LogWarning("TagAndProbe") << "Warning: Var1 name invalid, setting var1 name to pt!";
       var1Name_ = "pt";
@@ -118,7 +132,10 @@ TagProbeEDMAnalysis::TagProbeEDMAnalysis(const edm::ParameterSet& iConfig)
 
    if( !( var2Name_ == "pt" || var2Name_ == "p"   || var2Name_ == "px" ||
 	  var2Name_ == "py" || var2Name_ == "pz"  || var2Name_ == "e"  ||
-	  var2Name_ == "et" || var2Name_ == "eta" || var2Name_ == "phi" ) )
+	  var2Name_ == "et" || var2Name_ == "eta" || var2Name_ == "phi" ||
+	  var2Name_ == "ptDet" || var2Name_ == "pDet"   || var2Name_ == "pxDet" ||
+	  var2Name_ == "pyDet" || var2Name_ == "pzDet"  || var2Name_ == "eDet"  ||
+	  var2Name_ == "etDet" || var2Name_ == "etaDet" || var2Name_ == "phiDet") )
    {
       LogWarning("TagAndProbe") << "Warning: Var2 name invalid, setting var2 name to eta!";
       var2Name_ = "eta";
@@ -415,13 +432,24 @@ TagProbeEDMAnalysis::analyze(const edm::Event& iEvent, const edm::EventSetup& iS
          cout << "No Cndgmid in Tree!" << endl; 
       }
 
+
+
+      std::string truthVar1 = var1Name_.c_str();
+      std::string truthVar2 = var2Name_.c_str();
+
+      if(!useRecoVarsForTruthMatchedCands_) {
+	truthVar1.insert(0, "Cnd");
+	truthVar2.insert(0, "Cnd");
+      }
+
+
       Handle< vector<float> > cnd_var1;
-      if ( !iEvent.getByLabel("TPEdm",("Cnd"+var1Name_).c_str(),cnd_var1) ) {
+      if ( !iEvent.getByLabel("TPEdm",truthVar1.c_str(),cnd_var1) ) {
          cout << "No Cnd"+var1Name_+" in Tree!" << endl; 
       }
 
       Handle< vector<float> > cnd_var2;
-      if ( !iEvent.getByLabel("TPEdm",("Cnd"+var2Name_).c_str(),cnd_var2) ) {
+      if ( !iEvent.getByLabel("TPEdm",truthVar2.c_str(),cnd_var2) ) {
          cout << "No Cnd"+var2Name_+" in Tree!" << endl; 
       }
 
