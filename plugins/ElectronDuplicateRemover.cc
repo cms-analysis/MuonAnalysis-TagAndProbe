@@ -11,7 +11,12 @@
 ElectronDuplicateRemover::ElectronDuplicateRemover(const edm::ParameterSet &params)
 {
 
-  _inputProducer = params.getParameter<std::string>("src");
+  _inputProducer = params.getUntrackedParameter<std::string>("src", "pixelMatchGsfElectrons");
+  _BarrelMaxEta  = params.getUntrackedParameter<double>("BarrelMaxEta", 1.4442);
+  _EndcapMinEta  = params.getUntrackedParameter<double>("EndcapMinEta", 1.560);
+  _EndcapMaxEta  = params.getUntrackedParameter<double>("EndcapMaxEta", 2.5);
+  _ptMin         = params.getUntrackedParameter<double>("ptMin", 20.0);
+  _ptMax         = params.getUntrackedParameter<double>("ptMax", 1000.0);
 
    produces<reco::GsfElectronCollection>();
 }
@@ -63,8 +68,28 @@ void ElectronDuplicateRemover::produce(edm::Event &event, const edm::EventSetup 
    
    for(reco::GsfElectronCollection::const_iterator 
 	 elec = electrons->begin(); elec != electrons->end();++elec) {
+     
+     double elecEta = elec->superCluster().get()->eta();
+     double elecE   = elec->superCluster().get()->energy();
+     double elecPt  = elecE / cosh(elecEta);
+    
+     bool withinFiducialEta = false;
+     bool withinFiducialPt  = false;
+
+     if (fabs(elecEta) < _BarrelMaxEta ||  
+	 ( fabs(elecEta) > _EndcapMinEta && fabs(elecEta) < _EndcapMaxEta))
+       withinFiducialEta = true;
+
+     if( elecPt > _ptMin && elecPt < _ptMax ) withinFiducialPt = true; 
+
+     if( !(withinFiducialEta && withinFiducialPt) ) continue;
+
+
+
      const reco::PixelMatchGsfElectronRef  
        electronRef(eleCandidatesHandle, index);
+
+
      //Remove duplicate electrons which share a supercluster
      bool duplicate = false;
      reco::GsfElectronCollection::const_iterator BestDuplicate = elec;
@@ -87,6 +112,7 @@ void ElectronDuplicateRemover::produce(edm::Event &event, const edm::EventSetup 
        }
        ++index2;
      }
+
      if(BestDuplicate == elec) outCol->push_back(*electronRef);
      ++index;
    }

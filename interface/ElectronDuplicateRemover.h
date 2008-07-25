@@ -27,6 +27,11 @@ class ElectronDuplicateRemover : public edm::EDProducer
   // ----------member data ---------------------------
       
   std::string _inputProducer;
+  double _BarrelMaxEta;
+  double _EndcapMinEta;
+  double _EndcapMaxEta;
+  double _ptMin;
+  double _ptMax;
 };
 
 #endif

@@ -1,0 +1,136 @@
+
+- First, you need to checkout from the HEAD of CVS the package 
+  "MuonAnalysis/TagAndProbe". At the time of writing of this 
+  instruction, the package works fine in CMSSW_2_0_X and 
+  CMSSW_1_8_X releases. You should be able to compile and link 
+  the package in usual way.
+
+
+- Then there are two steps to calculate efficiency using 
+  tag-and-probe method. In the first step, you need to make EDM 
+  TTree using your favorite "tag" and "probe" selections. In the 
+  second step, you calculate efficiency (= number of passing probe /
+  total number of probe) by either fitting for the Z--> e+e- 
+  (or, mu+mu-) invariant mass peak, or by performing a background 
+  subtraction, or by looking into the truth match.
+
+
+  Below is a brief outline of the two steps for Z--> e+e-. The relevant
+  configuration scripts have more detailed comments.
+
+ Step I. 
+ --------
+ Make EDM TTree by modifying the example script  
+      "test/Electron_EDM_Ntuple.cfg" 
+ in the following way:
+
+ 1.) Define your own tag-probe pair by modifying the file
+      "MuonAnalysis/TagAndProbe/data/tag_probe_electron_example.cfi".
+      I believe that for tag you always want to have GsfElectron passing
+      isolation, id, and HLT criteria.
+
+     The four standard tag-probe pairs (SuperCluster --> GsfElectron, 
+     GsfElectron  --> isolation, isolation  --> passing loose id,
+     loose id  --> passing trigger) have have already been implemented 
+     in the file:
+
+     "MuonAnalysis/TagAndProbe/data/tag_probe_electron.cfi".
+
+
+
+ 2.) Modify the "PoolSource" module to run over your favorite data
+    sample.
+
+
+ 3.) If you want to obtain efficiency for a non-standard tag-probe 
+     selection, you may need to modify the following line to 
+     include your own tag-probe pair (see step #1 above):
+
+     "include "MuonAnalysis/TagAndProbe/data/tag_probe_electron.cfi""
+
+ 4.) Also modify the "outpath" module to change the output file name.
+
+
+
+ Step II. 
+ --------
+
+ Calculate efficiency as function of 'eta', 'p_T', 'phi', 'p',
+ 'px', 'py', or 'pz'. You can choose two variables at a time.
+  There is also support for two-dimensional efficiency binning.
+  You will need to modify the file "test/TagProbe_electron_example.cfg".
+  The standard stuff are implemented in the file:
+
+   "MuonAnalysis/TagAndProbe/test/Electron_TagProbe_Analysis.cfg"
+
+
+ 1.) Modify the "PoolSource" module to run over your EDM TTree
+     created in step I.
+
+ 2.) Set the boolean variables "CalculateEffSideBand",
+     "CalculateEffFitter", and "CalculateEffTruth" to 'true' or
+     'false' depending on which method(s) you want to use. You can
+     set all three to 'true'.
+
+ 3.) If using "CalculateEffFitter" method (i.e., if you are fitting
+     for signal and background events using a likelihood fit), you can
+     set the boolean variable "UnbinnedFit" to 'true' if you want to 
+     perform unbinned maximum likelihood fit. Otherwise, MINUIT will 
+     do a binned maximum likelihood fit by default.
+
+    [ Beware that the unbinned fit may take several hours or even a 
+      full day depending on the binning of the dependent variables 
+      and the size of the data sample. ]
+ 
+
+ 4.) Also modify the "FitFileName" to change the output ROOT file name.
+     This file stores the histohrams for pass/fail events, the
+     MINUIT fit plots, and "Efficiency vs. eta", "Efficiency vs. p_T", 
+     ... etc. plots.
+
+
+ 
+
+
+ PS: Sometime you may find the following error message while 
+      running STEP-I:
+
+    
+ ##########################################################
+
+ %MSG-s CMSException:  17-Jul-2008 18:01:08 CDT pre-events
+ cms::Exception caught in cmsRun
+ ---- Configuration BEGIN
+ Error occured while creating PoolDBESSource
+ ---- FileInPathError BEGIN
+ Unable to find file electronIdLikelihoodTkIsolated.db anywhere in the
+ search path.
+ The search path is defined by: CMSSW_SEARCH_PATH
+ ${CMSSW_SEARCH_PATH} is: ......
+ Current directory is:  ......
+ ---- FileInPathError END
+ ---- Configuration END
+ ##########################################################
+
+
+  
+Actually the error is coming from the electron ID module from Egamma POG 
+( There are two kernel files which are supposed to be picked up from 
+database, but are actually not). A quick workaround is to copy the 
+following two files from my area (at FNAL uscms) into your release area 
+(or somewhere in your $PATH):
+
+
+/uscms/home/kalanand/cms/electron/efficiency/CMSSW_2_0_7/src/
+ electronIdLikelihoodNonIsolated.db
+ electronIdLikelihoodTkIsolated.db
+
+
+ We actually do not use these files, but for some reason the electron 
+ ID module wants to load them and complains if it cannot find in 
+ the PATH. 
+
+
+
+
+

@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.4 2008/06/18 20:55:02 kalanand Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.5 2008/07/01 16:12:36 cliu Exp $
 //
 //
 
@@ -302,6 +302,16 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    produces<std::vector<float> >( "TPTageta" ).setBranchAlias( "TPTageta" ); /* Tag pseudorapidity. */
    produces<std::vector<float> >( "TPTagphi" ).setBranchAlias( "TPTagphi" ); /* Tag phi. */                 
 
+   produces<std::vector<float> >( "TPTagpDet"   ).setBranchAlias( "TPTagpDet"   ); /* Tag detector momentum. */
+   produces<std::vector<float> >( "TPTagpxDet"  ).setBranchAlias( "TPTagpxDet"  ); /* Tag detector x-momentum. */
+   produces<std::vector<float> >( "TPTagpyDet"  ).setBranchAlias( "TPTagpyDet"  ); /* Tag detector y-momentum. */
+   produces<std::vector<float> >( "TPTagpzDet"  ).setBranchAlias( "TPTagpzDet"  ); /* Tag detector z-momentum. */
+   produces<std::vector<float> >( "TPTagptDet"  ).setBranchAlias( "TPTagptDet"  ); /* Tag detector transverse momentum. */
+   produces<std::vector<float> >( "TPTageDet"   ).setBranchAlias( "TPTageDet"   ); /* Tag detector energy. */
+   produces<std::vector<float> >( "TPTagetDet"  ).setBranchAlias( "TPTagetDet"  ); /* Tag detector transverse energy. */
+   produces<std::vector<float> >( "TPTagetaDet" ).setBranchAlias( "TPTagetaDet" ); /* Tag detector pseudorapidity. */
+   produces<std::vector<float> >( "TPTagphiDet" ).setBranchAlias( "TPTagphiDet" ); /* Tag detector phi. */                 
+
    produces<std::vector<float> >( "TPProbep"   ).setBranchAlias( "TPProbep"   ); /* Probe momentum. */            
    produces<std::vector<float> >( "TPProbepx"  ).setBranchAlias( "TPProbepx"  ); /* Probe x-momentum. */          
    produces<std::vector<float> >( "TPProbepy"  ).setBranchAlias( "TPProbepy"  ); /* Probe y-momentum. */          
@@ -311,7 +321,17 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    produces<std::vector<float> >( "TPProbeet"  ).setBranchAlias( "TPProbeet"  ); /* Probe transverse energy. */   
    produces<std::vector<float> >( "TPProbeq"   ).setBranchAlias( "TPProbeq"   ); /* Probe charge. */              
    produces<std::vector<float> >( "TPProbeeta" ).setBranchAlias( "TPProbeeta" ); /* Probe pseudorapidity. */      
-   produces<std::vector<float> >( "TPProbephi" ).setBranchAlias( "TPProbephi" ); /* Probe phi. */                 
+   produces<std::vector<float> >( "TPProbephi" ).setBranchAlias( "TPProbephi" ); /* Probe phi. */     
+
+   produces<std::vector<float> >( "TPProbepDet"   ).setBranchAlias( "TPProbepDet"   ); /* Probe detector momentum. */            
+   produces<std::vector<float> >( "TPProbepxDet"  ).setBranchAlias( "TPProbepxDet"  ); /* Probe detector x-momentum. */          
+   produces<std::vector<float> >( "TPProbepyDet"  ).setBranchAlias( "TPProbepyDet"  ); /* Probe detector y-momentum. */          
+   produces<std::vector<float> >( "TPProbepzDet"  ).setBranchAlias( "TPProbepzDet"  ); /* Probe detector z-momentum. */          
+   produces<std::vector<float> >( "TPProbeptDet"  ).setBranchAlias( "TPProbeptDet"  ); /* Probe detector transverse momentum. */ 
+   produces<std::vector<float> >( "TPProbeeDet"   ).setBranchAlias( "TPProbeeDet"   ); /* Probe detector energy. */              
+   produces<std::vector<float> >( "TPProbeetDet"  ).setBranchAlias( "TPProbeetDet"  ); /* Probe detector transverse energy. */
+   produces<std::vector<float> >( "TPProbeetaDet" ).setBranchAlias( "TPProbeetaDet" ); /* Probe detector pseudorapidity. */      
+   produces<std::vector<float> >( "TPProbephiDet" ).setBranchAlias( "TPProbephiDet" ); /* Probe detector phi. */     
 
    produces< int >( "nCnd" ).setBranchAlias( "nCnd" );                        /* Number of true daughter cands. */
    produces< std::vector<int> >( "Cndtype" ).setBranchAlias( "Cndtype" );     /* Type of eff measurement. */
@@ -341,7 +361,18 @@ TagProbeEDMNtuple::TagProbeEDMNtuple(const edm::ParameterSet& iConfig)
    produces<std::vector<float> >( "Cndret" ).setBranchAlias( "Cndret" );  /* Candidate reco transverse energy. */   
    produces<std::vector<float> >( "Cndrq" ).setBranchAlias( "Cndrq" );	  /* Candidate reco charge. */              
    produces<std::vector<float> >( "Cndreta" ).setBranchAlias( "Cndreta" ); /* Candidate reco pesudorapidity. */
-   produces<std::vector<float> >( "Cndrphi" ).setBranchAlias( "Cndrphi" ); /* Candidate reco phi. */           
+   produces<std::vector<float> >( "Cndrphi" ).setBranchAlias( "Cndrphi" ); /* Candidate reco phi. */       
+
+
+   produces<std::vector<float> >( "CndpDet" ).setBranchAlias( "CndpDet" );    /* Candidate det momentum. */
+   produces<std::vector<float> >( "CndptDet" ).setBranchAlias( "CndptDet" );  /* Candidate det pT.*/
+   produces<std::vector<float> >( "CndpxDet" ).setBranchAlias( "CndpxDet" );  /* Candidate det x-momentum. */
+   produces<std::vector<float> >( "CndpyDet" ).setBranchAlias( "CndpyDet" );  /* Candidate det y-momentum. */
+   produces<std::vector<float> >( "CndpzDet" ).setBranchAlias( "CndpzDet" );  /* Candidate det z-momentum. */
+   produces<std::vector<float> >( "CndeDet" ).setBranchAlias( "CndeDet" );    /* Candidate det energy. */
+   produces<std::vector<float> >( "CndetDet" ).setBranchAlias( "CndetDet" );  /* Candidate det transverse energy.*/
+   produces<std::vector<float> >( "CndetaDet" ).setBranchAlias( "CndetaDet" ); /* Candidate det pesudorapidity. */
+   produces<std::vector<float> >( "CndphiDet" ).setBranchAlias( "CndphiDet" ); /* Candidate det phi. */  
 }
 
 
@@ -640,6 +671,16 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    auto_ptr< vector<float> > tp_tag_eta_( new vector<float> ); 
    auto_ptr< vector<float> > tp_tag_phi_( new vector<float> ); 
 
+   auto_ptr< vector<float> > tp_tag_pDet_( new vector<float> );   
+   auto_ptr< vector<float> > tp_tag_pxDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_pyDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_pzDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_ptDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_eDet_( new vector<float> );   
+   auto_ptr< vector<float> > tp_tag_etDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_tag_etaDet_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_tag_phiDet_( new vector<float> ); 
+
    auto_ptr< vector<float> > tp_probe_p_( new vector<float> );   
    auto_ptr< vector<float> > tp_probe_px_( new vector<float> );  
    auto_ptr< vector<float> > tp_probe_py_( new vector<float> );  
@@ -650,6 +691,19 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    auto_ptr< vector<float> > tp_probe_q_( new vector<float> );   
    auto_ptr< vector<float> > tp_probe_eta_( new vector<float> ); 
    auto_ptr< vector<float> > tp_probe_phi_( new vector<float> ); 
+
+   auto_ptr< vector<float> > tp_probe_pDet_( new vector<float> );   
+   auto_ptr< vector<float> > tp_probe_pxDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_pyDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_pzDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_ptDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_eDet_( new vector<float> );   
+   auto_ptr< vector<float> > tp_probe_etDet_( new vector<float> );  
+   auto_ptr< vector<float> > tp_probe_qDet_( new vector<float> );   
+   auto_ptr< vector<float> > tp_probe_etaDet_( new vector<float> ); 
+   auto_ptr< vector<float> > tp_probe_phiDet_( new vector<float> ); 
+
+
 
    // Trigger Info
    Handle<TriggerEventWithRefs> trgEvent;
@@ -808,6 +862,38 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    tp_tag_eta_->push_back(  deta );
 	    tp_tag_phi_->push_back(  dphi );
 
+
+	    // Kalanand: June 30, 2008
+	    // Added functionality for using 
+	    // detector variables in case of electrons.
+	    // Use gsfElectron.SuperCluster.eta() etc.
+
+	    if(candType_ != "Muon") {	      
+	      reco::SuperClusterRef SC 
+		= tag->get<SuperClusterRef>();
+	      float theta = SC->position().Theta();
+	      deta = SC->eta();
+	      dphi = SC->phi();
+	      dp   = SC->energy();
+	      dpx  = dp*sin(theta)*cos(dphi);
+	      dpy  = dp*sin(theta)*sin(dphi);
+	      dpz  = dp*cos(theta);
+	      dpt  = dp / cosh(deta);
+	      de   = SC->energy();
+	      det  = de / cosh(deta);
+	    }
+	    tp_tag_pDet_->push_back(    dp );
+	    tp_tag_pxDet_->push_back(   dpx );
+	    tp_tag_pyDet_->push_back(   dpy );
+	    tp_tag_pzDet_->push_back(   dpz );
+	    tp_tag_ptDet_->push_back(   dpt );
+	    tp_tag_eDet_->push_back(    de );
+	    tp_tag_etDet_->push_back(   det );
+	    tp_tag_etaDet_->push_back(  deta );
+	    tp_tag_phiDet_->push_back(  dphi );
+
+
+
 	    dp   = (vprobes[0].first)->p();
 	    dpx  = (vprobes[0].first)->px();
 	    dpy  = (vprobes[0].first)->py();
@@ -829,6 +915,36 @@ TagProbeEDMNtuple::fillTagProbeInfo()
 	    tp_probe_q_->push_back(    dq );
 	    tp_probe_eta_->push_back(  deta );
 	    tp_probe_phi_->push_back(  dphi );
+
+	    // Kalanand: June 30, 2008
+	    // Added functionality for using 
+	    // detector variables in case of electrons.
+	    // Use gsfElectron.SuperCluster.eta() etc.
+
+	    if(candType_ != "Muon") {	
+	      reco::SuperClusterRef SC 
+		= (vprobes[0].first)->get<SuperClusterRef>();
+	      float theta = SC->position().Theta();
+	      deta = SC->eta();
+	      dphi = SC->phi();
+	      dp   = SC->energy();
+	      dpx  = dp*sin(theta)*cos(dphi);
+	      dpy  = dp*sin(theta)*sin(dphi);
+	      dpz  = dp*cos(theta);
+	      dpt  = dp / cosh(deta);
+	      de   = SC->energy();
+	      det  = de / cosh(deta);
+	    }
+	    tp_probe_pDet_->push_back(    dp );
+	    tp_probe_pxDet_->push_back(   dpx );
+	    tp_probe_pyDet_->push_back(   dpy );
+	    tp_probe_pzDet_->push_back(   dpz );
+	    tp_probe_ptDet_->push_back(   dpt );
+	    tp_probe_eDet_->push_back(    de );
+	    tp_probe_etDet_->push_back(   det );
+	    tp_probe_etaDet_->push_back(  deta );
+	    tp_probe_phiDet_->push_back(  dphi );
+
 
 	    ++nrtp;
 	 }
@@ -864,6 +980,18 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    m_event->put( tp_tag_eta_, "TPTageta" ); 
    m_event->put( tp_tag_phi_, "TPTagphi" ); 
 
+
+   m_event->put( tp_tag_pDet_, "TPTagpDet" );   
+   m_event->put( tp_tag_pxDet_, "TPTagpxDet" );  
+   m_event->put( tp_tag_pyDet_, "TPTagpyDet" );  
+   m_event->put( tp_tag_pzDet_, "TPTagpzDet" );  
+   m_event->put( tp_tag_ptDet_, "TPTagptDet" );  
+   m_event->put( tp_tag_eDet_, "TPTageDet" );   
+   m_event->put( tp_tag_etDet_, "TPTagetDet" );   
+   m_event->put( tp_tag_etaDet_, "TPTagetaDet" ); 
+   m_event->put( tp_tag_phiDet_, "TPTagphiDet" ); 
+
+
    m_event->put( tp_probe_p_, "TPProbep" );   
    m_event->put( tp_probe_px_, "TPProbepx" );  
    m_event->put( tp_probe_py_, "TPProbepy" );  
@@ -874,6 +1002,16 @@ TagProbeEDMNtuple::fillTagProbeInfo()
    m_event->put( tp_probe_q_, "TPProbeq" );   
    m_event->put( tp_probe_eta_, "TPProbeeta" ); 
    m_event->put( tp_probe_phi_, "TPProbephi" ); 
+
+   m_event->put( tp_probe_pDet_, "TPProbepDet" );   
+   m_event->put( tp_probe_pxDet_, "TPProbepxDet" );  
+   m_event->put( tp_probe_pyDet_, "TPProbepyDet" );  
+   m_event->put( tp_probe_pzDet_, "TPProbepzDet" );  
+   m_event->put( tp_probe_ptDet_, "TPProbeptDet" );  
+   m_event->put( tp_probe_eDet_, "TPProbeeDet" );   
+   m_event->put( tp_probe_etDet_, "TPProbeetDet" );    
+   m_event->put( tp_probe_etaDet_, "TPProbeetaDet" ); 
+   m_event->put( tp_probe_phiDet_, "TPProbephiDet" ); 
 
 }
 // ******************************************************************* //
@@ -912,6 +1050,17 @@ TagProbeEDMNtuple::fillTrueEffInfo()
    auto_ptr< vector<float> > cnd_rq_( new vector<float> );   
    auto_ptr< vector<float> > cnd_reta_( new vector<float> ); 
    auto_ptr< vector<float> > cnd_rphi_( new vector<float> ); 
+
+   auto_ptr< vector<float> > cnd_Detp_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_Detpt_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_Detpx_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_Detpy_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_Detpz_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_Dete_( new vector<float> );   
+   auto_ptr< vector<float> > cnd_Detet_( new vector<float> );  
+   auto_ptr< vector<float> > cnd_Deteta_( new vector<float> ); 
+   auto_ptr< vector<float> > cnd_Detphi_( new vector<float> ); 
+
 
    // Should change this to get the eff info for all types of tag-probe!!
    Handle<GenParticleCollection> genparticles;
@@ -1000,16 +1149,27 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 	    double phi = (*genparticles)[i].phi();
 	    double eta = (*genparticles)[i].eta();
 
-	    double rp   = 0;
-	    double rpx  = 0;
-	    double rpy  = 0;
-	    double rpz  = 0; 
-	    double rpt  = 0; 
-	    double re   = 0;
-	    double ret  = 0;
-	    double rq   = 0;
-	    double rphi = 0;
-	    double reta = 0;
+	    double rp   = -99999.9;
+	    double rpx  = -99999.9;
+	    double rpy  = -99999.9;
+	    double rpz  = -99999.9; 
+	    double rpt  = -99999.9; 
+	    double re   = -99999.9;
+	    double ret  = -99999.9;
+	    double rq   = -99999.9;
+	    double rphi = -99999.9;
+	    double reta = -99999.9;
+
+	    double Detp   = -99999.9;
+	    double Detpx  = -99999.9;
+	    double Detpy  = -99999.9;
+	    double Detpz  = -99999.9; 
+	    double Detpt  = -99999.9; 
+	    double Dete   = -99999.9;
+	    double Detet  = -99999.9;
+	    double Detphi = -99999.9;
+	    double Deteta = -99999.9;
+
 
 	    GenParticleRef mcRef( genparticles, (size_t)i );
 	    if( tagmatch.isValid() )
@@ -1036,6 +1196,40 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 		     rq   = cnd->charge();
 		     rphi = cnd->phi();
 		     reta = cnd->eta();
+
+		     // Kalanand: June 30, 2008
+		     // Added functionality for using 
+		     // detector variables in case of electrons.
+		     // Use gsfElectron.SuperCluster.eta() etc.
+
+		     if(candType_ != "Muon") {	 
+
+		       Detp   = rp;
+		       Detpx  = rpx;
+		       Detpy  = rpy;
+		       Detpz  = rpz;
+		       Detpt  = rpt;
+		       Dete   = re;
+		       Detet  = ret;
+		       Detphi = rphi;
+		       Deteta = reta;
+     
+		       reco::SuperClusterRef SC 
+			 = tagRef->get<SuperClusterRef>();
+
+		       if ( SC.isNonnull() ) {
+			 float theta = SC->position().Theta();
+			 Deteta = SC->eta();
+			 Detphi = SC->phi();
+			 Detp   = SC->energy();
+			 Detpx  = Detp*sin(theta)*cos(Detphi);
+			 Detpy  = Detp*sin(theta)*sin(Detphi);
+			 Detpz  = Detp*cos(theta);
+			 Detpt  = Detp / cosh(Deteta);
+			 Dete   = SC->energy();
+			 Detet  = Dete / cosh(Deteta);
+		       }
+		     }
 		  }
 	       }
 	    }
@@ -1065,6 +1259,40 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 			rq   = cnd->charge();
 			rphi = cnd->phi();
 			reta = cnd->eta();
+
+		     // Kalanand: June 30, 2008
+		     // Added functionality for using 
+		     // detector variables in case of electrons.
+		     // Use gsfElectron.SuperCluster.eta() etc.
+
+			if(candType_ != "Muon") {
+
+			  Detp   = rp;
+			  Detpx  = rpx;
+			  Detpy  = rpy;
+			  Detpz  = rpz;
+			  Detpt  = rpt;
+			  Dete   = re;
+			  Detet  = ret;
+			  Detphi = rphi;
+			  Deteta = reta;
+     	      
+			  reco::SuperClusterRef SC 
+			    = tagRef->get<SuperClusterRef>();
+
+			  if ( SC.isNonnull() ) {
+			    float theta = SC->position().Theta();
+			    Deteta = SC->eta();
+			    Detphi = SC->phi();
+			    Detp   = SC->energy();
+			    Detpx  = Detp*sin(theta)*cos(Detphi);
+			    Detpy  = Detp*sin(theta)*sin(Detphi);
+			    Detpz  = Detp*cos(theta);
+			    Detpt  = Detp / cosh(Deteta);
+			    Dete   = SC->energy();
+			    Detet  = Dete / cosh(Deteta);
+			  }
+			}
 		     }
 		  }
 	       }
@@ -1095,6 +1323,41 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 			rq   = cnd->charge();
 			rphi = cnd->phi();
 			reta = cnd->eta();
+
+			// Kalanand: June 30, 2008
+			// Added functionality for using 
+			// detector variables in case of electrons.
+			// Use gsfElectron.SuperCluster.eta() etc.
+
+			if(candType_ != "Muon") {
+
+
+			  Detp   = rp;
+			  Detpx  = rpx;
+			  Detpy  = rpy;
+			  Detpz  = rpz;
+			  Detpt  = rpt;
+			  Dete   = re;
+			  Detet  = ret;
+			  Detphi = rphi;
+			  Deteta = reta;
+     	      	      
+			  reco::SuperClusterRef SC 
+			    = tagRef->get<SuperClusterRef>();
+
+			  if ( SC.isNonnull() ) {
+			    float theta = SC->position().Theta();
+			    Deteta = SC->eta();
+			    Detphi = SC->phi();
+			    Detp   = SC->energy();
+			    Detpx  = Detp*sin(theta)*cos(Detphi);
+			    Detpy  = Detp*sin(theta)*sin(Detphi);
+			    Detpz  = Detp*cos(theta);
+			    Detpt  = Detp / cosh(Deteta);
+			    Dete   = SC->energy();
+			    Detet  = Dete / cosh(Deteta);
+			  }
+			}
 		     }
 		  }
 	       }
@@ -1129,6 +1392,16 @@ TagProbeEDMNtuple::fillTrueEffInfo()
 	    cnd_rq_->push_back(   rq );
 	    cnd_rphi_->push_back(  rphi );
 	    cnd_reta_->push_back(  reta );
+
+	    cnd_Detp_->push_back(   Detp );
+	    cnd_Detpx_->push_back(  Detpx );
+	    cnd_Detpy_->push_back(  Detpy );
+	    cnd_Detpz_->push_back(  Detpz );
+	    cnd_Detpt_->push_back(  Detpt );
+	    cnd_Dete_->push_back(   Dete );
+	    cnd_Detet_->push_back(  Detet );
+	    cnd_Detphi_->push_back( Detphi );
+	    cnd_Deteta_->push_back( Deteta );
 
 	    ncnd++;
 	 }
@@ -1166,6 +1439,16 @@ TagProbeEDMNtuple::fillTrueEffInfo()
    m_event->put( cnd_rq_, "Cndrq" );  
    m_event->put( cnd_reta_, "Cndreta" ); 
    m_event->put( cnd_rphi_, "Cndrphi" ); 
+
+   m_event->put( cnd_Detp_, "CndpDet" );  
+   m_event->put( cnd_Detpt_, "CndptDet" ); 
+   m_event->put( cnd_Detpx_, "CndpxDet" ); 
+   m_event->put( cnd_Detpy_, "CndpyDet" ); 
+   m_event->put( cnd_Detpz_, "CndpzDet" ); 
+   m_event->put( cnd_Dete_, "CndeDet" );  
+   m_event->put( cnd_Detet_, "CndetDet" ); 
+   m_event->put( cnd_Deteta_, "CndetaDet" ); 
+   m_event->put( cnd_Detphi_, "CndphiDet" ); 
 }
 // *********************************************************************** //
 
@@ -1208,8 +1491,28 @@ int TagProbeEDMNtuple::ProbePassProbeOverlap( const CandidateBaseRef& probe,
    {
       for( int ipp=0; ipp<(int)passprobes->size(); ++ipp )
       {
+
 	 bool isOverlap = MatchObjects(&((*passprobes)[ipp]),
 				       probe,checkExactOverlap_);
+
+
+	 if(candType_ != "Muon" ) {
+
+	   reco::SuperClusterRef probeSC;
+	   reco::SuperClusterRef passprobeSC; 
+
+	   if( not probe.isNull() ) probeSC  = 
+				    probe->get<SuperClusterRef>();
+
+	   CandidateBaseRef ref = passprobes->refAt(ipp);
+
+	   if( not ref.isNull() ) passprobeSC = 
+				    ref->get<SuperClusterRef>();
+
+	   isOverlap = isOverlap && ( probeSC == passprobeSC );
+	 }
+
+
 	 if( isOverlap ) ppass = 1;
       } 
    }

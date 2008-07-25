@@ -4,7 +4,7 @@
 //
 // Original Author: Nadia Adam (Princeton University) 
 //         Created:  Fri May 16 16:48:24 CEST 2008
-// $Id: TagProbeEDMAnalysis.h,v 1.4 2008/06/24 22:58:22 ahunt Exp $
+// $Id: TagProbeEDMAnalysis.h,v 1.5 2008/06/30 15:19:48 neadam Exp $
 //
 
 // system include files
@@ -88,7 +88,8 @@ class TagProbeEDMAnalysis : public edm::EDAnalyzer
 
       bool unbinnedFit_;        // Do a binned/unbinned fit
       bool do2DFit_;            // Do the 2D fit as well
-      
+      bool useRecoVarsForTruthMatchedCands_; // use reco vars for calcEffsTruth
+
       int massNbins_;           // Number of bins in the fit
       double massLow_;          // Lower bound for fit range
       double massHigh_;         // Upper bound for fit range
