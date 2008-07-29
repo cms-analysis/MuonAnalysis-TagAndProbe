@@ -13,7 +13,7 @@
 //
 // Original Author:  Nadia Adam
 //         Created:  Mon May  5 08:47:29 CDT 2008
-// $Id: TagProbeEDMNtuple.cc,v 1.5 2008/07/01 16:12:36 cliu Exp $
+// $Id: TagProbeEDMNtuple.cc,v 1.6 2008/07/25 17:10:39 kalanand Exp $
 //
 //
 
@@ -38,8 +38,8 @@
 #include "DataFormats/EgammaCandidates/interface/Electron.h"
 #include "DataFormats/EgammaCandidates/interface/Electron.h"
 #include "DataFormats/EgammaCandidates/interface/ElectronIsolationAssociation.h"
-#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectron.h"
-#include "DataFormats/EgammaCandidates/interface/PixelMatchGsfElectronFwd.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectron.h"
+#include "DataFormats/EgammaCandidates/interface/GsfElectronFwd.h"
 #include "DataFormats/EgammaReco/interface/SuperCluster.h"
 #include "DataFormats/HLTReco/interface/TriggerEventWithRefs.h"
 #include "DataFormats/HLTReco/interface/TriggerFilterObjectWithRefs.h"
@@ -57,7 +57,6 @@
 #include "DataFormats/RecoCandidate/interface/RecoChargedCandidateFwd.h"
 #include "DataFormats/TrackReco/interface/Track.h"
 #include "Math/GenVector/VectorUtil.h"
-#include "PhysicsTools/HepMCCandAlgos/interface/MCCandMatcher.h"
 #include "SimDataFormats/HepMCProduct/interface/HepMCProduct.h"
 
 //
