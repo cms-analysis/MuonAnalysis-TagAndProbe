@@ -4,14 +4,14 @@ process = cms.Process("TagProbe")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-#process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 massRange    = ( 2.8, 3.5 ); 
 massRangeSta = (2, 5)
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'file:/afs/cern.ch/user/g/gpetrucc/scratch0/huntForRedOctober/CMSSW_3_1_2/src/JPsiMuMu_Skim.root'
+        'file:/afs/cern.ch/user/g/gpetrucc/scratch0/huntForRedOctober/CMSSW_3_1_3/src/JPsiMuMu_Skim.root'
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -39,7 +39,7 @@ process.tkTracks  = cms.EDProducer("ConcreteChargedCandidateProducer",
 ) 
 process.tkProbes = cms.EDProducer("CandViewRefSelector",
     src = cms.InputTag("tkTracks"),
-    cut = cms.string("pt > 3 && abs(eta) < 2.4"), ##FIXME
+    cut = cms.string("pt > 3 && abs(eta) < 2.4"),
 )
 
 ##    ____  _                  _    _    _                    ____            _               
@@ -71,6 +71,7 @@ process.tagMuons = cms.EDFilter("PATMuonRefSelector",
     cut = cms.string("isGlobalMuon && pt > 3 && abs(eta) < 2.4 && " + PASS_HLT ), 
     filter = cms.bool(True),
 )
+
 process.calProbes = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("patMuons"),
     cut = cms.string("isCaloMuon && pt > 3 && abs(eta) < 2.4"), 

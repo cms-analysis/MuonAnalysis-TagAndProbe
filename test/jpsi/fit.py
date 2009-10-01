@@ -43,7 +43,7 @@ RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",
 	CMSBkgAlpha           = cms.untracked.vdouble( 0 ), # fix these two to zero
 	CMSBkgBeta            = cms.untracked.vdouble( 0 ), # so it's just an exp
 	CMSBkgPeak            = cms.untracked.vdouble( 3.09 ),
-	CMSBkgGamma           = cms.untracked.vdouble( 0, -1, 1 )
+	CMSBkgGamma           = cms.untracked.vdouble( 0, -10, 10 )
       ),
 
       ## Efficiency variables
