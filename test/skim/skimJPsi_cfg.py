@@ -292,8 +292,6 @@ process.out = cms.OutputModule("PoolOutputModule",
         "Skim_jpsiTk",
         "Skim_jpsiSta",
     )),
-    dropMetaData = cms.untracked.string("PRIOR"), ## We don't need to keep the metadata for the previous processes, 
-                                                  ## as we can get the cfgs from DBS
 )
 process.end = cms.EndPath(process.out)
 
