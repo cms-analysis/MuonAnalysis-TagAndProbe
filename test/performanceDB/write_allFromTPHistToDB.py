@@ -36,6 +36,16 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     label = cms.string('TRKEFFMU_WP')
     ),
     cms.PSet(
+    record = cms.string('TRGMU_TABLE'),
+    tag = cms.string('TRGMU_TABLE'),
+    label = cms.string('TRGMU_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('TRGMU_WP'),
+    tag = cms.string('TRGMU_WP'),
+    label = cms.string('TRGMU_WP')
+    ),    
+    cms.PSet(
     record = cms.string('GLBMUCAL_TABLE'),
     tag = cms.string('GLBMUCAL_TABLE'),
     label = cms.string('GLBMUCAL_TABLE')
@@ -56,24 +66,28 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                 # For each table to be loaded, set the name of the input T/P file, histogram, algorithm, and cut (if any)
                                 inputHistoFiles = cms.vstring('../jpsi/fit_result_GlbFromTk.root',
                                                               '../jpsi/fit_result_TkFromSta.root',
+                                                              '../jpsi/fit_result_HltFromGlb.root',
                                                               '../jpsi/fit_result_GlbFromCal.root'),                                
 
                                 inputHistogramNames = cms.vstring('fit_eff_Pt_Eta',
+                                                                  'fit_eff_Pt_Eta',
                                                                   'fit_eff_Pt_Eta',
                                                                   'fit_eff_Pt_Eta'),
 
                                 inputAlgorithmNames = cms.vstring('GlobalMuonFromTrackerTrackJpsi',
                                                                   'TrackerTrackFromStandaloneMuonJpsi',
+                                                                  'TriggerMuonFromGlobalMuonJpsi',
                                                                   'GlobalMuonFromCaloMuonJpsi'), 
 
                                 inputDiscriminatorCuts = cms.vdouble(0.0,
+                                                                     0.0,
                                                                      0.0,
                                                                      0.0),
 
                                 # For each table to be loaded, set the payload and working point record names as
                                 # defined above in the PoolDBOutputService
-                                RecordPayloads = cms.vstring('GLBMU_TABLE','TRKEFFMU_TABLE','GLBMUCAL_TABLE'),
-                                RecordWPs = cms.vstring('GLBMU_WP','TRKEFFMU_WP','GLBMUCAL_WP'),
+                                RecordPayloads = cms.vstring('GLBMU_TABLE','TRKEFFMU_TABLE','TRGMU_TABLE','GLBMUCAL_TABLE'),
+                                RecordWPs = cms.vstring('GLBMU_WP','TRKEFFMU_WP','TRGMU_WP','GLBMUCAL_WP'),
 
                                 # Set the type of data to be stored, the binning variables, and the IOV
                                 # These are currently assumed to be the same for all tables loaded in a single job
