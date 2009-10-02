@@ -27,13 +27,13 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
                                       toGet = cms.VPSet(
     cms.PSet(
     record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('GLBMU_WP'),
-    label = cms.untracked.string('GLBMU_WP')
+    tag = cms.string('GLBMUZ_WP'),
+    label = cms.untracked.string('GLBMUZ_WP')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('GLBMU_TABLE'),
-    label = cms.untracked.string('GLBMU_TABLE')
+    tag = cms.string('GLBMUZ_TABLE'),
+    label = cms.untracked.string('GLBMUZ_TABLE')
     )))
 
 process.PoolDBESSource2 = cms.ESSource("PoolDBESSource",
@@ -41,28 +41,28 @@ process.PoolDBESSource2 = cms.ESSource("PoolDBESSource",
                                       toGet = cms.VPSet(
     cms.PSet(
     record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('TRKEFFMU_WP'),
-    label = cms.untracked.string('TRKEFFMU_WP')
+    tag = cms.string('TRKEFFMUZ_WP'),
+    label = cms.untracked.string('TRKEFFMUZ_WP')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('TRKEFFMU_TABLE'),
-    label = cms.untracked.string('TRKEFFMU_TABLE')
+    tag = cms.string('TRKEFFMUZ_TABLE'),
+    label = cms.untracked.string('TRKEFFMUZ_TABLE')
     )))
 
 process.demo2 = cms.EDAnalyzer('MuTestPerformanceFW_ES',
-                               AlgoName1 = cms.string('GlobalMuonFromTrackerTrackJpsi'),
-                               AlgoName2 = cms.string('TrackerTrackFromStandaloneMuonJpsi'))
+                               AlgoName1 = cms.string('GlobalMuonFromTrackerTrackZ'),
+                               AlgoName2 = cms.string('TrackerTrackFromStandaloneMuonZ'))
 
 #
 # change inside the source
 #
-process.MuonPerformanceESProducer_GlobalMuon.PayloadName = "GLBMU_TABLE"
-process.MuonPerformanceESProducer_GlobalMuon.WorkingPointName = "GLBMU_WP"
-process.MuonPerformanceESProducer_GlobalMuon.ComponentName = "GlobalMuonFromTrackerTrackJpsi"
-process.MuonPerformanceESProducer_TrackerTrackMuon.PayloadName = "TRKEFFMU_TABLE"
-process.MuonPerformanceESProducer_TrackerTrackMuon.WorkingPointName = "TRKEFFMU_WP"
-process.MuonPerformanceESProducer_TrackerTrackMuon.ComponentName = "TrackerTrackFromStandaloneMuonJpsi"
+process.MuonPerformanceESProducer_GlobalMuon.PayloadName = "GLBMUZ_TABLE"
+process.MuonPerformanceESProducer_GlobalMuon.WorkingPointName = "GLBMUZ_WP"
+process.MuonPerformanceESProducer_GlobalMuon.ComponentName = "GlobalMuonFromTrackerTrackZ"
+process.MuonPerformanceESProducer_TrackerTrackMuon.PayloadName = "TRKEFFMUZ_TABLE"
+process.MuonPerformanceESProducer_TrackerTrackMuon.WorkingPointName = "TRKEFFMUZ_WP"
+process.MuonPerformanceESProducer_TrackerTrackMuon.ComponentName = "TrackerTrackFromStandaloneMuonZ"
 
 process.p = cms.Path(process.demo2)
 

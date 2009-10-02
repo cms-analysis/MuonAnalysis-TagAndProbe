@@ -9,12 +9,12 @@ MuonPerformanceESProducer_GlobalMuon = cms.ESProducer("MuonPerformanceESProducer
                                                           )
 
 
-MuonPerformanceESProducer_StandaloneMuon = cms.ESProducer("MuonPerformanceESProducer",
+MuonPerformanceESProducer_TriggerMuon = cms.ESProducer("MuonPerformanceESProducer",
                                                           # this is what it makes available
-                                                          ComponentName = cms.string('StandaloneMuon'),
+                                                          ComponentName = cms.string('TriggerMuon'),
                                                           # this is where it gets the payload from                                                
-                                                          PayloadName = cms.string('StandaloneMuon'),
-                                                          WorkingPointName = cms.string('StandaloneMuon')
+                                                          PayloadName = cms.string('TriggerMuon'),
+                                                          WorkingPointName = cms.string('TriggerMuon')
                                                           )
 
 MuonPerformanceESProducer_TrackerTrackMuon = cms.ESProducer("MuonPerformanceESProducer",

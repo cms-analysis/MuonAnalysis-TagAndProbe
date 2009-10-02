@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.1 2009/09/30 09:47:26 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.1 2009/10/01 12:05:03 jjhollar Exp $
 //
 //
 
@@ -106,10 +106,10 @@ double
 MuTestPerformanceFW_ES::getEff(double pt, double eta, double phi, int charge, const MuonPerformance & theperf)
 {
   BinningPointByMap p; 
+  p.insert(BinningVariables::MuonPt,pt);  
   p.insert(BinningVariables::MuonEta,eta); 
-  p.insert(BinningVariables::MuonPt,pt); 
-  p.insert(BinningVariables::MuonPhi,phi); 
-  p.insert(BinningVariables::MuonCharge,charge);  
+  //  p.insert(BinningVariables::MuonPhi,phi); 
+  //  p.insert(BinningVariables::MuonCharge,charge);  
 
   double theeff = theperf.getResult(PerformanceResult::MUEFF,p);  
 
@@ -126,10 +126,10 @@ double
 MuTestPerformanceFW_ES::getEffError(double pt, double eta, double phi, int charge, const MuonPerformance & theperf) 
 { 
   BinningPointByMap p;  
+  p.insert(BinningVariables::MuonPt,pt);   
   p.insert(BinningVariables::MuonEta,eta);  
-  p.insert(BinningVariables::MuonPt,pt);  
-  p.insert(BinningVariables::MuonPhi,phi);  
-  p.insert(BinningVariables::MuonCharge,charge);   
+  //  p.insert(BinningVariables::MuonPhi,phi);  
+  //  p.insert(BinningVariables::MuonCharge,charge);   
  
   double theefferr = theperf.getResult(PerformanceResult::MUERR,p);  
   
@@ -142,10 +142,10 @@ MuTestPerformanceFW_ES::passesPIDKilling(double pt, double eta, double phi, int 
   bool passes = false;
 
   BinningPointByMap p;   
+  p.insert(BinningVariables::MuonPt,pt);    
   p.insert(BinningVariables::MuonEta,eta);   
-  p.insert(BinningVariables::MuonPt,pt);   
-  p.insert(BinningVariables::MuonPhi,phi);   
-  p.insert(BinningVariables::MuonCharge,charge);    
+  //  p.insert(BinningVariables::MuonPhi,phi);   
+  //  p.insert(BinningVariables::MuonCharge,charge);    
   
   double theeff = theperf.getResult(PerformanceResult::MUEFF,p);   
 
@@ -204,7 +204,7 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  /* Now lookup the efficiency and error from the DB based on the muon pT, eta, phi, and charge */
 
 	  getEff(pt, eta, phi, chg, standaloneMuon);
-	  getEffError(pt, eta, phi, chg, standaloneMuon); 
+ 	  getEffError(pt, eta, phi, chg, standaloneMuon); 
           getEff(pt, eta, phi, chg, tracking); 
           getEffError(pt, eta, phi, chg, tracking);  
 

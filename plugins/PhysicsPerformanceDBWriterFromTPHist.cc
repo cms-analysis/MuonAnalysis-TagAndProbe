@@ -138,6 +138,7 @@ void PhysicsPerformanceDBWriterFromTPHist::beginJob(const edm::EventSetup&)
   for(unsigned int i = 0; i < inputHistoFiles.size(); ++i)
     {
       number = 0; 
+      pl.clear();
 
       infilename = inputHistoFiles[i]; 
       histname = inputHistogramNames[i]; 
@@ -179,16 +180,36 @@ void PhysicsPerformanceDBWriterFromTPHist::beginJob(const edm::EventSetup&)
 
 	      bincontent = heff->GetBinContent(j,k);
 	      binerror = heff->GetBinError(j,k);
-	      cout << " Inserting " << bincontent << " in position " << number <<endl; 
+
+	      pl.push_back(binlowedgex);
+	      pl.push_back(binhighedgex); 
+              pl.push_back(binlowedgey); 
+              pl.push_back(binhighedgey);  
+
+	      cout << " Inserting " << bincontent << " in position " << number 
+		   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", " 
+		   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl; 
 	      pl.push_back(bincontent); 
 	      number++;
-	      cout << " Inserting " << binerror << " in position " << number <<endl;  
+	      cout << " Inserting " << binerror << " in position " << number   
+		   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", "  
+                   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl;  
 	      pl.push_back(binerror);  
 	      number++;
 	    }
 	}
 
       f->Close();
+
+
+      if (stride != nbin*2+nres)
+	{ 
+	  std::cout <<" Table not well formed"<<std::endl; 
+	} 
+      if ((number % stride) != 0)
+	{ 
+	  std::cout <<" Table not well formed"<<std::endl; 
+	} 
 
       PerformanceWorkingPoint * wp = new PerformanceWorkingPoint(cut, tagger); 
       
