@@ -54,7 +54,12 @@ RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",
 
       ## Variables for sideband subtraction
       SBSPeak            = cms.untracked.double( 3.09 ),   ## Mass peak
-      SBSStanDev         = cms.untracked.double( 2 )       ## SD from peak for subtraction
+      SBSStanDev         = cms.untracked.double( 2 ),      ## SD from peak for subtraction
+
+      # All the following is useless now that we just read and fit
+      # but it's required...
+      # --------------------------------------------
+      MCTruthParentId = cms.untracked.int32(443),
 )
 
 process.fitGlbFromTk = RunFit.clone(
