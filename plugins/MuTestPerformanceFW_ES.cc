@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.1 2009/10/01 12:05:03 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.2 2009/10/02 08:18:51 jjhollar Exp $
 //
 //
 
@@ -36,6 +36,7 @@
 //
 
 #include "RecoMuon/Records/interface/MuonPerformanceRecord.h"
+#include "MuonAnalysis/TagAndProbe/interface/MuonPerformanceReadback.h"
 
 #include "CondFormats/PhysicsToolsObjects/interface/BinningPointByMap.h" 
 #include "MuonAnalysis/TagAndProbe/interface/MuonPerformance.h" 
@@ -58,17 +59,15 @@ public:
   
   
 private:
-  std::string name1;
-  std::string name2;
+  std::vector<std::string> algonames;
   std::string rootfilename;
   virtual void beginJob(const edm::EventSetup&) ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
-  double getEff(double, double, double, int, const MuonPerformance &);
-  double getEffError(double, double, double, int, const MuonPerformance &); 
-  bool passesPIDKilling(double, double, double, int, const MuonPerformance &);
 
   // ----------member data ---------------------------
+
+  MuonPerformanceReadback *effreader;
 
   TFile *thefile;
   TH1D *hMCtruth;
@@ -88,8 +87,7 @@ using namespace reco;
 MuTestPerformanceFW_ES::MuTestPerformanceFW_ES(const edm::ParameterSet& iConfig)
 
 {
-  name1 =  iConfig.getParameter<std::string>("AlgoName1");
-  name2 =  iConfig.getParameter<std::string>("AlgoName2");
+  algonames =  iConfig.getParameter< std::vector<std::string> >("AlgoNames");
   rootfilename = iConfig.getUntrackedParameter<std::string>("outfilename","test.root");
 }
 
@@ -98,84 +96,17 @@ MuTestPerformanceFW_ES::~MuTestPerformanceFW_ES()
 {
 }
 
-
-//
-// member functions
-//
-double
-MuTestPerformanceFW_ES::getEff(double pt, double eta, double phi, int charge, const MuonPerformance & theperf)
-{
-  BinningPointByMap p; 
-  p.insert(BinningVariables::MuonPt,pt);  
-  p.insert(BinningVariables::MuonEta,eta); 
-  //  p.insert(BinningVariables::MuonPhi,phi); 
-  //  p.insert(BinningVariables::MuonCharge,charge);  
-
-  double theeff = theperf.getResult(PerformanceResult::MUEFF,p);  
-
-  /* Debugging printout. */ 
-  std::cout <<" test eta=" << eta << ", pt=" << pt << ", phi = " << phi << ", " << "charge = " << charge << std::endl;   
-  std::cout <<" Discriminant is "<<theperf.workingPoint().discriminantName()<<std::endl;  
-  std::cout <<" mueff/muerr ="<<theperf.getResult(PerformanceResult::MUEFF,p)<<"/"<<theperf.getResult(PerformanceResult::MUERR,p)<<std::endl;  
-
- 
-  return theeff;
-}
-
-double 
-MuTestPerformanceFW_ES::getEffError(double pt, double eta, double phi, int charge, const MuonPerformance & theperf) 
-{ 
-  BinningPointByMap p;  
-  p.insert(BinningVariables::MuonPt,pt);   
-  p.insert(BinningVariables::MuonEta,eta);  
-  //  p.insert(BinningVariables::MuonPhi,phi);  
-  //  p.insert(BinningVariables::MuonCharge,charge);   
- 
-  double theefferr = theperf.getResult(PerformanceResult::MUERR,p);  
-  
-  return theefferr; 
-} 
-
-bool
-MuTestPerformanceFW_ES::passesPIDKilling(double pt, double eta, double phi, int charge, const MuonPerformance & theperf)
-{
-  bool passes = false;
-
-  BinningPointByMap p;   
-  p.insert(BinningVariables::MuonPt,pt);    
-  p.insert(BinningVariables::MuonEta,eta);   
-  //  p.insert(BinningVariables::MuonPhi,phi);   
-  //  p.insert(BinningVariables::MuonCharge,charge);    
-  
-  double theeff = theperf.getResult(PerformanceResult::MUEFF,p);   
-
-  double randthrow = rnd->Rndm(); 
- 
-  if(randthrow < theeff) 
-    { 
-      passes = true;
-    }
-
-  return passes;
-}
-
 // ------------ method called to for each event  ------------
 void
 MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   /* Retrieve the DB "MuonPerformance" record through the EventSetup. */
-  edm::ESHandle<MuonPerformance> perfSA;
-  iSetup.get<MuonPerformanceRecord>().get(name1,perfSA);
-  const MuonPerformance & standaloneMuon = *(perfSA.product());
-
-  edm::ESHandle<MuonPerformance> perfTRK; 
-  iSetup.get<MuonPerformanceRecord>().get(name2,perfTRK); 
-  const MuonPerformance & tracking = *(perfTRK.product()); 
 
   double eta, pt, phi;
   int pdgid = 0;
   int status = 0;
   int chg = 0;
+  std::string algoname;
 
   Handle<GenParticleCollection> genParticles;  
   iEvent.getByLabel( "genParticles", genParticles );  
@@ -201,30 +132,32 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	  if(pdgid == -13) 
 	    chg = -1;
 
+	  bool passescorrection = true;
+
 	  /* Now lookup the efficiency and error from the DB based on the muon pT, eta, phi, and charge */
-
-	  getEff(pt, eta, phi, chg, standaloneMuon);
- 	  getEffError(pt, eta, phi, chg, standaloneMuon); 
-          getEff(pt, eta, phi, chg, tracking); 
-          getEffError(pt, eta, phi, chg, tracking);  
-
-
-	  /* Fill a histogram of the pT spectrum for all true muons */
-          hMCtruth->Fill(pt); 
-
-	  /* 
-	   * Now apply the actual efficiency correction. The example here uses "PID-Killing"; just do a muon-by-muon 
-	   * accept-reject and keep all muons that pass. Alternativly "PID-weighting"; when we have tables for the T/P 
-	   * efficiency from both data & MC, apply the ratio as a weight.
-	   */
-	  if(passesPIDKilling(pt, eta, phi, chg, standaloneMuon)) // Apply the SA-muon efficiency correction
+	  for(unsigned int i = 0; i < algonames.size(); ++i) 
 	    {
-	      if(passesPIDKilling(pt, eta, phi, chg, tracking)) // Apply the tracking efficiency correction
+	      algoname = algonames[i];
+	      const MuonPerformance &muonefficiency = effreader->getPerformanceRecord(algoname, iSetup); 
+
+	      effreader->getEff(pt, eta, phi, chg, muonefficiency);
+	      effreader->getEffError(pt, eta, phi, chg, muonefficiency); 
+	      
+	      /* Fill a histogram of the pT spectrum for all true muons */
+	      hMCtruth->Fill(pt); 
+	      
+	      /* 
+	       * Now apply the actual efficiency correction. The example here uses "PID-Killing"; just do a muon-by-muon 
+	       * accept-reject and keep all muons that pass. Alternativly "PID-weighting"; when we have tables for the T/P 
+	       * efficiency from both data & MC, apply the ratio as a weight.
+	       */
+	      if(effreader->passesPIDKilling(pt, eta, phi, chg, muonefficiency) == false) // Apply the muon efficiency correction
 		{
-		  hMCCorrected->Fill(pt);
+		  passescorrection = false;
 		}
 	    }
-
+	  if(passescorrection == true)
+	    hMCCorrected->Fill(pt); 
 	}
     }
 
@@ -236,13 +169,14 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
     {
       hReconstructed->Fill(muon1->pt());
     }
-
 }
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
 MuTestPerformanceFW_ES::beginJob(const edm::EventSetup&)
 {
+  effreader = new MuonPerformanceReadback();
+
   thefile = new TFile(rootfilename.c_str(),"recreate");  
   thefile->cd();  
   hMCtruth= new TH1D("hMCtruth","hMCtruth",100,0,100); 
