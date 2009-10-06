@@ -3,11 +3,11 @@ jobtype = cmssw
 scheduler = glite
 
 [CMSSW]
-datasetpath = /ppMuX/gpetrucc-OctoberX_JPsiTNPSkim_TestOnly_v2-27590de989bc64ab95ce191a7f62cb3f/USER
+datasetpath = /ppMuX/muon-OctoberX_JPsiSkim-a01a96349687977ce06909ff2f088b43/USER
 dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
 pset = tp_from_skim.py
 total_number_of_events = -1
-number_of_jobs = 10
+number_of_jobs = 100
 output_file = histo_output_GlbFromCal.root, histo_output_GlbFromTk.root, histo_output_HltFromGlb.root, histo_output_TkFromSta.root
 
 [USER]
