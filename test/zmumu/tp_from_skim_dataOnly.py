@@ -242,6 +242,7 @@ MakeHisto = cms.EDAnalyzer("TagProbeEDMAnalysis",
 
       TagProbeType = cms.untracked.int32(0),
 
+      MCTruthParentId = cms.untracked.int32(443),
       Weight = cms.untracked.double(1.0),
 
       CalculateEffSideBand = cms.untracked.bool( True ), ## Calculate and store effs using SB
