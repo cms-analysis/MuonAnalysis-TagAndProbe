@@ -10,7 +10,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",  
       ## Efficiency/Fitting variables
-      CalculateEffSideBand = cms.untracked.bool( True ), ## Calculate and store effs using SB
+      CalculateEffSideBand = cms.untracked.bool( False ), ## Calculate and store effs using SB
       CalculateEffFitter   = cms.untracked.bool( True ), ## Calculate and store effs from Roofit
       CalculateEffTruth    = cms.untracked.bool( False ), ## Calculate and store true effs
 
@@ -59,7 +59,12 @@ RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",
 
       ## Variables for sideband subtraction
       SBSPeak            = cms.untracked.double( 91.2 ),   ## Mass peak
-      SBSStanDev         = cms.untracked.double( 2 )       ## SD from peak for subtraction
+      SBSStanDev         = cms.untracked.double( 2 ),      ## SD from peak for subtraction
+
+      # All the following is useless now that we just read and fit
+      # but it's required...
+      # --------------------------------------------
+      MCTruthParentId = cms.untracked.int32(443),
 )
 
 process.fitGlbFromTk = RunFit.clone(
