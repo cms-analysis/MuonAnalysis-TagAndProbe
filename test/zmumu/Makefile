@@ -31,6 +31,9 @@ $(CRABDIRS): %: %.crab tp_from_skim_dataOnly.py
 STDOUTS = $(patsubst %,%/res/CMSSW_1.stdout, $(CRABDIRS))
 status: $(STDOUTS)
 
+allstatus:
+	for D in $(CRABDIRS); do crab -c $$D -status 2>&1 | tee status.$$D; done
+
 ## this rule pretends that *.stdout is made using crab -c ... -status
 $(STDOUTS): %/res/CMSSW_1.stdout: %
 	crab -c $< -status 2>&1 | tee status.$(patsubst %,%.status,$<)
@@ -51,7 +54,7 @@ $(STDERRS): %/res/CMSSW_1.stderr: %
 ##   |_|   |___| |_|   |___/\__|\__,_|_| |_|  
 ##                                            
 ##   
-HISTOS  = $(ipatsubst %,histo_dataonly_%.root, $(FITS))
+HISTOS  = $(patsubst %,histo_dataonly_%.root, $(FITS))
 RESULTS = $(patsubst %,fit_result_%.root, $(FITS))
 
 ## 'make fit' just means make all the results
@@ -68,3 +71,4 @@ ALLCRABHISTS = $(wildcard $(patsubst %,%/res/histo_*.root,$(CRABDIRS)))
 $(HISTOS): histo_%.root: $(ALLCRABHISTS)
 	hadd -f $@ $(wildcard $(patsubst %,%/res/histo_$*_*.root,$(CRABDIRS)))
 
+histos: $(HISTOS)  $(ALLCRABHISTS)
