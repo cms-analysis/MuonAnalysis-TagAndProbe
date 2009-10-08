@@ -16,84 +16,84 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     timetype = cms.untracked.string("runnumber"),                                          
     toPut = cms.VPSet(
     cms.PSet(
-    record = cms.string('GLBMUJPSI_TABLE'),
-    tag = cms.string('GLBMUJPSI_TABLE'),
-    label = cms.string('GLBMUJPSI_TABLE')
+    record = cms.string('GLBMUJPSI_OCTXTEST_TABLE'),
+    tag = cms.string('GLBMUJPSI_OCTXTEST_TABLE'),
+    label = cms.string('GLBMUJPSI_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('GLBMUJPSI_WP'),
-    tag = cms.string('GLBMUJPSI_WP'),
-    label = cms.string('GLBMUJPSI_WP')
+    record = cms.string('GLBMUJPSI_OCTXTEST_WP'),
+    tag = cms.string('GLBMUJPSI_OCTXTEST_WP'),
+    label = cms.string('GLBMUJPSI_OCTXTEST_WP')
     ),
     cms.PSet(
-    record = cms.string('TRKEFFMUJPSI_TABLE'),
-    tag = cms.string('TRKEFFMUJPSI_TABLE'),
-    label = cms.string('TRKEFFMUJPSI_TABLE')
+    record = cms.string('TRKEFFMUJPSI_OCTXTEST_TABLE'),
+    tag = cms.string('TRKEFFMUJPSI_OCTXTEST_TABLE'),
+    label = cms.string('TRKEFFMUJPSI_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('TRKEFFMUJPSI_WP'),
-    tag = cms.string('TRKEFFMUJPSI_WP'),
-    label = cms.string('TRKEFFMUJPSI_WP')
+    record = cms.string('TRKEFFMUJPSI_OCTXTEST_WP'),
+    tag = cms.string('TRKEFFMUJPSI_OCTXTEST_WP'),
+    label = cms.string('TRKEFFMUJPSI_OCTXTEST_WP')
     ),
     cms.PSet(
-    record = cms.string('TRGMUJPSI_TABLE'),
-    tag = cms.string('TRGMUJPSI_TABLE'),
-    label = cms.string('TRGMUJPSI_TABLE')
+    record = cms.string('TRGMUJPSI_OCTXTEST_TABLE'),
+    tag = cms.string('TRGMUJPSI_OCTXTEST_TABLE'),
+    label = cms.string('TRGMUJPSI_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('TRGMUJPSI_WP'),
-    tag = cms.string('TRGMUJPSI_WP'),
-    label = cms.string('TRGMUJPSI_WP')
+    record = cms.string('TRGMUJPSI_OCTXTEST_WP'),
+    tag = cms.string('TRGMUJPSI_OCTXTEST_WP'),
+    label = cms.string('TRGMUJPSI_OCTXTEST_WP')
     ),    
     cms.PSet(
-    record = cms.string('GLBMUJPSICAL_TABLE'),
-    tag = cms.string('GLBMUJPSICAL_TABLE'),
-    label = cms.string('GLBMUJPSICAL_TABLE')
+    record = cms.string('GLBMUJPSICAL_OCTXTEST_TABLE'),
+    tag = cms.string('GLBMUJPSICAL_OCTXTEST_TABLE'),
+    label = cms.string('GLBMUJPSICAL_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('GLBMUJPSICAL_WP'),
-    tag = cms.string('GLBMUJPSICAL_WP'),
-    label = cms.string('GLBMUJPSICAL_WP')
+    record = cms.string('GLBMUJPSICAL_OCTXTEST_WP'),
+    tag = cms.string('GLBMUJPSICAL_OCTXTEST_WP'),
+    label = cms.string('GLBMUJPSICAL_OCTXTEST_WP')
     ),
     cms.PSet(
-    record = cms.string('GLBMUZ_TABLE'),
-    tag = cms.string('GLBMUZ_TABLE'),
-    label = cms.string('GLBMUZ_TABLE')
+    record = cms.string('GLBMUZ_OCTXTEST_TABLE'),
+    tag = cms.string('GLBMUZ_OCTXTEST_TABLE'),
+    label = cms.string('GLBMUZ_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('GLBMUZ_WP'),
-    tag = cms.string('GLBMUZ_WP'),
-    label = cms.string('GLBMUZ_WP')
+    record = cms.string('GLBMUZ_OCTXTEST_WP'),
+    tag = cms.string('GLBMUZ_OCTXTEST_WP'),
+    label = cms.string('GLBMUZ_OCTXTEST_WP')
     ),
     cms.PSet(
-    record = cms.string('TRKEFFMUZ_TABLE'),
-    tag = cms.string('TRKEFFMUZ_TABLE'),
-    label = cms.string('TRKEFFMUZ_TABLE')
+    record = cms.string('TRKEFFMUZ_OCTXTEST_TABLE'),
+    tag = cms.string('TRKEFFMUZ_OCTXTEST_TABLE'),
+    label = cms.string('TRKEFFMUZ_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('TRKEFFMUZ_WP'),
-    tag = cms.string('TRKEFFMUZ_WP'),
-    label = cms.string('TRKEFFMUZ_WP')
+    record = cms.string('TRKEFFMUZ_OCTXTEST_WP'),
+    tag = cms.string('TRKEFFMUZ_OCTXTEST_WP'),
+    label = cms.string('TRKEFFMUZ_OCTXTEST_WP')
     ),
     cms.PSet(
-    record = cms.string('TRGMUZ_TABLE'),
-    tag = cms.string('TRGMUZ_TABLE'),
-    label = cms.string('TRGMUZ_TABLE')
+    record = cms.string('TRGMUZ_OCTXTEST_TABLE'),
+    tag = cms.string('TRGMUZ_OCTXTEST_TABLE'),
+    label = cms.string('TRGMUZ_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('TRGMUZ_WP'),
-    tag = cms.string('TRGMUZ_WP'),
-    label = cms.string('TRGMUZ_WP')
+    record = cms.string('TRGMUZ_OCTXTEST_WP'),
+    tag = cms.string('TRGMUZ_OCTXTEST_WP'),
+    label = cms.string('TRGMUZ_OCTXTEST_WP')
     ),    
     cms.PSet(
-    record = cms.string('GLBMUZCAL_TABLE'),
-    tag = cms.string('GLBMUZCAL_TABLE'),
-    label = cms.string('GLBMUZCAL_TABLE')
+    record = cms.string('GLBMUZCAL_OCTXTEST_TABLE'),
+    tag = cms.string('GLBMUZCAL_OCTXTEST_TABLE'),
+    label = cms.string('GLBMUZCAL_OCTXTEST_TABLE')
     ),
     cms.PSet(
-    record = cms.string('GLBMUZCAL_WP'),
-    tag = cms.string('GLBMUZCAL_WP'),
-    label = cms.string('GLBMUZCAL_WP')
+    record = cms.string('GLBMUZCAL_OCTXTEST_WP'),
+    tag = cms.string('GLBMUZCAL_OCTXTEST_WP'),
+    label = cms.string('GLBMUZCAL_OCTXTEST_WP')
     )
     
     )
@@ -105,24 +105,24 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
 process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
 
                                 # For each table to be loaded, set the name of the input T/P file, histogram, algorithm, and cut (if any)
-                                inputHistoFiles = cms.vstring('../jpsi/fit_result_GlbFromTk.root',
-                                                              '../jpsi/fit_result_TkFromSta.root',
-                                                              '../jpsi/fit_result_HltFromGlb.root',
-                                                              '../jpsi/fit_result_GlbFromCal.root',
-                                                              '../zmumu/fit_result_GlbFromTk.root',
-                                                              '../zmumu/fit_result_TkFromSta.root',
-                                                              '../zmumu/fit_result_HltFromGlb.root',
-                                                              '../zmumu/fit_result_GlbFromCal.root'
+                                inputHistoFiles = cms.vstring('fit_result_GlbFromTk_JPsi.root',
+                                                              'fit_result_TkFromSta_JPsi.root',
+                                                              'fit_result_HltFromGlb_JPsi.root',
+                                                              'fit_result_GlbFromCal_JPsi.root',
+                                                              'fit_result_GlbFromTk_Z.root',
+                                                              'fit_result_TkFromSta_Z.root',
+                                                              'fit_result_HltFromGlb_Z.root',
+                                                              'fit_result_GlbFromCal_Z.root'
                                                               ),                                
 
-                                inputHistogramNames = cms.vstring('fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta',
-                                                                  'fit_eff_Pt_Eta'),
+                                inputHistogramNames = cms.vstring('fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta'),
                                 
                                 inputAlgorithmNames = cms.vstring('GlobalMuonFromTrackerTrackJpsi',
                                                                   'TrackerTrackFromStandaloneMuonJpsi',
@@ -144,10 +144,10 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                 
                                 # For each table to be loaded, set the payload and working point record names as
                                 # defined above in the PoolDBOutputService
-                                RecordPayloads = cms.vstring('GLBMUJPSI_TABLE','TRKEFFMUJPSI_TABLE','TRGMUJPSI_TABLE','GLBMUJPSICAL_TABLE',
-                                                             'GLBMUZ_TABLE','TRKEFFMUZ_TABLE','TRGMUZ_TABLE','GLBMUZCAL_TABLE'),
-                                RecordWPs = cms.vstring('GLBMUJPSI_WP','TRKEFFMUJPSI_WP','TRGMUJPSI_WP','GLBMUJPSICAL_WP',
-                                                        'GLBMUZ_WP','TRKEFFMUZ_WP','TRGMUZ_WP','GLBMUZCAL_WP'),
+                                RecordPayloads = cms.vstring('GLBMUJPSI_OCTXTEST_TABLE','TRKEFFMUJPSI_OCTXTEST_TABLE','TRGMUJPSI_OCTXTEST_TABLE','GLBMUJPSICAL_OCTXTEST_TABLE',
+                                                             'GLBMUZ_OCTXTEST_TABLE','TRKEFFMUZ_OCTXTEST_TABLE','TRGMUZ_OCTXTEST_TABLE','GLBMUZCAL_OCTXTEST_TABLE'),
+                                RecordWPs = cms.vstring('GLBMUJPSI_OCTXTEST_WP','TRKEFFMUJPSI_OCTXTEST_WP','TRGMUJPSI_OCTXTEST_WP','GLBMUJPSICAL_OCTXTEST_WP',
+                                                        'GLBMUZ_OCTXTEST_WP','TRKEFFMUZ_OCTXTEST_WP','TRGMUZ_OCTXTEST_WP','GLBMUZCAL_OCTXTEST_WP'),
 
                                 # Set the type of data to be stored, the binning variables, and the IOV
                                 # These are currently assumed to be the same for all tables loaded in a single job

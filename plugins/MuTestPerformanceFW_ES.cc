@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.2 2009/10/02 08:18:51 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.3 2009/10/04 19:13:29 jjhollar Exp $
 //
 //
 
@@ -35,10 +35,7 @@
 // class decleration
 //
 
-#include "RecoMuon/Records/interface/MuonPerformanceRecord.h"
 #include "MuonAnalysis/TagAndProbe/interface/MuonPerformanceReadback.h"
-
-#include "CondFormats/PhysicsToolsObjects/interface/BinningPointByMap.h" 
 #include "MuonAnalysis/TagAndProbe/interface/MuonPerformance.h" 
 
 #include "DataFormats/HepMCCandidate/interface/GenParticle.h"  

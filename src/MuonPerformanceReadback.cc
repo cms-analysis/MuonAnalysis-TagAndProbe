@@ -62,7 +62,11 @@ MuonPerformanceReadback::passesPIDKilling(double pt, double eta, double phi, int
   double theeff = theperf.getResult(PerformanceResult::MUEFF,p);   
 
   double randthrow = rnd->Rndm(); 
- 
+
+  if(theeff < 0)
+    {
+      passes = true;
+    }
   if(randthrow < theeff) 
     { 
       passes = true;
