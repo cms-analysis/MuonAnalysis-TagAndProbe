@@ -122,6 +122,42 @@ process.calPassingGlb = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("calProbes"),
     match = cms.InputTag("muToGlbMatch"),
 )
+##    ____               _               ____            _                   _______        ___  __
+##   |  _ \ __ _ ___ ___(_)_ __   __ _  |  _ \ _ __ ___ | |__   ___  ___ _  | ____\ \      / / |/ /
+##   | |_) / _` / __/ __| | '_ \ / _` | | |_) | '__/ _ \| '_ \ / _ \/ __(_) |  _|  \ \ /\ / /| ' / 
+##   |  __/ (_| \__ \__ \ | | | | (_| | |  __/| | | (_) | |_) |  __/\__ \_  | |___  \ V  V / | . \ 
+##   |_|   \__,_|___/___/_|_| |_|\__, | |_|   |_|  \___/|_.__/ \___||___(_) |_____|  \_/\_/  |_|\_\
+##                               |___/                                                             
+##   
+process.load("RecoVertex.BeamSpotProducer.BeamSpot_cfi")
+
+process.muonSelectionWmunu = cms.EDProducer("MuonSelectorWmunu",
+    src = cms.InputTag("selectedLayer1MuonsTriggerMatch"),
+)
+process.tkToMuMatchWmunu = process.tkToGlbMatch.clone(matched = "muonSelectionWmunu")
+process.tkPassingMuWmunu = process.tkPassingGlb.clone(match   = "tkToMuMatchWmunu")
+process.muWmunuProbesForHLT = cms.EDFilter("MuonSelectorWmunu",
+    src = cms.InputTag("glbProbes"),
+)
+process.muWmunuPassingHLT = cms.EDFilter("MuonSelectorWmunu",
+    src = cms.InputTag("glbPassingHLT"),
+)
+
+process.muonSelectionZmumu = cms.EDFilter("PATMuonRefSelector",
+    src = cms.InputTag("selectedLayer1MuonsTriggerMatch"),
+    cut = cms.string("isGlobalMuon && trackIso < 3"),
+)
+process.tkToMuMatchZmumu = process.tkToGlbMatch.clone(matched = "muonSelectionZmumu")
+process.tkPassingMuZmumu = process.tkPassingGlb.clone(match   = "tkToMuMatchZmumu")
+
+process.ewkSelections = cms.Sequence(
+    process.offlineBeamSpot * (
+            process.muonSelectionWmunu * process.tkToMuMatchWmunu * process.tkPassingMuWmunu +
+            process.muWmunuProbesForHLT +
+            process.muWmunuPassingHLT
+        ) +
+    process.muonSelectionZmumu * process.tkToMuMatchZmumu * process.tkPassingMuZmumu
+)
 
 ##    ____               _               ____            _                   _____               _    _             
 ##   |  _ \ __ _ ___ ___(_)_ __   __ _  |  _ \ _ __ ___ | |__   ___  ___ _  |_   _| __ __ _  ___| | _(_)_ __   __ _ 
@@ -164,7 +200,8 @@ process.allPassingProbes = cms.Sequence(
     process.tkToGlbMatch * process.tkPassingGlb +
     process.muToGlbMatch * process.calPassingGlb +
     process.staToTkMatch * process.staPassingTk +
-    process.glbPassingHLT
+    process.glbPassingHLT +
+    process.ewkSelections 
 )
 
 ##    __  __       _          _____                 ____            _                                      
@@ -184,13 +221,15 @@ process.tagProbeGlbFromCal = tagProbeTemplate.clone(  ProbeCollection = cms.Inpu
 process.tagProbeTkFromSta  = tagProbeTemplate.clone(  ProbeCollection = cms.InputTag("staProbes"),
                                                       MassMinCut = cms.untracked.double(massRangeSta[0]),
                                                       MassMaxCut = cms.untracked.double(massRangeSta[1]), )
-process.tagProbeHltFromGlb = tagProbeTemplate.clone(  ProbeCollection = cms.InputTag("glbProbes") )
+process.tagProbeHltFromGlb   = tagProbeTemplate.clone(  ProbeCollection = cms.InputTag("glbProbes") )
+process.tagProbeHltFromWmunu = tagProbeTemplate.clone(  ProbeCollection = cms.InputTag("muWmunuProbesForHLT") )
 
 process.allTagProbeMaps = cms.Sequence(
     process.tagProbeGlbFromTk +
     process.tagProbeGlbFromCal +
     process.tagProbeTkFromSta +
-    process.tagProbeHltFromGlb
+    process.tagProbeHltFromGlb +
+    process.tagProbeHltFromWmunu
 )
 
 ##    _____           _       _ ____            _            _   _ _____            _      
@@ -359,12 +398,72 @@ process.fitHltFromGlb = MakeHisto.clone(
     Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1 ),
 )
 
+#####
+## Mu from Tk (EWK/Wmunu analsis)
+process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
+process.TPEdm.allProbeCandTags  += [ cms.InputTag("tkProbes")   ]
+process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuWmunu") ]
+process.TPEdm.tagProbeMapTags   += [ cms.InputTag("tagProbeGlbFromTk") ]
+process.TPEdm.tagTruthMatchMapTags       += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.passProbeTruthMatchMapTags += [ cms.InputTag("tkMcMatch") ]
+process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("tkMcMatch") ]
+process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
+process.TPEdm.BestProbeInvMass  += [ 3.1 ]
+process.fitMuFromTkWmunu = MakeHisto.clone( 
+    TagProbeType = cms.untracked.int32(4),
+    FitFileName = cms.untracked.string( "histo_dataonly_MuFromTkWmunu.root"),
+    Var1BinBoundaries   = cms.untracked.vdouble( 25, 40, 60, 100 ),
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1 ),
+)
+
+#####
+## Trigger from Mu (EWK/Wmunu analsis)
+process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
+process.TPEdm.allProbeCandTags  += [ cms.InputTag("muWmunuProbesForHLT")   ]
+process.TPEdm.passProbeCandTags += [ cms.InputTag("muWmunuPassingHLT") ]
+process.TPEdm.tagProbeMapTags   += [ cms.InputTag("tagProbeHltFromWmunu") ]
+process.TPEdm.tagTruthMatchMapTags       += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.passProbeTruthMatchMapTags += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
+process.TPEdm.BestProbeInvMass  += [ 3.1 ]
+process.fitHltFromWmunu = MakeHisto.clone( 
+    TagProbeType = cms.untracked.int32(5),
+    FitFileName = cms.untracked.string( "histo_dataonly_HltFromWmunu.root"),
+    Var1BinBoundaries   = cms.untracked.vdouble( 25, 40, 60, 100 ),
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1 ),
+)
+
+
+
+#####
+## Mu from Tk (EWK/Zmumu analsis)
+process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
+process.TPEdm.allProbeCandTags  += [ cms.InputTag("tkProbes")   ]
+process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuZmumu") ]
+process.TPEdm.tagProbeMapTags   += [ cms.InputTag("tagProbeGlbFromTk") ]
+process.TPEdm.tagTruthMatchMapTags       += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.passProbeTruthMatchMapTags += [ cms.InputTag("tkMcMatch") ]
+process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("tkMcMatch") ]
+process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
+process.TPEdm.BestProbeInvMass  += [ 3.1 ]
+process.fitMuFromTkZmumu = MakeHisto.clone( 
+    TagProbeType = cms.untracked.int32(6),
+    FitFileName = cms.untracked.string( "histo_dataonly_MuFromTkZmumu.root"),
+    Var1BinBoundaries   = cms.untracked.vdouble( 20, 40, 60, 100 ),
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.0,-1.2,-0.7,0.0,0.7,1.2,2.0 ),
+)
+
+
 process.allTPHistos = cms.Sequence(
     process.TPEdm +
     process.fitGlbFromTk +
     process.fitGlbFromCal +
     process.fitTkFromSta +
-    process.fitHltFromGlb 
+    process.fitHltFromGlb +
+    process.fitMuFromTkWmunu +
+    process.fitHltFromWmunu +
+    process.fitMuFromTkZmumu
 )
 
 ##    ____       _   _     

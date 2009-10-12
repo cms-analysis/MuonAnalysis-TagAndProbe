@@ -92,9 +92,32 @@ process.fitHltFromGlb = RunFit.clone(
     Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1),
 )
 
+process.fitMuFromTkWmunu = RunFit.clone(
+    ReadFromFiles = [ 'histo_dataonly_MuFromTkWmunu.root' ],
+    FitFileName   =     'fit_result_MuFromTkWmunu.root'  ,
+    Var1BinBoundaries   = cms.untracked.vdouble( 25, 40, 60, 100 ),
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1),
+)
+process.fitHltFromWmunu = RunFit.clone(
+    ReadFromFiles = [ 'histo_dataonly_HltFromWmunu.root' ],
+    FitFileName   =     'fit_result_HltFromWmunu.root'  ,
+    Var1BinBoundaries   = cms.untracked.vdouble( 25, 40, 60, 100 ),
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1),
+)
+process.fitMuFromTkZmumu = RunFit.clone(
+    ReadFromFiles = [ 'histo_dataonly_MuFromTkZmumu.root' ],
+    FitFileName   =     'fit_result_MuFromTkZmumu.root'  ,
+    Var1BinBoundaries   = cms.untracked.vdouble( 20, 40, 60, 100 ),
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.0,-1.2,-0.7,0.0,0.7,1.2,2.0 ),
+)
+
+
 process.fitness = cms.Path(
     process.fitGlbFromTk  +
     process.fitGlbFromCal +
     process.fitTkFromSta  +
-    process.fitHltFromGlb 
+    process.fitHltFromGlb +
+    process.fitHltFromWmunu + 
+    process.fitMuFromTkWmunu +
+    process.fitMuFromTkZmumu 
 )

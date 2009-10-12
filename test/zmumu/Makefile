@@ -24,7 +24,11 @@ create: $(CRABDIRS)
 ## each crabdir has prerequisites the crab file and the python file, and is created with crab -create -submit
 $(CRABDIRS): %: %.crab tp_from_skim_dataOnly.py
 	rm -rf $@ || /bin/true
-	crab -cfg $@.crab -create -submit
+	crab -cfg $@.crab -create
+
+submit: $(CRABDIRS)
+	for D in $(CRABDIRS); do crab -c $$D -submit 2>&1 | tee status.$$D; done
+
 
 ### ------------------------------------
 ### 'make status' will issue crab -status
