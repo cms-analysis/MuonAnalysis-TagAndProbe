@@ -9,7 +9,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",  
       ## Efficiency/Fitting variables
-      CalculateEffSideBand = cms.untracked.bool( True ), ## Calculate and store effs using SB
+      CalculateEffSideBand = cms.untracked.bool( False ), ## Calculate and store effs using SB
       CalculateEffFitter   = cms.untracked.bool( True ), ## Calculate and store effs from Roofit
       CalculateEffTruth    = cms.untracked.bool( True ), ## Calculate and store true effs
 
@@ -91,9 +91,25 @@ process.fitHltFromGlb = RunFit.clone(
     Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1),
 )
 
+process.fitMuFromTkJPsiPlusMu = RunFit.clone(
+    ReadFromFiles = [ 'histo_output_MuFromTkJPsiPlusMu.root' ],
+    FitFileName   =     'fit_result_MuFromTkJPsiPlusMu.root'  ,
+)
+process.fitMuFromTkJPsi = RunFit.clone(
+    ReadFromFiles = [ 'histo_output_MuFromTkJPsi.root' ],
+    FitFileName   =     'fit_result_MuFromTkJPsi.root'  ,
+)
+process.fitMuFromTkBExcl = RunFit.clone(
+    ReadFromFiles = [ 'histo_output_MuFromTkBExcl.root' ],
+    FitFileName   =     'fit_result_MuFromTkBExcl.root'  ,
+)
+
 process.fitness = cms.Path(
     process.fitGlbFromTk +
     process.fitGlbFromCal +
     process.fitTkFromSta +
-    process.fitHltFromGlb 
+    process.fitHltFromGlb +
+    process.fitMuFromTkJPsiPlusMu +
+    process.fitMuFromTkJPsi +
+    process.fitMuFromTkBExcl
 )
