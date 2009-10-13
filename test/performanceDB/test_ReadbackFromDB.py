@@ -95,6 +95,62 @@ process.PoolDBESSource3 = cms.ESSource("PoolDBESSource",
     label = cms.untracked.string('TRGMUZ_OCTXTEST_TABLE')
     )))
 
+# PAG-specific selections
+process.PoolDBESSource4 =  cms.ESSource("PoolDBESSource",
+                                       process.CondDBCommon,
+                                       toGet = cms.VPSet(
+    cms.PSet( 
+    record = cms.string('PerformancePayloadRecord'), 
+    tag = cms.string('TRGMUJPSI_JPSIANAL_OCTXTEST_TABLE'), 
+    label = cms.untracked.string('TRGMUJPSI_JPSIANAL_OCTXTEST_TABLE') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformanceWPRecord'), 
+    tag = cms.string('TRGMUJPSI_JPSIANAL_OCTXTEST_WP'), 
+    label = cms.untracked.string('TRGMUJPSI_JPSIANAL_OCTXTEST_WP') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformancePayloadRecord'), 
+    tag = cms.string('MUJPSI_JPSIGLBANAL_OCTXTEST_TABLE'), 
+    label = cms.untracked.string('MUJPSI_JPSIGLBANAL_OCTXTEST_TABLE') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformanceWPRecord'), 
+    tag = cms.string('MUJPSI_JPSIGLBANAL_OCTXTEST_WP'), 
+    label = cms.untracked.string('MUJPSI_JPSIGLBANAL_OCTXTEST_WP') 
+    ),     
+    cms.PSet( 
+    record = cms.string('PerformancePayloadRecord'), 
+    tag = cms.string('MUJPSI_JPSITKMANAL_OCTXTEST_TABLE'), 
+    label = cms.untracked.string('MUJPSI_JPSITKMANAL_OCTXTEST_TABLE') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformanceWPRecord'), 
+    tag = cms.string('MUJPSI_JPSITKMANAL_OCTXTEST_WP'), 
+    label = cms.untracked.string('MUJPSI_JPSITKMANAL_OCTXTEST_WP') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformancePayloadRecord'), 
+    tag = cms.string('MUJPSI_JPSIPLUSMUANAL_OCTXTEST_TABLE'), 
+    label = cms.untracked.string('MUJPSI_JPSIPLUSMUANAL_OCTXTEST_TABLE') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformanceWPRecord'), 
+    tag = cms.string('MUJPSI_JPSIPLUSMUANAL_OCTXTEST_WP'), 
+    label = cms.untracked.string('MUJPSI_JPSIPLUSMUANAL_OCTXTEST_WP') 
+    ),     
+    cms.PSet( 
+    record = cms.string('PerformancePayloadRecord'), 
+    tag = cms.string('MUJPSI_BEXCLANAL_OCTXTEST_TABLE'), 
+    label = cms.untracked.string('MUJPSI_BEXCLANAL_OCTXTEST_TABLE') 
+    ), 
+    cms.PSet( 
+    record = cms.string('PerformanceWPRecord'), 
+    tag = cms.string('MUJPSI_BEXCLANAL_OCTXTEST_WP'), 
+    label = cms.untracked.string('MUJPSI_BEXCLANAL_OCTXTEST_WP') 
+    )))
+
+
 #
 # change inside the source
 #
@@ -117,7 +173,24 @@ process.MuonPerformanceESProducer_TrackerTrackMuon2.ComponentName = "TrackerTrac
 process.MuonPerformanceESProducer_TriggerMuon2.PayloadName = "TRGMUJPSI_OCTXTEST_TABLE"
 process.MuonPerformanceESProducer_TriggerMuon2.WorkingPointName = "TRGMUJPSI_OCTXTEST_WP"
 process.MuonPerformanceESProducer_TriggerMuon2.ComponentName = "TriggerMuonFromGlobalMuonJpsi"
- 
+
+# PAG-specific selections
+process.MuonPerformanceESProducer_TriggerMuon2.PayloadName = "TRGMUJPSI_JPSIANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_TriggerMuon2.WorkingPointName = "TRGMUJPSI_JPSIANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_TriggerMuon2.ComponentName = "TriggerMuonFromGlobalMuonJpsi_JpsiAnal"
+process.MuonPerformanceESProducer_Muon1.PayloadName = "MUJPSI_JPSIGLBANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_Muon1.WorkingPointName = "MUJPSI_JPSIGLBANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_Muon1.ComponentName = "MuonFromTrackerTrackJpsi_JpsiGlbAnal"
+process.MuonPerformanceESProducer_Muon2.PayloadName = "MUJPSI_JPSITKMANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_Muon2.WorkingPointName = "MUJPSI_JPSITKMANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_Muon2.ComponentName = "MuonFromTrackerTrackJpsi_JpsiTkMAnal"
+process.MuonPerformanceESProducer_Muon3.PayloadName = "MUJPSI_JPSIPLUSMUANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_Muon3.WorkingPointName = "MUJPSI_JPSIPLUSMUANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_Muon3.ComponentName = "MuonFromTrackerTrackJpsi_JpsiPlusMuAnal"
+process.MuonPerformanceESProducer_Muon3.PayloadName = "MUJPSI_BEXCLANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_Muon3.WorkingPointName = "MUJPSI_BEXCLANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_Muon3.ComponentName = "MuonFromTrackerTrackJpsi_BExclAnal"
+
 
 process.demo2 = cms.EDAnalyzer('MuTestPerformanceFW_ES',
                                AlgoNames = cms.vstring(
@@ -126,7 +199,12 @@ process.demo2 = cms.EDAnalyzer('MuTestPerformanceFW_ES',
     'TrackerTrackFromStandaloneMuonZ',
     'TriggerMuonFromGlobalMuonJpsi',
     'GlobalMuonFromTrackerTrackJpsi',
-    'TrackerTrackFromStandaloneMuonJpsi'    
+    'TrackerTrackFromStandaloneMuonJpsi',
+    'TriggerMuonFromGlobalMuonJpsi_JpsiAnal', 
+    'MuonFromTrackerTrackJpsi_JpsiGlbAnal', 
+    'MuonFromTrackerTrackJpsi_JpsiTkMAnal', 
+    'MuonFromTrackerTrackJpsi_JpsiPlusMuAnal', 
+    'MuonFromTrackerTrackJpsi_BExclAnal'
     ))
 
 process.p = cms.Path(process.demo2)

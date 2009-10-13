@@ -5,10 +5,14 @@ import os, string, sys, posix, tokenize, array, getopt
 def main(argv):
 
     tables = ['GLBMUJPSI_OCTXTEST_TABLE','TRKEFFMUJPSI_OCTXTEST_TABLE','TRGMUJPSI_OCTXTEST_TABLE','GLBMUJPSICAL_OCTXTEST_TABLE',
-              'GLBMUZ_OCTXTEST_TABLE','TRKEFFMUZ_OCTXTEST_TABLE','TRGMUZ_OCTXTEST_TABLE','GLBMUZCAL_OCTXTEST_TABLE']
+              'GLBMUZ_OCTXTEST_TABLE','TRKEFFMUZ_OCTXTEST_TABLE','TRGMUZ_OCTXTEST_TABLE','GLBMUZCAL_OCTXTEST_TABLE',
+              'TRGMUJPSI_JPSIANAL_OCTXTEST_TABLE', 'MUJPSI_JPSIGLBANAL_OCTXTEST_TABLE', 'MUJPSI_JPSITKMANAL_OCTXTEST_TABLE',
+              'MUJPSI_JPSIPLUSMUANAL_OCTXTEST_TABLE', 'MUJPSI_BEXCLANAL_OCTXTEST_TABLE']
 
     wps = ['GLBMUJPSI_OCTXTEST_WP','TRKEFFMUJPSI_OCTXTEST_WP','TRGMUJPSI_OCTXTEST_WP','GLBMUJPSICAL_OCTXTEST_WP',
-           'GLBMUZ_OCTXTEST_WP','TRKEFFMUZ_OCTXTEST_WP','TRGMUZ_OCTXTEST_WP','GLBMUZCAL_OCTXTEST_WP']
+           'GLBMUZ_OCTXTEST_WP','TRKEFFMUZ_OCTXTEST_WP','TRGMUZ_OCTXTEST_WP','GLBMUZCAL_OCTXTEST_WP',
+           'TRGMUJPSI_JPSIANAL_OCTXTEST_WP', 'MUJPSI_JPSIGLBANAL_OCTXTEST_WP', 'MUJPSI_JPSITKMANAL_OCTXTEST_WP',
+           'MUJPSI_JPSIPLUSMUANAL_OCTXTEST_WP', 'MUJPSI_BEXCLANAL_OCTXTEST_WP']
     
     effs = ['GlobalMuonFromTrackerTrackJpsi',
             'TrackerTrackFromStandaloneMuonJpsi',
@@ -17,7 +21,12 @@ def main(argv):
             'GlobalMuonFromTrackerTrackZ',
             'TrackerTrackFromStandaloneMuonZ',
             'TriggerMuonFromGlobalMuonZ',
-            'GlobalMuonFromCaloMuonZ'
+            'GlobalMuonFromCaloMuonZ',
+            'TriggerMuonFromGlobalMuonJpsi_JpsiAnal',
+            'MuonFromTrackerTrackJpsi_JpsiGlbAnal',
+            'MuonFromTrackerTrackJpsi_JpsiTkMAnal',
+            'MuonFromTrackerTrackJpsi_JpsiPlusMuAnal',
+            'MuonFromTrackerTrackJpsi_BExclAnal'
             ]
     
     curdir = '/tmp/jjhollar'
