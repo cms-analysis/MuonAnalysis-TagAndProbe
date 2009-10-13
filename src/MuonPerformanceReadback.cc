@@ -27,10 +27,12 @@ MuonPerformanceReadback::getEff(double pt, double eta, double phi, int charge, c
   double theeff = theperf.getResult(PerformanceResult::MUEFF,p);  
 
   /* Debugging printout. */ 
+  /*
   std::cout <<" Discriminant is "<<theperf.workingPoint().discriminantName()<<std::endl;   
   std::cout <<"\teta=" << eta << ", pt=" << pt << ", phi = " << phi << ", " << "charge = " << charge << std::endl;   
   std::cout <<"\tmueff/muerr ="<<theperf.getResult(PerformanceResult::MUEFF,p)<<"/"<<theperf.getResult(PerformanceResult::MUERR,p)<<std::endl;  
- 
+  */
+
   return theeff;
 }
 

@@ -175,9 +175,9 @@ process.MuonPerformanceESProducer_TriggerMuon2.WorkingPointName = "TRGMUJPSI_OCT
 process.MuonPerformanceESProducer_TriggerMuon2.ComponentName = "TriggerMuonFromGlobalMuonJpsi"
 
 # PAG-specific selections
-process.MuonPerformanceESProducer_TriggerMuon2.PayloadName = "TRGMUJPSI_JPSIANAL_OCTXTEST_TABLE"
-process.MuonPerformanceESProducer_TriggerMuon2.WorkingPointName = "TRGMUJPSI_JPSIANAL_OCTXTEST_WP"
-process.MuonPerformanceESProducer_TriggerMuon2.ComponentName = "TriggerMuonFromGlobalMuonJpsi_JpsiAnal"
+process.MuonPerformanceESProducer_TriggerMuon3.PayloadName = "TRGMUJPSI_JPSIANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_TriggerMuon3.WorkingPointName = "TRGMUJPSI_JPSIANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_TriggerMuon3.ComponentName = "TriggerMuonFromGlobalMuonJpsi_JpsiAnal"
 process.MuonPerformanceESProducer_Muon1.PayloadName = "MUJPSI_JPSIGLBANAL_OCTXTEST_TABLE"
 process.MuonPerformanceESProducer_Muon1.WorkingPointName = "MUJPSI_JPSIGLBANAL_OCTXTEST_WP"
 process.MuonPerformanceESProducer_Muon1.ComponentName = "MuonFromTrackerTrackJpsi_JpsiGlbAnal"
@@ -187,9 +187,9 @@ process.MuonPerformanceESProducer_Muon2.ComponentName = "MuonFromTrackerTrackJps
 process.MuonPerformanceESProducer_Muon3.PayloadName = "MUJPSI_JPSIPLUSMUANAL_OCTXTEST_TABLE"
 process.MuonPerformanceESProducer_Muon3.WorkingPointName = "MUJPSI_JPSIPLUSMUANAL_OCTXTEST_WP"
 process.MuonPerformanceESProducer_Muon3.ComponentName = "MuonFromTrackerTrackJpsi_JpsiPlusMuAnal"
-process.MuonPerformanceESProducer_Muon3.PayloadName = "MUJPSI_BEXCLANAL_OCTXTEST_TABLE"
-process.MuonPerformanceESProducer_Muon3.WorkingPointName = "MUJPSI_BEXCLANAL_OCTXTEST_WP"
-process.MuonPerformanceESProducer_Muon3.ComponentName = "MuonFromTrackerTrackJpsi_BExclAnal"
+process.MuonPerformanceESProducer_Muon4.PayloadName = "MUJPSI_BEXCLANAL_OCTXTEST_TABLE"
+process.MuonPerformanceESProducer_Muon4.WorkingPointName = "MUJPSI_BEXCLANAL_OCTXTEST_WP"
+process.MuonPerformanceESProducer_Muon4.ComponentName = "MuonFromTrackerTrackJpsi_BExclAnal"
 
 
 process.demo2 = cms.EDAnalyzer('MuTestPerformanceFW_ES',
