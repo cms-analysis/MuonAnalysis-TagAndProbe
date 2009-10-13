@@ -3,7 +3,7 @@ jobtype = cmssw
 scheduler = glite
 
 [CMSSW]
-datasetpath = /Zmumu/degrutto-testEWK_ZMuMuSubSkim_zmmv2-aa58da5e00dd1bb3b2b306ca5f4fd9de/USER
+datasetpath = /Zmumu/degrutto-EWK_zMuMuSubSkim7TeVv2-aa58da5e00dd1bb3b2b306ca5f4fd9de/USER
 dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
 pset = tp_from_skim_dataOnly.py
 total_number_of_events = -1

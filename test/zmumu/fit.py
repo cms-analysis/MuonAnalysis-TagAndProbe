@@ -118,6 +118,6 @@ process.fitness = cms.Path(
     process.fitTkFromSta  +
     process.fitHltFromGlb +
     process.fitHltFromWmunu + 
-    process.fitMuFromTkWmunu #+
-    #process.fitMuFromTkZmumu 
+    process.fitMuFromTkWmunu +
+    process.fitMuFromTkZmumu 
 )

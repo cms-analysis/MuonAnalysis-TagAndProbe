@@ -1,8 +1,8 @@
 ### DEFINE THE SAMPLES
-SAMPLES = Zmumu Wmunu TTbar QCD_Pt15 QCD_Pt30 InclusiveMu15
+SAMPLES = Zmumu TTbar QCD_Pt15 QCD_Pt30 # InclusiveMu15 Wmunu 
 
 ### DEFINE THE MEASUREMENTS TO DO
-FITS = GlbFromCal GlbFromTk HltFromGlb TkFromSta HltFromWmunu MuFromTkWmunu ## MuFromTkZmumu
+FITS = GlbFromCal GlbFromTk HltFromGlb TkFromSta HltFromWmunu MuFromTkWmunu MuFromTkZmumu
 
 ##     ____ ____      _    ____        _          __  __ 
 ##    / ___|  _ \    / \  | __ )   ___| |_ _   _ / _|/ _|
@@ -51,6 +51,10 @@ getoutput: $(STDERRS)
 $(STDERRS): %/res/CMSSW_1.stderr: %
 	crab -c $< -getoutput 
 
+crabclean:
+	@echo "I will not delete the dirs, just print out the commands to delete them"
+	@for D in $(CRABDIRS); do echo crab -c $$D -clean 2>&1; done
+	@echo "rm -rf $(CRABDIRS)" 
 ##    _____ ___ _____       _          __  __ 
 ##   |  ___|_ _|_   _|  ___| |_ _   _ / _|/ _|
 ##   | |_   | |  | |   / __| __| | | | |_| |_ 
