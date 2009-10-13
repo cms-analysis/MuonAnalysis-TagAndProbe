@@ -2,7 +2,7 @@
 SAMPLES = Zmumu Wmunu TTbar QCD_Pt15 QCD_Pt30 InclusiveMu15
 
 ### DEFINE THE MEASUREMENTS TO DO
-FITS = GlbFromCal GlbFromTk HltFromGlb TkFromSta
+FITS = GlbFromCal GlbFromTk HltFromGlb TkFromSta HltFromWmunu MuFromTkWmunu ## MuFromTkZmumu
 
 ##     ____ ____      _    ____        _          __  __ 
 ##    / ___|  _ \    / \  | __ )   ___| |_ _   _ / _|/ _|

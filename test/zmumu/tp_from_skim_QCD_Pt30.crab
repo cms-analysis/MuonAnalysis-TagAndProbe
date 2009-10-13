@@ -8,7 +8,7 @@ dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/
 pset = tp_from_skim_dataOnly.py
 total_number_of_events = -1
 number_of_jobs = 1
-output_file = histo_dataonly_GlbFromCal.root, histo_dataonly_GlbFromTk.root, histo_dataonly_HltFromGlb.root, histo_dataonly_TkFromSta.root, histo_dataonly_MuFromTkWmunu.root, hist_dataonly_MuFromTkZmumu.root, histo_dataonly_HltFromWmunu.root
+output_file = histo_dataonly_GlbFromCal.root, histo_dataonly_GlbFromTk.root, histo_dataonly_HltFromGlb.root, histo_dataonly_TkFromSta.root, histo_dataonly_MuFromTkWmunu.root, histo_dataonly_MuFromTkZmumu.root, histo_dataonly_HltFromWmunu.root
 
 [USER]
 ui_working_dir = tp_from_skim_QCD_Pt30 
