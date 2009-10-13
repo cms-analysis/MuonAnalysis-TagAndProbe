@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 process = cms.Process("myprocess")
 process.load("CondCore.DBCommon.CondDBCommon_cfi")
 
-process.CondDBCommon.connect = 'sqlite_file:MuonPhysicsPerformance.db'
+process.CondDBCommon.connect = 'sqlite_file:MuonPhysicsPerformance10TeV.db'
 
 
 process.maxEvents = cms.untracked.PSet(
@@ -146,8 +146,28 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     record = cms.string('MUJPSI_BEXCLANAL_OCTXTEST_WP'),
     tag = cms.string('MUJPSI_BEXCLANAL_OCTXTEST_WP'),
     label = cms.string('MUJPSI_BEXCLANAL_OCTXTEST_WP')
-    ) )
-                                          )
+    ),
+    cms.PSet(
+    record = cms.string('TRGMUZ_WMUNUANAL_OCTXTEST_TABLE'),
+    tag = cms.string('TRGMUZ_WMUNUANAL_OCTXTEST_TABLE'),
+    label = cms.string('TRGMUZ_WMUNUANAL_OCTXTEST_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('TRGMUZ_WMUNUANAL_OCTXTEST_WP'),
+    tag = cms.string('TRGMUZ_WMUNUANAL_OCTXTEST_WP'),
+    label = cms.string('TRGMUZ_WMUNUANAL_OCTXTEST_WP')
+    ),
+    cms.PSet(    
+    record = cms.string('MUZ_WMUNUANAL_OCTXTEST_TABLE'),
+    tag = cms.string('MUZ_WMUNUANAL_OCTXTEST_TABLE'),
+    label = cms.string('MUZ_WMUNUANAL_OCTXTEST_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('MUZ_WMUNUANAL_OCTXTEST_WP'),
+    tag = cms.string('MUZ_WMUNUANAL_OCTXTEST_WP'),
+    label = cms.string('MUZ_WMUNUANAL_OCTXTEST_WP')
+    )))    
+        
                       
 
 
@@ -167,9 +187,11 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                                               'fit_result_MuFromTk_JPsi_JPsiGlbAnal.root',
                                                               'fit_result_MuFromTk_JPsi_JPsiTkMAnal.root',
                                                               'fit_result_MuFromTk_JPsi_JPsiPlusMuAnal.root',
-                                                              'fit_result_MuFromTk_JPsi_BExclAnal.root'
+                                                              'fit_result_MuFromTk_JPsi_BExclAnal.root',
+                                                              'fit_result_HltFromGlb_Z_WmunuAnal.root',
+                                                              'fit_result_MuFromTk_Z_WmunuAnal.root'
                                                               ),                                
-
+                                
                                 inputHistogramNames = cms.vstring('fit_eff_pt_eta',
                                                                   'fit_eff_pt_eta',
                                                                   'fit_eff_pt_eta',
@@ -182,7 +204,9 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                                                   'fit_eff_pt_eta',
                                                                   'fit_eff_pt_eta',
                                                                   'fit_eff_pt_eta',
-                                                                  'fit_eff_pt_eta'
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta',
+                                                                  'fit_eff_pt_eta'                                                                  
                                                                   ),
                                 
                                 inputAlgorithmNames = cms.vstring('GlobalMuonFromTrackerTrackJpsi',
@@ -197,9 +221,13 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                                                   'MuonFromTrackerTrackJpsi_JpsiGlbAnal',
                                                                   'MuonFromTrackerTrackJpsi_JpsiTkMAnal',
                                                                   'MuonFromTrackerTrackJpsi_JpsiPlusMuAnal',
-                                                                  'MuonFromTrackerTrackJpsi_BExclAnal'), 
-
+                                                                  'MuonFromTrackerTrackJpsi_BExclAnal',
+                                                                  'TriggerMuonFromGlobalMuonZ_WmunuAnal',
+                                                                  'MuonFromTrackerTrackZ_WmunuAnal'), 
+                                
                                 inputDiscriminatorCuts = cms.vdouble(0.0,
+                                                                     0.0,
+                                                                     0.0,
                                                                      0.0,
                                                                      0.0,
                                                                      0.0,
@@ -227,7 +255,10 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                                              'MUJPSI_JPSIGLBANAL_OCTXTEST_TABLE',
                                                              'MUJPSI_JPSITKMANAL_OCTXTEST_TABLE',
                                                              'MUJPSI_JPSIPLUSMUANAL_OCTXTEST_TABLE',
-                                                             'MUJPSI_BEXCLANAL_OCTXTEST_TABLE'),
+                                                             'MUJPSI_BEXCLANAL_OCTXTEST_TABLE',
+                                                             'TRGMUZ_WMUNUANAL_OCTXTEST_TABLE',
+                                                             'MUZ_WMUNUANAL_OCTXTEST_TABLE'),
+
                                 RecordWPs = cms.vstring('GLBMUJPSI_OCTXTEST_WP',
                                                         'TRKEFFMUJPSI_OCTXTEST_WP',
                                                         'TRGMUJPSI_OCTXTEST_WP',
@@ -240,7 +271,9 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPHist",
                                                         'MUJPSI_JPSIGLBANAL_OCTXTEST_WP',
                                                         'MUJPSI_JPSITKMANAL_OCTXTEST_WP',
                                                         'MUJPSI_JPSIPLUSMUANAL_OCTXTEST_WP',
-                                                        'MUJPSI_BEXCLANAL_OCTXTEST_WP'
+                                                        'MUJPSI_BEXCLANAL_OCTXTEST_WP',
+                                                        'TRGMUZ_WMUNUANAL_OCTXTEST_WP',
+                                                        'MUZ_WMUNUANAL_OCTXTEST_WP'
                                                         ),
 
                                 # Set the type of data to be stored, the binning variables, and the IOV
