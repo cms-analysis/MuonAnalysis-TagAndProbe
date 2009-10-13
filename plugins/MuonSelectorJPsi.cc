@@ -1,7 +1,7 @@
 /** \class MuonSelectorJPsi
  *  Example selector of muons.
  *
- *  $Date: 2009/09/25 10:13:44 $
+ *  $Date: 2009/10/12 06:55:33 $
  *  $Revision: 1.1 $
  *  \author G. Petrucciani (SNS Pisa)
  */
@@ -35,13 +35,16 @@ class MuonSelectorJPsi : public edm::EDProducer {
 
         /// Input collection of muons
         edm::InputTag src_;
+        
+        bool selectGlobalMuons_;
 
 }; // C++ note: you need a ';' at the end of the class declaration.
 
 
 /// Constructor: read the configuration, initialize data members, declare what to produce
 MuonSelectorJPsi::MuonSelectorJPsi(const edm::ParameterSet &iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src"))
+    src_(iConfig.getParameter<edm::InputTag>("src")),
+    selectGlobalMuons_(iConfig.getParameter<bool>("selectGlobalMuons"))
 {
     // declare what we produce: a vector of references to Muon-like objects (can be reco::Muon or pat::Muons)
     // subsequent modules should read this with View<reco::Muon>
@@ -78,10 +81,16 @@ MuonSelectorJPsi::produce(edm::Event &iEvent, const edm::EventSetup &iSetup)
         const reco::Muon & mu = *muonRef;
 
         /// now we perform some example selection...
-        if ((mu.isGlobalMuon() && mu.globalTrack()->chi2()/mu.globalTrack()->ndof()< 20.0) || (!mu.isGlobalMuon() && mu.isTrackerMuon() && mu.track()->numberOfValidHits() > 12 && (muon::isGoodMuon(mu, muon::TM2DCompatibilityTight) || muon::isGoodMuon(mu, muon::TMLastStationOptimizedLowPtLoose)) &&  mu.track()->chi2()/mu.track()->ndof()< 5.0))               
-        {
-            // save the muon reference in the output vector
-            out->push_back(muonRef);
+        if (selectGlobalMuons_) {
+            if (mu.isGlobalMuon() && mu.globalTrack()->chi2()/mu.globalTrack()->ndof()< 20.0) {
+                out->push_back(muonRef);
+            }
+        } else {
+            if (!mu.isGlobalMuon() && mu.isTrackerMuon() && mu.track()->numberOfValidHits() > 12 && 
+                    (muon::isGoodMuon(mu, muon::TM2DCompatibilityTight) || muon::isGoodMuon(mu, muon::TMLastStationOptimizedLowPtLoose)) &&  
+                    mu.track()->chi2()/mu.track()->ndof()< 5.0) {
+                out->push_back(muonRef);
+            }
         }
         
     }

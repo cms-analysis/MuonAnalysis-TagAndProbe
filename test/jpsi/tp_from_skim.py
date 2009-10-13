@@ -125,33 +125,6 @@ process.calPassingGlb = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("calProbes"),
     match = cms.InputTag("muToGlbMatch"),
 )
-### Analysis-specific muon selectors
-## 1) From the J/Psi + Mu analysis
-process.muonsJPsiPlusMu = cms.EDProducer("MuonSelectorJPsiPlusMu",
-    src = cms.InputTag("patMuons")
-)
-process.tkToMuJPsiPlusMuMatch = process.tkToGlbMatch.clone(matched = "muonsJPsiPlusMu")
-process.tkPassingMuJPsiPlusMu = process.tkPassingGlb.clone(match   = "tkToMuJPsiPlusMuMatch")
-## 2) From the J/Psi analysis
-process.muonsJPsi = cms.EDProducer("MuonSelectorJPsi",
-    src = cms.InputTag("patMuons")
-)
-process.tkToMuJPsiMatch = process.tkToGlbMatch.clone(matched = "muonsJPsi")
-process.tkPassingMuJPsi = process.tkPassingGlb.clone(match   = "tkToMuJPsiMatch")
-## 3) From the Exclusive B analysis: a very simple cut, just the OR of global and tracker muon
-process.muonsBExcl = cms.EDFilter("PATMuonRefSelector",
-    src = cms.InputTag("patMuons"),
-    cut = cms.string("isGlobalMuon || isTrackerMuon"),
-)
-process.tkToMuBExclMatch = process.tkToGlbMatch.clone(matched = "muonsBExcl")
-process.tkPassingMuBExcl = process.tkPassingGlb.clone(match   = "tkToMuBExclMatch")
-
-process.PAGMuonIDs = cms.Sequence(
-    process.muonsJPsiPlusMu * process.tkToMuJPsiPlusMuMatch * process.tkPassingMuJPsiPlusMu +
-    process.muonsJPsi * process.tkToMuJPsiMatch * process.tkPassingMuJPsi +
-    process.muonsBExcl * process.tkToMuBExclMatch * process.tkPassingMuBExcl 
-)
-
 ##    ____               _               ____            _                   _____               _    _             
 ##   |  _ \ __ _ ___ ___(_)_ __   __ _  |  _ \ _ __ ___ | |__   ___  ___ _  |_   _| __ __ _  ___| | _(_)_ __   __ _ 
 ##   | |_) / _` / __/ __| | '_ \ / _` | | |_) | '__/ _ \| '_ \ / _ \/ __(_)   | || '__/ _` |/ __| |/ / | '_ \ / _` |
@@ -190,13 +163,72 @@ process.glbPassingHLT = cms.EDFilter("PATMuonRefSelector",
     cut = cms.string(process.glbProbes.cut.value() + " && " + PASS_HLT),
 )
 
+##    ____               _               ____            _                   ____        ____   _    ____ 
+##   |  _ \ __ _ ___ ___(_)_ __   __ _  |  _ \ _ __ ___ | |__   ___  ___ _  | __ )      |  _ \ / \  / ___|
+##   | |_) / _` / __/ __| | '_ \ / _` | | |_) | '__/ _ \| '_ \ / _ \/ __(_) |  _ \ _____| |_) / _ \| |  _ 
+##   |  __/ (_| \__ \__ \ | | | | (_| | |  __/| | | (_) | |_) |  __/\__ \_  | |_) |_____|  __/ ___ \ |_| |
+##   |_|   \__,_|___/___/_|_| |_|\__, | |_|   |_|  \___/|_.__/ \___||___(_) |____/      |_| /_/   \_\____|
+##                               |___/                                                                    
+##   
+
+## 1) From the J/Psi + Mu analysis
+process.muonsJPsiPlusMu = cms.EDProducer("MuonSelectorJPsiPlusMu",
+    src = cms.InputTag("patMuons")
+)
+process.tkToMuJPsiPlusMuMatch = process.tkToGlbMatch.clone(matched = "muonsJPsiPlusMu")
+process.tkPassingMuJPsiPlusMu = process.tkPassingGlb.clone(match   = "tkToMuJPsiPlusMuMatch")
+## 2a) From the J/Psi analysis (Global)
+process.muonsJPsiGlb = cms.EDProducer("MuonSelectorJPsi",
+    src = cms.InputTag("patMuons"),
+    selectGlobalMuons = cms.bool(True)
+)
+process.tkToMuJPsiGlbMatch = process.tkToGlbMatch.clone(matched = "muonsJPsiGlb")
+process.tkPassingMuJPsiGlb = process.tkPassingGlb.clone(match   = "tkToMuJPsiGlbMatch")
+
+## 2b) From the J/Psi analysis (Tracker not global)
+process.muonsJPsiTkM = cms.EDProducer("MuonSelectorJPsi",
+    src = cms.InputTag("patMuons"),
+    selectGlobalMuons = cms.bool(True)
+)
+process.tkToMuJPsiTkMMatch = process.tkToGlbMatch.clone(matched = "muonsJPsiTkM")
+process.tkPassingMuJPsiTkM = process.tkPassingGlb.clone(match   = "tkToMuJPsiTkMMatch")
+
+## 2c) From the J/Psi analysis (Global with custom ID cut -> trigger)
+process.muJPsiGlbProbes = cms.EDProducer("MuonSelectorJPsi",
+    src = cms.InputTag("glbProbes"),
+    selectGlobalMuons = cms.bool(True)
+)
+process.muJPsiGlbPassingHLT = cms.EDProducer("MuonSelectorJPsi",
+    src = cms.InputTag("glbPassingHLT"),
+    selectGlobalMuons = cms.bool(True)
+)
+
+
+## 3) From the Exclusive B analysis: a very simple cut, just the OR of global and tracker muon
+process.muonsBExcl = cms.EDFilter("PATMuonRefSelector",
+    src = cms.InputTag("patMuons"),
+    cut = cms.string("isGlobalMuon || isTrackerMuon"),
+)
+process.tkToMuBExclMatch = process.tkToGlbMatch.clone(matched = "muonsBExcl")
+process.tkPassingMuBExcl = process.tkPassingGlb.clone(match   = "tkToMuBExclMatch")
+
+process.PAGMuonIDs = cms.Sequence(
+    process.muonsJPsiPlusMu * process.tkToMuJPsiPlusMuMatch * process.tkPassingMuJPsiPlusMu +
+    process.muonsJPsiGlb * process.tkToMuJPsiGlbMatch * process.tkPassingMuJPsiGlb +
+    process.muJPsiGlbProbes * process.muJPsiGlbPassingHLT +
+    process.muonsJPsiTkM * process.tkToMuJPsiTkMMatch * process.tkPassingMuJPsiTkM +
+    process.muonsBExcl * process.tkToMuBExclMatch * process.tkPassingMuBExcl 
+)
+
 process.allPassingProbes = cms.Sequence(
     process.tkToGlbMatch * process.tkPassingGlb +
     process.muToGlbMatch * process.calPassingGlb +
     process.staToTkMatch * process.staPassingTk +
-    process.glbPassingHLT
-    + process.PAGMuonIDs 
+    process.glbPassingHLT +
+    process.PAGMuonIDs 
 )
+
+
 
 ##    __  __       _          _____                 ____            _                                      
 ##   |  \/  | __ _| | _____  |_   _|_ _  __ _   _  |  _ \ _ __ ___ | |__   ___   _ __ ___   __ _ _ __  ___ 
@@ -218,12 +250,16 @@ process.tagProbeTkFromSta  = tagProbeTemplate.clone(  ProbeCollection = cms.Inpu
 process.tagProbeHltFromGlb = tagProbeTemplate.clone(  ProbeCollection = cms.InputTag("glbProbes") )
 
 ### Note that we do NOT need extra TagProbeProducers, as the PAG-specific muon IDs just define new *passing* probes.
+### Except for the Global->HLT
+process.tagProbeHltFromJPsiGlb = tagProbeTemplate.clone(  ProbeCollection = cms.InputTag("muJPsiGlbProbes") )
+
 
 process.allTagProbeMaps = cms.Sequence(
     process.tagProbeGlbFromTk +
     process.tagProbeGlbFromCal +
     process.tagProbeTkFromSta +
-    process.tagProbeHltFromGlb
+    process.tagProbeHltFromGlb +
+    process.tagProbeHltFromJPsiGlb
 )
 
 ##    __  __  ____   __  __       _       _               
@@ -418,17 +454,48 @@ process.allTPHistos = cms.Sequence(
 ## PAG-specific muon IDs
 process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
 process.TPEdm.allProbeCandTags  += [ cms.InputTag("tkProbes")   ]
-process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuJPsi") ]
+process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuJPsiGlb") ]
 process.TPEdm.tagProbeMapTags   += [ cms.InputTag("tagProbeGlbFromTk") ]
 process.TPEdm.tagTruthMatchMapTags       += [ cms.InputTag("muMcMatch") ]
 process.TPEdm.passProbeTruthMatchMapTags += [ cms.InputTag("tkMcMatch") ]
 process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("tkMcMatch") ]
 process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
 process.TPEdm.BestProbeInvMass  += [ 3.1 ]
-process.fitMuFromTkJPsi = MakeHisto.clone( 
+process.fitMuFromTkJPsiGlb = MakeHisto.clone( 
     TagProbeType = cms.untracked.int32(4),
-    FitFileName = cms.untracked.string( "histo_output_MuFromTkJPsi.root"),
+    FitFileName = cms.untracked.string( "histo_output_MuFromTkJPsiGlb.root"),
 )
+
+process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
+process.TPEdm.allProbeCandTags  += [ cms.InputTag("tkProbes")   ]
+process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuJPsiTkM") ]
+process.TPEdm.tagProbeMapTags   += [ cms.InputTag("tagProbeGlbFromTk") ]
+process.TPEdm.tagTruthMatchMapTags       += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.passProbeTruthMatchMapTags += [ cms.InputTag("tkMcMatch") ]
+process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("tkMcMatch") ]
+process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
+process.TPEdm.BestProbeInvMass  += [ 3.1 ]
+process.fitMuFromTkJPsiTkM = MakeHisto.clone( 
+    TagProbeType = cms.untracked.int32(4),
+    FitFileName = cms.untracked.string( "histo_output_MuFromTkJPsiTkM.root"),
+)
+
+process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
+process.TPEdm.allProbeCandTags  += [ cms.InputTag("muJPsiGlbProbes")   ]
+process.TPEdm.passProbeCandTags += [ cms.InputTag("muJPsiGlbPassingHLT") ]
+process.TPEdm.tagProbeMapTags   += [ cms.InputTag("tagProbeHltFromJPsiGlb") ]
+process.TPEdm.tagTruthMatchMapTags       += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.passProbeTruthMatchMapTags += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("muMcMatch") ]
+process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
+process.TPEdm.BestProbeInvMass  += [ 3.1 ]
+process.fitHltFromJPsiGlb = MakeHisto.clone( 
+    TagProbeType = cms.untracked.int32(5),
+    FitFileName = cms.untracked.string( "histo_output_HltFromJPsiGlb.root"),
+    ## need to override eta bins
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1 ),
+)
+
 process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
 process.TPEdm.allProbeCandTags  += [ cms.InputTag("tkProbes")   ]
 process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuJPsiPlusMu") ]
@@ -439,9 +506,10 @@ process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("tkMcMatch") ]
 process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
 process.TPEdm.BestProbeInvMass  += [ 3.1 ]
 process.fitMuFromTkJPsiPlusMu = MakeHisto.clone( 
-    TagProbeType = cms.untracked.int32(5),
+    TagProbeType = cms.untracked.int32(6),
     FitFileName = cms.untracked.string( "histo_output_MuFromTkJPsiPlusMu.root"),
 )
+
 process.TPEdm.tagCandTags       += [ cms.InputTag("tagMuons") ]
 process.TPEdm.allProbeCandTags  += [ cms.InputTag("tkProbes")   ]
 process.TPEdm.passProbeCandTags += [ cms.InputTag("tkPassingMuBExcl") ]
@@ -452,12 +520,14 @@ process.TPEdm.allProbeTruthMatchMapTags  += [ cms.InputTag("tkMcMatch") ]
 process.TPEdm.BestProbeCriteria += [ "OneProbe" ]
 process.TPEdm.BestProbeInvMass  += [ 3.1 ]
 process.fitMuFromTkBExcl = MakeHisto.clone( 
-    TagProbeType = cms.untracked.int32(6),
+    TagProbeType = cms.untracked.int32(7),
     FitFileName = cms.untracked.string( "histo_output_MuFromTkBExcl.root"),
 )
 
 process.allTPHistos += cms.Sequence(
-    process.fitMuFromTkJPsi +
+    process.fitMuFromTkJPsiGlb +
+    process.fitHltFromJPsiGlb +
+    process.fitMuFromTkJPsiTkM +
     process.fitMuFromTkJPsiPlusMu +
     process.fitMuFromTkBExcl 
 )

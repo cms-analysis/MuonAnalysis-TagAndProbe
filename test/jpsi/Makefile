@@ -4,7 +4,7 @@ getoutput: tp_from_skim_JPsiMuMu/res/CMSSW_1.stderr tp_from_skim_ppMuX/res/CMSSW
 fit: fit_result_GlbFromCal.root
 
 
-fit_result_GlbFromCal.root: histo_output_GlbFromCal.root histo_output_GlbFromTk.root  histo_output_HltFromGlb.root histo_output_TkFromSta.root
+fit_result_GlbFromCal.root: histo_output_GlbFromCal.root histo_output_GlbFromTk.root  histo_output_HltFromGlb.root histo_output_TkFromSta.root histo_output_MuFromTkJPsiTkM.root histo_output_MuFromTkJPsiGlb.root histo_output_MuFromTkJPsiPlusMu.root histo_output_MuFromTkBExcl.root histo_output_HltFromJPsiGlb.root
 	cmsRun fit.py
 
 histo_output_GlbFromCal.root: tp_from_skim_JPsiMuMu/res/histo_output_GlbFromCal_1.root tp_from_skim_ppMuX/res/histo_output_GlbFromCal_1.root
@@ -18,6 +18,21 @@ histo_output_HltFromGlb.root: tp_from_skim_JPsiMuMu/res/histo_output_HltFromGlb_
 
 histo_output_TkFromSta.root: tp_from_skim_JPsiMuMu/res/histo_output_TkFromSta_1.root tp_from_skim_ppMuX/res/histo_output_TkFromSta_1.root
 	hadd -f histo_output_TkFromSta.root tp_from_skim_JPsiMuMu/res/histo_output_TkFromSta_*.root tp_from_skim_ppMuX/res/histo_output_TkFromSta_*.root
+
+histo_output_MuFromTkJPsiTkM.root: tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkJPsiTkM_1.root tp_from_skim_ppMuX/res/histo_output_MuFromTkJPsiTkM_1.root
+	hadd -f histo_output_MuFromTkJPsiTkM.root tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkJPsiTkM_*.root tp_from_skim_ppMuX/res/histo_output_MuFromTkJPsiTkM_*.root
+
+histo_output_MuFromTkJPsiGlb.root: tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkJPsiGlb_1.root tp_from_skim_ppMuX/res/histo_output_MuFromTkJPsiGlb_1.root
+	hadd -f histo_output_MuFromTkJPsiGlb.root tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkJPsiGlb_*.root tp_from_skim_ppMuX/res/histo_output_MuFromTkJPsiGlb_*.root
+
+histo_output_MuFromTkJPsiPlusMu.root: tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkJPsiPlusMu_1.root tp_from_skim_ppMuX/res/histo_output_MuFromTkJPsiPlusMu_1.root
+	hadd -f histo_output_MuFromTkJPsiPlusMu.root tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkJPsiPlusMu_*.root tp_from_skim_ppMuX/res/histo_output_MuFromTkJPsiPlusMu_*.root
+
+histo_output_MuFromTkBExcl.root: tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkBExcl_1.root tp_from_skim_ppMuX/res/histo_output_MuFromTkBExcl_1.root
+	hadd -f histo_output_MuFromTkBExcl.root tp_from_skim_JPsiMuMu/res/histo_output_MuFromTkBExcl_*.root tp_from_skim_ppMuX/res/histo_output_MuFromTkBExcl_*.root
+
+histo_output_HltFromJPsiGlb.root: tp_from_skim_JPsiMuMu/res/histo_output_HltFromJPsiGlb_1.root tp_from_skim_ppMuX/res/histo_output_HltFromJPsiGlb_1.root
+	hadd -f histo_output_HltFromJPsiGlb.root tp_from_skim_JPsiMuMu/res/histo_output_HltFromJPsiGlb_*.root tp_from_skim_ppMuX/res/histo_output_HltFromJPsiGlb_*.root
 
 tp_from_skim_JPsiMuMu/res/CMSSW_1.stdout:
 	crab -status -c tp_from_skim_JPsiMuMu

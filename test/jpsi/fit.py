@@ -95,9 +95,18 @@ process.fitMuFromTkJPsiPlusMu = RunFit.clone(
     ReadFromFiles = [ 'histo_output_MuFromTkJPsiPlusMu.root' ],
     FitFileName   =     'fit_result_MuFromTkJPsiPlusMu.root'  ,
 )
-process.fitMuFromTkJPsi = RunFit.clone(
-    ReadFromFiles = [ 'histo_output_MuFromTkJPsi.root' ],
-    FitFileName   =     'fit_result_MuFromTkJPsi.root'  ,
+process.fitMuFromTkJPsiTkM = RunFit.clone(
+    ReadFromFiles = [ 'histo_output_MuFromTkJPsiTkM.root' ],
+    FitFileName   =     'fit_result_MuFromTkJPsiTkM.root'  ,
+)
+process.fitMuFromTkJPsiGlb = RunFit.clone(
+    ReadFromFiles = [ 'histo_output_MuFromTkJPsiGlb.root' ],
+    FitFileName   =     'fit_result_MuFromTkJPsiGlb.root'  ,
+)
+process.fitHltFromJPsiGlb = RunFit.clone(
+    ReadFromFiles = [ 'histo_output_HltFromJPsiGlb.root' ],
+    FitFileName   =     'fit_result_HltFromJPsiGlb.root'  ,
+    Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1),
 )
 process.fitMuFromTkBExcl = RunFit.clone(
     ReadFromFiles = [ 'histo_output_MuFromTkBExcl.root' ],
@@ -110,6 +119,8 @@ process.fitness = cms.Path(
     process.fitTkFromSta +
     process.fitHltFromGlb +
     process.fitMuFromTkJPsiPlusMu +
-    process.fitMuFromTkJPsi +
+    process.fitMuFromTkJPsiTkM +
+    process.fitMuFromTkJPsiGlb +
+    process.fitHltFromJPsiGlb +
     process.fitMuFromTkBExcl
 )
