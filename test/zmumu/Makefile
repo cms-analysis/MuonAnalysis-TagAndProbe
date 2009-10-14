@@ -1,5 +1,5 @@
 ### DEFINE THE SAMPLES
-SAMPLES = Zmumu TTbar QCD_Pt15 QCD_Pt30 # InclusiveMu15 Wmunu 
+SAMPLES = Zmumu TTbar QCD_Pt15 QCD_Pt30 InclusiveMu15 Wmunu 
 
 ### DEFINE THE MEASUREMENTS TO DO
 FITS = GlbFromCal GlbFromTk HltFromGlb TkFromSta HltFromWmunu MuFromTkWmunu MuFromTkZmumu
