@@ -36,7 +36,7 @@ def main(argv):
     curdir = '/tmp/jjhollar'
     files = os.listdir(curdir)
 
-    dbfilename = 'MuonPhysicsPerformance.db'
+    dbfilename = 'MuonPhysicsPerformance10TeV.db'
 
     i = 0
     for table in tables:
@@ -55,12 +55,15 @@ def main(argv):
         fin,fout = os.popen4(cmd)
         uuid = str(fout.read()).rstrip()
 
-        movedfilename = metadataprefixname + '@' + uuid + '.txt'
-        movecommand = 'mv ' + metadatafilename + ' ' + movedfilename
+        movedfilename = table + '@' + uuid + '.txt' 
+        #        movedfilename = metadataprefixname + '@' + uuid + '.txt'
+        movecommand = 'mv ' + metadatafilename + ' ../' + movedfilename
         os.system(movecommand)
 
-        copydbfilename = metadataprefixname + '@' + uuid + '.db'
-        copycommand = 'cp ' + dbfilename + ' ' + copydbfilename
+        #        copydbfilename = metadataprefixname + '@' + uuid + '.db'
+        copydbfilename = table + '@' + uuid + '.db'
+        #        copycommand = 'cp ' + dbfilename + ' ../' + copydbfilename
+        copycommand = 'cmscond_export_iov -d sqlite_file:' + str(copydbfilename) + ' -s sqlite_file:' + str(dbfilename) + ' -D CondFormatsPhysicsToolsObjects -t ' + str(table) + ' -P .'
         os.system(copycommand)
         print movedfilename
         print copydbfilename
@@ -83,12 +86,15 @@ def main(argv):
         fin,fout = os.popen4(cmd)
         uuid = str(fout.read()).rstrip()
 
-        movedfilename = metadataprefixname + '@' + uuid + '.txt'
-        movecommand = 'mv ' + metadatafilename + ' ' + movedfilename
+        movedfilename = wp + '@' + uuid + '.txt'
+        #        movedfilename = metadataprefixname + '@' + uuid + '.txt'
+        movecommand = 'mv ' + metadatafilename + ' ../' + movedfilename
         os.system(movecommand)
 
-        copydbfilename = metadataprefixname + '@' + uuid + '.db'
-        copycommand = 'cp ' + dbfilename + ' ' + copydbfilename
+        #        copydbfilename = metadataprefixname + '@' + uuid + '.db'
+        copydbfilename = wp + '@' + uuid + '.db'        
+        #        copycommand = 'cp ' + dbfilename + ' ../' + copydbfilename
+        copycommand = 'cmscond_export_iov -d sqlite_file:' + str(copydbfilename) + ' -s sqlite_file:' + str(dbfilename) + ' -D CondFormatsPhysicsToolsObjects -t ' + str(wp) + ' -P .'
         os.system(copycommand)
         print movedfilename
         print copydbfilename
