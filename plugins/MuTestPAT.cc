@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPAT.cc,v 1.4 2009/10/08 07:32:51 jjhollar Exp $
+// $Id: MuTestPAT.cc,v 1.1 2009/11/10 09:37:44 jjhollar Exp $
 //
 //
 
@@ -117,9 +117,9 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       patchg = patmuon->charge();
       pat::Muon myMuon = *patmuon; // copy
 
+      sort(algonames.begin(), algonames.end());
 
-      for(unsigned int i = 0; i < 1; ++i)
-      //      for(unsigned int i = 0; i < algonames.size(); ++i)
+      for(unsigned int i = 0; i < algonames.size(); ++i)
 	{
 	  const MuonPerformance &muonefficiency = effreader->getPerformanceRecord(algonames[i], iSetup);
 	  double myeff = effreader->getEff(patpt, pateta, patphi, patchg, muonefficiency);
@@ -130,8 +130,7 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	       << algonames[i] << ")" << endl;
 	  
 	  std::string effname = algonames[i];
-	  pat::LookupTableRecord muonLUTrecord = pat::LookupTableRecord(myeff, myefferr, 0); 
-	  myMuon.setEfficiency(effname,muonLUTrecord);
+	  myMuon.setEfficiency(effname, pat::LookupTableRecord(myeff, myefferr, 0));
 	  cout << "\tPAT muon efficiency " 
 	       << (myMuon.efficiency(effname)).value() << " +- " 
 	       << (myMuon.efficiency(effname)).error() << " (" 
