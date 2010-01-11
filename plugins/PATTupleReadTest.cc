@@ -1,0 +1,126 @@
+// -*- C++ -*-
+//
+// Package:    PATTupleReadTest
+// Class:      PATTupleReadTest
+// 
+/**\class PATTupleReadTest PATTupleReadTest.cc MuonAnalysis/TagAndProbe/src/PATTupleReadTest.cc
+
+ Description: <one line class summary>
+
+ Implementation:
+     <Notes on implementation>
+*/
+//
+// Original Author:  Tommaso Boccali
+// Modified for muons: Jonathan Hollar
+//         Created:  Tue Nov 25 15:50:50 CET 2008
+// $Id: PATTupleReadTest.cc,v 1.4 2009/10/08 07:32:51 jjhollar Exp $
+//
+//
+
+
+// system include files
+#include <memory>
+
+// user include files
+#include "FWCore/Framework/interface/Frameworkfwd.h"
+#include "FWCore/Framework/interface/EDAnalyzer.h"
+#include "FWCore/Framework/interface/EDProducer.h"
+
+#include "FWCore/Framework/interface/Event.h"
+#include "FWCore/Framework/interface/MakerMacros.h"
+#include "FWCore/Framework/interface/EventSetup.h"
+#include "FWCore/ParameterSet/interface/ParameterSet.h"
+#include "FWCore/Framework/interface/ESHandle.h"
+//
+// class decleration
+//
+
+
+#include "DataFormats/MuonReco/interface/Muon.h"   
+#include "DataFormats/MuonReco/interface/MuonFwd.h"   
+
+#include "DataFormats/PatCandidates/interface/PATObject.h"
+#include "DataFormats/PatCandidates/interface/LookupTableRecord.h"
+#include "DataFormats/PatCandidates/interface/Muon.h"
+
+#include <TFile.h> 
+#include <TH1D.h> 
+#include <TTree.h> 
+#include <TRandom3.h>
+
+class PATTupleReadTest : public edm::EDAnalyzer {
+public:
+  explicit PATTupleReadTest(const edm::ParameterSet&);
+  ~PATTupleReadTest();
+  
+private:
+  virtual void beginJob(const edm::EventSetup&) ;
+  virtual void analyze(const edm::Event&, const edm::EventSetup&);
+  virtual void endJob() ;
+
+  // ----------member data ---------------------------
+};
+
+using namespace edm; 
+using namespace std; 
+using namespace reco; 
+
+//
+// constructors and destructor
+//
+PATTupleReadTest::PATTupleReadTest(const edm::ParameterSet& iConfig)
+
+{
+}
+
+
+PATTupleReadTest::~PATTupleReadTest()
+{
+}
+
+// ------------ method called to for each event  ------------
+void
+PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
+{
+  edm::Handle<edm::View<pat::Muon> > patmuons;
+  iEvent.getByLabel("selectedLayer1MuonsWithEff",patmuons);
+  edm::View<pat::Muon>::const_iterator patmuon;
+  for (edm::View<pat::Muon>::const_iterator patmuon = patmuons->begin(), end = patmuons->end(); patmuon != end; ++patmuon) 
+    {
+      std::string effname = "TriggerMuonFromGlobalMuonZ";
+      pat::Muon myMuon = *patmuon; // copy
+
+      cout << "\tRead PAT efficiency " 
+	   << (myMuon.efficiency(effname)).value() << " +- " 
+	   << (myMuon.efficiency(effname)).error() << " (" 
+	   << effname << ")" << endl;
+
+      effname = "GlobalMuonFromTrackerTrackZ";
+      cout << "\tRead PAT efficiency "
+           << (myMuon.efficiency(effname)).value() << " +- "
+           << (myMuon.efficiency(effname)).error() << " ("
+           << effname << ")" << endl;
+
+      effname = "TrackerTrackFromStandaloneMuonZ";
+      cout << "\tRead PAT efficiency "
+           << (myMuon.efficiency(effname)).value() << " +- "
+           << (myMuon.efficiency(effname)).error() << " ("
+           << effname << ")" << endl;
+
+    }
+}
+
+// ------------ method called once each job just before starting event loop  ------------
+void 
+PATTupleReadTest::beginJob(const edm::EventSetup&)
+{
+}
+
+// ------------ method called once each job just after ending the event loop  ------------
+void 
+PATTupleReadTest::endJob() {
+}
+
+//define this as a plug-in
+DEFINE_FWK_MODULE(PATTupleReadTest);
