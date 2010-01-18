@@ -243,7 +243,7 @@ mcTruthCommonStuff = cms.PSet(
 
 #####
 ## Mu from Tk
-process.fitMuFromTk = cms.EDAnalyzer("TagProbeFitTreeProducer",
+process.histoMuFromTk = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ## pick the defaults
     recoCommonStuff, mcTruthCommonStuff,
     # choice of tag and probe pairs, and arbitration
@@ -261,7 +261,7 @@ process.fitMuFromTk = cms.EDAnalyzer("TagProbeFitTreeProducer",
 
 #####
 ## Mu from Cal
-process.fitMuFromCal = cms.EDAnalyzer("TagProbeFitTreeProducer",
+process.histoMuFromCal = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ## pick the defaults
     recoCommonStuff, mcTruthCommonStuff,
     # choice of tag and probe pairs, and arbitration
@@ -279,7 +279,7 @@ process.fitMuFromCal = cms.EDAnalyzer("TagProbeFitTreeProducer",
 
 #####
 ## Tk from Sta
-process.fitTkFromSta = cms.EDAnalyzer("TagProbeFitTreeProducer",
+process.histoTkFromSta = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ## pick the defaults
     recoCommonStuff, mcTruthCommonStuff,
     # choice of tag and probe pairs, and arbitration
@@ -294,7 +294,7 @@ process.fitTkFromSta = cms.EDAnalyzer("TagProbeFitTreeProducer",
 
 #####
 ## HLT from Glb
-process.fitHltFromGlb = cms.EDAnalyzer("TagProbeFitTreeProducer",
+process.histoHltFromGlb = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ## pick the defaults
     recoCommonStuff, mcTruthCommonStuff,
     # choice of tag and probe pairs, and arbitration
@@ -315,10 +315,10 @@ process.fitHltFromGlb = cms.EDAnalyzer("TagProbeFitTreeProducer",
 
 
 process.allTPHistos = cms.Sequence(
-    process.fitMuFromTk +
-    process.fitMuFromCal +
-    process.fitTkFromSta +
-    process.fitHltFromGlb 
+    process.histoMuFromTk +
+    process.histoMuFromCal +
+    process.histoTkFromSta +
+    process.histoHltFromGlb 
 )
 
 ##    ____       _   _     
