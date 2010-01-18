@@ -12,9 +12,9 @@ process = cms.Process("Skim")
 ptMin  = 1.5; # minimum pT to consider tracks and muons
 ptTag  = 3.0; # minimum pT for the tag
 etaTag = 2.5; # maximum |eta| for the tag
-triggerProcess = 'HLT8E29'  # when running on 3.1.X MC
-#triggerProcess = 'HLT'     # when testing on RelVals
-triggerPath    = 'HLT_Mu3'  # Trigger name
+#triggerProcess = 'HLT8E29'  # when running on 3.1.X MC
+triggerProcess = 'HLT'       # when  running on 3.3.X MC or RelVals
+triggerPath    = 'HLT_Mu3'   # Trigger name
 massRangeMu  = (2.0, 4.0)
 massRangeTk  = (2.0, 4.0) 
 massRangeSta = (2.0, 5.0)
@@ -26,32 +26,17 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.source = cms.Source("PoolSource",  
     fileNames = cms.untracked.vstring(
-        #'file:/afs/cern.ch/user/g/gpetrucc/scratch0/huntForRedOctober/CMSSW_3_1_2/src/MuonAnalysis/TagAndProbe/test/crab/ppMuX_AODSIM.root'
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0042/F41E5C99-A98B-DE11-B023-001D0967BE87.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0042/54BB83B5-8C8B-DE11-A580-001D0967E07F.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/FC3D5957-8B8B-DE11-9D92-0019B9E4878A.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/EA16CB89-6B8B-DE11-93CB-001D0967DC7E.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/D41FAF77-748B-DE11-9212-001D0968F5BC.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/C0F0B48E-8B8B-DE11-9568-001D0967DC7E.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/BE5592CF-6E8B-DE11-8DDD-001D0967A19D.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/BA582338-8A8B-DE11-82BE-001D0967E07F.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/B247689E-6B8B-DE11-83C6-0015178C15DC.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/A4088A9A-8B8B-DE11-9FA7-0019B9E48C13.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/821CCF6D-6D8B-DE11-A192-0015179ECB84.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/80CEE1B5-8A8B-DE11-8237-001D096B0BDE.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/7EAACE2B-8A8B-DE11-8229-001D0967DC4C.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/545ABAB4-8A8B-DE11-9F0E-001D0967DA3A.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/26B431BF-698B-DE11-9719-001D0967D39B.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0041/0AC6C38A-6B8B-DE11-855A-001D0967D341.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0040/E08D7559-398B-DE11-916A-0015178C4B94.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0040/E08660B6-488B-DE11-BE7E-001D0967C987.root',
-	'/store/mc/Summer09/JPsiMuMu/AODSIM/MC_31X_V3_AODSIM-v1/0040/D6366A95-558B-DE11-AA1B-0015178C6478.root',
+        '/store/relval/CMSSW_3_4_1/RelValJpsiMM/GEN-SIM-RECO/STARTUP3X_V14-v1/0004/DC4D9E50-82ED-DE11-BF03-003048D375AA.root',
+        '/store/relval/CMSSW_3_4_1/RelValJpsiMM/GEN-SIM-RECO/STARTUP3X_V14-v1/0004/88F9B6DC-85ED-DE11-A295-001D09F2514F.root',
+        '/store/relval/CMSSW_3_4_1/RelValJpsiMM/GEN-SIM-RECO/STARTUP3X_V14-v1/0004/66B9D232-85ED-DE11-B5EC-0019B9F7312C.root',
+        '/store/relval/CMSSW_3_4_1/RelValJpsiMM/GEN-SIM-RECO/STARTUP3X_V14-v1/0004/509FE9BB-83ED-DE11-A25F-001D09F253C0.root',
+        '/store/relval/CMSSW_3_4_1/RelValJpsiMM/GEN-SIM-RECO/STARTUP3X_V14-v1/0004/4294CBAC-B5ED-DE11-B7E8-003048D2BE08.root',
     )
 )
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(-1))
 ## === GlobalTag is needed to read L1 infomration ====
 #process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
-#process.GlobalTag.globaltag = "MC_31X_V3::All"
+#process.GlobalTag.globaltag = "STARTUP3X_V15::All"
 
 ##     ____  _ _                     _                  _    ___  ____  
 ##    / ___|| (_)_ __ ___  _ __ ___ (_)_ __   __ _     / \  / _ \|  _ \ 
@@ -80,69 +65,24 @@ process.slimAOD = cms.Sequence(
 )
 
 
-
-##    __  __                        ____      _       __  __                       
-##   |  \/  | ___ _ __ __ _  ___   / ___|__ _| | ___ |  \/  |_   _  ___  _ __  ___ 
-##   | |\/| |/ _ \ '__/ _` |/ _ \ | |   / _` | |/ _ \| |\/| | | | |/ _ \| '_ \/ __|
-##   | |  | |  __/ | | (_| |  __/ | |__| (_| | | (_) | |  | | |_| | (_) | | | \__ \
-##   |_|  |_|\___|_|  \__, |\___|  \____\__,_|_|\___/|_|  |_|\__,_|\___/|_| |_|___/
-##                    |___/                                                        
-##   
-## ==== Merge CaloMuons into the collection of reco::Muons ====
-from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
-process.muons = cms.EDProducer("CaloMuonMerger",
-    muons     = cms.InputTag("muons"), # half-dirty thing. it works as long as we're the first module using muons in the path
-    caloMuons = cms.InputTag("calomuons"),
-    minCaloCompatibility = calomuons.minCaloCompatibility
-)
-
 ##    __  __       _          ____   _  _____   __  __                       
 ##   |  \/  | __ _| | _____  |  _ \ / \|_   _| |  \/  |_   _  ___  _ __  ___ 
 ##   | |\/| |/ _` | |/ / _ \ | |_) / _ \ | |   | |\/| | | | |/ _ \| '_ \/ __|
 ##   | |  | | (_| |   <  __/ |  __/ ___ \| |   | |  | | |_| | (_) | | | \__ \
 ##   |_|  |_|\__,_|_|\_\___| |_| /_/   \_\_|   |_|  |_|\__,_|\___/|_| |_|___/
+##
 ##                                                                           
-##   
-### ==== Make PAT Muons ====
-from PhysicsTools.PatAlgos.producersLayer1.muonProducer_cfi import allLayer1Muons
-process.patMuonsWithoutTrigger = allLayer1Muons.clone(
-    # embed the tracks, so we don't have to carry them around
-    embedTrack          = True,
-    embedCombinedMuon   = True,
-    embedStandAloneMuon = True,
-    # then switch off some features we don't need
-    #addTeVRefits = False, ## <<--- this doesn't work. PAT bug ??
-    embedPickyMuon = False,
-    embedTpfmsMuon = False, 
-    isolation = cms.PSet(),   # no extra isolation beyond what's in reco::Muon itself
-    isoDeposits = cms.PSet(), # no heavy isodeposits
-    addGenMatch = False,      # no mc: T&P doesn't take it from here anyway.
-)
-### ==== Unpack trigger, and match ====
-process.load("PhysicsTools.PatAlgos.triggerLayer1.triggerProducer_cfi")
-process.patTrigger.onlyStandAlone = True
-process.patTrigger.processName    = triggerProcess
-from PhysicsTools.PatAlgos.triggerLayer1.triggerMatcher_cfi import muonTriggerMatchHLT1MuonIso
-process.muonMatchHLTMuX = muonTriggerMatchHLT1MuonIso.clone(
-    src = 'patMuonsWithoutTrigger',
-    pathNames = [ triggerPath ]
-)
-### ==== Embed ====
-process.patMuonsWithTrigger = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
-    src     = cms.InputTag( "patMuonsWithoutTrigger" ),
-    matches = cms.VInputTag( "muonMatchHLTMuX" ),
-)
-### ==== Select ====
-process.patMuons = cms.EDFilter("PATMuonSelector",
-    src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > %f" % (ptMin,)), 
-)
-### ==== Sequence ====
-process.patMuonSequence = cms.Sequence( 
-    process.patMuonsWithoutTrigger *
-    process.patTrigger * process.muonMatchHLTMuX * process.patMuonsWithTrigger *
-    process.patMuons  
-)
+##  We take them from Onia2MuMuPAT but we make a few changes
+##
+process.load("HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cff");
+## put a PT cut on the muons
+process.patMuons.cut = "pt > %f" % (ptMin,);
+## use the genMuons as MC source, so that we keep them and have the correct mother refs
+process.muonMatch.matched = 'genMuons'
+## switch off genParticle embedding, as we keep the genMuons collection
+## also switch off standalone muon track embedding, as we keep it separately
+process.patMuonsWithoutTrigger.embedGenMatch = False
+process.patMuonsWithoutTrigger.embedStandAloneMuon = False
 
 ##    __  __       _                _   _                                                 
 ##   |  \/  | __ _| | _____    ___ | |_| |__   ___ _ __   _ __ ___  _   _  ___  _ __  ___ 
@@ -184,7 +124,6 @@ process.otherMuons = cms.Sequence(
 
 
 process.allMuons = cms.Sequence(
-    process.muons *  # this merges the CaloMuons
     process.patMuonSequence *
     process.otherMuons
 )
@@ -256,7 +195,7 @@ process.acceptanceFilter = cms.EDFilter("CandViewRefSelector",
     filter = cms.bool(True),
 )
 process.Check_OneTag  = cms.Path(process.filterHLTMuX * process.oneTagFilter)
-# i clone these, as now they'll have different filters before...
+# I clone these, as now they'll have different filters before...
 process.filterHLTAcc  = process.filterHLTMuX.clone()
 process.oneTagFilterAcc = process.oneTagFilter.clone()
 process.jpsiMuFilterAcc = process.jpsiMuFilter.clone()
@@ -281,10 +220,12 @@ process.out = cms.OutputModule("PoolOutputModule",
         "keep *_patMuons_*_Skim",
         "keep *_goodTracks_*_Skim",
         "keep *_genMuons_*_Skim",
-        "keep recoTrackExtras_standAloneMuons_*_*",       ## track states at the muon system, used both by patMuons and standAloneMuons
-        "keep recoTracks_standAloneMuons_UpdatedAtVtx_*", ## bare standalone muon tracks, using standalone muon momentum (with BS constraint)
-        "keep edmTriggerResults_*_*_Skim",          ## to know which kind of skim channel got us the event   
-       #"keep l1extraL1MuonParticles_l1extraParticles_*_*",  ## if we ever want to do L1 efficiency too ## <<--- Not in 3.1.X AODSIM
+        "keep recoTrackExtras_standAloneMuons_*_*",          ## track states at the muon system, used both by patMuons and standAloneMuons
+        "keep recoTracks_standAloneMuons_UpdatedAtVtx_*",    ## bare standalone muon tracks, using standalone muon momentum (with BS constraint)
+        "keep edmTriggerResults_*_*_Skim",                   ## to know which kind of skim channel got us the event   
+        "keep l1extraL1MuonParticles_l1extraParticles_*_*",  ## if we ever want to do L1 efficiency too ## <<--- Not in 3.1.X AODSIM
+        "keep *_offlinePrimaryVertices__*",                  ## vertices and BS are not very useful on MC
+        "keep *_offlineBeamSpot__*",                         ## but they can be important on data
        # "keep *_jpsiMu_*_Skim", "keep *_jpsiTk_*_Skim", "keep *_jpsiSta_*_Skim",                       ## <<--- keep these for monitoring
     ),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring(
@@ -313,5 +254,19 @@ process.schedule = cms.Schedule(
     process.Check_Acceptance_Sta, 
     process.end
 )
-#process.out.fileName = "/tmp/gpetrucc/skimJPsi.root"
+process.out.fileName = "/tmp/gpetrucc/skimJPsi.root"
 process.maxEvents.input = 10000
+
+#### Turn on this on Real Data
+# from HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cff import onia2MuMu_isNotMC
+# onia2MuMu_isNotMC(process)
+# process.slimAOD.remove(process.genMuons)
+# process.schedule = cms.Schedule(
+#     process.main,
+#     process.Skim_jpsiMu,
+#     process.Skim_jpsiTk,
+#     process.Skim_jpsiSta,
+#     process.Check_OneTag, 
+#     process.end
+# )
+
