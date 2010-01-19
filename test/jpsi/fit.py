@@ -33,7 +33,7 @@ RunFit = cms.EDAnalyzer("TagProbeEDMAnalysis",
     
       ## Variable Specifications for SB subtractions and Roofit
       NameVar1             = cms.untracked.string( "pt" ),
-      Var1BinBoundaries   = cms.untracked.vdouble( 3, 4.5, 6, 10, 20),
+      Var1BinBoundaries   = cms.untracked.vdouble( 1.5, 3, 4.5, 6, 10, 20),
       NameVar2             = cms.untracked.string( "eta" ),
       Var2BinBoundaries   = cms.untracked.vdouble( -2.4, -1.3, -0.8, 0.8, 1.3, 2.4),
 
@@ -95,7 +95,8 @@ process.fitTkFromSta = RunFit.clone(
 process.fitMu3FromGlb = RunFit.clone(
     ReadFromDirectory = 'histoHltFromGlb',
     PassingProbeName  = 'Mu3',
-    ## Override eta bins for trigger
+    ## Override pt. eta bins for trigger
+    Var1BinBoundaries   = cms.untracked.vdouble( 3, 4.5, 6, 10, 20),
     Var2BinBoundaries   = cms.untracked.vdouble( -2.1,-1.2,-0.7,0.0,0.7,1.2,2.1),
 )
 process.fitMu5FromGlb    = process.fitMu3FromGlb.clone(PassingProbeName  = 'Mu5')

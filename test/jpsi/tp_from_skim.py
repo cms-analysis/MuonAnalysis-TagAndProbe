@@ -35,6 +35,7 @@ process.GlobalTag.globaltag = cms.string('STARTUP3X_V15::All')
 ##                                                                                      
 ##   
 TRACK_CUTS="track.numberOfValidHits >= 10 && track.normalizedChi2 < 5 && abs(track.d0) < 2 && abs(track.dz) < 30"
+PT_ETA_CUTS="((pt > 3 && abs(eta) < 1.3) || (pt > 1.5 && 1.3 <= abs(eta) < 2.4))"
 process.betterTracks = cms.EDFilter("TrackSelector",
     src = cms.InputTag("goodTracks"),
     cut = cms.string(TRACK_CUTS.replace("track.","")), # this is a Track object, so I have to remove the 'track.'
@@ -45,7 +46,7 @@ process.tkTracks  = cms.EDProducer("ConcreteChargedCandidateProducer",
 ) 
 process.tkProbes = cms.EDProducer("CandViewRefSelector",
     src = cms.InputTag("tkTracks"),
-    cut = cms.string("pt > 3 && abs(eta) < 2.4"),
+    cut = cms.string(PT_ETA_CUTS),
 )
 
 ##    ____  _                  _    _    _                    ____            _               
@@ -61,7 +62,7 @@ process.staTracks = cms.EDProducer("ConcreteChargedCandidateProducer",
 )
 process.staProbes = cms.EDProducer("CandViewRefSelector",
     src = cms.InputTag("staTracks"),
-    cut = cms.string("pt > 3 && abs(eta) < 2.4"),
+    cut = cms.string(PT_ETA_CUTS),
 )
 
 ##    __  __                     ____            _                                 _   _____               
@@ -80,7 +81,8 @@ process.tagMuons = cms.EDFilter("PATMuonRefSelector",
 
 process.calProbes = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("patMuons"),
-    cut = cms.string("isCaloMuon && pt > 3 && abs(eta) < 2.4 && " + TRACK_CUTS), 
+#   cut = cms.string("isCaloMuon && pt > 3 && abs(eta) < 2.4 && " + TRACK_CUTS), 
+    cut = cms.string("isCaloMuon && "+PT_ETA_CUTS+" && "+TRACK_CUTS),
 )
 process.glbMuons = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("patMuons"),
@@ -344,6 +346,21 @@ process.tagAndProbe = cms.Path(
 ##   
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi.root"))
 
+
+##    ____             _      ___         _____ _                
+##   | __ )  __ _  ___| | __ |_ _|_ __   |_   _(_)_ __ ___   ___ 
+##   |  _ \ / _` |/ __| |/ /  | || '_ \    | | | | '_ ` _ \ / _ \
+##   | |_) | (_| | (__|   <   | || | | |   | | | | | | | | |  __/
+##   |____/ \__,_|\___|_|\_\ |___|_| |_|   |_| |_|_| |_| |_|\___|
+##                                                               
+#### To run on 3.1.X Skims
+#### change output file and test input file
+# process.source.fileNames = [ 'file:/afs/cern.ch/user/g/gpetrucc/scratch0/huntForRedOctober/CMSSW_3_1_3/src/JPsiMuMu_Skim.root' ]
+# process.TFileService.fileName = 'tnpJPsi31X.root'
+#### we had only HLT_Mu3
+# process.histoHltFromGlb.flags = cms.PSet(Mu3 = cms.string("!triggerObjectMatchesByPath('HLT_Mu3').empty()"))
+
+#
 ##    ____       _                 
 ##   |  _ \  ___| |__  _   _  __ _ 
 ##   | | | |/ _ \ '_ \| | | |/ _` |
