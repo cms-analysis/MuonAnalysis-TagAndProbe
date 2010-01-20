@@ -147,6 +147,9 @@ process.jpsiSta = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("goldenMuons@+ staTracks@-"),
     cut = cms.string("%f < mass < %f" % massRangeSta),
 )
+process.allJPsis = cms.Sequence(
+    process.jpsiMu + process.jpsiTk + process.jpsiSta
+)
 
 ##    __  __       _                     _   _     
 ##   |  \/  | __ _(_)_ __    _ __   __ _| |_| |__  
@@ -157,8 +160,49 @@ process.jpsiSta = cms.EDProducer("CandViewShallowCloneCombiner",
 ##   
 process.main = cms.Path(
     process.slimAOD  *    
-    process.allMuons
+    process.allMuons *
+    process.allJPsis
 )
+
+##     ____      _ _ _     _               _____                 _     ____       _           _   _             
+##    / ___|___ | | (_)___(_) ___  _ __   | ____|_   _____ _ __ | |_  / ___|  ___| | ___  ___| |_(_) ___  _ __  
+##   | |   / _ \| | | / __| |/ _ \| '_ \  |  _| \ \ / / _ \ '_ \| __| \___ \ / _ \ |/ _ \/ __| __| |/ _ \| '_ \ 
+##   | |__| (_) | | | \__ \ | (_) | | | | | |___ \ V /  __/ | | | |_   ___) |  __/ |  __/ (__| |_| | (_) | | | |
+##    \____\___/|_|_|_|___/_|\___/|_| |_| |_____| \_/ \___|_| |_|\__| |____/ \___|_|\___|\___|\__|_|\___/|_| |_|
+##                                                                                                              
+##   
+
+# Some event filters
+process.load('L1TriggerConfig.L1GtConfigProducers.L1GtTriggerMaskTechTrigConfig_cff')
+from HLTrigger.HLTfilters.hltLevel1GTSeed_cfi import hltLevel1GTSeed
+process.bit40    = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('(40 OR 41)'))
+process.haloVeto = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('NOT (36 OR 37 OR 38 OR 39)'))
+process.bptxAnd  = hltLevel1GTSeed.clone(L1TechTriggerSeeding = cms.bool(True), L1SeedsLogicalExpression = cms.string('0'))
+
+from HLTrigger.HLTfilters.hltHighLevelDev_cfi import hltHighLevelDev
+process.physDecl = hltHighLevelDev.clone(HLTPaths = ['HLT_PhysicsDeclared'], HLTPathsPrescales = [1])
+
+process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
+   src = cms.InputTag("offlinePrimaryVertices"),
+   cut = cms.string("!isFake && tracksSize > 3 && abs(z) <= 15 && position.Rho <= 2"),
+   filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
+)
+
+process.noScraping = cms.EDFilter("FilterOutScraping",
+    applyfilter = cms.untracked.bool(True),
+    debugOn = cms.untracked.bool(False), ## Or 'True' to get some per-event info
+    numtrack = cms.untracked.uint32(10),
+    thresh = cms.untracked.double(0.2)
+)
+
+#### Current configuration
+## rationale:
+##   - bptxAnd and haloVeto are needed only on data (MC has no halo nor beam-gas)
+##   - oneGoodVertexFilter should also cut away cosmics in coincidence with BPTX
+##   - noScraping shouldn't cut anything, but we keep it for safety
+process.collisionFilterMC   = cms.Sequence(process.oneGoodVertexFilter * process.noScraping)
+process.collisionFilterData = cms.Sequence(process.bptxAnd * process.haloVeto * process.oneGoodVertexFilter * process.noScraping)
+process.collisionFilter     = cms.Sequence(process.collisionFilterMC)
 
 ##    ____  _    _             ____       _   _         
 ##   / ___|| | _(_)_ __ ___   |  _ \ __ _| |_| |__  ___ 
@@ -174,9 +218,9 @@ process.jpsiMuFilter  = cms.EDFilter("CandViewCountFilter",
 process.jpsiTkFilter  = process.jpsiMuFilter.clone(src = 'jpsiTk')
 process.jpsiStaFilter = process.jpsiMuFilter.clone(src = 'jpsiSta')
 
-process.Skim_jpsiMu  = cms.Path(process.jpsiMu  * process.jpsiMuFilter )
-process.Skim_jpsiTk  = cms.Path(process.jpsiTk  * process.jpsiTkFilter )
-process.Skim_jpsiSta = cms.Path(process.jpsiSta * process.jpsiStaFilter)
+process.Skim_jpsiMu  = cms.Path(process.collisionFilter + process.jpsiMuFilter )
+process.Skim_jpsiTk  = cms.Path(process.collisionFilter + process.jpsiTkFilter )
+process.Skim_jpsiSta = cms.Path(process.collisionFilter + process.jpsiStaFilter)
 
 # I define a few other paths that are not enabled in the OutputModule but which are useful to see what is the
 # efficiency of the various steps
@@ -187,24 +231,9 @@ process.filterHLTMuX = hltHighLevel.clone(
     TriggerResultsTag = cms.InputTag("TriggerResults","",triggerProcess),
 )
 process.oneTagFilter  = process.jpsiMuFilter.clone(src = 'goldenMuons')
-process.acceptanceFilter = cms.EDFilter("CandViewRefSelector",
-    src = cms.InputTag("genMuons"),
-    cut = cms.string(("pdgId == 443 && abs(daughter(0).pdgId) == 13 && ")+
-                     ("abs(daughter(0).eta) < %f && abs(daughter(1).eta) < %f && " % (etaTag, etaTag))+
-                     ("daughter(0).pt > %f && daughter(1).pt > %f && max(daughter(0).pt, daughter(1).pt) > %f" % (ptMin, ptMin, ptTag)) ),
-    filter = cms.bool(True),
-)
-process.Check_OneTag  = cms.Path(process.filterHLTMuX * process.oneTagFilter)
-# I clone these, as now they'll have different filters before...
-process.filterHLTAcc  = process.filterHLTMuX.clone()
-process.oneTagFilterAcc = process.oneTagFilter.clone()
-process.jpsiMuFilterAcc = process.jpsiMuFilter.clone()
-process.jpsiTkFilterAcc = process.jpsiTkFilter.clone()
-process.jpsiStaFilterAcc = process.jpsiStaFilter.clone()
-process.Check_Acceptance_Mu  = cms.Path(process.acceptanceFilter * process.filterHLTAcc * process.oneTagFilterAcc * process.jpsiMuFilterAcc)
-process.Check_Acceptance_Tk  = cms.Path(process.acceptanceFilter * process.filterHLTAcc * process.oneTagFilterAcc * process.jpsiTkFilterAcc)
-process.Check_Acceptance_Sta = cms.Path(process.acceptanceFilter * process.filterHLTAcc * process.oneTagFilterAcc * process.jpsiStaFilterAcc)
 
+process.Check_Collisions = cms.Path(process.collisionFilter)
+process.Check_OneTag     = cms.Path(process.collisionFilter + process.filterHLTMuX + process.oneTagFilter)
 
 ##     ___        _               _   
 ##    / _ \ _   _| |_ _ __  _   _| |_ 
@@ -248,25 +277,9 @@ process.schedule = cms.Schedule(
     process.Skim_jpsiMu,
     process.Skim_jpsiTk,
     process.Skim_jpsiSta,
+    process.Check_Collisions, 
     process.Check_OneTag, 
-    process.Check_Acceptance_Mu, 
-    process.Check_Acceptance_Tk, 
-    process.Check_Acceptance_Sta, 
     process.end
 )
-process.out.fileName = "/tmp/gpetrucc/skimJPsi.root"
-process.maxEvents.input = 10000
 
-#### Turn on this on Real Data
-# from HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cff import onia2MuMu_isNotMC
-# onia2MuMu_isNotMC(process)
-# process.slimAOD.remove(process.genMuons)
-# process.schedule = cms.Schedule(
-#     process.main,
-#     process.Skim_jpsiMu,
-#     process.Skim_jpsiTk,
-#     process.Skim_jpsiSta,
-#     process.Check_OneTag, 
-#     process.end
-# )
 
