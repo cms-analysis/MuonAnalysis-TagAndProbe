@@ -87,9 +87,9 @@ process.histo = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagMatches = cms.InputTag("muMcMatch"),
     probeMatches  = cms.InputTag("muMcMatch"),
     motherPdgId = cms.int32(443),
-    makeMCUnbiasTree = cms.bool(True),
-    checkMotherInUnbiasEff = cms.bool(True),
-    allProbes = cms.InputTag("probeMuons"),
+    makeMCUnbiasTree = cms.bool(False),        ## NO! 'unbias' efficiency on a skim is
+    #checkMotherInUnbiasEff = cms.bool(True),  ##      biased _a lot_ by the skim tags
+    #allProbes = cms.InputTag("probeMuons"),
 )
            
 process.tagAndProbe = cms.Path( 

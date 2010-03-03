@@ -187,8 +187,8 @@ recoCommonStuff = cms.PSet(
 )
 mcTruthCommonStuff = cms.PSet(
     isMC = cms.bool(True),
-    makeMCUnbiasTree = cms.bool(True),
-    checkMotherInUnbiasEff = cms.bool(True),
+    makeMCUnbiasTree = cms.bool(False),        ## NO! 'unbias' efficiency on a skim is
+    #checkMotherInUnbiasEff = cms.bool(True),  ##      biased _a lot_ by the skim tags
     tagMatches = cms.InputTag("muMcMatch"),
     motherPdgId = cms.int32(443),
 )
@@ -208,7 +208,7 @@ process.histoMuFromTk = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("tkMcMatch"),
-    allProbes     = cms.InputTag("tkProbes"),
+    #allProbes     = cms.InputTag("tkProbes"), # NO 'unbias' efficiency on skims
 )
 
 #####
@@ -226,7 +226,7 @@ process.histoMuFromCal = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("muMcMatch"),
-    allProbes     = cms.InputTag("calProbes"),
+    #allProbes     = cms.InputTag("calProbes"),   # NO 'unbias' efficiency on skims
 )
 
 process.allTPHistos = cms.Sequence(
