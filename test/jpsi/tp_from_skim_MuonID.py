@@ -19,7 +19,7 @@ TRACK_CUTS = ("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithM
               "&& abs(track.d0) < 2 && abs(track.dz) < 30")
 PT_ETA_CUTS = "(pt > 3 || (abs(eta)>1 && p > 2.6))" ## the enclosing () are very important, because there's an "||"
 PASSING_GLB_CUT = "isGlobalMuon && globalTrack.normalizedChi2 < 20"
-PASSING_TRK_CUT = "!("+PASSING_GLB_CUT+") && isTrackerMuon && muonID('TMLastStationAngTight')";
+PASSING_TM_CUT = "!("+PASSING_GLB_CUT+") && isTrackerMuon && muonID('TMLastStationAngTight')";
 
 PASS_HLT = "!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"
 TAG_CUTS = PASSING_GLB_CUT + " && " + TRACK_CUTS +' && '+ PASS_HLT 
@@ -109,7 +109,7 @@ process.muonsGlb = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("patMuons"),
     cut = cms.string(PASSING_GLB_CUT),
 )
-process.muonsTrk = process.muonsGlb.clone(cut = PASSING_TRK_CUT)
+process.muonsTM = process.muonsGlb.clone(cut = PASSING_TM_CUT)
 
 process.tkToGlbMatch = cms.EDProducer("MatcherUsingTracks",
     src     = cms.InputTag("tkTracks"), # all tracks are available for matching
@@ -128,12 +128,12 @@ process.tkPassingGlb = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("tkProbes"),
     match = cms.InputTag("tkToGlbMatch"),
 )
-process.tkToTrkMatch  = process.tkToGlbMatch.clone(matched = 'muonsTrk')
-process.tkPassingTrk  = process.tkPassingGlb.clone( match = 'tkToTrkMatch')
+process.tkToTMMatch = process.tkToGlbMatch.clone(matched = 'muonsTM')
+process.tkPassingTM = process.tkPassingGlb.clone( match = 'tkToTMMatch')
 
 process.tkPassingProbes = cms.Sequence(
     process.muonsGlb * process.tkToGlbMatch * process.tkPassingGlb +
-    process.muonsTrk * process.tkToTrkMatch * process.tkPassingTrk 
+    process.muonsTM  * process.tkToTMMatch  * process.tkPassingTM 
 )
 ##    _____ ___   ____    ____       _          
 ##   |_   _( _ ) |  _ \  |  _ \ __ _(_)_ __ ___ 
@@ -204,7 +204,7 @@ process.histoMuFromTk = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of what defines a 'passing' probe
     flags = cms.PSet(
         Glb = cms.InputTag("tkPassingGlb"),
-        Trk = cms.InputTag("tkPassingTrk"),
+        TM  = cms.InputTag("tkPassingTM"),
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("tkMcMatch"),
@@ -221,8 +221,8 @@ process.histoMuFromCal = cms.EDAnalyzer("TagProbeFitTreeProducer",
     arbitration   = cms.string("OneProbe"),
     # choice of what defines a 'passing' probe
     flags = cms.PSet(
-        passingGlb   = cms.string(PASSING_GLB_CUT),
-        passingTrkEx = cms.string(PASSING_TRK_CUT),
+        Glb = cms.string(PASSING_GLB_CUT),
+        TM  = cms.string(PASSING_TM_CUT),
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("muMcMatch"),
