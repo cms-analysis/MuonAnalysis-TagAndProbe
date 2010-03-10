@@ -17,7 +17,7 @@ process.out.outputCommands += [ 'keep *_jpsiTk_*_*', 'keep *_jpsiMu_*_*', 'keep 
 
 ## Test on background
 ## file: /store/mc/Summer09/ppMuXLoose/GEN-SIM-RECO/STARTUP3X_V8I_900GeV-v1/0005/F83A17E0-9AEB-DE11-844A-00E08178C015.root
-##  aka  root:///pcmssd12.cern.ch//data/mc/900GeV/ppMuXLoose_STARTUP3X_V8I_RECO/F83A17E0-9AEB-DE11-844A-00E08178C015.root
+##  aka  root://pcmssd12.cern.ch//data/mc/900GeV/ppMuXLoose_STARTUP3X_V8I_RECO/F83A17E0-9AEB-DE11-844A-00E08178C015.root
 ##  aka  file:/data/mc/900GeV/ppMuXLoose_STARTUP3X_V8I_RECO/F83A17E0-9AEB-DE11-844A-00E08178C015.root 
 process.source.fileNames = [ 'file:/data/mc/900GeV/ppMuXLoose_STARTUP3X_V8I_RECO/F83A17E0-9AEB-DE11-844A-00E08178C015.root' ]
 process.out.fileName = "skimJPsiLoose_ppxMuXLoose900GeV.root"
