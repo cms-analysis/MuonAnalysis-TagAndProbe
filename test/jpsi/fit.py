@@ -1,6 +1,8 @@
-PTBINS = cms.vdouble(3.5, 4.5, 50.0)
-ETABINS = cms.vdouble(-2.1, 0.0, 2.1)
-FILEPREFIX = "coarse_"
+FILEPREFIX = "fine_"
+BINS = cms.PSet(
+    pt = cms.vdouble(0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5, 5.5, 7.0, 20.0),
+    eta = cms.vdouble(-2.4, -2.1, -1.6, -1.2, -0.8, 0.8, 1.2, 1.6, 2.1, 2.4)
+)
 
 import FWCore.ParameterSet.Config as cms
 
@@ -53,7 +55,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 process.TnP_MuFromTk = Template.clone(
-    InputFileNames = cms.vstring("tnpJPsi_MuonID_JPsi-0.084pb.root", "tnpJPsi_MuonID_ppMuX.root"),
+    InputFileNames = cms.vstring("tnpJPsi_MuonID_JPsi-1pb.root"),
     InputDirectoryName = cms.string("histoMuFromTk"),
     InputTreeName = cms.string("fitter_tree"),
     OutputFileName = cms.string(FILEPREFIX+"TnP_MuFromTk.root"),
@@ -61,46 +63,34 @@ process.TnP_MuFromTk = Template.clone(
         Glb_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("Glb","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
+            BinnedVariables = BINS,
             BinToPDFmap = cms.vstring("gaussPlusLinear")
         ),
         Glb_pt_eta_mcTrue = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("Glb","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                mcTrue = cms.vstring("true"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS.clone(
+                mcTrue = cms.vstring("true")
+            )
         ),
         Trk_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("Trk","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
+            BinnedVariables = BINS,
             BinToPDFmap = cms.vstring("gaussPlusLinear")
         ),
         Trk_pt_eta_mcTrue = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("Trk","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                mcTrue = cms.vstring("true"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS.clone(
+                mcTrue = cms.vstring("true")
+            )
         ),
     )
 )
 
 process.TnP_MuFromCal = Template.clone(
-    InputFileNames = cms.vstring("tnpJPsi_MuonID_JPsi-0.084pb.root", "tnpJPsi_MuonID_ppMuX.root"),
+    InputFileNames = cms.vstring("tnpJPsi_MuonID_JPsi-1pb.root"),
     InputDirectoryName = cms.string("histoMuFromCal"),
     InputTreeName = cms.string("fitter_tree"),
     OutputFileName = cms.string(FILEPREFIX+"TnP_MuFromCal.root"),
@@ -108,67 +98,45 @@ process.TnP_MuFromCal = Template.clone(
         Glb_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passingGlb","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring("gaussPlusLinear")
+            BinnedVariables = BINS,
+#            BinToPDFmap = cms.vstring("gaussPlusLinear")
         ),
         Glb_pt_eta_mcTrue = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passingGlb","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                mcTrue = cms.vstring("true"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS.clone(
+                mcTrue = cms.vstring("true")
+            )
         ),
         Trk_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passingTrkEx","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring("gaussPlusLinear")
+            BinnedVariables = BINS,
+#            BinToPDFmap = cms.vstring("gaussPlusLinear")
         ),
         Trk_pt_eta_mcTrue = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passingTrkEx","pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                mcTrue = cms.vstring("true"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS.clone(
+                mcTrue = cms.vstring("true")
+            )
         ),
     )
 )
 
 process.MC_MuFromTk = Template.clone(
-    InputFileNames = cms.vstring("tnpJPsi_MuonID_JPsi-0.084pb.root", "tnpJPsi_MuonID_ppMuX.root"),
+    InputFileNames = cms.vstring("tnpJPsi_MuonID_JPsi-1pb.root"),
     InputDirectoryName = cms.string("histoMuFromTk"),
     InputTreeName = cms.string("mcUnbias_tree"),
     OutputFileName = cms.string(FILEPREFIX+"MC_MuFromTk.root"),
     Efficiencies = cms.PSet(
         Glb_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("Glb","pass"),
-            UnbinnedVariables = cms.vstring(),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS
         ),
         Trk_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("Trk","pass"),
-            UnbinnedVariables = cms.vstring(),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS
         )
     )
 )
@@ -179,21 +147,11 @@ process.MC_MuFromCal = process.MC_MuFromTk.clone(
     Efficiencies = cms.PSet(
         Glb_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passingGlb","pass"),
-            UnbinnedVariables = cms.vstring(),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS
         ),
         Trk_pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passingTrkEx","pass"),
-            UnbinnedVariables = cms.vstring(),
-            BinnedVariables = cms.PSet(
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS
         )
     )
 )
@@ -201,7 +159,7 @@ process.MC_MuFromCal = process.MC_MuFromTk.clone(
 # -------------TRIGGER-----------
 
 process.TnP_TriggerFromGlb = Template.clone(
-    InputFileNames = cms.vstring("tnpJPsi_Trigger_JPsi-0.084pb.root", "tnpJPsi_Trigger_ppMuX.root"),
+    InputFileNames = cms.vstring("tnpJPsi_Trigger_JPsi-1pb.root"),
     InputDirectoryName = cms.string("histo"),
     InputTreeName = cms.string("fitter_tree"),
     OutputFileName = cms.string(FILEPREFIX+"TnP_TriggerFromGlb.root"),
@@ -226,10 +184,8 @@ for trig in [ 'HLTMu3', 'L1DiMuOpen' ]:
 	cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(trig,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                Glb = cms.vstring("pass"),
-                pt = PTBINS,
-                eta = ETABINS
+            BinnedVariables = BINS.clone(
+                Glb = cms.vstring("pass")
             ),
             BinToPDFmap = cms.vstring("gaussPlusLinear")
         )
@@ -238,35 +194,26 @@ for trig in [ 'HLTMu3', 'L1DiMuOpen' ]:
         cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(trig,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
+            BinnedVariables = BINS.clone(
                 Glb = cms.vstring("pass"),
-                mcTrue = cms.vstring("true"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+                mcTrue = cms.vstring("true")
+            )
         )
     )
     setattr( process.MC_TriggerFromGlb.Efficiencies, trig+'pt_eta',
         cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(trig,"pass"),
-            UnbinnedVariables = cms.vstring(),
-            BinnedVariables = cms.PSet(
-                Glb = cms.vstring("pass"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS.clone(
+                Glb = cms.vstring("pass")
+            )
         )
     )
     setattr( process.TnP_TriggerFromTrk.Efficiencies, trig+'pt_eta',
 	cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(trig,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
-                Trk = cms.vstring("pass"),
-                pt = PTBINS,
-                eta = ETABINS
+            BinnedVariables = BINS.clone(
+                Trk = cms.vstring("pass")
             ),
             BinToPDFmap = cms.vstring("gaussPlusLinear")
         )
@@ -275,25 +222,18 @@ for trig in [ 'HLTMu3', 'L1DiMuOpen' ]:
         cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(trig,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = cms.PSet(
+            BinnedVariables = BINS.clone(
                 Trk = cms.vstring("pass"),
-                mcTrue = cms.vstring("true"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+                mcTrue = cms.vstring("true")
+            )
         )
     )
     setattr( process.MC_TriggerFromTrk.Efficiencies, trig+'pt_eta',
         cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(trig,"pass"),
-            UnbinnedVariables = cms.vstring(),
-            BinnedVariables = cms.PSet(
-                Trk = cms.vstring("pass"),
-                pt = PTBINS,
-                eta = ETABINS
-            ),
-            BinToPDFmap = cms.vstring()
+            BinnedVariables = BINS.clone(
+                Trk = cms.vstring("pass")
+            )
         )
     )
 
