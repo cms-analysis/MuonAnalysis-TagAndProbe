@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: PATTupleReadTest.cc,v 1.4 2009/10/08 07:32:51 jjhollar Exp $
+// $Id: PATTupleReadTest.cc,v 1.1 2010/01/11 06:54:21 jjhollar Exp $
 //
 //
 
@@ -55,7 +55,7 @@ public:
   ~PATTupleReadTest();
   
 private:
-  virtual void beginJob(const edm::EventSetup&) ;
+  virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
@@ -84,11 +84,11 @@ void
 PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
   edm::Handle<edm::View<pat::Muon> > patmuons;
-  iEvent.getByLabel("selectedLayer1MuonsWithEff",patmuons);
+  iEvent.getByLabel("selectedPatMuonsWithEff",patmuons);
   edm::View<pat::Muon>::const_iterator patmuon;
   for (edm::View<pat::Muon>::const_iterator patmuon = patmuons->begin(), end = patmuons->end(); patmuon != end; ++patmuon) 
     {
-      std::string effname = "TriggerMuonFromGlobalMuonZ";
+      std::string effname = "GlobalMuonFromTrackerTrackJpsi";
       pat::Muon myMuon = *patmuon; // copy
 
       cout << "\tRead PAT efficiency " 
@@ -96,13 +96,13 @@ PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 	   << (myMuon.efficiency(effname)).error() << " (" 
 	   << effname << ")" << endl;
 
-      effname = "GlobalMuonFromTrackerTrackZ";
+      effname = "GlobalMuonFromTrackerTrackJpsi";
       cout << "\tRead PAT efficiency "
            << (myMuon.efficiency(effname)).value() << " +- "
            << (myMuon.efficiency(effname)).error() << " ("
            << effname << ")" << endl;
 
-      effname = "TrackerTrackFromStandaloneMuonZ";
+      effname = "GlobalMuonFromTrackerTrackJpsi";
       cout << "\tRead PAT efficiency "
            << (myMuon.efficiency(effname)).value() << " +- "
            << (myMuon.efficiency(effname)).error() << " ("
@@ -113,7 +113,7 @@ PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-PATTupleReadTest::beginJob(const edm::EventSetup&)
+PATTupleReadTest::beginJob()
 {
 }
 

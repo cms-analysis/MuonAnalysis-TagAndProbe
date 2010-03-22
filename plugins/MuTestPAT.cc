@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPAT.cc,v 1.1 2009/11/10 09:37:44 jjhollar Exp $
+// $Id: MuTestPAT.cc,v 1.2 2009/11/10 10:43:28 jjhollar Exp $
 //
 //
 
@@ -63,7 +63,7 @@ public:
 private:
   std::vector<std::string> algonames;
   std::string rootfilename;
-  virtual void beginJob(const edm::EventSetup&) ;
+  virtual void beginJob() ;
   //  virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
@@ -106,7 +106,7 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   std::vector<pat::Muon> * patCorrMuons = new std::vector<pat::Muon>();
 
   edm::Handle<edm::View<pat::Muon> > patmuons;
-  iEvent.getByLabel("selectedLayer1Muons",patmuons);
+  iEvent.getByLabel("selectedPatMuons",patmuons);
   edm::View<pat::Muon>::const_iterator patmuon;
 
   for (edm::View<pat::Muon>::const_iterator patmuon = patmuons->begin(), end = patmuons->end(); patmuon != end; ++patmuon) 
@@ -145,7 +145,7 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-MuTestPAT::beginJob(const edm::EventSetup&)
+MuTestPAT::beginJob()
 {
   effreader = new MuonPerformanceReadback();
 }

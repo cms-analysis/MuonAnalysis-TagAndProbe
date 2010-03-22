@@ -16,8 +16,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    '/store/relval/CMSSW_3_1_2/RelValZMM/GEN-SIM-RECO/STARTUP31X_V2-v1/0007/EECE7AB6-CC78-DE11-805C-0019B9F709A4.root'    
-#    '/store/relval/CMSSW_3_3_0_pre2/RelValZMM/GEN-SIM-RECO/STARTUP31X_V7-v1/0003/16950730-469C-DE11-9130-001731A281B1.root'        
+        '/store/relval/CMSSW_3_5_3/RelValJpsiMM/GEN-SIM-DIGI-RAW-HLTDEBUG/START3X_V24-v1/0002/E097E737-3C28-DF11-A723-002618943979.root'
     )
                             )
 
@@ -217,7 +216,7 @@ process.MuonPerformanceESProducer_Muon5.WorkingPointName = "MUZ_WMUNUANAL_OCTXTE
 process.MuonPerformanceESProducer_Muon5.ComponentName = "MuonFromTrackerTrackZ_WmunuAnal"
 
 
-process.selectedLayer1MuonsWithEff = cms.EDAnalyzer('MuTestPAT',
+process.selectedPatMuonsWithEff = cms.EDAnalyzer('MuTestPAT',
                                                     AlgoNames = cms.vstring(
     'TriggerMuonFromGlobalMuonZ',
     'GlobalMuonFromTrackerTrackZ',
@@ -250,9 +249,9 @@ process.output = cms.OutputModule("PoolOutputModule",
 
 process.p = cms.Path(
     #    process.patDefaultSequence +
-    process.makeAllLayer1Muons *
-    process.selectedLayer1Muons +
-    process.selectedLayer1MuonsWithEff +
+    process.makePatMuons *
+    process.selectedPatMuons +
+    process.selectedPatMuonsWithEff +
     process.output)
 
 #print process.dumpPython()

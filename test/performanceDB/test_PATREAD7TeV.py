@@ -8,7 +8,7 @@ process.maxEvents = cms.untracked.PSet(
 
 process.source = cms.Source("PoolSource",
                             fileNames = cms.untracked.vstring(
-    'file:/tmp/jjhollar/zmm.pattuple.root'
+    'file:/tmp/jjhollar/jpsimm.pattuple.root'
     )
                             )
 

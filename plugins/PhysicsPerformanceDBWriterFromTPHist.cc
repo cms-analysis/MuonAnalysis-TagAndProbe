@@ -23,7 +23,7 @@ class PhysicsPerformanceDBWriterFromTPHist : public edm::EDAnalyzer
 {
 public:
   PhysicsPerformanceDBWriterFromTPHist(const edm::ParameterSet&);
-  virtual void beginJob(const edm::EventSetup&);
+  virtual void beginJob();
   virtual void analyze(const edm::Event&, const edm::EventSetup&) {}
   virtual void endJob() {}
   ~PhysicsPerformanceDBWriterFromTPHist() {}
@@ -60,7 +60,7 @@ PhysicsPerformanceDBWriterFromTPHist::PhysicsPerformanceDBWriterFromTPHist
 
 }
 
-void PhysicsPerformanceDBWriterFromTPHist::beginJob(const edm::EventSetup&)
+void PhysicsPerformanceDBWriterFromTPHist::beginJob()
 {
   //
   // read object from file
