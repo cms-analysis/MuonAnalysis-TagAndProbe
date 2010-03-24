@@ -1,0 +1,17 @@
+[CRAB]
+jobtype = cmssw
+scheduler = glite
+
+[CMSSW]
+datasetpath = /PYTHIA6_JPsiWithFSR_7TeV_test/fat-PYTHIA6_JPsiWithFSR_7TeV_1E31_HLT_V00-00-01-5c26105940f888f51f1349fc7b7e24ce/USER 
+dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
+pset = tp_from_aod.py
+total_number_of_events = -1
+events_per_job = 20000
+#number_of_jobs = 5
+
+[USER]
+ui_working_dir = tp_from_aod_JPsiMuMu_7TeV
+return_data = 1
+copy_data = 0
+
