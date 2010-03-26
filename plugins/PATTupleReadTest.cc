@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: PATTupleReadTest.cc,v 1.1 2010/01/11 06:54:21 jjhollar Exp $
+// $Id: PATTupleReadTest.cc,v 1.2 2010/03/22 19:25:16 jjhollar Exp $
 //
 //
 
@@ -93,19 +93,25 @@ PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
 
       cout << "\tRead PAT efficiency " 
 	   << (myMuon.efficiency(effname)).value() << " +- " 
-	   << (myMuon.efficiency(effname)).error() << " (" 
+           << (myMuon.efficiency(effname)).error() << " ("
+	//           << (myMuon.efficiency(effname)).errorUpper() << " - "
+	//	   << (myMuon.efficiency(effname)).errorLower() << " (" 
 	   << effname << ")" << endl;
 
       effname = "GlobalMuonFromTrackerTrackJpsi";
       cout << "\tRead PAT efficiency "
            << (myMuon.efficiency(effname)).value() << " +- "
            << (myMuon.efficiency(effname)).error() << " ("
+	//           << (myMuon.efficiency(effname)).errorUpper() << " - "
+	//           << (myMuon.efficiency(effname)).errorLower() << " ("
            << effname << ")" << endl;
 
       effname = "GlobalMuonFromTrackerTrackJpsi";
       cout << "\tRead PAT efficiency "
            << (myMuon.efficiency(effname)).value() << " +- "
            << (myMuon.efficiency(effname)).error() << " ("
+	//           << (myMuon.efficiency(effname)).errorUpper() << " - "
+	//           << (myMuon.efficiency(effname)).errorLower() << " ("
            << effname << ")" << endl;
 
     }
