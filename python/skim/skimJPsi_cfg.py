@@ -57,7 +57,7 @@ process.physDecl = hltHighLevelDev.clone(HLTPaths = ['HLT_PhysicsDeclared'], HLT
 
 process.oneGoodVertexFilter = cms.EDFilter("VertexSelector",
    src = cms.InputTag("offlinePrimaryVertices"),
-   cut = cms.string("!isFake && tracksSize > 3 && abs(z) <= 15 && position.Rho <= 2"),
+   cut = cms.string("!isFake && ndof > 4 && abs(z) <= 15 && position.Rho <= 2"),
    filter = cms.bool(True),   # otherwise it won't filter the events, just produce an empty vertex collection.
 )
 
@@ -65,7 +65,7 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
     applyfilter = cms.untracked.bool(True),
     debugOn = cms.untracked.bool(False), ## Or 'True' to get some per-event info
     numtrack = cms.untracked.uint32(10),
-    thresh = cms.untracked.double(0.2)
+    thresh = cms.untracked.double(0.25)
 )
 
 #### Current configuration
@@ -153,7 +153,10 @@ process.schedule = cms.Schedule(
 import sys
 args = sys.argv[1:]
 if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
-test = "Summer09_Signal"
+#test = "Summer09_Signal"
+test = "OniaTrigger"
+#del process.jpsiSkimOut.SelectEvents ## keep all events
+
 if len(args) > 0:
     test = args[0]
     print "Will run test '%s'" % (test,)

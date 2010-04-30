@@ -176,9 +176,10 @@ jpsiSkimOut = cms.OutputModule("PoolOutputModule",
         "keep recoTrackExtras_standAloneMuons_*_*",          ## track states at the muon system, used both by patMuons and standAloneMuons
         "keep recoTracks_standAloneMuons_UpdatedAtVtx_*",    ## bare standalone muon tracks, using standalone muon momentum (with BS constraint)
         "keep edmTriggerResults_*_*_Skim",                   ## to know which kind of skim channel got us the event   
-       #"keep l1extraL1MuonParticles_l1extraParticles_*_*",  ## if we ever want to do L1 efficiency too ## <<--- Not in 3.1.X AODSIM
-       #"keep *_offlinePrimaryVertices__*",                  ## vertices and BS are not very useful on MC
-       #"keep *_offlineBeamSpot__*",                         ## but they can be important on data
+        "keep edmTriggerResults_*_*_HLT",                    ## to know what got us on tape
+        "keep l1extraL1MuonParticles_l1extraParticles_*_*",  ## if we ever want to do L1 efficiency too ## <<--- Not in 3.1.X AODSIM
+        "keep *_offlinePrimaryVertices__*",                  ## vertices and BS are not very useful on MC
+        "keep *_offlineBeamSpot__*",                         ## but they can be important on data
        #"keep *_jpsiMu_*_Skim", "keep *_jpsiTk_*_Skim", "keep *_jpsiSta_*_Skim",                       ## <<--- keep these for monitoring
     ),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring(
@@ -195,3 +196,14 @@ def Summer09_Trigger(process):
     ## Remove matches to l1Extra which is not in 3.1.X samples and that we woudln't use anyway
     for n in process.patTrigger.parameters_(): 
         if n.startswith("l1Extra"): delattr(process.patTrigger, n)
+
+def Spring10ReDigi_Trigger(process):
+    process.patTrigger.processName = 'REDIGI'
+    if hasattr(process, 'muonMatchHLTCtfTrack'):
+        process.muonMatchHLTCtfTrack.collectionTags[0] = process.muonMatchHLTCtfTrack.collectionTags[0].replace('::HLT','::REDIGI')
+    if hasattr(process, 'filterHLT1Mu'): process.filterHLT1Mu.TriggerResultsTag = cms.InputTag('TriggerResults','','REDIGI')
+    if hasattr(process, 'filterHLT2Mu'): process.filterHLT2Mu.TriggerResultsTag = cms.InputTag('TriggerResults','','REDIGI')
+    ## Remove matches to l1Extra which is not in 3.1.X samples and that we woudln't use anyway
+    for n in process.patTrigger.parameters_():
+        if n.startswith("l1Extra"): delattr(process.patTrigger, n)
+
