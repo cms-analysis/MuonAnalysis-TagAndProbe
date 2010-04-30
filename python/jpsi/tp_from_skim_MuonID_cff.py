@@ -86,11 +86,21 @@ tpGlbTk = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("tagMuons1Mu@+ tkProbes@-"), # charge coniugate states are implied
     cut   = cms.string("%f < mass < %f" % MASS_RANGE),
 )
+tpGlbTkVtxFit = cms.EDProducer("KalmanVertexFitCompositeCandProducer",
+    src = cms.InputTag("tpGlbTk"),
+)
+tpGlbTkVtxCut = cms.EDFilter("CandViewRefSelector",
+    src = cms.InputTag("tpGlbTkVtxFit"),
+    cut = cms.string("chi2prob(vertexChi2, vertexNdof) > 0.01"), # 0.002 = chi2 cut at 10
+)
+
 
 tpGlbCal = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("tagMuons1Mu@+ calProbes@-"), # charge coniugate states are implied
     cut   = cms.string("%f < mass < %f" % MASS_RANGE),
 )
+tpGlbCalVtxFit = tpGlbTkVtxFit.clone(src = 'tpGlbCal')
+tpGlbCalVtxCut = tpGlbTkVtxFit.clone(src = 'tpGlbCalVtxFit')
 
 allTPPairsMuonID = cms.Sequence(
     tpGlbTk + tpGlbCal
@@ -141,8 +151,36 @@ histoMuFromCal = tnpTreeProducer.clone(
     allProbes     = cms.InputTag("calProbes"),   
 )
 
+#####
+## Mu from Tk
+histoMuFromTkVtx = tnpTreeProducer.clone(
+    tagProbePairs = cms.InputTag("tpGlbTkVtxCut"),
+    # choice of what defines a 'passing' probe
+    flags = cms.PSet(
+        Glb = cms.InputTag("tkPassingGlb"),
+        TM  = cms.InputTag("tkPassingTM"),
+    ),
+    ## These two MC things depend on the specific choice of probes
+    probeMatches  = cms.InputTag("tkMcMatch"),
+    allProbes     = cms.InputTag("tkProbes"), # NO 'unbias' efficiency on skims
+)
+
+#####
+## Mu from Cal
+histoMuFromCalVtx = tnpTreeProducer.clone(
+    tagProbePairs = cms.InputTag("tpGlbCalVtxCut"),
+    # choice of what defines a 'passing' probe
+    flags = cms.PSet(
+        Glb = cms.string(PASSING_GLB_CUT),
+        TM  = cms.string(PASSING_TM_CUT),
+    ),
+    ## These two MC things depend on the specific choice of probes
+    probeMatches  = cms.InputTag("muMcMatch"),
+    allProbes     = cms.InputTag("calProbes"),
+)
+
 allTPHistosMuonID = cms.Sequence(
-    histoMuFromTk +
+    histoMuFromTk  +
     histoMuFromCal 
 )
 
@@ -154,6 +192,12 @@ tnpSequenceMuonID = cms.Sequence(
     allTPHistosMuonID
 )
 
+tnpSequenceMuonIDVtx = cms.Sequence(
+    tpGlbTkVtxFit  + tpGlbTkVtxCut  +
+    tpGlbCalVtxFit + tpGlbCalVtxCut +
+    histoMuFromTkVtx  +
+    histoMuFromCalVtx 
+)
 
 
 
