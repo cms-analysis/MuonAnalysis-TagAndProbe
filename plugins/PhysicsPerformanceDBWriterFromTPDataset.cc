@@ -206,10 +206,8 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	      hlo->SetBinContent(b, effvar->getVal()+effvar->getErrorLo());
 	      hhi->SetBinContent(b, effvar->getVal()+effvar->getErrorHi());
 
-	      // NB. The "average" error her is temporary until the 
-	      // DB+PAT support asymmetric errors.
 	      bincontent = effvar->getVal();
-	      binerror = fabs(effvar->getErrorHi() + effvar->getErrorLo())/2.0;
+	      binerror = (effvar->getErrorHi() + effvar->getErrorLo())/2.0;
 
               pl.push_back(binlowedgex);
               pl.push_back(binhighedgex);
