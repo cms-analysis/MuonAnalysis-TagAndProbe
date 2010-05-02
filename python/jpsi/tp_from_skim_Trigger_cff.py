@@ -19,6 +19,7 @@ histoTrigger = tnpTreeProducer.clone(
         Glb = cms.string(PASSING_GLB_CUT),
         Trk = cms.string(PASSING_TM_CUT),
         HLTMu3     = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
+        HLTDiMu0   = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered0').empty()"),
         L1DiMuOpen = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
     ),
     probeMatches  = cms.InputTag("muMcMatch"),
