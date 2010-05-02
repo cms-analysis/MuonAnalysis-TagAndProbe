@@ -160,6 +160,9 @@ histoMuFromTkVtx = tnpTreeProducer.clone(
         Glb = cms.InputTag("tkPassingGlb"),
         TM  = cms.InputTag("tkPassingTM"),
     ),
+    # chi2 of constrained fit (-1 if it failed)
+    pairVariables = cms.PSet(vtxChi2 = cms.string("vertexChi2")),
+    pairFlags     = cms.PSet(),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("tkMcMatch"),
     allProbes     = cms.InputTag("tkProbes"), # NO 'unbias' efficiency on skims
@@ -174,6 +177,9 @@ histoMuFromCalVtx = tnpTreeProducer.clone(
         Glb = cms.string(PASSING_GLB_CUT),
         TM  = cms.string(PASSING_TM_CUT),
     ),
+    # chi2 of constrained fit (-1 if it failed)
+    pairVariables = cms.PSet(vtxChi2 = cms.string("vertexChi2")),
+    pairFlags     = cms.PSet(),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("muMcMatch"),
     allProbes     = cms.InputTag("calProbes"),

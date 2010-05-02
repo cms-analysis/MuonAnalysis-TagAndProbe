@@ -88,12 +88,22 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     # choice of what defines a 'passing' probe
     flags = cms.PSet(),
-    ## These two MC things depend on the specific choice of probes
+    ## variables relative to the _tag_
+    tagVariables = cms.PSet(
+        pt  = cms.string("pt"),
+        eta = cms.string("eta"),
+     ),
+    tagFlags = cms.PSet(
+        HLTMu3         = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
+        L1SingleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty()"),
+    ),
+    ## MC-related info
     isMC = cms.bool(True),
-    makeMCUnbiasTree = cms.bool(False),        ## NO! 'unbias' efficiency on a skim is
+    makeMCUnbiasTree = cms.bool(False),       ## NO! 'unbias' efficiency on a skim is
     checkMotherInUnbiasEff = cms.bool(True),  ##      biased _a lot_ by the skim tags
     tagMatches = cms.InputTag("muMcMatch"),
     motherPdgId = cms.int32(443),
+    ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("REPLACE_ME"),
     allProbes     = cms.InputTag("REPLACE_ME"), 
 )
