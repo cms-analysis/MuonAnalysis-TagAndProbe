@@ -116,3 +116,18 @@ tnpCommonSequence = cms.Sequence(
     muMcMatch 
 )
 
+def addDiMuonSeparationVariables(process, sequence, treeProducer):
+    from MuonAnalysis.TagAndProbe.nearbyMuonsInfo_cfi import nearbyMuonsInfo;
+    tpp = treeProducer.tagProbePairs.moduleLabel
+    if not hasattr(process, tpp+"DiMuonInfo"):
+        setattr(process, tpp+"DiMuonInfo", nearbyMuonsInfo.clone(src = treeProducer.tagProbePairs))
+        sequence.replace(getattr(process,tpp), getattr(process,tpp) + getattr(process, tpp+"DiMuonInfo"))
+    if not hasattr(treeProducer, 'pairVariables'):
+        treeProducer.pairVariables = cms.PSet()
+        treeProducer.pairFlags     = cms.PSet()
+    treeProducer.pairVariables.dphiVtxTimesQ = cms.InputTag(tpp+"DiMuonInfo", "dphiVtxTimesQ")
+    treeProducer.pairVariables.drM2          = cms.InputTag(tpp+"DiMuonInfo", "drM2")
+    treeProducer.pairVariables.dphiM2        = cms.InputTag(tpp+"DiMuonInfo", "dphiM2")
+    treeProducer.pairVariables.distM2        = cms.InputTag(tpp+"DiMuonInfo", "distM2")
+    treeProducer.pairVariables.drStaIn       = cms.InputTag(tpp+"DiMuonInfo", "drStaIn")
+    treeProducer.pairVariables.dphiStaIn     = cms.InputTag(tpp+"DiMuonInfo", "dphiStaIn")
