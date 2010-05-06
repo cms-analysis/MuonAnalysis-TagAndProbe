@@ -31,9 +31,27 @@ goodTracks = cms.EDFilter("TrackSelector",
     cut = cms.string(ptMinCut),
 )
 
+## ==== Slim PAT jets, for B analysis that need dr(mu,jet) ====
+from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import patJetCorrFactors
+from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import patJets as ak5CaloJetsPAT
+patJetCorrFactors.corrSample = "Summer09_7TeV_ReReco332" ## << TO BE IMPROVED
+patJetCorrFactors.corrLevels.L5Flavor = 'none' # save space
+patJetCorrFactors.corrLevels.L7Parton = 'none' # save space
+ak5CaloJetsPAT.addBTagInfo         = False # save
+ak5CaloJetsPAT.addAssociatedTracks = False # more
+ak5CaloJetsPAT.addJetCharge        = False # space
+ak5CaloJetsPAT.addGenPartonMatch = False # save space
+ak5CaloJetsPAT.addGenJetMatch    = False # and not
+ak5CaloJetsPAT.getJetMCFlavour   = False # in data
+patJets = cms.EDFilter("PATJetSelector",
+    src = cms.InputTag("ak5CaloJetsPAT"),
+    cut = cms.string("pt > 20 && abs(eta) < 3 && (emEnergyFraction() > 0.01 && jetID.n90Hits > 1 && jetID.fHPD < 0.98)"),
+)
+
 slimAOD = cms.Sequence(
     genMuons +
-    goodTracks 
+    goodTracks +
+    (patJetCorrFactors * ak5CaloJetsPAT) * patJets
 )
 
 
@@ -180,6 +198,7 @@ jpsiSkimOut = cms.OutputModule("PoolOutputModule",
         "keep l1extraL1MuonParticles_l1extraParticles_*_*",  ## if we ever want to do L1 efficiency too ## <<--- Not in 3.1.X AODSIM
         "keep *_offlinePrimaryVertices__*",                  ## vertices and BS are not very useful on MC
         "keep *_offlineBeamSpot__*",                         ## but they can be important on data
+        "keep patJets_patJets__*",                           ## for inclusive B and for top backgrounds
        #"keep *_jpsiMu_*_Skim", "keep *_jpsiTk_*_Skim", "keep *_jpsiSta_*_Skim",                       ## <<--- keep these for monitoring
     ),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring(

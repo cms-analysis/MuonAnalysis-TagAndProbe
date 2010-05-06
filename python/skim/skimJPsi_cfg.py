@@ -153,15 +153,21 @@ process.schedule = cms.Schedule(
 import sys
 args = sys.argv[1:]
 if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
-#test = "Summer09_Signal"
-test = "OniaTrigger"
+test = "Spring10_Signal"
+#test = "OniaTrigger"
 #del process.jpsiSkimOut.SelectEvents ## keep all events
 
 if len(args) > 0:
     test = args[0]
     print "Will run test '%s'" % (test,)
-
-if test == "Summer09_Signal":
+if test == "Spring10_Signal":
+    process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/jpsi/BpToJPsiMuMu_Spring10_START3X_V26_S09_GEN-SIM-RECO_0003_E477AF59-764D-DF11-9839-002618943902.root' ]
+    process.jpsiSkimOut.fileName = 'JPsiMuMu_skimJPsi_Spring10.root'
+elif test == "Summer10ReDigi_ppMuX":
+    Spring10ReDigi_Trigger(process)
+    process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/jpsi/ppMuX_Spring10_REDIGI_START3X_V26_S09_GEN-SIM-RECO_C0AC7DEB-8144-DF11-A1E1-00304867D838.root' ]  
+    process.jpsiSkimOut.fileName = 'ppMuX_skimJPsi_Spring10.root'
+elif test == "Summer09_Signal":
     Summer09_Trigger(process)
     process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/mc/7TeV/Summer09/JPsiMuMu_AODSIM_72B0D83F-908B-DE11-9A88-001D09646131.root' ]
     process.jpsiSkimOut.fileName = 'JPsiMuMu_skimJPsi_Summmer09.root'
