@@ -49,11 +49,34 @@ betterTracks = cms.EDFilter("TrackSelector",
     src = cms.InputTag("goodTracks"),
     cut = cms.string(TRACK_CUTS.replace("track.","")), # this is a Track object, so I have to remove the 'track.'
 )
-tkTracks  = cms.EDProducer("ConcreteChargedCandidateProducer", 
-    src  = cms.InputTag("betterTracks"),      
+tkTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
+    src = cms.InputTag("betterTracks"),      
     particleType = cms.string("mu+"),
 ) 
 
+##    ____  _                  _    _    _                  
+##   / ___|| |_ __ _ _ __   __| |  / \  | | ___  _ __   ___ 
+##   \___ \| __/ _` | '_ \ / _` | / _ \ | |/ _ \| '_ \ / _ \
+##    ___) | || (_| | | | | (_| |/ ___ \| | (_) | | | |  __/
+##   |____/ \__\__,_|_| |_|\__,_/_/   \_\_|\___/|_| |_|\___|
+##                                 
+staOneValidHit = cms.EDProducer("TrackSelector",
+    src = cms.InputTag("standAloneMuons","UpdatedAtVtx"), 
+    cut = cms.string("numberOfValidHits > 0"),
+)
+staTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
+    src = cms.InputTag("standAloneMuons","UpdatedAtVtx"), 
+    particleType = cms.string("mu+"),
+)
+staTracksValidHits = staTracks.clone(src = "staOneValidHit")
+                         
+##    _____               _        
+##   |_   _| __ __ _  ___| | _____ 
+##     | || '__/ _` |/ __| |/ / __|
+##     | || | | (_| | (__|   <\__ \
+##     |_||_|  \__,_|\___|_|\_\___/
+##                                 
+##   
 ##    __  __  ____   __  __       _       _               
 ##   |  \/  |/ ___| |  \/  | __ _| |_ ___| |__   ___  ___ 
 ##   | |\/| | |     | |\/| |/ _` | __/ __| '_ \ / _ \/ __|
@@ -94,8 +117,13 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
         eta = cms.string("eta"),
      ),
     tagFlags = cms.PSet(
-        HLTMu3         = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
         L1SingleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty()"),
+        L1DoubleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
+        HLTMu0L1MuOpen = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
+        HLTMu3L1MuOpen = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
+        HLTMu3         = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
+        HLTMu0Tk       = cms.string("!triggerObjectMatchesByFilter('hltMu0TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
+        HLTMu3Tk       = cms.string("!triggerObjectMatchesByFilter('hltMu3TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
     ),
     ## MC-related info
     isMC = cms.bool(True),
@@ -111,6 +139,8 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
 
 tnpCommonSequence = cms.Sequence(
     betterTracks * tkTracks +
+    staTracks   +
+    staOneValidHit * staTracksValidHits +
     tagMuons1Mu + 
     tagMuons2Mu + 
     muMcMatch 
@@ -131,3 +161,10 @@ def addDiMuonSeparationVariables(process, sequence, treeProducer):
     treeProducer.pairVariables.distM2        = cms.InputTag(tpp+"DiMuonInfo", "distM2")
     treeProducer.pairVariables.drStaIn       = cms.InputTag(tpp+"DiMuonInfo", "drStaIn")
     treeProducer.pairVariables.dphiStaIn     = cms.InputTag(tpp+"DiMuonInfo", "dphiStaIn")
+
+def allTPTreeProducers(process):
+    for K in process.analyzers_().keys():
+        V = getattr(process,K) # ; print K, V.type_()
+        if V.type_() == "TagProbeFitTreeProducer":
+            yield (K,V)
+

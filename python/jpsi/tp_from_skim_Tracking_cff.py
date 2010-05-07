@@ -9,10 +9,6 @@ from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
 ##   |____/ \__\__,_|_| |_|\__,_/_/   \_\_|\___/|_| |_|\___| |_|   |_|  \___/|_.__/ \___||___/
 ##                                                                                            
 ##   
-staTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
-    src  = cms.InputTag("standAloneMuons","UpdatedAtVtx"), 
-    particleType = cms.string("mu+"),
-)
 staProbes = cms.EDProducer("CandViewRefSelector",
     src = cms.InputTag("staTracks"),
     cut = cms.string(PT_ETA_CUTS),
@@ -83,7 +79,8 @@ allMcMatchesTracking = cms.Sequence(staMcMatch)
 histoTracking = tnpTreeProducer.clone(
     tagProbePairs = cms.InputTag("tpGlbSta"),
     flags = cms.PSet(
-        passing = cms.InputTag('staPassingTk')
+        passing      = cms.InputTag('staPassingTk'),
+        hasValidHits = cms.string('track.numberOfValidHits > 0'),
     ),
     # MC Matching configurables
     probeMatches  = cms.InputTag("staMcMatch"),
