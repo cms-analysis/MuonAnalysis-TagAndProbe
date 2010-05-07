@@ -10,6 +10,8 @@ process.source = cms.Source("PoolSource",
     fileNames = cms.untracked.vstring(
         'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/DATA/DATA_skimJPsiLoose_fromApr20MuonSkim-v2.root',
         'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/DATA/DATA_skimJPsiLoose_fromMuonSkimV9_upToApr28-v2.root',
+        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/DATA_skimJPsiLoose_fromApr20MuonSkim-v2.root',
+        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/DATA_skimJPsiLoose_fromMuonSkimV9_upToApr28-v2.root',
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -36,19 +38,18 @@ process.tagAndProbe = cms.Path(
       process.tnpSequenceTrigger   )
 )
 
+from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
+
 ## Remove all MC matcher modules from the sequence
 for K in process.filters_().keys() + process.producers_().keys():
     V = getattr(process,K) #; print K, V.type_()
     if V.type_() == "MCTruthDeltaRMatcherNew":
         process.tagAndProbe.remove(V)
+
 ## Set 'isMC' to False in all T&P tree producers
-for K in process.analyzers_().keys():
-    V = getattr(process,K) # ; print K, V.type_()
-    if V.type_() == "TagProbeFitTreeProducer":
-        getattr(process,K).isMC = False
+for K,V in allTPTreeProducers(process): V.isMC = False
 
 ## Redefine the tags requiring only L1SingleMuOpen
-from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
 process.tagMuons1Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
 process.tagMuons2Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
 
