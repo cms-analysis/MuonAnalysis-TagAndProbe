@@ -215,6 +215,10 @@ def Summer09_Trigger(process):
     ## Remove matches to l1Extra which is not in 3.1.X samples and that we woudln't use anyway
     for n in process.patTrigger.parameters_(): 
         if n.startswith("l1Extra"): delattr(process.patTrigger, n)
+    process.jpsiSkimOut.outputCommands += [
+        "drop edmTriggerResults_*_*_HLT",       ## to know what got us on tape
+        "keep edmTriggerResults_*_*_HLT8E29",   ## to know what got us on tape
+    ]
 
 def Spring10ReDigi_Trigger(process):
     process.patTrigger.processName = 'REDIGI'
@@ -225,4 +229,8 @@ def Spring10ReDigi_Trigger(process):
     ## Remove matches to l1Extra which is not in 3.1.X samples and that we woudln't use anyway
     for n in process.patTrigger.parameters_():
         if n.startswith("l1Extra"): delattr(process.patTrigger, n)
+    process.jpsiSkimOut.outputCommands += [
+        "drop edmTriggerResults_*_*_HLT",       ## to know what got us on tape
+        "keep edmTriggerResults_*_*_REDIGI",   ## to know what got us on tape
+    ]
 
