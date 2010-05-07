@@ -47,6 +47,11 @@ muonsGlb = cms.EDFilter("PATMuonRefSelector",
 )
 muonsTM = muonsGlb.clone(cut = PASSING_TM_CUT)
 
+muonsPOGGlb    = muonsGlb.clone(cut = "isGlobalMuon")
+muonsPOGGlbPT  = muonsGlb.clone(cut = "isGlobalMuon && muonID('GlobalMuonPromptTight')")
+muonsPOGTMA    = muonsGlb.clone(cut = "isTrackerMuon && muonID('TrackerMuonArbitrated')")
+muonsPOGTMLSAT = muonsGlb.clone(cut = "isTrackerMuon && muonID('TMLastStationAngTight')")
+
 tkToGlbMatch = cms.EDProducer("MatcherUsingTracks",
     src     = cms.InputTag("tkTracks"), # all tracks are available for matching
     matched = cms.InputTag("muonsGlb"), # to all global muons
@@ -67,13 +72,43 @@ tkPassingGlb = cms.EDProducer("MatchedCandidateSelector",
 tkToTMMatch = tkToGlbMatch.clone(matched = 'muonsTM')
 tkPassingTM = tkPassingGlb.clone( match = 'tkToTMMatch')
 
+tkToStaMatch = tkToGlbMatch.clone(
+    maxDeltaR        = cms.double(1.),   # large range in DR
+    maxDeltaEta      = cms.double(0.4),  # small in eta, which is more precise
+    maxDeltaLocalPos = cms.double(100),
+    maxDeltaPtRel    = cms.double(5),
+)
+
+tkToPOGGlbMatch    = tkToGlbMatch.clone(matched = 'muonsPOGGlb')
+tkToPOGGlbPTMatch  = tkToGlbMatch.clone(matched = 'muonsPOGGlbPT')
+tkToPOGTMAMatch    = tkToGlbMatch.clone(matched = 'muonsPOGTMA')
+tkToPOGTMLSATMatch = tkToGlbMatch.clone(matched = 'muonsPOGTMLSAT')
+tkToPOGStaMatch    = tkToStaMatch.clone(matched = 'staTracks')
+tkToPOGStaVHMatch  = tkToStaMatch.clone(matched = 'staTracksValidHits')
+tkPassingPOGGlb    = tkPassingGlb.clone(match = 'tkToPOGGlbMatch')
+tkPassingPOGGlbPT  = tkPassingGlb.clone(match = 'tkToPOGGlbPTMatch')
+tkPassingPOGSta    = tkPassingGlb.clone(match = 'tkToPOGStaMatch')
+tkPassingPOGStaVH  = tkPassingGlb.clone(match = 'tkToPOGStaVHMatch')
+tkPassingPOGTMA    = tkPassingGlb.clone(match = 'tkToPOGTMAMatch')
+tkPassingPOGTMLSAT = tkPassingGlb.clone(match = 'tkToPOGTMLSATMatch')
+
 tkPassingProbes = cms.Sequence(
     muonsGlb * tkToGlbMatch * tkPassingGlb +
     muonsTM  * tkToTMMatch  * tkPassingTM 
 )
+tkPassingProbesPOG = cms.Sequence(
+    muonsPOGGlb    * tkToPOGGlbMatch    * tkPassingPOGGlb    +
+    muonsPOGGlbPT  * tkToPOGGlbPTMatch  * tkPassingPOGGlbPT  +
+    muonsPOGTMA    * tkToPOGTMAMatch    * tkPassingPOGTMA    +
+    muonsPOGTMLSAT * tkToPOGTMLSATMatch * tkPassingPOGTMLSAT +
+                     tkToPOGStaMatch    * tkPassingPOGSta    +
+                     tkToPOGStaVHMatch  * tkPassingPOGStaVH
+)
+
 
 allPassingProbesMuonID = cms.Sequence(
-    tkPassingProbes
+    tkPassingProbes    +
+    tkPassingProbesPOG
 )
 ##    _____ ___   ____    ____       _          
 ##   |_   _( _ ) |  _ \  |  _ \ __ _(_)_ __ ___ 
@@ -131,6 +166,12 @@ histoMuFromTk = tnpTreeProducer.clone(
     flags = cms.PSet(
         Glb = cms.InputTag("tkPassingGlb"),
         TM  = cms.InputTag("tkPassingTM"),
+        POG_Glb    = cms.InputTag("tkPassingPOGGlb"),
+        POG_GlbPT  = cms.InputTag("tkPassingPOGGlbPT"),
+        POG_Sta    = cms.InputTag("tkPassingPOGSta"),
+        POG_StaVH  = cms.InputTag("tkPassingPOGStaVH"),
+        POG_TMA    = cms.InputTag("tkPassingPOGTMA"),
+        POG_TMLSAT = cms.InputTag("tkPassingPOGTMLSAT"),
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("tkMcMatch"),
@@ -145,6 +186,10 @@ histoMuFromCal = tnpTreeProducer.clone(
     flags = cms.PSet(
         Glb = cms.string(PASSING_GLB_CUT),
         TM  = cms.string(PASSING_TM_CUT),
+        POG_Glb    = cms.string("isGlobalMuon"),
+        POG_GlbPT  = cms.string("isGlobalMuon  && muonID('GlobalMuonPromptTight')"),
+        POG_TMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
+        POG_TMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("muMcMatch"),
@@ -159,6 +204,12 @@ histoMuFromTkVtx = tnpTreeProducer.clone(
     flags = cms.PSet(
         Glb = cms.InputTag("tkPassingGlb"),
         TM  = cms.InputTag("tkPassingTM"),
+        POG_Glb    = cms.InputTag("tkPassingPOGGlb"),
+        POG_GlbPT  = cms.InputTag("tkPassingPOGGlbPT"),
+        POG_Sta    = cms.InputTag("tkPassingPOGSta"),
+        POG_StaVH  = cms.InputTag("tkPassingPOGStaVH"),
+        POG_TMA    = cms.InputTag("tkPassingPOGTMA"),
+        POG_TMLSAT = cms.InputTag("tkPassingPOGTMLSAT"),
     ),
     # chi2 of constrained fit (-1 if it failed)
     pairVariables = cms.PSet(vtxChi2 = cms.string("vertexChi2")),
@@ -176,6 +227,10 @@ histoMuFromCalVtx = tnpTreeProducer.clone(
     flags = cms.PSet(
         Glb = cms.string(PASSING_GLB_CUT),
         TM  = cms.string(PASSING_TM_CUT),
+        POG_Glb    = cms.string("isGlobalMuon"),
+        POG_GlbPT  = cms.string("isGlobalMuon  && muonID('GlobalMuonPromptTight')"),
+        POG_TMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
+        POG_TMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
     ),
     # chi2 of constrained fit (-1 if it failed)
     pairVariables = cms.PSet(vtxChi2 = cms.string("vertexChi2")),
