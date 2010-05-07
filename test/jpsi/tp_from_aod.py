@@ -48,6 +48,8 @@ process.tagAndProbe = cms.Path(
       process.tnpSequenceTrigger   )
 )
 
+from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import addDiMuonSeparationVariables
+addDiMuonSeparationVariables(process, process.tnpSequenceMuonID, process.histoMuFromTk)
 
 ## Now, if this is unskimmed then we can turn on muon efficiencies
 process.histoMuFromTk.makeMCUnbiasTree  = True
