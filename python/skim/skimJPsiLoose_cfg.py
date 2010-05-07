@@ -25,5 +25,5 @@ process.jpsiSta.cut = "2 < mass < 20"
 #process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/mc/900GeV/ppMuXLoose_STARTUP3X_V8I_RECO/F83A17E0-9AEB-DE11-844A-00E08178C015.root' ]
 process.source.fileNames =['root://pcmssd12.cern.ch//data/gpetrucc/7TeV/jpsi/BpToJPsiMuMu_Spring10_START3X_V26_S09_GEN-SIM-RECO_0003_E477AF59-764D-DF11-9839-002618943902.root']
 #
-process.jpsiSkimOut.fileName = "skimJPsiLoose_ppxMuXLoose900GeV.root"
+process.jpsiSkimOut.fileName = "skimJPsiLoose_Spring10.root"
 
