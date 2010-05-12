@@ -49,6 +49,10 @@ for K in process.filters_().keys() + process.producers_().keys():
 ## Set 'isMC' to False in all T&P tree producers
 for K,V in allTPTreeProducers(process): V.isMC = False
 
+## Add Run and LS info in each tree entry
+for K,V in allTPTreeProducers(process): 
+    V.addRunLumiInfo = cms.bool(True)
+
 ## Redefine the tags requiring only L1SingleMuOpen
 process.tagMuons1Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
 process.tagMuons2Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
