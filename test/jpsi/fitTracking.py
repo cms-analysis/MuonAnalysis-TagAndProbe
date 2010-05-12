@@ -1,6 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-FILEPREFIX = "signal_"
+#FILEPREFIX = "signal_"
+FILEPREFIX = "withbg_"
 CONSTRAINTS = cms.PSet(
     hasValidHits = cms.vstring("pass"),
     tag_HLTMu3   = cms.vstring("pass"),
@@ -60,12 +61,14 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
 process.TnP_Tracking = Template.clone(
     InputFileNames = cms.vstring(
-        "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
-        #"tnpJPsi_ppMuX_Spring10_0.1pb.root"
+        #"tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
+        "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
+        "tnpJPsi_ppMuX_Spring10_0.1pb.root"
     ),
     InputDirectoryName = cms.string("histoTracking"),
     InputTreeName = cms.string("fitter_tree"),
-    OutputFileName = cms.string(FILEPREFIX+"TnP_Tracking_0.5pb.root"),
+    #OutputFileName = cms.string(FILEPREFIX+"TnP_Tracking_0.5pb.root"),
+    OutputFileName = cms.string(FILEPREFIX+"TnP_Tracking_0.1pb.root"),
     Efficiencies = cms.PSet(
         pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passing","pass"),
@@ -95,6 +98,21 @@ process.TnP_Tracking = Template.clone(
         ),
     )
 )
+
+if True:
+    process.TnP_Tracking.InputFileNames = [ "tnpJPsi_Data.root" ]
+    process.TnP_Tracking.OutputFileName = "data_TnP_Tracking_1nb.root"
+    process.TnP_Tracking.Efficiencies = cms.PSet(
+        eff = cms.PSet(
+            EfficiencyCategoryAndState = cms.vstring("passing","pass"),
+            UnbinnedVariables = cms.vstring("mass"),
+            BinnedVariables = cms.PSet(
+                pt = cms.vdouble(2,4.5,20),
+                hasValidHits = cms.vstring("pass"),
+            ),
+            BinToPDFmap = cms.vstring("gaussPlusCubic")
+        )
+    )
 
 process.p = cms.Path(
     process.TnP_Tracking
