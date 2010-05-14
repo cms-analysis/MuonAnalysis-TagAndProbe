@@ -25,7 +25,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     SaveWorkspace = cms.bool(False),
 
     Variables = cms.PSet(
-        mass = cms.vstring("Tag-Probe Mass", "2.0", "4.3", "GeV/c^{2}"),
+        mass = cms.vstring("Tag-Probe Mass", "2.8", "3.5", "GeV/c^{2}"),
         pt = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
         p = cms.vstring("Probe p", "0", "1000", "GeV/c"),
         eta = cms.vstring("Probe #eta", "-2.5", "2.5", ""),
@@ -43,7 +43,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     PDFs = cms.PSet(
         gaussPlusExpo = cms.vstring(
-            "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.2,0.05,0.5])",
+            "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.05,0.005,0.1])",
             "Exponential::backgroundPass(mass, lp[0,-1,1])",
             "Exponential::backgroundFail(mass, lp)",  # same slope, they're both muons
             #"Exponential::backgroundFail(mass, lf[0,-1,1])",
@@ -55,14 +55,14 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
 process.TnP_Trigger = Template.clone(
     InputFileNames = cms.vstring(
-        #"tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
-        "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
+        "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
+        #"tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
         #"tnpJPsi_ppMuX_Spring10_0.1pb.root"
     ),
     InputDirectoryName = cms.string("histoTrigger"),
     InputTreeName = cms.string("fitter_tree"),
-    #OutputFileName = cms.string(FILEPREFIX+"TnP_Trigger_0.5pb.root"),
-    OutputFileName = cms.string(FILEPREFIX+"TnP_Trigger_0.1pb.root"),
+    OutputFileName = cms.string(FILEPREFIX+"TnP_Trigger_0.5pb.root"),
+    #OutputFileName = cms.string(FILEPREFIX+"TnP_Trigger_0.1pb.root"),
     Efficiencies = cms.PSet(),
 )
 
@@ -81,7 +81,7 @@ for T in [ "HLTMu3", "L1DiMuOpen" ]:
             )
     ))
     
-if False:
+if True:
     process.TnP_Trigger.InputFileNames = [ "tnpJPsi_Data.root" ]
     process.TnP_Trigger.OutputFileName = "data_TnP_Trigger_1nb.root"
     process.TnP_Trigger.Efficiencies = cms.PSet()
