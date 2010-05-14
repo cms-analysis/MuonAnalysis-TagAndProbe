@@ -102,12 +102,14 @@ process.TnP_Tracking = Template.clone(
 if True:
     process.TnP_Tracking.InputFileNames = [ "tnpJPsi_Data.root" ]
     process.TnP_Tracking.OutputFileName = "data_TnP_Tracking_1nb.root"
+    process.TnP_Tracking.Variables.tag_pt[1] = "0.0"; # don't cut on tag pt
     process.TnP_Tracking.Efficiencies = cms.PSet(
         eff = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passing","pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = cms.PSet(
-                pt = cms.vdouble(2,4.5,20),
+                pt  = cms.vdouble(3,20),
+                eta = cms.vdouble(-2.5,2.5),
                 hasValidHits = cms.vstring("pass"),
             ),
             BinToPDFmap = cms.vstring("gaussPlusCubic")
