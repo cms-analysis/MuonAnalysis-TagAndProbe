@@ -11,8 +11,6 @@ process.jpsiSkimOut.fileName = "skimJPsiLoose_Data.root"
 process.globalReplace('collisionFilter', process.collisionFilterData)
 
 # Take away MC-related stuff matching
-from HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cff import onia2MuMu_isNotMC
-onia2MuMu_isNotMC(process)
 process.slimAOD.remove(process.genMuons)
 
 #### Discard immediately events which don't have a global muon.
