@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPAT.cc,v 1.3 2010/03/22 19:25:16 jjhollar Exp $
+// $Id: MuTestPAT.cc,v 1.4 2010/03/26 08:00:18 jjhollar Exp $
 //
 //
 
@@ -131,9 +131,9 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  
 	  std::string effname = algonames[i];
 	  // Fill asymmetric errors
-	  myMuon.setEfficiency(effname, pat::LookupTableRecord(myeff, myefferr, myefferr, myefferr, 0));
+	  //      myMuon.setEfficiency(effname, pat::LookupTableRecord(myeff, myefferr, myefferr, myefferr, 0));
 	  // Fill only symmetric errors
-	  //	  myMuon.setEfficiency(effname, pat::LookupTableRecord(myeff, myefferr, 0));
+	  	  myMuon.setEfficiency(effname, pat::LookupTableRecord(myeff, myefferr, 0));
 	  cout << "\tPAT muon efficiency " 
 	       << (myMuon.efficiency(effname)).value() << " +- " 
                << (myMuon.efficiency(effname)).error() << " ("
