@@ -1,16 +1,23 @@
 import FWCore.ParameterSet.Config as cms
 
-FILEPREFIX = "signal_"
-#FILEPREFIX = "withbg_"
+import sys
+args = sys.argv[1:]
+if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
+scenario = "signal_0.1pb"
+if len(args) > 0: scenario = args[0]
+print "Will run scenario ", scenario 
+
 CONSTRAINTS = cms.PSet(
     Glb        = cms.vstring("true"),
     tag_HLTMu3 = cms.vstring("pass"),
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
-    pt = cms.vdouble( 2, 3, 4.5, 6, 20),
+    pt = cms.vdouble( 2, 3, 4.5, 6, 12),
     eta = cms.vdouble(-2.1, -1.1, 1.1, 2.1)
 )
+if scenario == "signal_0.5pb":
+    PT_ETA_BINS.pt = cms.vdouble( 2, 3, 4.5, 6, 10, 20)
 
 process = cms.Process("TagProbe")
 
@@ -43,7 +50,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     PDFs = cms.PSet(
         gaussPlusExpo = cms.vstring(
-            "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.05,0.005,0.1])",
+            "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.05,0.02,0.1])",
             "Exponential::backgroundPass(mass, lp[0,-1,1])",
             "Exponential::backgroundFail(mass, lp)",  # same slope, they're both muons
             #"Exponential::backgroundFail(mass, lf[0,-1,1])",
@@ -54,17 +61,20 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 process.TnP_Trigger = Template.clone(
-    InputFileNames = cms.vstring(
-        "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
-        #"tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
-        #"tnpJPsi_ppMuX_Spring10_0.1pb.root"
-    ),
+    InputFileNames = cms.vstring("tnpJPsi_JPsiMuMu_Spring10_0.1pb.root"),
     InputDirectoryName = cms.string("histoTrigger"),
     InputTreeName = cms.string("fitter_tree"),
-    OutputFileName = cms.string(FILEPREFIX+"TnP_Trigger_0.5pb.root"),
-    #OutputFileName = cms.string(FILEPREFIX+"TnP_Trigger_0.1pb.root"),
+    OutputFileName = cms.string("TnP_Trigger_%s.root" % scenario),
     Efficiencies = cms.PSet(),
 )
+if scenario == "all_0.1pb":
+    process.TnP_Trigger.InputFileNames = [ 
+        "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
+        "tnpJPsi_ppMuX_Spring10_0.1pb.root"
+    ]
+elif scenario == "signal_0.5pb":
+    process.TnP_Trigger.InputFileNames = [ "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root" ]
+  
 
 for T in [ "HLTMu3", "L1DiMuOpen" ]:
     setattr(process.TnP_Trigger.Efficiencies, T+"_pt_eta", cms.PSet(
@@ -81,9 +91,11 @@ for T in [ "HLTMu3", "L1DiMuOpen" ]:
             )
     ))
     
-if True:
-    process.TnP_Trigger.InputFileNames = [ "tnpJPsi_Data.root" ]
-    process.TnP_Trigger.OutputFileName = "data_TnP_Trigger_1nb.root"
+if scenario.startswith("data"):
+    if scenario == "data_all":
+        process.TnP_Trigger.InputFileNames = [ "tnpJPsi_Data.root" ]
+    elif scenario == "data_0.001pb":
+         process.TnP_Trigger.InputFileNames = [ "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_fromMay6th.root" ]
     process.TnP_Trigger.Efficiencies = cms.PSet()
     process.TnP_Trigger.Variables.tag_pt[1] = "0.0"; # don't cut on tag pt
     process.TnP_Trigger.Variables.run       = cms.vstring("Run number", "0", "9999999", "");
@@ -93,7 +105,7 @@ if True:
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = cms.PSet(
                 Glb = cms.vstring("true"),
-                pt  = cms.vdouble( 2, 3, 15 ),
+                pt  = cms.vdouble( 2, 3, 12 ),
                 eta = cms.vdouble(-2.1,-1.0,1.0, 2.1),
                 run = cms.vdouble(0,9999999),
             ),
@@ -113,6 +125,29 @@ if True:
         if T.find("HLT") != -1:
             getattr(process.TnP_Trigger.Efficiencies, T+"_pt_eta").BinnedVariables.run = cms.vdouble(133443,9999999)
             getattr(process.TnP_Trigger.Efficiencies, T+"_pt"    ).BinnedVariables.run = cms.vdouble(133443,9999999)
+        setattr(process.TnP_Trigger.Efficiencies, T+"_run", cms.PSet(
+            EfficiencyCategoryAndState = cms.vstring(T,"pass"),
+            UnbinnedVariables = cms.vstring("mass"),
+            BinnedVariables = cms.PSet(
+                Glb = cms.vstring("true"),
+                pt  = cms.vdouble( 3, 15),
+                eta = cms.vdouble(-2.1, 2.1),
+                run = cms.vdouble(132440,133443,13500,135200,135525,135536),
+            ),
+            BinToPDFmap = cms.vstring("gaussPlusExpo")
+        ))
+        setattr(process.TnP_Trigger.Efficiencies, T+"_run_eta", cms.PSet(
+            EfficiencyCategoryAndState = cms.vstring(T,"pass"),
+            UnbinnedVariables = cms.vstring("mass"),
+            BinnedVariables = cms.PSet(
+                Glb = cms.vstring("true"),
+                pt  = cms.vdouble( 3, 15),
+                eta = cms.vdouble(-2.1,-1.0,1.0, 2.1),
+                run = cms.vdouble(132440,133443,13500,135200,135525,135536),
+            ),
+            BinToPDFmap = cms.vstring("gaussPlusExpo")
+        ))
+
 
 
 process.p = cms.Path(

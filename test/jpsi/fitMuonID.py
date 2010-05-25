@@ -1,16 +1,23 @@
 import FWCore.ParameterSet.Config as cms
 
-FILEPREFIX = "signal_"
-#FILEPREFIX = "withbg_"
+import sys
+args = sys.argv[1:]
+if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
+scenario = "signal_0.1pb"
+if len(args) > 0: scenario = args[0]
+print "Will run scenario ", scenario 
+
 CONSTRAINTS = cms.PSet(
-    #Glb        = cms.vstring("true"),
     tag_HLTMu3 = cms.vstring("pass"),
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
-    pt = cms.vdouble( 2, 3, 4.5, 6, 20),
+    pt = cms.vdouble( 2, 3, 4.5, 6, 12),
     eta = cms.vdouble(-2.4, -1.1, 1.1, 2.4)
 )
+if scenario == "signal_0.5pb":
+    PT_ETA_BINS.pt = cms.vdouble( 2, 3, 4.5, 6, 10, 20)
+
 
 process = cms.Process("TagProbe")
 
@@ -53,17 +60,21 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 process.TnP_MuonID = Template.clone(
-    InputFileNames = cms.vstring(
-        "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
-        #"tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
-        #"tnpJPsi_ppMuX_Spring10_0.1pb.root"
-    ),
+    InputFileNames = cms.vstring("tnpJPsi_JPsiMuMu_Spring10_0.1pb.root"),
     InputDirectoryName = cms.string("histoMuFromTk"),
     InputTreeName = cms.string("fitter_tree"),
-    OutputFileName = cms.string(FILEPREFIX+"TnP_MuonID_0.5pb.root"),
-    #OutputFileName = cms.string(FILEPREFIX+"TnP_MuonID_0.1pb.root"),
+    OutputFileName = cms.string("TnP_MuonID_%s.root" % scenario),
     Efficiencies = cms.PSet(),
 )
+if scenario == "all_0.1pb":
+    process.TnP_MuonID.InputFileNames = [ 
+        "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
+        "tnpJPsi_ppMuX_Spring10_0.1pb.root"
+    ]
+elif scenario == "signal_0.5pb":
+    process.TnP_MuonID.InputFileNames = [ "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root" ]
+  
+
 
 for T in [ "POG_Glb", "POG_TMA", "POG_Sta" ]:
     setattr(process.TnP_MuonID.Efficiencies, T+"_pt_eta", cms.PSet(
@@ -79,19 +90,27 @@ for T in [ "POG_Glb", "POG_TMA", "POG_Sta" ]:
                 mcTrue = cms.vstring("true")
             )
     ))
-    
-if True:
-    process.TnP_MuonID.InputFileNames = [ "tnpJPsi_Data.root" ]
-    process.TnP_MuonID.OutputFileName = "data_TnP_MuonID_1nb.root"
+
+
+if scenario.startswith("data"):
+    if scenario == "data_all":
+        process.TnP_MuonID.InputFileNames = [ "tnpJPsi_Data.root" ]
+    elif scenario == "data_0.001pb":
+        process.TnP_MuonID.InputFileNames = [ "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_fromMay6th.root" ]
+        process.TnP_MuonID.Variables.tag_pt[1] = "0.0"; # cut on tag pt
+    elif scenario == "datalike_mc":
+        process.TnP_MuonID.InputFileNames = [
+            "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
+            "tnpJPsi_ppMuX_Spring10_0.1pb.root"
+        ]
     process.TnP_MuonID.Efficiencies = cms.PSet()
-    process.TnP_MuonID.Variables.tag_pt[1] = "0.0"; # cut on tag pt
     for T in [ "POG_Glb", "POG_TMA", "POG_Sta" ]:
         setattr(process.TnP_MuonID.Efficiencies, T+"_pt_eta", cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(T,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = cms.PSet(
-                pt  = cms.vdouble( 2, 3.5, 15 ),
-                eta = cms.vdouble(-2.4, -1.1, 1.1, 2.4),
+                pt  = cms.vdouble( 2, 3, 5, 12 ),
+                eta = cms.vdouble(-2.4, -1.0, 1.0, 2.4),
             ),
             BinToPDFmap = cms.vstring("gaussPlusExpo")
         ))
@@ -99,14 +118,19 @@ if True:
             EfficiencyCategoryAndState = cms.vstring(T,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = cms.PSet(
-                pt  = cms.vdouble( 2, 3.5, 15 ),
+                pt  = cms.vdouble( 2, 3, 5, 12 ),
                 eta = cms.vdouble(-2.4, 2.4),
             ),
             BinToPDFmap = cms.vstring("gaussPlusExpo")
         ))
 
 
+process.TnP_MuonID_fromCalo = process.TnP_MuonID.clone(
+    InputDirectoryName = "histoMuFromCal",
+    OutputFileName = "TnP_MuonID_fromCalo_%s.root" % scenario
+)
 process.p = cms.Path(
-    process.TnP_MuonID
+    process.TnP_MuonID +
+    process.TnP_MuonID_fromCalo
 )
 

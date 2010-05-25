@@ -1,5 +1,6 @@
 //TString prefix = "plots/trigger/signal_0.1pb/";
 TString prefix = "plots/trigger/all_0.1pb/";
+bool includeCounting = true;
 
 TCanvas *c1 = new TCanvas("c1","c1");
 void plotTrigger(TString scenario, int mc=1) {
@@ -24,6 +25,8 @@ void plotTriggerData() {
 
         TDirectory *fit_pt = gFile->GetDirectory("histoTrigger/"+trigname+"_pt/");
         TDirectory *fit_pt_eta = gFile->GetDirectory("histoTrigger/"+trigname+"_pt_eta/");
+        TDirectory *fit_run = gFile->GetDirectory("histoTrigger/"+trigname+"_run/");
+        TDirectory *fit_run_eta = gFile->GetDirectory("histoTrigger/"+trigname+"_run_eta/");
 
         single(fit_pt, trigname+"_pt_all", "pt_plot__eta_bin0__run_bin0__Glb_true");
 
@@ -31,7 +34,12 @@ void plotTriggerData() {
         single(fit_pt_eta, trigname+"_pt_ec_neg", "pt_plot__eta_bin0__run_bin0__Glb_true");
         single(fit_pt_eta, trigname+"_pt_ec_pos", "pt_plot__eta_bin2__run_bin0__Glb_true");
         single(fit_pt_eta, trigname+"_eta_pt2_3",  "eta_plot__pt_bin0__run_bin0__Glb_true");
-        single(fit_pt_eta, trigname+"_eta_pt3_15", "eta_plot__pt_bin1__run_bin0__Glb_true");
+        single(fit_pt_eta, trigname+"_eta_pt3_12", "eta_plot__pt_bin1__run_bin0__Glb_true");
+
+        single(fit_run, trigname+"_run_pt3", "run_plot__eta_bin0__pt_bin0__Glb_true");
+        single(fit_run_eta, trigname+"_run_barrel_pt3", "run_plot__eta_bin1__pt_bin0__Glb_true");
+        single(fit_run_eta, trigname+"_run_ec_neg_pt3", "run_plot__eta_bin0__pt_bin0__Glb_true");
+        single(fit_run_eta, trigname+"_run_ec_pos_pt3", "run_plot__eta_bin2__pt_bin0__Glb_true");
 
         doCanvas(fit_pt,      1, 2, trigname+"_pt_%d",  "eta_bin0__pt_bin%d__run_bin0__Glb_true__gaussPlusExpo");
         doCanvas(fit_pt_eta,  3, 2, trigname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__run_bin0__Glb_true__gaussPlusExpo");
@@ -54,9 +62,14 @@ void plotTriggerMC() {
         stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt2_3",   "eta_plot__pt_bin0__Glb_true__mcTrue_true__tag_HLTMu3_pass");
         stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt3_4.5", "eta_plot__pt_bin1__Glb_true__mcTrue_true__tag_HLTMu3_pass");
         stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt4.5_6", "eta_plot__pt_bin2__Glb_true__mcTrue_true__tag_HLTMu3_pass");
-        stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt6_20",  "eta_plot__pt_bin3__Glb_true__mcTrue_true__tag_HLTMu3_pass");
-
-        doCanvas(fit_pt_eta,  3, 4, trigname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__Glb_true__tag_HLTMu3_pass__gaussPlusExpo");
+        if (strstr(prefix.Data(), "signal_0.5pb")) {
+            stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt6_10",   "eta_plot__pt_bin3__Glb_true__mcTrue_true__tag_HLTMu3_pass");
+            stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt10_20",  "eta_plot__pt_bin4__Glb_true__mcTrue_true__tag_HLTMu3_pass");
+            doCanvas(fit_pt_eta,  3, 5, trigname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__Glb_true__tag_HLTMu3_pass__gaussPlusExpo");
+        } else {
+            stack(mc_pt_eta, fit_pt_eta, trigname+"_eta_pt6_12",  "eta_plot__pt_bin3__Glb_true__mcTrue_true__tag_HLTMu3_pass");
+            doCanvas(fit_pt_eta,  3, 4, trigname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__Glb_true__tag_HLTMu3_pass__gaussPlusExpo");
+        }
     }
 }
 
@@ -97,17 +110,19 @@ void stack(TDirectory *mc, TDirectory *fit, TString alias, TString mcname) {
 }
 
 void single( TDirectory *fit, TString alias, TString fitname) {
-    /*
-    RooPlot *pcnt = (RooPlot *) fit->Get("cnt_eff_plots/"+fitname);
-    RooHist *hcnt = (RooHist *) pcnt->findObject("hxy_cnt_eff");
-    hcnt->SetLineWidth(2);
-    hcnt->SetLineColor(kBlue);
-    hcnt->SetMarkerColor(kBlue);
-    hcnt->SetMarkerStyle(21);
-    hcnt->SetMarkerSize(1.8);
-    pcnt->Draw();
-    pcnt->GetYaxis()->SetRangeUser(0.0, 1.08);
-    */
+    c1->cd(); c1->Clear();
+
+    if (includeCounting) {
+        RooPlot *pcnt = (RooPlot *) fit->Get("cnt_eff_plots/"+fitname);
+        RooHist *hcnt = (RooHist *) pcnt->findObject("hxy_cnt_eff");
+        hcnt->SetLineWidth(2);
+        hcnt->SetLineColor(kBlue);
+        hcnt->SetMarkerColor(kBlue);
+        hcnt->SetMarkerStyle(21);
+        hcnt->SetMarkerSize(1.8);
+        pcnt->Draw();
+        pcnt->GetYaxis()->SetRangeUser(0.0, 1.08);
+    }
 
     RooPlot *pfit = (RooPlot *) fit->Get("fit_eff_plots/"+fitname);
     RooHist *hfit = (RooHist *) pfit->findObject("hxy_fit_eff");
@@ -116,9 +131,12 @@ void single( TDirectory *fit, TString alias, TString fitname) {
     hfit->SetMarkerColor(kBlack);
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
-    //pfit->Draw("SAME");
-    pfit->Draw();
-    pfit->GetYaxis()->SetRangeUser(0.0, 1.08);
+    if (includeCounting) {
+        pfit->Draw("SAME");
+    } else {
+        pfit->Draw();
+        pfit->GetYaxis()->SetRangeUser(0.0, 1.08);
+    }
 
     c1->Print(prefix+alias+".png");
 }

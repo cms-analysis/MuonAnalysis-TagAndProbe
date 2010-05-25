@@ -1,9 +1,10 @@
 //TString prefix = "plots/muonid/signal_0.1pb/";
-TString prefix = "FIXME";
+TString prefix = "plots/muonid/";
+TString basedir = "histoMuFromTk";
 
 TCanvas *c1 = new TCanvas("c1","c1");
 void plotMuonID(TString scenario, int mc=1) {
-    prefix = TString("plots/muonid/")+scenario+"/";
+    prefix = prefix+scenario+"/";
     gSystem->mkdir(prefix,true);
 
     gROOT->ProcessLine(".x ~/cpp/tdrstyle.cc");
@@ -22,8 +23,8 @@ void plotMuonIDData() {
     for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
 
-        TDirectory *fit_pt     = gFile->GetDirectory("histoMuFromTk/POG_"+idname+"_pt/");
-        TDirectory *fit_pt_eta = gFile->GetDirectory("histoMuFromTk/POG_"+idname+"_pt_eta/");
+        TDirectory *fit_pt     = gFile->GetDirectory(basedir+"/POG_"+idname+"_pt/");
+        TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/POG_"+idname+"_pt_eta/");
     
         single(fit_pt, idname+"_pt_all", "pt_plot__eta_bin0");
 
@@ -44,8 +45,8 @@ void plotMuonIDMC() {
     for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
 
-        TDirectory *mc_pt_eta  = gFile->GetDirectory("histoMuFromTk/POG_"+idname+"_pt_eta_mcTrue/");
-        TDirectory *fit_pt_eta = gFile->GetDirectory("histoMuFromTk/POG_"+idname+"_pt_eta/");
+        TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/POG_"+idname+"_pt_eta_mcTrue/");
+        TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/POG_"+idname+"_pt_eta/");
 
         stack(mc_pt_eta, fit_pt_eta, idname+"_pt_barrel", "pt_plot__eta_bin1__mcTrue_true__tag_HLTMu3_pass");
         stack(mc_pt_eta, fit_pt_eta, idname+"_pt_ec_neg", "pt_plot__eta_bin0__mcTrue_true__tag_HLTMu3_pass");
@@ -53,9 +54,15 @@ void plotMuonIDMC() {
         stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt2_3",   "eta_plot__pt_bin0__mcTrue_true__tag_HLTMu3_pass");
         stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt3_4.5", "eta_plot__pt_bin1__mcTrue_true__tag_HLTMu3_pass");
         stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt4.5_6", "eta_plot__pt_bin2__mcTrue_true__tag_HLTMu3_pass");
-        stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt6_20",  "eta_plot__pt_bin3__mcTrue_true__tag_HLTMu3_pass");
+        if (strstr(prefix.Data(), "signal_0.5pb")) {
+            stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt6_10",  "eta_plot__pt_bin3__mcTrue_true__tag_HLTMu3_pass");
+            stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt10_20",  "eta_plot__pt_bin4__mcTrue_true__tag_HLTMu3_pass");
+            doCanvas(fit_pt_eta,  3, 5,  idname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__tag_HLTMu3_pass__gaussPlusExpo");
+        } else {
+            stack(mc_pt_eta, fit_pt_eta, idname+"_eta_pt6_12",  "eta_plot__pt_bin3__mcTrue_true__tag_HLTMu3_pass");
+            doCanvas(fit_pt_eta,  3, 4,  idname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__tag_HLTMu3_pass__gaussPlusExpo");
+        }
 
-        doCanvas(fit_pt_eta,  3, 4,  idname+"_eta_pt_%d_%d",  "eta_bin%d__pt_bin%d__tag_HLTMu3_pass__gaussPlusExpo");
     }
 }
 

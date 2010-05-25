@@ -1,14 +1,20 @@
 import FWCore.ParameterSet.Config as cms
 
-#FILEPREFIX = "signal_"
-FILEPREFIX = "withbg_"
+import sys
+args = sys.argv[1:]
+if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
+scenario = "signal_0.1pb"
+if len(args) > 0: scenario = args[0]
+print "Will run scenario ", scenario 
+
+
 CONSTRAINTS = cms.PSet(
     hasValidHits = cms.vstring("pass"),
     tag_HLTMu3   = cms.vstring("pass"),
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
-    pt = cms.vdouble( 2, 4.5, 20),
+    pt = cms.vdouble( 2, 4.5, 15),
     eta = cms.vdouble(-2.5, -1.1, 1.1, 2.5)
 )
 ETA_PHI_BINS = cms.PSet(
@@ -45,7 +51,6 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         passing = cms.vstring("passing", "dummy[pass=1,fail=0]"),
         hasValidHits = cms.vstring("hasValidHits",  "dummy[pass=1,fail=0]"),
         tag_HLTMu3 = cms.vstring("tag_HLTMu3", "dummy[pass=1,fail=0]"),
-        #tag_L1DiMuOpen = cms.vstring("tag_L1DoubleMuOpen", "dummy[pass=1,fail=0]")
     ),
 
     PDFs = cms.PSet(
@@ -60,15 +65,10 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 process.TnP_Tracking = Template.clone(
-    InputFileNames = cms.vstring(
-        #"tnpJPsi_JPsiMuMu_Spring10_0.5pb.root",
-        "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
-        "tnpJPsi_ppMuX_Spring10_0.1pb.root"
-    ),
+    InputFileNames = cms.vstring("tnpJPsi_JPsiMuMu_Spring10_0.1pb.root"),
     InputDirectoryName = cms.string("histoTracking"),
     InputTreeName = cms.string("fitter_tree"),
-    #OutputFileName = cms.string(FILEPREFIX+"TnP_Tracking_0.5pb.root"),
-    OutputFileName = cms.string(FILEPREFIX+"TnP_Tracking_0.1pb.root"),
+    OutputFileName = cms.string("TnP_Tracking_%s.root" % scenario),
     Efficiencies = cms.PSet(
         pt_eta = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passing","pass"),
@@ -98,18 +98,39 @@ process.TnP_Tracking = Template.clone(
         ),
     )
 )
+if scenario == "all_0.1pb":
+    process.TnP_Tracking.InputFileNames = [ 
+        "tnpJPsi_JPsiMuMu_Spring10_0.1pb.root",
+        "tnpJPsi_ppMuX_Spring10_0.1pb.root"
+    ]
+elif scenario == "signal_0.5pb":
+    process.TnP_Tracking.InputFileNames = [ "tnpJPsi_JPsiMuMu_Spring10_0.5pb.root" ]
 
-if True:
-    process.TnP_Tracking.InputFileNames = [ "tnpJPsi_Data.root" ]
-    process.TnP_Tracking.OutputFileName = "data_TnP_Tracking_1nb.root"
+if scenario.startswith("data"):
+    if scenario == "data_all":
+        process.TnP_Tracking.InputFileNames = [ "tnpJPsi_Data.root" ]
+    elif scenario == "data_0.001pb":
+         process.TnP_Tracking.InputFileNames = [ "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_fromMay6th.root" ]
+    elif scenario == "datalike_mc":
+         process.TnP_Tracking.InputFileNames = [ "tnpJPsi_JPsiMuMu_Spring10_0.03pb.root", "tnpJPsi_ppMuX_Spring10_0.03pb.root" ]
     process.TnP_Tracking.Variables.tag_pt[1] = "0.0"; # don't cut on tag pt
     process.TnP_Tracking.Efficiencies = cms.PSet(
         eff = cms.PSet(
             EfficiencyCategoryAndState = cms.vstring("passing","pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = cms.PSet(
-                pt  = cms.vdouble(3,20),
+                pt  = cms.vdouble(3,15),
                 eta = cms.vdouble(-2.5,2.5),
+                hasValidHits = cms.vstring("pass"),
+            ),
+            BinToPDFmap = cms.vstring("gaussPlusCubic")
+        ),
+        eff_eta = cms.PSet(
+            EfficiencyCategoryAndState = cms.vstring("passing","pass"),
+            UnbinnedVariables = cms.vstring("mass"),
+            BinnedVariables = cms.PSet(
+                pt  = cms.vdouble(3,15),
+                eta = cms.vdouble(-2.5,-1.1,1.1,2.5),
                 hasValidHits = cms.vstring("pass"),
             ),
             BinToPDFmap = cms.vstring("gaussPlusCubic")

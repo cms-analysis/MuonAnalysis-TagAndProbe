@@ -18,11 +18,14 @@ void plotTracking(TString scenario, int mc=1) {
 }
 
 void plotTrackingData() {
-    TDirectory *fit_pt_eta = gFile->GetDirectory("histoTracking/eff");
+    TDirectory *fit     = gFile->GetDirectory("histoTracking/eff");
+    TDirectory *fit_eta = gFile->GetDirectory("histoTracking/eff_eta");
 
-    single(fit_pt_eta, "fit", "eta_plot__pt_bin0__hasValidHits_pass");
+    single(fit,     "fit",     "eta_plot__pt_bin0__hasValidHits_pass");
+    single(fit_eta, "fit_eta", "eta_plot__pt_bin0__hasValidHits_pass");
 
-    doCanvas(fit_pt_eta,  1, 1, "eff",  "eta_bin0__pt_bin0__hasValidHits_pass__gaussPlusCubic");
+    doCanvas(fit,      1, 1, "eff",         "eta_bin0__pt_bin0__hasValidHits_pass__gaussPlusCubic");
+    doCanvas(fit_eta,  3, 1, "eff_eta_%d",  "eta_bin%d__pt_bin0__hasValidHits_pass__gaussPlusCubic");
 }
 
 void plotTrackingMC() {
@@ -70,6 +73,7 @@ void stack(TDirectory *mc, TDirectory *fit, TString alias, TString mcname) {
 }
 
 void single( TDirectory *fit, TString alias, TString fitname) {
+    c1->cd(); c1->Clear();
     RooPlot *pfit = (RooPlot *) fit->Get("fit_eff_plots/"+fitname);
     RooHist *hfit = (RooHist *) pfit->findObject("hxy_fit_eff");
     hfit->SetLineWidth(2);
