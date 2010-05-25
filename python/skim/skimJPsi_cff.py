@@ -62,19 +62,33 @@ slimAOD = cms.Sequence(
 ##   |_|  |_|\__,_|_|\_\___| |_| /_/   \_\_|   |_|  |_|\__,_|\___/|_| |_|___/
 ##
 ##                                                                           
-##  We take them from Onia2MuMuPAT but we make a few changes
-##
-from HeavyFlavorAnalysis.Onia2MuMu.onia2MuMuPAT_cff import *
+## ==== Merge CaloMuons into the collection of reco::Muons  ====
+from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
+mergedMuons = cms.EDProducer("CaloMuonMerger",
+    muons     = cms.InputTag("muons"), 
+    caloMuons = cms.InputTag("calomuons"),
+    minCaloCompatibility = calomuons.minCaloCompatibility
+)
 
-## Trigger matches
-## put a PT cut on the muons
-patMuons.cut = ptMinCut;
-## use the genMuons as MC source, so that we keep them and have the correct mother refs
-muonMatch.matched = 'genMuons'
-## switch off genParticle embedding, as we keep the genMuons collection
+## ==== PAT Muons with trigger matching ====
+from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_8E29_cff import *
+## use merged collection
+patMuonsWithoutTrigger.muonSource = 'mergedMuons'
 ## also switch off standalone muon track embedding, as we keep it separately
-patMuonsWithoutTrigger.embedGenMatch = False
 patMuonsWithoutTrigger.embedStandAloneMuon = False
+## also add matching with with di-muon triggers
+patTriggerMatching.replace(patTriggerMatchers1Mu, patTriggerMatchers1Mu + patTriggerMatchers2Mu)
+patMuonsWithTrigger.matches += patTriggerMatchers2MuInputTags
+## finally make a collection of patMuons possibly applying some filter
+patMuons = cms.EDFilter("PATMuonSelector",
+    src = cms.InputTag("patMuonsWithTrigger"),
+    cut = cms.string(ptMinCut),
+)
+patMuonSequence = cms.Sequence(
+    mergedMuons *
+    patMuonsWithTriggerSequence *
+    patMuons
+)
 
 ##    __  __       _                _   _                                                 
 ##   |  \/  | __ _| | _____    ___ | |_| |__   ___ _ __   _ __ ___  _   _  ___  _ __  ___ 
@@ -208,29 +222,18 @@ jpsiSkimOut = cms.OutputModule("PoolOutputModule",
     )),
 )
 
-def Summer09_Trigger(process):
-    process.patTrigger.processName = 'HLT8E29'
-    if hasattr(process, 'filterHLT1Mu'): process.filterHLT1Mu.TriggerResultsTag = cms.InputTag('TriggerResults','','HLT8E29')
-    if hasattr(process, 'filterHLT2Mu'): process.filterHLT2Mu.TriggerResultsTag = cms.InputTag('TriggerResults','','HLT8E29')
-    ## Remove matches to l1Extra which is not in 3.1.X samples and that we woudln't use anyway
-    for n in process.patTrigger.parameters_(): 
-        if n.startswith("l1Extra"): delattr(process.patTrigger, n)
+def changeTriggerProcessName(process, triggerProcessName, oldProcessName="HLT"):
+    from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_8E29_cff import changeTriggerProcessName as changeTriggerProcessNameBase
+    changeTriggerProcessNameBase(process, triggerProcessName, oldProcessName)
+    if hasattr(process, 'filterHLT1Mu'): process.filterHLT1Mu.TriggerResultsTag = cms.InputTag('TriggerResults','',triggerProcessName)
+    if hasattr(process, 'filterHLT2Mu'): process.filterHLT2Mu.TriggerResultsTag = cms.InputTag('TriggerResults','',triggerProcessName)
     process.jpsiSkimOut.outputCommands += [
-        "drop edmTriggerResults_*_*_HLT",       ## to know what got us on tape
-        "keep edmTriggerResults_*_*_HLT8E29",   ## to know what got us on tape
+        "drop edmTriggerResults_*_*_"+oldProcessName,       ## to know what got us on tape
+        "keep edmTriggerResults_*_*_"+triggerProcessName,   ## to know what got us on tape
     ]
+    
+def Summer09_Trigger(process):
+    changeTriggerProcessName(process, 'HLT8E29', process.patTrigger.processName.value())
 
 def Spring10ReDigi_Trigger(process):
-    process.patTrigger.processName = 'REDIGI'
-    if hasattr(process, 'muonMatchHLTCtfTrack'):
-        process.muonMatchHLTCtfTrack.collectionTags[0] = process.muonMatchHLTCtfTrack.collectionTags[0].replace('::HLT','::REDIGI')
-    if hasattr(process, 'filterHLT1Mu'): process.filterHLT1Mu.TriggerResultsTag = cms.InputTag('TriggerResults','','REDIGI')
-    if hasattr(process, 'filterHLT2Mu'): process.filterHLT2Mu.TriggerResultsTag = cms.InputTag('TriggerResults','','REDIGI')
-    ## Remove matches to l1Extra which is not in 3.1.X samples and that we woudln't use anyway
-    for n in process.patTrigger.parameters_():
-        if n.startswith("l1Extra"): delattr(process.patTrigger, n)
-    process.jpsiSkimOut.outputCommands += [
-        "drop edmTriggerResults_*_*_HLT",       ## to know what got us on tape
-        "keep edmTriggerResults_*_*_REDIGI",   ## to know what got us on tape
-    ]
-
+    changeTriggerProcessName(process, 'HLT8E29', process.patTrigger.processName.value())
