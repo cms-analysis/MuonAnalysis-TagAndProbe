@@ -8,11 +8,12 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.source = cms.Source("PoolSource",  
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_3_5_4/RelValJpsiMM/GEN-SIM-RECO/START3X_V24-v1/0004/1244DD00-2D2C-DF11-8FA3-002618943977.root',
-	'/store/relval/CMSSW_3_5_4/RelValJpsiMM/GEN-SIM-RECO/START3X_V24-v1/0004/1217EA49-A52B-DF11-9081-00304867BFAE.root',
-	'/store/relval/CMSSW_3_5_4/RelValJpsiMM/GEN-SIM-RECO/START3X_V24-v1/0003/BE67D561-A02B-DF11-9FE7-001A928116B4.root',
-	'/store/relval/CMSSW_3_5_4/RelValJpsiMM/GEN-SIM-RECO/START3X_V24-v1/0003/B892E028-9F2B-DF11-96DD-003048679164.root',
-	'/store/relval/CMSSW_3_5_4/RelValJpsiMM/GEN-SIM-RECO/START3X_V24-v1/0003/5C692C2C-9E2B-DF11-B817-002618943869.root',
+	'/store/relval/CMSSW_3_6_1/RelValJpsiMM/GEN-SIM-RECO/START36_V7-v1/0021/88E49DFB-515D-DF11-BB0F-0018F3D096A6.root',
+	'/store/relval/CMSSW_3_6_1/RelValJpsiMM/GEN-SIM-RECO/START36_V7-v1/0020/C64A8F56-345D-DF11-B376-0018F3D096E8.root',
+	'/store/relval/CMSSW_3_6_1/RelValJpsiMM/GEN-SIM-RECO/START36_V7-v1/0020/C2F0667A-375D-DF11-BC46-00261894384F.root',
+	'/store/relval/CMSSW_3_6_1/RelValJpsiMM/GEN-SIM-RECO/START36_V7-v1/0020/AA541856-365D-DF11-9611-003048B95B30.root',
+	'/store/relval/CMSSW_3_6_1/RelValJpsiMM/GEN-SIM-RECO/START36_V7-v1/0020/98FED2C5-325D-DF11-B496-002618943925.root',
+	'/store/relval/CMSSW_3_6_1/RelValJpsiMM/GEN-SIM-RECO/START36_V7-v1/0020/8E83555C-355D-DF11-BB90-002618943957.root',
     )
 )
 process.maxEvents = cms.untracked.PSet(input = cms.untracked.int32(5000))
@@ -21,8 +22,7 @@ process.load("Configuration.StandardSequences.MagneticField_38T_cff")
 process.load("Configuration.StandardSequences.GeometryExtended_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = "MC_3XY_V25::All"  # 3.1.X MC is Ideal
-#process.GlobalTag.globaltag = "START3X_V25::All"
+process.GlobalTag.globaltag = "START36_V8::All"
 
 process.load("MuonAnalysis.TagAndProbe.skim.skimJPsi_cff")
 # we also do a regular python import to get some variables like the names of the triggers, which are not exported by process.load
@@ -167,19 +167,7 @@ elif test == "Summer10ReDigi_ppMuX":
     Spring10ReDigi_Trigger(process)
     process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/jpsi/ppMuX_Spring10_REDIGI_START3X_V26_S09_GEN-SIM-RECO_C0AC7DEB-8144-DF11-A1E1-00304867D838.root' ]  
     process.jpsiSkimOut.fileName = 'ppMuX_skimJPsi_Spring10.root'
-elif test == "Summer09_Signal":
-    Summer09_Trigger(process)
-    process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/mc/7TeV/Summer09/JPsiMuMu_AODSIM_72B0D83F-908B-DE11-9A88-001D09646131.root' ]
-    process.jpsiSkimOut.fileName = 'JPsiMuMu_skimJPsi_Summmer09.root'
-elif test == "Summer09_ppMuX":
-    Summer09_Trigger(process)
-    process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/mc/7TeV/Summer09/ppMuX_AODSIM_EAB08D8C-78A6-DE11-88FD-001AA009562B.root' ]
-    process.jpsiSkimOut.fileName = 'ppMuX_skimJPsi_Summmer09.root'
-elif test == "RelVal354":
-    process.jpsiSkimOut.fileName = 'JPsiMuMu_skimJPsi_RelVal354.root'
-elif test == "OniaTrigger":
-    process.source.fileNames = [ 'root://pcmssd12.cern.ch//data/gpetrucc/PYTHIA6_7TeV_JPsiWithFSR_MC_3XY_V16_1E31_HLT_12.root' ]
-    process.source.duplicateCheckMode = cms.untracked.string("noDuplicateCheck")
-    process.jpsiSkimOut.fileName = 'JPsiMuMu_skimJPsi_OniaTrigger.root'
+elif test == "RelVal":
+    process.jpsiSkimOut.fileName = 'JPsiMuMu_skimJPsi_RelVal.root'
 else:
     raise ValueError, "Unknown test '%s'" % (test,)
