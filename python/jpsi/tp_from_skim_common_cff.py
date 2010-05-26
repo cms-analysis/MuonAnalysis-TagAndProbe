@@ -22,8 +22,8 @@ PASSING_TM_CUT  = "!("+PASSING_GLB_CUT+") && " + PASSING_TMI_CUT;
 
 PASS_HLT_1MU = "!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"
 PASS_HLT_2MU = "!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"
-TAG_CUTS_1MU = PASSING_GLB_CUT + " && " + TRACK_CUTS +' && '+ PASS_HLT_1MU
-TAG_CUTS_2MU = PASSING_GLB_CUT + " && " + TRACK_CUTS +' && '+ PASS_HLT_2MU
+TAG_CUTS_1MU = "isGlobalMuon && " + TRACK_CUTS +' && '+ PASS_HLT_1MU
+TAG_CUTS_2MU = "isGlobalMuon && " + TRACK_CUTS +' && '+ PASS_HLT_2MU
 
 ##     ____ _       _           _ __  __                     _____               
 ##    / ___| | ___ | |__   __ _| |  \/  |_   _  ___  _ __   |_   _|_ _  __ _ ___ 
