@@ -8,14 +8,17 @@ import FWCore.ParameterSet.Config as cms
 ##                                                                                        
 ##   
 
-MASS_RANGE = ( 2.8, 3.5 )
+MASS_RANGE = ( 2.6, 3.6 )
 MASS_RANGE_STA = ( 2, 5 )
 TRACK_CUTS = ("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithMeasurement > 1 "+
-              "&& track.normalizedChi2 < 5 "+
-              "&& abs(track.d0) < 2 && abs(track.dz) < 30")
+              "&& track.normalizedChi2 < 4 "+
+              "&& abs(track.d0) < 3 && abs(track.dz) < 30")
 PT_ETA_CUTS = "(pt > 3 || (abs(eta)>1 && p > 2.6))" ## the enclosing () are very important, because there's an "||"
-PASSING_GLB_CUT = "isGlobalMuon && globalTrack.normalizedChi2 < 20"
-PASSING_TM_CUT = "!("+PASSING_GLB_CUT+") && isTrackerMuon && muonID('TMLastStationAngTight')";
+PASSING_GLB_CUT = ("isGlobalMuon && globalTrack.normalizedChi2 < 20  && "+
+                   "globalTrack.hitPattern.numberOfValidMuonHits > 0 && "+
+                   "muonID('TrackerMuonArbitrated') &&  muonID('TMLastStationAngTight')")
+PASSING_TMI_CUT = "isTrackerMuon && muonID('TMLastStationAngTight')";
+PASSING_TM_CUT  = "!("+PASSING_GLB_CUT+") && " + PASSING_TMI_CUT;
 
 PASS_HLT_1MU = "!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"
 PASS_HLT_2MU = "!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"
@@ -107,6 +110,7 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
         pt  = cms.string("pt"),
         p   = cms.string("p"),
         eta = cms.string("eta"),
+        abseta = cms.string("abs(eta)"),
         phi = cms.string("phi"),
     ),
     # choice of what defines a 'passing' probe
@@ -117,13 +121,16 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
         eta = cms.string("eta"),
      ),
     tagFlags = cms.PSet(
-        L1SingleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty()"),
-        L1DoubleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
-        HLTMu0L1MuOpen = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
-        HLTMu3L1MuOpen = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
-        HLTMu3         = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
-        HLTMu0Tk       = cms.string("!triggerObjectMatchesByFilter('hltMu0TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
-        HLTMu3Tk       = cms.string("!triggerObjectMatchesByFilter('hltMu3TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
+        L1MuOpen = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty()"),
+        L2Mu0    = cms.string("!triggerObjectMatchesByFilter('hltL2Mu0L2Filtered0').empty()"),
+        L2Mu3    = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L2Filtered3').empty()"),
+        Mu3      = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
+        Mu5      = cms.string("!triggerObjectMatchesByFilter('hltSingleMu5L3Filtered5').empty()"),
+        L1DoubleMuOpen  = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
+        Mu0_L1MuOpen    = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
+        Mu3_L1MuOpen    = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
+        Mu0_Track0_JPsi = cms.string("!triggerObjectMatchesByFilter('hltMu0TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
+        Mu3_Track0_JPsi = cms.string("!triggerObjectMatchesByFilter('hltMu3TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
     ),
     ## MC-related info
     isMC = cms.bool(True),
