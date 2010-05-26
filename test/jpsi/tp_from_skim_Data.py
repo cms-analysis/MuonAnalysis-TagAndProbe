@@ -8,10 +8,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/DATA/DATA_skimJPsiLoose_fromApr20MuonSkim-v2.root',
-        'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/DATA/DATA_skimJPsiLoose_fromMuonSkimV9_upToApr28-v2.root',
+        #'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/DATA/DATA_skimJPsiLoose_fromApr20MuonSkim-v2.root',
+        #'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/DATA/DATA_skimJPsiLoose_fromMuonSkimV9_upToApr28-v2.root',
         #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/DATA_skimJPsiLoose_fromApr20MuonSkim-v2.root',
         #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/DATA_skimJPsiLoose_fromMuonSkimV9_upToApr28-v2.root',
+        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/DATA_skimJPsiLoose_fromPromptReco_run13509to135175.part1.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/DATA_skimJPsiLoose_fromPromptReco_run13509to135175.part2.root',
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -24,7 +26,7 @@ process.load("Geometry.CommonDetUnit.globalTrackingGeometry_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
-process.GlobalTag.globaltag = cms.string('GR_R_35X_V8::All')
+process.GlobalTag.globaltag = cms.string('GR_R_36X_V11::All')
 
 process.load("MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_Tracking_cff")
 process.load("MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_MuonID_cff")
@@ -34,7 +36,7 @@ process.tagAndProbe = cms.Path(
     process.tnpCommonSequence    *
     ( process.tnpSequenceTracking  +
       process.tnpSequenceMuonID    +
-      process.tnpSequenceMuonIDVtx +
+      #process.tnpSequenceMuonIDVtx +
       process.tnpSequenceTrigger   )
 )
 
@@ -53,9 +55,16 @@ for K,V in allTPTreeProducers(process): V.isMC = False
 for K,V in allTPTreeProducers(process): 
     V.addRunLumiInfo = cms.bool(True)
 
-## Redefine the tags requiring only L1SingleMuOpen
-process.tagMuons1Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
-process.tagMuons2Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
+## Redefine the tags requiring L2Mu0; requesting even Mu3 is sugggested
+process.tagMuons1Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltL2Mu0L2Filtered0').empty() && " + TRACK_CUTS;
+process.tagMuons2Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltL2Mu0L2Filtered0').empty() && " + TRACK_CUTS;
+
+from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import addDiMuonSeparationVariables
+addDiMuonSeparationVariables(process, process.tnpSequenceTrigger, process.histoTrigger)
+addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromTk)
+addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromCal)
+
+#process.load("UserCode.GPetrucc.edmLumi_cfi") ## see twiki UserCodeGPetrucc if you want this
 
 ##     ___        _               _     _   _ _     _            
 ##    / _ \ _   _| |_ _ __  _   _| |_  | | | (_)___| |_ ___  ___ 
@@ -64,5 +73,4 @@ process.tagMuons2Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('
 ##    \___/ \__,_|\__| .__/ \__,_|\__| |_| |_|_|___/\__\___/|___/
 ##                   |_|                                         
 ##   
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_Data.root"))
-
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_Data_test.root"))
