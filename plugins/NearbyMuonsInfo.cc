@@ -1,5 +1,5 @@
 //
-// $Id: NearbyMuonsInfo.cc,v 1.1 2009/09/30 13:59:58 gpetrucc Exp $
+// $Id: NearbyMuonsInfo.cc,v 1.1 2010/05/04 12:43:32 gpetrucc Exp $
 //
 
 /**
@@ -7,7 +7,7 @@
   \brief    Matcher of reconstructed objects to L1 Muons 
             
   \author   Giovanni Petrucciani
-  \version  $Id: NearbyMuonsInfo.cc,v 1.1 2009/09/30 13:59:58 gpetrucc Exp $
+  \version  $Id: NearbyMuonsInfo.cc,v 1.1 2010/05/04 12:43:32 gpetrucc Exp $
 */
 
 
@@ -85,6 +85,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
         if (mu1 == 0) throw cms::Exception("CorruptData") << "First daughter of candidate is not a ShallowClone of a reco::RecoCandidate\n";
         if (mu2 == 0) throw cms::Exception("CorruptData") << "Second daughter of candidate is not a ShallowClone of a reco::RecoCandidate\n";
         if (mu1->standAloneMuon().isNonnull()            && mu2->standAloneMuon().isNonnull() &&
+            mu1->standAloneMuon().isAvailable()          && mu2->standAloneMuon().isAvailable() &&
             mu1->standAloneMuon()->extra().isAvailable() && mu2->standAloneMuon()->extra().isAvailable()  ) {
             dphiStaIn[i] = deltaPhi(mu1->standAloneMuon()->innerPosition().Phi(), mu2->standAloneMuon()->innerPosition().Phi());
             drStaIn[i]   = hypot(dphiStaIn[i], std::abs(mu1->standAloneMuon()->innerPosition().Eta() - mu2->standAloneMuon()->innerPosition().Eta()));
