@@ -19,11 +19,11 @@ histoTrigger = tnpTreeProducer.clone(
         ## Selections
         Cal = cms.string("isCaloMuon"),
         Glb = cms.string(PASSING_GLB_CUT),
-        Trk = cms.string(PASSING_TMI_CUT),
-        POGGlb    = cms.string("isGlobalMuon"),
-        POGGlbPT  = cms.string("isGlobalMuon && muonID('GlobalMuonPromptTight')"),
-        POGTMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
-        POGTMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
+        TM  = cms.string(PASSING_TMI_CUT),
+        POG_Glb    = cms.string("isGlobalMuon"),
+        POG_GlbPT  = cms.string("isGlobalMuon  && muonID('GlobalMuonPromptTight')"),
+        POG_TMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
+        POG_TMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
         ## Triggers
         L1MuOpen   = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty()"),
         L2Mu0      = cms.string("!triggerObjectMatchesByFilter('hltL2Mu0L2Filtered0').empty()"),
