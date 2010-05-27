@@ -8,14 +8,11 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/MC/TnP/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_1_1.root',
-        'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/MC/TnP/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_2_0.root',
-        'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/MC/TnP/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_3_0.root',
-        'rfio:/castor/cern.ch/user/g/gpetrucc/7TeV/MC/TnP/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_4_0.root',
-        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_1_1.root',
-        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_2_0.root',
-        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_3_0.root',
-        #'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v1/skimJPsiLoose_ppxMuXLoose900GeV_4_0.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_1_1.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_2_1.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_3_1.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_4_1.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_5_1.root',
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -37,8 +34,14 @@ process.load("MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_Trigger_cff")
 from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
 
 ## Loosen tag requirements to the minimum
-process.tagMuons1Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
-process.tagMuons2Mu.cut = PASSING_GLB_CUT + " && !triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty() && " + TRACK_CUTS;
+process.tagMuons1Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty() && " + TRACK_CUTS;
+process.tagMuons2Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty() && " + TRACK_CUTS;
+#process.tagMuons2Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty() && " + TRACK_CUTS;
+
+from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import addDiMuonSeparationVariables
+addDiMuonSeparationVariables(process, process.tnpSequenceTrigger, process.histoTrigger)
+addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromTk)
+addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromCal)
 
 ## On REDIGI
 #for K,V in allTPTreeProducers(process): 
