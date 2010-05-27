@@ -1,0 +1,20 @@
+[CRAB]
+jobtype = cmssw
+scheduler = glite
+use_server = 1
+
+[CMSSW]
+datasetpath = /ppMuX/muon-Spring10ReDigi_skimJPsiLoose_v2-3f0fb5c06e0ff4a2dfc570422e29b244/USER  
+dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
+pset = tp_from_skimLoose_MCReDigi.py
+total_number_of_events = -1
+events_per_job = 100000
+
+[USER]
+return_data = 1
+copy_data = 0
+
+[GRID]
+rb = CERN
+virtual_organization   = cms
+role                   = priorityuser
