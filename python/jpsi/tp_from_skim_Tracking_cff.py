@@ -14,6 +14,17 @@ staProbes = cms.EDProducer("CandViewRefSelector",
     cut = cms.string(PT_ETA_CUTS),
 )
 
+tkTracksNoJPsi = cms.EDProducer("CandidateResonanceInefficiencyCreator",
+    src = cms.InputTag("tkTracks"),
+    tags = cms.InputTag("tagMuons2Mu"),
+    mass    = cms.double(3.096),
+    massMin = cms.double(2.85), ## Should cut away
+    massMax = cms.double(3.25), ## 99.5% of signal
+    onlyBestMatch = cms.bool(False),
+    outputMode = cms.string("RefToBaseVector"),
+)
+tkTracksNoBestJPsi = tkTracksNoJPsi.clone(onlyBestMatch = True)
+
 ##    ____               _               ____            _                   _____               _    _             
 ##   |  _ \ __ _ ___ ___(_)_ __   __ _  |  _ \ _ __ ___ | |__   ___  ___ _  |_   _| __ __ _  ___| | _(_)_ __   __ _ 
 ##   | |_) / _` / __/ __| | '_ \ / _` | | |_) | '__/ _ \| '_ \ / _ \/ __(_)   | || '__/ _` |/ __| |/ / | '_ \ / _` |
@@ -40,12 +51,18 @@ staPassingTk = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("staProbes"),
     match = cms.InputTag("staToTkMatch"),
 )
+staToTkMatchNoJPsi     = staToTkMatch.clone(matched = 'tkTracksNoJPsi')
+staToTkMatchNoBestJPsi = staToTkMatch.clone(matched = 'tkTracksNoBestJPsi')
+staPassingTkNoJPsi     = staPassingTk.clone(match = 'staToTkMatchNoJPsi')
+staPassingTkNoBestJPsi = staPassingTk.clone(match = 'staToTkMatchNoBestJPsi')
 
 allProbesTracking = cms.Sequence(
     staTracks * staProbes 
 )
 allPassingProbesTracking = cms.Sequence(
-    staToTkMatch * staPassingTk 
+    staToTkMatch           * staPassingTk           +
+    staToTkMatchNoJPsi     * staPassingTkNoJPsi     +
+    staToTkMatchNoBestJPsi * staPassingTkNoBestJPsi  
 )
 
 ##    _____ ___   ____    ____       _          
@@ -79,13 +96,25 @@ allMcMatchesTracking = cms.Sequence(staMcMatch)
 histoTracking = tnpTreeProducer.clone(
     tagProbePairs = cms.InputTag("tpGlbSta"),
     flags = cms.PSet(
-        passing      = cms.InputTag('staPassingTk'),
+        # Passing definition
+        passing = cms.InputTag('staPassingTk'),
+        passingNoJPsi     = cms.InputTag('staPassingTkNoJPsi'),
+        passingNoBestJPsi = cms.InputTag('staPassingTkNoBestJPsi'),
+        # Quality cuts
         hasValidHits = cms.string('track.numberOfValidHits > 0'),
     ),
     # MC Matching configurables
     probeMatches  = cms.InputTag("staMcMatch"),
     allProbes = cms.InputTag("staProbes"),
 )
+histoTracking.variables.match_deltaR     = cms.InputTag("staToTkMatch", "deltaR")
+histoTracking.variables.match_deltaEta   = cms.InputTag("staToTkMatch", "deltaEta")
+histoTracking.variables.match_deltaPhi   = cms.InputTag("staToTkMatch", "deltaPhi")
+histoTracking.variables.match_deltaPtRel = cms.InputTag("staToTkMatch", "deltaPtRel")
+histoTracking.variables.match_deltaR_NoJPsi     = cms.InputTag("staToTkMatchNoJPsi", "deltaR")
+histoTracking.variables.match_deltaEta_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi", "deltaEta")
+histoTracking.variables.match_deltaPhi_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi", "deltaPhi")
+histoTracking.variables.match_deltaPtRel_NoJPsi = cms.InputTag("staToTkMatchNoJPsi", "deltaPtRel")
 
 allTPHistosTracking = cms.Sequence(
         histoTracking     
@@ -93,6 +122,7 @@ allTPHistosTracking = cms.Sequence(
 
 tnpSequenceTracking = cms.Sequence(
     allProbesTracking *
+    (tkTracksNoJPsi + tkTracksNoBestJPsi) *
     allPassingProbesTracking *
     allTPPairsTracking   *
     allMcMatchesTracking * 
