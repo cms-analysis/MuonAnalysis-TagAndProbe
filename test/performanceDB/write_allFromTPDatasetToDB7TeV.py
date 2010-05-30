@@ -175,9 +175,9 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
 process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPDataset",
 
                                 # For each table to be loaded, set the name of the input T/P file, histogram, algorithm, and cut (if any)
-                                inputHistoFiles = cms.vstring('myplots.root'),
+                                inputHistoFiles = cms.vstring('TnP_MuonID_data_all.root'),
                                 
-                                inputHistogramNames = cms.vstring('fit_eff_pt_eta'),
+                                inputDatasetNames = cms.vstring('histoMuFromTk/POG_Glb_pt_eta/fit_eff'),
                                 
                                 inputAlgorithmNames = cms.vstring('GlobalMuonFromTrackerTrackJpsi'),
                                 

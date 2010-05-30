@@ -40,7 +40,7 @@ private:
   boost::uint64_t iovBegin;
   boost::uint64_t iovEnd;  
   std::vector<std::string> inputHistoFiles;
-  std::vector<std::string> inputHistogramNames; 
+  std::vector<std::string> inputDatasetNames; 
   std::vector<std::string> inputBinningVariables;
   std::vector<std::string> inputResultTypes;
   std::vector<std::string> inputAlgorithmNames;
@@ -57,7 +57,7 @@ PhysicsPerformanceDBWriterFromTPDataset::PhysicsPerformanceDBWriterFromTPDataset
   iovBegin = p.getParameter<boost::uint64_t>("IOVBegin"); 
   iovEnd = p.getParameter<boost::uint64_t>("IOVEnd"); 
   inputHistoFiles = p.getParameter< std::vector<std::string> >("inputHistoFiles");
-  inputHistogramNames = p.getParameter< std::vector<std::string> >("inputHistogramNames"); 
+  inputDatasetNames = p.getParameter< std::vector<std::string> >("inputDatasetNames"); 
   inputAlgorithmNames = p.getParameter< std::vector<std::string> >("inputAlgorithmNames");
   inputDiscriminatorCuts = p.getParameter< std::vector<double> >("inputDiscriminatorCuts");
   inputConcreteClass = p.getUntrackedParameter<std::string>("inputConcreteClass","PerformancePayloadFromTable");
@@ -88,7 +88,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
   std::string comment; 
   std::vector<float> pl; 
   std::string infilename;
-  std::string histname;
+  std::string datasetname;
   int stride; 
   int nres, nbin;  
   int number = 0;
@@ -147,7 +147,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
       pl.clear();
 
       infilename = inputHistoFiles[i]; 
-      histname = inputHistogramNames[i]; 
+      datasetname = inputDatasetNames[i]; 
       tagger = inputAlgorithmNames[i];
       cut = inputDiscriminatorCuts[i];    
       tmpiovBegin = iovBegin;
@@ -156,7 +156,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
       tmprec2 = rec2[i];
 
       cout << "Reading from Tag-&-Probe file " << infilename << endl; 
-      cout << "\tReading efficiencies from histograms named " << histname << endl;
+      cout << "\tReading efficiencies from RooDataset named " << datasetname << endl;
       cout << "Algorithm name = " << tagger << endl;
       cout << "Discriminator cut = " << cut << endl;
 
@@ -164,9 +164,8 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 
       TFile *f = TFile::Open(infilename.c_str());
       f->cd();
-      //      TH2F *heff = (TH2F *)f->Get(histname.c_str());
 
-      datatmp = (RooDataSet *)f->Get("MakeHisto/pt_eta/fit_eff");
+      datatmp = (RooDataSet *)f->Get(datasetname.c_str());
       const RooArgSet* vars = datatmp->get();
       RooRealVar* effvar = (RooRealVar*) vars->find("efficiency");
       RooRealVar* etavar = (RooRealVar*) vars->find("eta");
@@ -209,7 +208,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	      // NB. The "average" error her is temporary until the 
 	      // DB+PAT support asymmetric errors.
 	      bincontent = effvar->getVal();
-	      binerror = fabs(effvar->getErrorHi() + effvar->getErrorLo())/2.0;
+	      binerror = fabs(effvar->getErrorHi() - effvar->getErrorLo())/2.0;
 
               pl.push_back(binlowedgex);
               pl.push_back(binhighedgex);
@@ -218,7 +217,9 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 
 	      cout << "(" << binlowedgex << " < pT < "  << binhighedgex << "), "
 		   << "(" << binlowedgey << " < eta < " << binhighedgey << ") "
-		   << " = " << h->GetBinContent(b) << "+" << hhi->GetBinContent(b) << "-" << hlo->GetBinContent(b) << endl;
+		   << " = " << h->GetBinContent(b)
+		   << "+" << (hhi->GetBinContent(b) - h->GetBinContent(b))
+		   << "-" << (h->GetBinContent(b) - hlo->GetBinContent(b)) << endl;
 
               cout << " Inserting " << bincontent << " in position " << number
                    << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", "
