@@ -2,124 +2,51 @@ import FWCore.ParameterSet.Config as cms
 
 MuonPerformanceESProducer_GlobalMuon1 = cms.ESProducer("MuonPerformanceESProducer",
                                                           # this is what it makes available
-                                                          ComponentName = cms.string('GlobalMuon'),
+                                                          ComponentName = cms.string('GlobalMuonFromTrackerTrackZ'),
                                                           # this is where it gets the payload from
-                                                          PayloadName = cms.string('GlobalMuon'),
-                                                          WorkingPointName = cms.string('GlobalMuon')
+                                                          PayloadName = cms.string('GLBMUZ_TEST7TEV_TABLE'),
+                                                          WorkingPointName = cms.string('GLBMUZ_TEST7TEV_WP')
                                                           )
 
 
 MuonPerformanceESProducer_TriggerMuon1 = cms.ESProducer("MuonPerformanceESProducer",
                                                           # this is what it makes available
-                                                          ComponentName = cms.string('TriggerMuon'),
-                                                          # this is where it gets the payload from                                                
-                                                          PayloadName = cms.string('TriggerMuon'),
-                                                          WorkingPointName = cms.string('TriggerMuon')
+                                                          ComponentName = cms.string('TriggerMuonFromGlobalMuonZ'),
+                                                          # this is where it gets the payload from
+                                                          PayloadName = cms.string('TRGMUZ_TEST7TEV_TABLE'),
+                                                          WorkingPointName = cms.string('TRGMUZ_TEST7TEV_WP')
                                                           )
 
 MuonPerformanceESProducer_TrackerTrackMuon1 = cms.ESProducer("MuonPerformanceESProducer",
                                                             # this is what it makes available
-                                                            ComponentName = cms.string('TrackerTrackMuon'),
+                                                            ComponentName = cms.string('TrackerTrackFromStandaloneMuonZ'),
                                                             # this is where it gets the payload from
-                                                            PayloadName = cms.string('TrackerTrackMuon'),
-                                                            WorkingPointName = cms.string('TrackerTrackMuon')
+                                                            PayloadName = cms.string('TRKEFFMUZ_TEST7TEV_TABLE'),
+                                                            WorkingPointName = cms.string('TRKEFFMUZ_TEST7TEV_WP')
                                                             )
-
-
-MuonPerformanceESProducer_TriggerMuon1 = cms.ESProducer("MuonPerformanceESProducer",
-                                                        # this is what it makes available
-                                                        ComponentName = cms.string('TriggerMuon'),
-                                                        # this is where it gets the payload from
-                                                        PayloadName = cms.string('TriggerMuon'),
-                                                        WorkingPointName = cms.string('TriggerMuon')
-                                                        )
 
 MuonPerformanceESProducer_GlobalMuon2 = cms.ESProducer("MuonPerformanceESProducer",
                                                        # this is what it makes available
-                                                       ComponentName = cms.string('GlobalMuon'),
+                                                       ComponentName = cms.string('GlobalMuonFromTrackerTrackJpsi'),
                                                        # this is where it gets the payload from
-                                                       PayloadName = cms.string('GlobalMuon'),
-                                                       WorkingPointName = cms.string('GlobalMuon')
+                                                       PayloadName = cms.string('GLBMUJPSI_TEST7TEV_TABLE'),
+                                                       WorkingPointName = cms.string('GLBMUJPSI_TEST7TEV_WP')
                                                        )
 
 
 MuonPerformanceESProducer_TriggerMuon2 = cms.ESProducer("MuonPerformanceESProducer",
                                                         # this is what it makes available
-                                                        ComponentName = cms.string('TriggerMuon'),
+                                                        ComponentName = cms.string('TriggerMuonFromGlobalMuonJpsi'),
                                                         # this is where it gets the payload from
-                                                        PayloadName = cms.string('TriggerMuon'),
-                                                        WorkingPointName = cms.string('TriggerMuon')
+                                                        PayloadName = cms.string('TRGMUJPSI_TEST7TEV_TABLE'),
+                                                        WorkingPointName = cms.string('TRGMUJPSI_TEST7TEV_WP')
                                                         )
 
 MuonPerformanceESProducer_TrackerTrackMuon2 = cms.ESProducer("MuonPerformanceESProducer",
                                                              # this is what it makes available
-                                                             ComponentName = cms.string('TrackerTrackMuon'),
+                                                             ComponentName = cms.string('TrackerTrackFromStandaloneMuonJpsi'),
                                                              # this is where it gets the payload from
-                                                             PayloadName = cms.string('TrackerTrackMuon'),
-                                                             WorkingPointName = cms.string('TrackerTrackMuon')
+                                                             PayloadName = cms.string('TRKEFFMUJPSI_TEST7TEV_TABLE'),
+                                                             WorkingPointName = cms.string('TRKEFFMUJPSI_TEST7TEV_WP')
                                                              )
 
-MuonPerformanceESProducer_TriggerMuon2 = cms.ESProducer("MuonPerformanceESProducer",
-                                                        # this is what it makes available
-                                                        ComponentName = cms.string('TriggerMuon'),
-                                                        # this is where it gets the payload from
-                                                        PayloadName = cms.string('TriggerMuon'),
-                                                        WorkingPointName = cms.string('TriggerMuon')
-                                                        )
-
-# PAG-specific selections
-MuonPerformanceESProducer_TriggerMuon3 = cms.ESProducer("MuonPerformanceESProducer",
-                                                        # this is what it makes available
-                                                        ComponentName = cms.string('TriggerMuon'),
-                                                        # this is where it gets the payload from
-                                                        PayloadName = cms.string('TriggerMuon'),
-                                                        WorkingPointName = cms.string('TriggerMuon')
-                                                        )
-
-MuonPerformanceESProducer_Muon1 = cms.ESProducer("MuonPerformanceESProducer",
-                                                 # this is what it makes available
-                                                 ComponentName = cms.string('Muon'),
-                                                 # this is where it gets the payload from
-                                                 PayloadName = cms.string('Muon'),
-                                                 WorkingPointName = cms.string('Muon')
-                                                 )
-
-MuonPerformanceESProducer_Muon2 = cms.ESProducer("MuonPerformanceESProducer",
-                                                 # this is what it makes available
-                                                 ComponentName = cms.string('Muon'),
-                                                 # this is where it gets the payload from
-                                                 PayloadName = cms.string('Muon'),
-                                                 WorkingPointName = cms.string('Muon')
-                                                 )
-
-MuonPerformanceESProducer_Muon3 = cms.ESProducer("MuonPerformanceESProducer",
-                                                 # this is what it makes available
-                                                 ComponentName = cms.string('Muon'),
-                                                 # this is where it gets the payload from
-                                                 PayloadName = cms.string('Muon'),
-                                                 WorkingPointName = cms.string('Muon')
-                                                 )
-
-MuonPerformanceESProducer_Muon4 = cms.ESProducer("MuonPerformanceESProducer",
-                                                 # this is what it makes available
-                                                 ComponentName = cms.string('Muon'),
-                                                 # this is where it gets the payload from
-                                                 PayloadName = cms.string('Muon'),
-                                                 WorkingPointName = cms.string('Muon')
-                                                 )
-
-MuonPerformanceESProducer_TriggerMuon4 = cms.ESProducer("MuonPerformanceESProducer",
-                                                        # this is what it makes available
-                                                        ComponentName = cms.string('TriggerMuon'),
-                                                        # this is where it gets the payload from
-                                                        PayloadName = cms.string('TriggerMuon'),
-                                                        WorkingPointName = cms.string('TriggerMuon')
-                                                        )
-
-MuonPerformanceESProducer_Muon5 = cms.ESProducer("MuonPerformanceESProducer",
-                                                 # this is what it makes available
-                                                 ComponentName = cms.string('Muon'),
-                                                 # this is where it gets the payload from
-                                                 PayloadName = cms.string('Muon'),
-                                                 WorkingPointName = cms.string('Muon')
-                                                 )

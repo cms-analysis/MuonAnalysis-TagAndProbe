@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.3 2009/10/04 19:13:29 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.4 2009/10/08 07:32:51 jjhollar Exp $
 //
 //
 
@@ -58,7 +58,7 @@ public:
 private:
   std::vector<std::string> algonames;
   std::string rootfilename;
-  virtual void beginJob(const edm::EventSetup&) ;
+  virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
 
@@ -170,7 +170,7 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
 // ------------ method called once each job just before starting event loop  ------------
 void 
-MuTestPerformanceFW_ES::beginJob(const edm::EventSetup&)
+MuTestPerformanceFW_ES::beginJob()
 {
   effreader = new MuonPerformanceReadback();
 
