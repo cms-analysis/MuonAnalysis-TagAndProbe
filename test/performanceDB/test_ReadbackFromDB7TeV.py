@@ -1,9 +1,10 @@
 import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("MUONEFF")
-process.load("CondCore.DBCommon.CondDBCommon_cfi")
 
-process.CondDBCommon.connect = 'sqlite_file:MuonPhysicsPerformance7TeV.db'
+process.load("MuonAnalysis.TagAndProbe.MuonPerformanceESSource_cfi")
+
+process.poolDBESSource.connect = 'sqlite_file:MuonPhysicsPerformance7TeV.db'
 
 process.load ("MuonAnalysis.TagAndProbe.MuonPerformanceESProducer_cfi")
 
@@ -17,31 +18,8 @@ process.source = cms.Source("PoolSource",
     )
                             )
 
-process.PoolDBESSource = cms.ESSource("PoolDBESSource",
-                                      process.CondDBCommon,
-                                      toGet = cms.VPSet(
-                                          cms.PSet(
-                                              record = cms.string('PerformanceWPRecord'),
-                                              tag = cms.string('GLBMUJPSI_TEST7TEV_WP'),
-                                              label = cms.untracked.string('GLBMUJPSI_TEST7TEV_WP')
-                                            ),
-                                          cms.PSet(
-                                              record = cms.string('PerformancePayloadRecord'),
-                                              tag = cms.string('GLBMUJPSI_TEST7TEV_TABLE'),
-                                              label = cms.untracked.string('GLBMUJPSI_TEST7TEV_TABLE')
-                                              ),
-                                          cms.PSet(
-                                              record = cms.string('PerformanceWPRecord'),
-                                              tag = cms.string('TRGMUJPSI_TEST7TEV_WP'),
-                                              label = cms.untracked.string('TRGMUJPSI_TEST7TEV_WP')
-                                              ),
-                                          cms.PSet(
-                                              record = cms.string('PerformancePayloadRecord'),
-                                              tag = cms.string('TRGMUJPSI_TEST7TEV_TABLE'),
-                                              label = cms.untracked.string('TRGMUJPSI_TEST7TEV_TABLE')
-                                              )))
-
 process.demo2 = cms.EDAnalyzer('MuTestPerformanceFW_ES',
+                               outfilename = cms.untracked.string('EfficiencyCorrectionPlots.root'),
                                AlgoNames = cms.vstring(
     'GlobalMuonFromTrackerTrackJpsi',
     'TriggerMuonFromGlobalMuonJpsi',

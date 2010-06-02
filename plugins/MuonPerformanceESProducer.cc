@@ -26,15 +26,10 @@ MuonPerformanceESProducer::~MuonPerformanceESProducer() {}
 boost::shared_ptr<MuonPerformance> 
 MuonPerformanceESProducer::produce(const MuonPerformanceRecord & iRecord){ 
    ESHandle<PerformancePayload> pl;
-   //ESHandle<PhysicsPerformancePayload> pl;
    ESHandle<PerformanceWorkingPoint> wp;
    iRecord.getRecord<PerformancePayloadRecord>().get(mypl,pl);
    
-   std::cout <<"HERE "<<std::endl;
    iRecord.getRecord<PerformanceWPRecord>().get(mywp,wp);
-   std::cout <<"HERE "<<std::endl;
-   
-   std::cout <<" Got the payload, which is a  "<<typeid(*(pl.product())).name()<<std::endl;
    
    _perf  = boost::shared_ptr<MuonPerformance>(new MuonPerformance(*((pl.product())), *((wp.product()))));
 
