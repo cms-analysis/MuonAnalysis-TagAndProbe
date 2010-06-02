@@ -104,18 +104,23 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
   cout << nres << " result types" << endl;
 
   // First read the result types and binning variables
-  for(unsigned int i = 0; i < inputResultTypes.size(); ++i)
-    {
-      int tmp = -1; 
-      if(inputResultTypes[i] == "efficiency")
-	tmp = 2001;
-      else if(inputResultTypes[i] == "efficiency_symerr")
-	tmp = 2002; 
-      else
-	cout << "Unknown efficeincy result type " << inputResultTypes[i] << endl;
-      cout << "\tResult type = " << tmp << " (" << inputResultTypes[i] << ")" << endl;
-      res.push_back((PerformanceResult::ResultType)(tmp)); 
-    } 
+  //  for(unsigned int i = 0; i < inputResultTypes.size(); ++i)
+  //    {
+      //      int tmp = -1; 
+      //      if(inputResultTypes[i] == "efficiency")
+      //	tmp = 2001;
+  //      else if(inputResultTypes[i] == "efficiency_symerr")
+  //	tmp = 2002; 
+  //      else
+  //	cout << "Unknown efficeincy result type " << inputResultTypes[i] << endl;
+  //      cout << "\tResult type = " << tmp << " (" << inputResultTypes[i] << ")" << endl;
+  //      res.push_back((PerformanceResult::ResultType)(tmp)); 
+  //    } 
+
+  int tmp = 2001;
+  res.push_back((PerformanceResult::ResultType)(tmp));
+  tmp = 2002;
+  res.push_back((PerformanceResult::ResultType)(tmp));
 
   nbin = inputBinningVariables.size();
   cout << nbin << " binning variables" << endl;
@@ -141,6 +146,8 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
   stride = nres+nbin*2; 
 
   // Now read the acutal payload
+  for(int m = 0; m < 3; m++)
+    {
   for(unsigned int i = 0; i < inputHistoFiles.size(); ++i)
     {
       number = 0; 
@@ -154,6 +161,19 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
       tmpiovEnd = iovEnd;
       tmprec1 = rec1[i];
       tmprec2 = rec2[i];
+
+      if(m == 1)
+	{
+	  tmprec1 = "LOERR_" + tmprec1;
+          tmprec2 = "LOERR_" + tmprec2; 
+	  tagger = tagger + "_LowError";
+	}
+      if(m == 2)
+	{
+	  tmprec1 = "UPERR_" + tmprec1;
+          tmprec2 = "UPERR_" + tmprec2; 
+	  tagger = tagger + "_UpperError";
+	}
 
       cout << "Reading from Tag-&-Probe file " << infilename << endl; 
       cout << "\tReading efficiencies from RooDataset named " << datasetname << endl;
@@ -207,8 +227,15 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 
 	      // NB. The "average" error her is temporary until the 
 	      // DB+PAT support asymmetric errors.
-	      bincontent = effvar->getVal();
-	      binerror = fabs(effvar->getErrorHi() - effvar->getErrorLo())/2.0;
+	      if(m == 0)
+		bincontent = effvar->getVal();
+	      if(m == 1)
+		bincontent = effvar->getErrorLo();
+	      if(m == 2)
+		bincontent = effvar->getErrorHi();
+
+	      //	      binerror = fabs(effvar->getErrorHi() - effvar->getErrorLo())/2.0;
+	      binerror = 0.0;
 
               pl.push_back(binlowedgex);
               pl.push_back(binhighedgex);
@@ -306,6 +333,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	  cout << "Wrote Working Point" << endl;
 	}       
 
+    }
     }
 }
 

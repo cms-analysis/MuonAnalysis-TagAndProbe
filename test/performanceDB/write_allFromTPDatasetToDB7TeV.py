@@ -93,7 +93,167 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
     cms.PSet(
     record = cms.string('GLBMUZCAL_TEST7TEV_WP'),
     tag = cms.string('GLBMUZCAL_TEST7TEV_WP'),
-    label = cms.string('GLBMUZCAL_TEST7TEV_WP')
+    label = cms.string('GLBMUZCAL_TEST7TEV_WP'),
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUJPSI_TEST7TEV_WP'),
+    tag = cms.string('LOERR_GLBMUJPSI_TEST7TEV_WP'),
+    label = cms.string('LOERR_GLBMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRKEFFMUJPSI_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_TRKEFFMUJPSI_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_TRKEFFMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRKEFFMUJPSI_TEST7TEV_WP'),
+    tag = cms.string('LOERR_TRKEFFMUJPSI_TEST7TEV_WP'),
+    label = cms.string('LOERR_TRKEFFMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRGMUJPSI_TEST7TEV_WP'),
+    tag = cms.string('LOERR_TRGMUJPSI_TEST7TEV_WP'),
+    label = cms.string('LOERR_TRGMUJPSI_TEST7TEV_WP')
+    ),    
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUJPSICAL_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_GLBMUJPSICAL_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_GLBMUJPSICAL_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUJPSICAL_TEST7TEV_WP'),
+    tag = cms.string('LOERR_GLBMUJPSICAL_TEST7TEV_WP'),
+    label = cms.string('LOERR_GLBMUJPSICAL_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUZ_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_GLBMUZ_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_GLBMUZ_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUZ_TEST7TEV_WP'),
+    tag = cms.string('LOERR_GLBMUZ_TEST7TEV_WP'),
+    label = cms.string('LOERR_GLBMUZ_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRKEFFMUZ_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_TRKEFFMUZ_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_TRKEFFMUZ_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRKEFFMUZ_TEST7TEV_WP'),
+    tag = cms.string('LOERR_TRKEFFMUZ_TEST7TEV_WP'),
+    label = cms.string('LOERR_TRKEFFMUZ_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRGMUZ_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_TRGMUZ_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_TRGMUZ_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_TRGMUZ_TEST7TEV_WP'),
+    tag = cms.string('LOERR_TRGMUZ_TEST7TEV_WP'),
+    label = cms.string('LOERR_TRGMUZ_TEST7TEV_WP')
+    ),    
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUZCAL_TEST7TEV_TABLE'),
+    tag = cms.string('LOERR_GLBMUZCAL_TEST7TEV_TABLE'),
+    label = cms.string('LOERR_GLBMUZCAL_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('LOERR_GLBMUZCAL_TEST7TEV_WP'),
+    tag = cms.string('LOERR_GLBMUZCAL_TEST7TEV_WP'),
+    label = cms.string('LOERR_GLBMUZCAL_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUJPSI_TEST7TEV_WP'),
+    tag = cms.string('UPERR_GLBMUJPSI_TEST7TEV_WP'),
+    label = cms.string('UPERR_GLBMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRKEFFMUJPSI_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_TRKEFFMUJPSI_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_TRKEFFMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRKEFFMUJPSI_TEST7TEV_WP'),
+    tag = cms.string('UPERR_TRKEFFMUJPSI_TEST7TEV_WP'),
+    label = cms.string('UPERR_TRKEFFMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRGMUJPSI_TEST7TEV_WP'),
+    tag = cms.string('UPERR_TRGMUJPSI_TEST7TEV_WP'),
+    label = cms.string('UPERR_TRGMUJPSI_TEST7TEV_WP')
+    ),    
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUJPSICAL_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_GLBMUJPSICAL_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_GLBMUJPSICAL_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUJPSICAL_TEST7TEV_WP'),
+    tag = cms.string('UPERR_GLBMUJPSICAL_TEST7TEV_WP'),
+    label = cms.string('UPERR_GLBMUJPSICAL_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUZ_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_GLBMUZ_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_GLBMUZ_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUZ_TEST7TEV_WP'),
+    tag = cms.string('UPERR_GLBMUZ_TEST7TEV_WP'),
+    label = cms.string('UPERR_GLBMUZ_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRKEFFMUZ_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_TRKEFFMUZ_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_TRKEFFMUZ_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRKEFFMUZ_TEST7TEV_WP'),
+    tag = cms.string('UPERR_TRKEFFMUZ_TEST7TEV_WP'),
+    label = cms.string('UPERR_TRKEFFMUZ_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRGMUZ_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_TRGMUZ_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_TRGMUZ_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_TRGMUZ_TEST7TEV_WP'),
+    tag = cms.string('UPERR_TRGMUZ_TEST7TEV_WP'),
+    label = cms.string('UPERR_TRGMUZ_TEST7TEV_WP')
+    ),    
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUZCAL_TEST7TEV_TABLE'),
+    tag = cms.string('UPERR_GLBMUZCAL_TEST7TEV_TABLE'),
+    label = cms.string('UPERR_GLBMUZCAL_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('UPERR_GLBMUZCAL_TEST7TEV_WP'),
+    tag = cms.string('UPERR_GLBMUZCAL_TEST7TEV_WP'),
+    label = cms.string('UPERR_GLBMUZCAL_TEST7TEV_WP')
     )))
                       
 
@@ -118,7 +278,8 @@ process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPDataset",
                                 # For each table to be loaded, set the payload and working point record names as
                                 # defined above in the PoolDBOutputService
                                 RecordPayloads = cms.vstring('GLBMUJPSI_TEST7TEV_TABLE',
-                                                             'TRGMUJPSI_TEST7TEV_TABLE'),
+                                                             'TRGMUJPSI_TEST7TEV_TABLE'
+                                                             ),
                                 
                                 RecordWPs = cms.vstring('GLBMUJPSI_TEST7TEV_WP',
                                                         'TRGMUJPSI_TEST7TEV_WP'),
