@@ -73,6 +73,7 @@ mergedMuons = cms.EDProducer("CaloMuonMerger",
 ## ==== PAT Muons with trigger matching ====
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_8E29_cff import *
 ## use merged collection
+muonL1Info.src = 'mergedMuons'
 patMuonsWithoutTrigger.muonSource = 'mergedMuons'
 ## also switch off standalone muon track embedding, as we keep it separately
 patMuonsWithoutTrigger.embedStandAloneMuon = False
@@ -237,3 +238,4 @@ def Summer09_Trigger(process):
 
 def Spring10ReDigi_Trigger(process):
     changeTriggerProcessName(process, 'HLT8E29', process.patTrigger.processName.value())
+
