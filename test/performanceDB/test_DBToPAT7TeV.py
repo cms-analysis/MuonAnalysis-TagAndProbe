@@ -43,6 +43,48 @@ process.PoolDBESSource = cms.ESSource("PoolDBESSource",
     record = cms.string('PerformancePayloadRecord'),
     tag = cms.string('TRGMUJPSI_TEST7TEV_TABLE'),
     label = cms.untracked.string('TRGMUJPSI_TEST7TEV_TABLE')
+    ),
+
+    cms.PSet(
+    record = cms.string('PerformanceWPRecord'),
+    tag = cms.string('LOERR_GLBMUJPSI_TEST7TEV_WP'),
+    label = cms.untracked.string('LOERR_GLBMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE'),
+    label = cms.untracked.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('PerformanceWPRecord'),
+    tag = cms.string('LOERR_TRGMUJPSI_TEST7TEV_WP'),
+    label = cms.untracked.string('LOERR_TRGMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE'),
+    label = cms.untracked.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE')
+    ),
+
+    cms.PSet(
+    record = cms.string('PerformanceWPRecord'),
+    tag = cms.string('UPERR_GLBMUJPSI_TEST7TEV_WP'),
+    label = cms.untracked.string('UPERR_GLBMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE'),
+    label = cms.untracked.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('PerformanceWPRecord'),
+    tag = cms.string('UPERR_TRGMUJPSI_TEST7TEV_WP'),
+    label = cms.untracked.string('UPERR_TRGMUJPSI_TEST7TEV_WP')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE'),
+    label = cms.untracked.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE')
     )))
 
 
@@ -52,16 +94,22 @@ process.selectedPatMuonsWithEff = cms.EDAnalyzer('MuTestPAT',
                                                      'TriggerMuonFromGlobalMuonJpsi'
                                     ))
 
-process.output = cms.OutputModule("PoolOutputModule",
-                                  outputCommands = cms.untracked.vstring('drop *',
-                                                                         'keep *_selectedPatMuonsWithEff_*_*'),
-                                  fileName = cms.untracked.string('file:/tmp/jjhollar/jpsimm.pattuple.root'))
+#process.output = cms.OutputModule("PoolOutputModule",
+#                                  outputCommands = cms.untracked.vstring('drop *',
+#                                                                         'keep *_selectedPatMuonsWithEff_*_*'),
+#                                  fileName = cms.untracked.string('file:/tmp/jjhollar/jpsimm.pattuple.root'))
+
+process.out.fileName = 'file:jpsimm.pattuple.root'
+process.out.outputCommands = ['drop *','keep *_selectedPatMuonsWithEff_*_*']
 
 process.p = cms.Path(
     process.makePatMuons *
     process.selectedPatMuons +
-    process.selectedPatMuonsWithEff +
-    process.output)
+    process.selectedPatMuonsWithEff)
+
+
+##process.out.fileName = 'file:jpsimm.pattuple.root'
+##process.out.outputCommands = ['drop *','keep *_selectedPatMuonsWithEff_*_*']
 
 #print process.dumpPython()
 

@@ -166,7 +166,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	{
 	  tmprec1 = "LOERR_" + tmprec1;
           tmprec2 = "LOERR_" + tmprec2; 
-	  tagger = tagger + "_LowError";
+	  tagger = tagger + "_LowerError";
 	}
       if(m == 2)
 	{

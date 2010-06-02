@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: PATTupleReadTest.cc,v 1.3 2010/03/26 08:00:18 jjhollar Exp $
+// $Id: PATTupleReadTest.cc,v 1.4 2010/06/01 06:59:02 jjhollar Exp $
 //
 //
 
@@ -92,9 +92,10 @@ PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
       pat::Muon myMuon = *patmuon; // copy
 
       cout << "\tRead PAT efficiency " 
-	   << (myMuon.efficiency(effname)).value() << " +- " 
-           << (myMuon.efficiency(effname)).error() << " ("
-	   << effname << ")" << endl;
+	   << (myMuon.efficiency("GlobalMuonFromTrackerTrackJpsi")).value() << " + " 
+	   << (myMuon.efficiency("GlobalMuonFromTrackerTrackJpsi_UpperError")).value() << " - " 
+	   << (myMuon.efficiency("GlobalMuonFromTrackerTrackJpsi_LowerError")).value() 
+	   << " (" <<  effname << ")" << endl;
     }
 }
 
