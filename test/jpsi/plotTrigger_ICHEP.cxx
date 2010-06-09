@@ -1,14 +1,8 @@
 /**
   USAGE: 
-    DATA-only:    root.exe -b -l -q TnP_ICHEP_Trigger_data_all.root "plotTrigger.cxx(\"data_all\")"
-    MC data-like: root.exe -b -l -q TnP_ICHEP_Trigger_datalike_mc.root  "plotTrigger.cxx(\"datalike_mc\")"
-    DATA+MC:      root.exe -b -l -q TnP_ICHEP_Trigger_data_all.root TnP_ICHEP_Trigger_datalike_mc.root  "plotTrigger.cxx(\"data_vs_mc\")"
-
-  REQUIRES:
-   1) mkdir -p plots_ichep/muonid/
-   2) provide a suitable "tdrStyle.cc" macro or similar
-      (by default, it's taken from ~/cpp/tdrstyle.cc;
-       if you need one you might want to grab ~gpetrucc/cpp/tdrstyle.cc)
+    DATA-only:    root.exe -b -l -q TnP_ICHEP_Trigger_data_all.root 'plotTrigger_ICHEP.cxx("data_all")'
+    MC data-like: root.exe -b -l -q TnP_ICHEP_Trigger_datalike_mc.root  'plotTrigger_ICHEP.cxx("datalike_mc")'
+    DATA+MC:      root.exe -b -l -q TnP_ICHEP_Trigger_data_all.root TnP_ICHEP_Trigger_datalike_mc.root  'plotTrigger_ICHEP.cxx("data_vs_mc")'
 */
 #include <TCanvas.h>
 #include <TPad.h>
@@ -35,18 +29,19 @@ void plotTrigger_ICHEP(TString scenario) {
 }
 
 void plotTriggerData() {
-    char *ids[2] = { "Mu3", "L1DoubleMuOpen" };
-    for (size_t i = 0; i < 2; ++i) {
-        TString idname(ids[i]);
+    TString mu[4] = { "POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT" };
+    TString trig[2] = { "Mu3", "L1DoubleMuOpen" };
+    for (size_t i = 0; i < 4; ++i) {
+      for (size_t j = 0; j < 2; ++j) {
+        TString idname = mu[i]+"_To_"+trig[j];
         plotTriggerData(idname);
+      }
 
-    }
-
-    for (size_t i = 0; i < 1; ++i) {
-        TString idname = TString(ids[i])+"overL1";
+      for (size_t j = 0; j < 1; ++j) {
+        TString idname = mu[i]+"_To_"+trig[j]+"overL1";
         plotTriggerData(idname);
+      }
     }
-    
 }
 void plotTriggerData(TString idname) {
     TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
