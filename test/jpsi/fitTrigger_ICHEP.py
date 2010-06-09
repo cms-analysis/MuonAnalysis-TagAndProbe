@@ -93,27 +93,27 @@ for T in [ "L1DoubleMuOpen", "Mu3" ]:
     for M in ["POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT"]:
         BINNEDVARS = PT_ETA_BINS.clone()
         setattr(BINNEDVARS, M, cms.vstring("pass"))
-        setattr(process.TnP_Trigger.Efficiencies, T+"_pt_abseta_FROM_"+M, cms.PSet(
+        setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_pt_abseta", cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(T,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = BINNEDVARS,
             BinToPDFmap = cms.vstring("gaussPlusExpo")
         ))
         if scenario == "datalike_mc":
-            setattr(process.TnP_Trigger.Efficiencies, T+"_pt_abseta_mcTrue_FROM_"+M, cms.PSet(
+            setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_pt_abseta_mcTrue", cms.PSet(
                 EfficiencyCategoryAndState = cms.vstring(T,"pass"),
                 UnbinnedVariables = cms.vstring("mass"),
                 BinnedVariables = BINNEDVARS.clone(mcTrue = cms.vstring("true"))
             ))
         if T != "L1DoubleMuOpen":
-            setattr(process.TnP_Trigger.Efficiencies, T+"overL1_pt_abseta_FROM_"+M, cms.PSet(
+            setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"overL1_pt_abseta", cms.PSet(
                 EfficiencyCategoryAndState = cms.vstring(T,"pass"),
                 UnbinnedVariables = cms.vstring("mass"),
                 BinnedVariables = BINNEDVARS.clone(L1DoubleMuOpen = cms.vstring("pass")),
                 BinToPDFmap = cms.vstring("gaussPlusExpo")
             ))
             if scenario == "datalike_mc":
-                setattr(process.TnP_Trigger.Efficiencies, T+"overL1_pt_abseta_mcTrue_FROM_"+M, cms.PSet(
+                setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"overL1_pt_abseta_mcTrue", cms.PSet(
                     EfficiencyCategoryAndState = cms.vstring(T,"pass"),
                     UnbinnedVariables = cms.vstring("mass"),
                     BinnedVariables = PT_ETA_BINS.clone(L1DoubleMuOpen = cms.vstring("pass"), mcTrue = cms.vstring("true"))
