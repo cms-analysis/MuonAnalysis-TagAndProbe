@@ -35,10 +35,13 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     Categories = cms.PSet(
         # Efficiencies to measure
+        L1DoubleMuOpen = cms.vstring("L1DoubleMuOpen", "dummy[pass=1,fail=0]"),
         Mu3 = cms.vstring("Mu3", "dummy[pass=1,fail=0]"),
         # Denominator
         POG_Glb = cms.vstring("POG_Glb", "dummy[pass=1,fail=0]"),
-        L1DoubleMuOpen = cms.vstring("L1DoubleMuOpen", "dummy[pass=1,fail=0]"),
+        POG_GlbPT = cms.vstring("POG_GlbPT", "dummy[pass=1,fail=0]"),
+        POG_TMA = cms.vstring("POG_TMA", "dummy[pass=1,fail=0]"),
+        POG_TMLSAT = cms.vstring("POG_TMLSAT", "dummy[pass=1,fail=0]"),
         # Other constraints
         tag_Mu3 = cms.vstring("tag_Mu3", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
@@ -59,7 +62,6 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
 CONSTRAINTS = cms.PSet(
     tag_Mu3 = cms.vstring("pass"),
-    POG_Glb = cms.vstring("pass"),
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
@@ -69,7 +71,7 @@ PT_ETA_BINS = cms.PSet(
 
 
 process.TnP_Trigger = Template.clone(
-    InputFileNames = cms.vstring("tnpJPsi_Data.root"),
+    InputFileNames = cms.vstring("/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data.root"),
     InputDirectoryName = cms.string("histoTrigger"),
     InputTreeName = cms.string("fitter_tree"),
     OutputFileName = cms.string("TnP_ICHEP_Trigger_%s.root" % scenario),
@@ -81,38 +83,41 @@ if scenario == "data_all":
 
 if scenario == "datalike_mc":
     process.TnP_Trigger.InputFileNames = [
-        "tnpJPsi_JPsiMuMu_Spring10_0.117pb.root",
-        "tnpJPsi_ppMuX_Spring10_0.117pb.root"
+        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_JPsiMuMu_Spring10_0.117pb.root",
+        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_ppMuX_Spring10_0.117pb.root"
     ]
 
 
 
-for T in [ "Mu3", "L1DoubleMuOpen" ]:
-    setattr(process.TnP_Trigger.Efficiencies, T+"_pt_abseta", cms.PSet(
-        EfficiencyCategoryAndState = cms.vstring(T,"pass"),
-        UnbinnedVariables = cms.vstring("mass"),
-        BinnedVariables = PT_ETA_BINS,
-        BinToPDFmap = cms.vstring("gaussPlusExpo")
-    ))
-    if scenario == "datalike_mc":
-        setattr(process.TnP_Trigger.Efficiencies, T+"_pt_abseta_mcTrue", cms.PSet(
+for T in [ "L1DoubleMuOpen", "Mu3" ]:
+    for M in ["POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT"]:
+        BINNEDVARS = PT_ETA_BINS.clone()
+        setattr(BINNEDVARS, M, cms.vstring("pass"))
+        setattr(process.TnP_Trigger.Efficiencies, T+"_pt_abseta_FROM_"+M, cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(T,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = PT_ETA_BINS.clone(mcTrue = cms.vstring("true"))
-        )) 
-    if T != "L1DoubleMuOpen":
-        setattr(process.TnP_Trigger.Efficiencies, T+"overL1_pt_abseta", cms.PSet(
-            EfficiencyCategoryAndState = cms.vstring(T,"pass"),
-            UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = PT_ETA_BINS.clone(L1DoubleMuOpen = cms.vstring("pass")),
+            BinnedVariables = BINNEDVARS,
             BinToPDFmap = cms.vstring("gaussPlusExpo")
         ))
         if scenario == "datalike_mc":
-            setattr(process.TnP_Trigger.Efficiencies, T+"overL1_pt_abseta_mcTrue", cms.PSet(
+            setattr(process.TnP_Trigger.Efficiencies, T+"_pt_abseta_mcTrue_FROM_"+M, cms.PSet(
                 EfficiencyCategoryAndState = cms.vstring(T,"pass"),
                 UnbinnedVariables = cms.vstring("mass"),
-                BinnedVariables = PT_ETA_BINS.clone(L1DoubleMuOpen = cms.vstring("pass"), mcTrue = cms.vstring("true"))
-            )) 
+                BinnedVariables = BINNEDVARS.clone(mcTrue = cms.vstring("true"))
+            ))
+        if T != "L1DoubleMuOpen":
+            setattr(process.TnP_Trigger.Efficiencies, T+"overL1_pt_abseta_FROM_"+M, cms.PSet(
+                EfficiencyCategoryAndState = cms.vstring(T,"pass"),
+                UnbinnedVariables = cms.vstring("mass"),
+                BinnedVariables = BINNEDVARS.clone(L1DoubleMuOpen = cms.vstring("pass")),
+                BinToPDFmap = cms.vstring("gaussPlusExpo")
+            ))
+            if scenario == "datalike_mc":
+                setattr(process.TnP_Trigger.Efficiencies, T+"overL1_pt_abseta_mcTrue_FROM_"+M, cms.PSet(
+                    EfficiencyCategoryAndState = cms.vstring(T,"pass"),
+                    UnbinnedVariables = cms.vstring("mass"),
+                    BinnedVariables = PT_ETA_BINS.clone(L1DoubleMuOpen = cms.vstring("pass"), mcTrue = cms.vstring("true"))
+                )) 
 
 process.p = cms.Path(
     process.TnP_Trigger
