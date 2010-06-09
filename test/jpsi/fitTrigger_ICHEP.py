@@ -31,7 +31,6 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         pt     = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         tag_pt = cms.vstring("Tag p_{T}", "2.6", "1000", "GeV/c"),
-        mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
 
     Categories = cms.PSet(
@@ -42,6 +41,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         L1DoubleMuOpen = cms.vstring("L1DoubleMuOpen", "dummy[pass=1,fail=0]"),
         # Other constraints
         tag_Mu3 = cms.vstring("tag_Mu3", "dummy[pass=1,fail=0]"),
+        mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
 
     PDFs = cms.PSet(
