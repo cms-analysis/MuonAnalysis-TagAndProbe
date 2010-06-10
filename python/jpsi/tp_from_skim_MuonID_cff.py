@@ -51,6 +51,7 @@ muonsPOGGlb    = muonsGlb.clone(cut = "isGlobalMuon")
 muonsPOGGlbPT  = muonsGlb.clone(cut = "isGlobalMuon && muonID('GlobalMuonPromptTight')")
 muonsPOGTMA    = muonsGlb.clone(cut = "isTrackerMuon && muonID('TrackerMuonArbitrated')")
 muonsPOGTMLSAT = muonsGlb.clone(cut = "isTrackerMuon && muonID('TMLastStationAngTight')")
+muonsVBTFLike  = muonsGlb.clone(cut = PASSING_VBTFLIKE_CUTS)
 
 tkToGlbMatch = cms.EDProducer("MatcherUsingTracks",
     src     = cms.InputTag("tkTracks"), # all tracks are available for matching
@@ -83,6 +84,7 @@ tkToPOGGlbMatch    = tkToGlbMatch.clone(matched = 'muonsPOGGlb')
 tkToPOGGlbPTMatch  = tkToGlbMatch.clone(matched = 'muonsPOGGlbPT')
 tkToPOGTMAMatch    = tkToGlbMatch.clone(matched = 'muonsPOGTMA')
 tkToPOGTMLSATMatch = tkToGlbMatch.clone(matched = 'muonsPOGTMLSAT')
+tkToVBTFLikeMatch  = tkToGlbMatch.clone(matched = 'muonsVBTFLike')
 tkToPOGStaMatch    = tkToStaMatch.clone(matched = 'staTracks')
 tkToPOGStaVHMatch  = tkToStaMatch.clone(matched = 'staTracksValidHits')
 tkPassingPOGGlb    = tkPassingGlb.clone(match = 'tkToPOGGlbMatch')
@@ -91,6 +93,7 @@ tkPassingPOGSta    = tkPassingGlb.clone(match = 'tkToPOGStaMatch')
 tkPassingPOGStaVH  = tkPassingGlb.clone(match = 'tkToPOGStaVHMatch')
 tkPassingPOGTMA    = tkPassingGlb.clone(match = 'tkToPOGTMAMatch')
 tkPassingPOGTMLSAT = tkPassingGlb.clone(match = 'tkToPOGTMLSATMatch')
+tkPassingVBTFLike  = tkPassingGlb.clone(match = 'tkToVBTFLikeMatch')
 
 tkPassingProbes = cms.Sequence(
     muonsGlb * tkToGlbMatch * tkPassingGlb +
@@ -102,7 +105,8 @@ tkPassingProbesPOG = cms.Sequence(
     muonsPOGTMA    * tkToPOGTMAMatch    * tkPassingPOGTMA    +
     muonsPOGTMLSAT * tkToPOGTMLSATMatch * tkPassingPOGTMLSAT +
                      tkToPOGStaMatch    * tkPassingPOGSta    +
-                     tkToPOGStaVHMatch  * tkPassingPOGStaVH
+                     tkToPOGStaVHMatch  * tkPassingPOGStaVH  +
+    muonsVBTFLike  * tkToVBTFLikeMatch  * tkPassingVBTFLike
 )
 
 
@@ -172,6 +176,8 @@ histoMuFromTk = tnpTreeProducer.clone(
         POG_StaVH  = cms.InputTag("tkPassingPOGStaVH"),
         POG_TMA    = cms.InputTag("tkPassingPOGTMA"),
         POG_TMLSAT = cms.InputTag("tkPassingPOGTMLSAT"),
+        VBTFLike   = cms.InputTag("tkPassingVBTFLike"),
+        Acc_JPsi   = cms.string(JPSI_ACCEPTANCE_CUT),
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("tkMcMatch"),
@@ -190,6 +196,8 @@ histoMuFromCal = tnpTreeProducer.clone(
         POG_GlbPT  = cms.string("isGlobalMuon  && muonID('GlobalMuonPromptTight')"),
         POG_TMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
         POG_TMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
+        VBTFLike   = cms.string(PASSING_VBTFLIKE_CUTS),
+        Acc_JPsi   = cms.string(JPSI_ACCEPTANCE_CUT),
     ),
     ## These two MC things depend on the specific choice of probes
     probeMatches  = cms.InputTag("muMcMatch"),
@@ -210,6 +218,8 @@ histoMuFromTkVtx = tnpTreeProducer.clone(
         POG_StaVH  = cms.InputTag("tkPassingPOGStaVH"),
         POG_TMA    = cms.InputTag("tkPassingPOGTMA"),
         POG_TMLSAT = cms.InputTag("tkPassingPOGTMLSAT"),
+        VBTFLike   = cms.InputTag("tkPassingVBTFLike"),
+        Acc_JPsi   = cms.string(JPSI_ACCEPTANCE_CUT),
     ),
     # chi2 of constrained fit (-1 if it failed)
     pairVariables = cms.PSet(vtxChi2 = cms.string("vertexChi2")),
@@ -218,6 +228,7 @@ histoMuFromTkVtx = tnpTreeProducer.clone(
     probeMatches  = cms.InputTag("tkMcMatch"),
     allProbes     = cms.InputTag("tkProbes"), # NO 'unbias' efficiency on skims
 )
+histoMuFromCal.variables.caloCompatibility = cms.string("caloCompatibility")
 
 #####
 ## Mu from Cal
@@ -231,6 +242,8 @@ histoMuFromCalVtx = tnpTreeProducer.clone(
         POG_GlbPT  = cms.string("isGlobalMuon  && muonID('GlobalMuonPromptTight')"),
         POG_TMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
         POG_TMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
+        VBTFLike   = cms.string(PASSING_VBTFLIKE_CUTS),
+        Acc_JPsi   = cms.string(JPSI_ACCEPTANCE_CUT),
     ),
     # chi2 of constrained fit (-1 if it failed)
     pairVariables = cms.PSet(vtxChi2 = cms.string("vertexChi2")),
@@ -239,6 +252,7 @@ histoMuFromCalVtx = tnpTreeProducer.clone(
     probeMatches  = cms.InputTag("muMcMatch"),
     allProbes     = cms.InputTag("calProbes"),
 )
+histoMuFromCalVtx.variables.caloCompatibility = cms.string("caloCompatibility")
 
 allTPHistosMuonID = cms.Sequence(
     histoMuFromTk  +

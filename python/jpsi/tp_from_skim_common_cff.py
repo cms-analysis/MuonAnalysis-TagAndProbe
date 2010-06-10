@@ -14,14 +14,30 @@ TRACK_CUTS = ("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithM
               "&& track.normalizedChi2 < 4 "+
               "&& abs(track.d0) < 3 && abs(track.dz) < 30")
 PT_ETA_CUTS = "(pt > 3 || (abs(eta)>1 && p > 2.6))" ## the enclosing () are very important, because there's an "||"
+JPSI_ACCEPTANCE_CUT = ("(       abs(eta) <= 1.3  && pt > 3.3 || "+
+                       "  1.3 < abs(eta) <= 2.2  && p >  2.9 || "+
+                       "  2.2 < abs(eta) <= 2.4  && pt > 0.8 )  ")
+
 PASSING_GLB_CUT = ("isGlobalMuon && globalTrack.normalizedChi2 < 20  && "+
                    "globalTrack.hitPattern.numberOfValidMuonHits > 0 && "+
                    "muonID('TrackerMuonArbitrated') &&  muonID('TMLastStationAngTight')")
 PASSING_TMI_CUT = "isTrackerMuon && muonID('TMLastStationAngTight')";
 PASSING_TM_CUT  = "!("+PASSING_GLB_CUT+") && " + PASSING_TMI_CUT;
 
-PASS_HLT_1MU = "!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"
-PASS_HLT_2MU = "!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"
+PASSING_VBTFLIKE_CUTS = ("numberOfMatches > 1 && " # tracker muon, 2 stations
+                         "muonID('GlobalMuonPromptTight') && "+ # and global, valid muon hits in global track, chi2/ndf < 10
+                         "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0 && "+ # track cuts
+                         "abs(dB) < 0.2") # dxy w.r.t. PV or BS, 2mm
+
+PASS_HLT_Mu3 = "(!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty())"
+PASS_HLT_L1DoubleMuOpen = "(!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty())"
+PASS_HLT_Mu0_Track0_Jpsi_New = ("(!triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty() && "+
+                               "  triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered'))")
+PASS_HLT_Mu0_Track0_Jpsi_ReDigi = PASS_HLT_Mu0_Track0_Jpsi_New.replace("::HLT","::REDIGI")
+PASS_HLT_Mu0_Track0_Jpsi = "( %s || %s )" % ( PASS_HLT_Mu0_Track0_Jpsi_New, PASS_HLT_Mu0_Track0_Jpsi_ReDigi )
+PASS_HLT_Mu3_Track0_Jpsi = PASS_HLT_Mu0_Track0_Jpsi.replace("Mu0Track","Mu3Track")
+PASS_HLT_1MU = "( %s || %s )" % ( PASS_HLT_Mu3, PASS_HLT_Mu0_Track0_Jpsi)
+PASS_HLT_2MU = "( %s || %s )" % ( PASS_HLT_Mu3, PASS_HLT_L1DoubleMuOpen)
 TAG_CUTS_1MU = "isGlobalMuon && " + TRACK_CUTS +' && '+ PASS_HLT_1MU
 TAG_CUTS_2MU = "isGlobalMuon && " + TRACK_CUTS +' && '+ PASS_HLT_2MU
 
@@ -129,8 +145,8 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
         L1DoubleMuOpen  = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
         Mu0_L1MuOpen    = cms.string("!triggerObjectMatchesByFilter('hltMu0L1MuOpenL3Filtered0').empty()"),
         Mu3_L1MuOpen    = cms.string("!triggerObjectMatchesByFilter('hltMu3L1MuOpenL3Filtered3').empty()"),
-        Mu0_Track0_JPsi = cms.string("!triggerObjectMatchesByFilter('hltMu0TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
-        Mu3_Track0_JPsi = cms.string("!triggerObjectMatchesByFilter('hltMu3TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty()"),
+        Mu0_Track0_JPsi = cms.string(PASS_HLT_Mu0_Track0_Jpsi),
+        Mu3_Track0_JPsi = cms.string(PASS_HLT_Mu3_Track0_Jpsi),
     ),
     ## MC-related info
     isMC = cms.bool(True),

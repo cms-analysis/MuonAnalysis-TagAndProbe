@@ -24,6 +24,7 @@ histoTrigger = tnpTreeProducer.clone(
         POG_GlbPT  = cms.string("isGlobalMuon  && muonID('GlobalMuonPromptTight')"),
         POG_TMA    = cms.string("isTrackerMuon && muonID('TrackerMuonArbitrated')"),
         POG_TMLSAT = cms.string("isTrackerMuon && muonID('TMLastStationAngTight')"),
+        VBTFLike   = cms.string(PASSING_VBTFLIKE_CUTS),
         ## Triggers
         L1MuOpen   = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenL1Filtered0').empty()"),
         L2Mu0      = cms.string("!triggerObjectMatchesByFilter('hltL2Mu0L2Filtered0').empty()"),
@@ -33,10 +34,13 @@ histoTrigger = tnpTreeProducer.clone(
         DoubleMu0  = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered').empty()"),
         DoubleMu3  = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered0').empty()"),
         L1DoubleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
+        ## Acceptance
+        Acc_JPsi   = cms.string(JPSI_ACCEPTANCE_CUT),
     ),
     probeMatches  = cms.InputTag("muMcMatch"),
     allProbes = cms.InputTag("anyProbeMuons"),
 )
+histoTrigger.variables.caloCompatibility = cms.string("caloCompatibility")
 
 tnpSequenceTrigger = cms.Sequence(
     anyProbeMuons *
