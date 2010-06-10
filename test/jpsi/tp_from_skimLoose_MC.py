@@ -33,20 +33,10 @@ process.load("MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_Trigger_cff")
 
 from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
 
-## Loosen tag requirements to the minimum
-process.tagMuons1Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty() && " + TRACK_CUTS;
-process.tagMuons2Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty() && " + TRACK_CUTS;
-#process.tagMuons2Mu.cut = "isGlobalMuon && !triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty() && " + TRACK_CUTS;
-
 from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import addDiMuonSeparationVariables
 addDiMuonSeparationVariables(process, process.tnpSequenceTrigger, process.histoTrigger)
 addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromTk)
 addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromCal)
-
-## On REDIGI
-#for K,V in allTPTreeProducers(process): 
-#    V.tagFlags.HLTMu0Tk = cms.string("!triggerObjectMatchesByFilter('hltMu0TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::REDIGI').empty()")
-#    V.tagFlags.HLTMu3Tk = cms.string("!triggerObjectMatchesByFilter('hltMu3TrackJpsiTrackMassFiltered').empty() && !triggerObjectMatchesByCollection('hltL3MuonCandidates::REDIGI').empty()")
 
 process.tagAndProbe = cms.Path( 
     process.tnpCommonSequence    *
@@ -64,5 +54,3 @@ process.tagAndProbe = cms.Path(
 ##                   |_|                                         
 ##   
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC.root"))
-
-
