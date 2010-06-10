@@ -4,8 +4,9 @@ scheduler = glite
 use_server = 1
 
 [CMSSW]
-datasetpath = /JPsiToMuMu_2MuPEtaFilter_7TeV-pythia6-evtgen/muon-Spring10_skimJPsiLoose_v3-8b75d8af690cce599c8716d67f1bedfa/USER  
-dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
+datasetpath = /JPsiToMuMu_2MuPEtaFilter_7TeV-pythia6-evtgen/StoreResults-Spring10_skimJPsiLoose_v3-8b75d8af690cce599c8716d67f1bedfa/USER
+#datasetpath = /JPsiToMuMu_2MuPEtaFilter_7TeV-pythia6-evtgen/muon-Spring10_skimJPsiLoose_v3-8b75d8af690cce599c8716d67f1bedfa/USER  
+#dbs_url = https://cmsdbsprod.cern.ch:8443/cms_dbs_ph_analysis_02_writer/servlet/DBSServlet
 pset = tp_from_skimLoose_MC.py
 total_number_of_events = -1
 events_per_job = 100000
@@ -15,6 +16,7 @@ return_data = 1
 copy_data = 0
 
 [GRID]
+# you might have to uncomment this, if you're not a priority user
 rb = CERN
 virtual_organization   = cms
 role                   = priorityuser
