@@ -45,6 +45,35 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     pref->Draw();
     hfit->Draw("P SAME");
     gPad->Print(prefix+alias+".png");
+
+    TGraphAsymmErrors diff(hfit->GetN()), zero(hfit->GetN());
+    double max = 0;
+    for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
+        max = TMath::Max(max, fabs(hfit->GetY()[i] - href->GetY()[i]) + fabs(hfit->GetErrorYhigh(i)) + fabs(hfit->GetErrorYlow(i)));
+        max = TMath::Max(max, fabs(href->GetErrorYlow(i)) + fabs(href->GetErrorYhigh(i)));
+        diff.SetPoint(i, hfit->GetX()[i], hfit->GetY()[i] - href->GetY()[i]);
+        diff.SetPointError(i, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), 
+                              hfit->GetErrorYlow(i), hfit->GetErrorYhigh(i));
+        zero.SetPoint(i, href->GetX()[i], 0);
+        zero.SetPointError(i, href->GetErrorXlow(i), href->GetErrorXhigh(i), 
+                              href->GetErrorYlow(i), href->GetErrorYhigh(i));
+    }
+    zero.SetLineWidth(2);
+    zero.SetLineColor(kRed);
+    zero.SetMarkerColor(kRed);
+    zero.SetMarkerStyle(25);
+    zero.SetMarkerSize(2.0);
+    diff.SetLineWidth(2);
+    diff.SetLineColor(kBlack);
+    diff.SetMarkerColor(kBlack);
+    diff.SetMarkerStyle(20);
+    diff.SetMarkerSize(1.6);
+
+    //diff.Draw("AP");
+    zero.Draw("AP"); // SAME");
+    diff.Draw("P SAME");
+    zero.GetYaxis()->SetRangeUser(-1.2*max,1.2*max);
+    gPad->Print(prefix+alias+"_diff.png");
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
