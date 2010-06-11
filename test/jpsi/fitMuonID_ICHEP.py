@@ -37,6 +37,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     Categories = cms.PSet(
         POG_TMLSAT = cms.vstring("POG_TMLSAT", "dummy[pass=1,fail=0]"),
+        VBTFLike = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
         POG_Glb = cms.vstring("POG_Glb", "dummy[pass=1,fail=0]"),
         tag_Mu3 = cms.vstring("tag_Mu3", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
@@ -84,7 +85,7 @@ if scenario == "datalike_mc":
 
 
 
-for T in [ "POG_Glb", "POG_TMLSAT" ]:
+for T in [ "POG_Glb", "POG_TMLSAT", "VBTFLike" ]:
     setattr(process.TnP_MuonID.Efficiencies, T+"_pt_abseta", cms.PSet(
         EfficiencyCategoryAndState = cms.vstring(T,"pass"),
         UnbinnedVariables = cms.vstring("mass"),
