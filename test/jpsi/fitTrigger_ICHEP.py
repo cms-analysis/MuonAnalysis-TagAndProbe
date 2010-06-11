@@ -42,6 +42,8 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         POG_GlbPT = cms.vstring("POG_GlbPT", "dummy[pass=1,fail=0]"),
         POG_TMA = cms.vstring("POG_TMA", "dummy[pass=1,fail=0]"),
         POG_TMLSAT = cms.vstring("POG_TMLSAT", "dummy[pass=1,fail=0]"),
+        Cal = cms.vstring("Cal", "dummy[pass=1,fail=0]"),
+        VBTFLike = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
         # Other constraints
         tag_Mu3 = cms.vstring("tag_Mu3", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
@@ -90,7 +92,8 @@ if scenario == "datalike_mc":
 
 
 for T in [ "L1DoubleMuOpen", "Mu3" ]:
-    for M in ["POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT"]:
+    #for M in ["POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT"]:
+    for M in ["POG_Glb", "VBTFLike", "Cal"]:
         BINNEDVARS = PT_ETA_BINS.clone()
         setattr(BINNEDVARS, M, cms.vstring("pass"))
         setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_pt_abseta", cms.PSet(

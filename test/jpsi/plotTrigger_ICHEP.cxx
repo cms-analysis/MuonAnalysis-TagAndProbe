@@ -29,9 +29,10 @@ void plotTrigger_ICHEP(TString scenario) {
 }
 
 void plotTriggerData() {
-    TString mu[4] = { "POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT" };
+    //TString mu[4] = { "POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT" };
+    TString mu[3] = { "POG_Glb", "Cal", "VBTFLike" };
     TString trig[2] = { "Mu3", "L1DoubleMuOpen" };
-    for (size_t i = 0; i < 4; ++i) {
+    for (size_t i = 0; i < 3; ++i) {
       for (size_t j = 0; j < 2; ++j) {
         TString idname = mu[i]+"_To_"+trig[j];
         plotTriggerData(idname);
