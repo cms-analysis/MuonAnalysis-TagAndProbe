@@ -16,6 +16,16 @@ void plotUtil() { }
 
 /* Other useful plotting macros */
 
+TString datalbl = "DATA", reflbl = "SIM";
+void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TString lab2) {
+    TLegend *leg = new TLegend(.7,.15,.85,.3);
+    leg->AddEntry(g1, lab1, "LP");
+    leg->AddEntry(g2, lab2, "LP");
+    leg->SetShadowColor(0);
+    leg->SetFillColor(0);
+    leg->Draw();
+}
+
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) {
     RooPlot *pref = getFromPrefix(ref->GetDirectory("fit_eff_plots"), fitname);
@@ -44,6 +54,7 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
 
     pref->Draw();
     hfit->Draw("P SAME");
+    if (datalbl) doLegend(hfit,href,datalbl,reflbl);
     gPad->Print(prefix+alias+".png");
 
     TGraphAsymmErrors diff(hfit->GetN()), zero(hfit->GetN());
@@ -73,6 +84,7 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     zero.Draw("AP"); // SAME");
     diff.Draw("P SAME");
     zero.GetYaxis()->SetRangeUser(-1.2*max,1.2*max);
+    if (datalbl) doLegend(&diff,&zero,datalbl,reflbl);
     gPad->Print(prefix+alias+"_diff.png");
 }
 
@@ -96,6 +108,7 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 
     pref->Draw();
     hfit->Draw("P SAME");
+    doLegend(hfit,href,"T&P FIT","MC Truth");
     gPad->Print(prefix+alias+".png");
 }
 

@@ -33,6 +33,8 @@ void plotMuonID_ICHEP(TString scenario, int fromTk=0) {
         prefix = "plots_ichep_dev/muonid_tk_vs_cal/";
         basedir   = "histoMuFromTk";
         basedir2  = "histoMuFromCal";
+        datalbl = "Trk Probes";
+        reflbl = "Cal Probes";
     }
 
     prefix = prefix+scenario+"/";
@@ -50,17 +52,17 @@ void plotMuonID_ICHEP(TString scenario, int fromTk=0) {
 }
 
 void plotMuonIDData() {
-    char *ids[2] = { "Glb", "TMLSAT" };
-    for (size_t i = 0; i < 2; ++i) {
+    char *ids[3] = { "POG_Glb", "POG_TMLSAT", "VBTFLike" };
+    for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
 
-        TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/POG_"+idname+"_pt_abseta/");
+        TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
         if (ref != 0) {
-            TDirectory *ref_pt_eta = ref->GetDirectory(basedir2+"/POG_"+idname+"_pt_abseta/");
+            TDirectory *ref_pt_eta = ref->GetDirectory(basedir2+"/"+idname+"_pt_abseta/");
             refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
             refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
         } else {
-            TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/POG_"+idname+"_pt_abseta_mcTrue/");
+            TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
             if (mc_pt_eta) {
                 mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
                 mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
