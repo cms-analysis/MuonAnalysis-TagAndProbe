@@ -97,9 +97,9 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
         if (fabs(href->GetY()[i]) < 0.05) { --j; continue; }
         double r   = hfit->GetY()[i]/href->GetY()[i];
         double rup = (hfit->GetY()[i] == 0 ? hfit->GetErrorYhigh(i)/(href->GetY()[i]) :
-                                             TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(i)/href->GetY()[i]));
+                                             r*TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(i)/href->GetY()[i]));
         double rdn = (hfit->GetY()[i] == 0 ? 0 :
-                                             TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(i)/href->GetY()[i]));
+                                             r*TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(i)/href->GetY()[i]));
         max = TMath::Max(max, fabs(r-1+rup));
         max = TMath::Max(max, fabs(r-1-rdn));
         ratio.SetPoint(j, hfit->GetX()[i], r);
