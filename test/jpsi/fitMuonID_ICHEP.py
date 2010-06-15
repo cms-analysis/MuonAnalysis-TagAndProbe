@@ -24,7 +24,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     NumCPU = cms.uint32(1),
-    SaveWorkspace = cms.bool(False),
+    SaveWorkspace = cms.bool(True),
 
     Variables = cms.PSet(
         mass = cms.vstring("Tag-Probe Mass", "2.8", "3.5", "GeV/c^{2}"),
