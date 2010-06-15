@@ -86,6 +86,38 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     zero.GetYaxis()->SetRangeUser(-1.2*max,1.2*max);
     if (datalbl) doLegend(&diff,&zero,datalbl,reflbl);
     gPad->Print(prefix+alias+"_diff.png");
+
+    size_t nNZD = 0; // non-zero-denominator
+    for (size_t i = 0, n = href->GetN(); i < n; ++i) {
+        if (fabs(href->GetY()[i]) > 0.05) nNZD++;
+    }
+    TGraphAsymmErrors ratio(nNZD);
+    max = 0;
+    for (size_t i = 0, j = 0, n = hfit->GetN(); i < n; ++i, ++j) {
+        if (fabs(href->GetY()[i]) < 0.05) { --j; continue; }
+        double r   = hfit->GetY()[i]/href->GetY()[i];
+        double rup = (hfit->GetY()[i] == 0 ? hfit->GetErrorYhigh(i)/(href->GetY()[i]) :
+                                             TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(i)/href->GetY()[i]));
+        double rdn = (hfit->GetY()[i] == 0 ? 0 :
+                                             TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(i)/href->GetY()[i]));
+        max = TMath::Max(max, fabs(r-1+rup));
+        max = TMath::Max(max, fabs(r-1-rdn));
+        ratio.SetPoint(j, hfit->GetX()[i], r);
+        ratio.SetPointError(j, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), rdn, rup);
+    }
+    TLine line(hfit->GetX()[0]-hfit->GetErrorXlow(i), 1, hfit->GetX()[hfit->GetN()-1]+hfit->GetErrorXhigh(hfit->GetN()-1), 1);
+    line.SetLineWidth(2);
+    line.SetLineColor(kRed);
+    ratio.SetLineWidth(2);
+    ratio.SetLineColor(kBlack);
+    ratio.SetMarkerColor(kBlack);
+    ratio.SetMarkerStyle(20);
+    ratio.SetMarkerSize(1.6);
+    ratio.Draw("AP");
+    line.DrawClone("SAME");
+    ratio.Draw("P SAME");
+    ratio.GetYaxis()->SetRangeUser(1-1.2*max,1+1.2*max);
+    gPad->Print(prefix+alias+"_ratio.png");
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
