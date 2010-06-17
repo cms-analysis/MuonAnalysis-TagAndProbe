@@ -107,14 +107,12 @@ histoTracking = tnpTreeProducer.clone(
     probeMatches  = cms.InputTag("staMcMatch"),
     allProbes = cms.InputTag("staProbes"),
 )
-histoTracking.variables.match_deltaR     = cms.InputTag("staToTkMatch", "deltaR")
-histoTracking.variables.match_deltaEta   = cms.InputTag("staToTkMatch", "deltaEta")
-histoTracking.variables.match_deltaPhi   = cms.InputTag("staToTkMatch", "deltaPhi")
-histoTracking.variables.match_deltaPtRel = cms.InputTag("staToTkMatch", "deltaPtRel")
-histoTracking.variables.match_deltaR_NoJPsi     = cms.InputTag("staToTkMatchNoJPsi", "deltaR")
-histoTracking.variables.match_deltaEta_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi", "deltaEta")
-histoTracking.variables.match_deltaPhi_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi", "deltaPhi")
-histoTracking.variables.match_deltaPtRel_NoJPsi = cms.InputTag("staToTkMatchNoJPsi", "deltaPtRel")
+histoTracking.variables.match_deltaR   = cms.InputTag("staToTkMatch", "deltaR")
+histoTracking.variables.match_deltaEta = cms.InputTag("staToTkMatch", "deltaEta")
+histoTracking.variables.match_deltaR_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi", "deltaR")
+histoTracking.variables.match_deltaEta_NoJPsi = cms.InputTag("staToTkMatchNoJPsi", "deltaEta")
+histoTracking.variables.match_deltaR_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi", "deltaR")
+histoTracking.variables.match_deltaEta_NoBestJPsi = cms.InputTag("staToTkMatchNoBestJPsi", "deltaEta")
 
 allTPHistosTracking = cms.Sequence(
         histoTracking     
