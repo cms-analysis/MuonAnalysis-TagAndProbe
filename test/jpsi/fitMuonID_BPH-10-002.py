@@ -61,7 +61,7 @@ CONSTRAINTS = cms.PSet(
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
-    pt     = cms.vdouble( 1.0, 3.0, 5.0, 8.0, 20.0 ),
+    pt     = cms.vdouble(  0.0, 1.0, 3.0, 5.0, 8.0, 20.0 ),
     abseta = cms.vdouble( 0.0, 1.2, 2.4 ),
 )
 
