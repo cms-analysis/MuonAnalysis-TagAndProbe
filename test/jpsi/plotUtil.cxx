@@ -26,8 +26,18 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TStrin
     leg->Draw();
 }
 
+int findBin(TGraphAsymmErrors *g, double x) {
+    for (int i = 0; i < g->GetN(); ++i) {
+        double xi = g->GetX()[i];
+        if ((xi - g->GetErrorXlow(i) <= x) && (x <= xi + g->GetErrorXhigh(i))) {
+            return i;
+        }
+    }
+    return -1;
+}
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) {
+    std::cout << "Making plot for " << fitname << std::endl;
     RooPlot *pref = getFromPrefix(ref->GetDirectory("fit_eff_plots"), fitname);
     if (pref == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << ref->GetName() << std::endl;
@@ -57,17 +67,55 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     if (datalbl) doLegend(hfit,href,datalbl,reflbl);
     gPad->Print(prefix+alias+".png");
 
-    TGraphAsymmErrors diff(hfit->GetN()), zero(hfit->GetN());
-    double max = 0;
+    size_t nNZD = 0; // non-zero-denominator
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
-        max = TMath::Max(max, fabs(hfit->GetY()[i] - href->GetY()[i]) + fabs(hfit->GetErrorYhigh(i)) + fabs(hfit->GetErrorYlow(i)));
-        max = TMath::Max(max, fabs(href->GetErrorYlow(i)) + fabs(href->GetErrorYhigh(i)));
-        diff.SetPoint(i, hfit->GetX()[i], hfit->GetY()[i] - href->GetY()[i]);
+        int j = findBin(href,hfit->GetX()[i]); if (j == -1) continue ;
+        if (fabs(href->GetY()[j]) > 0.05) nNZD++;
+    }
+    TGraphAsymmErrors ratio(nNZD);
+    double max = 0;
+    for (size_t i = 0, k = 0, n = hfit->GetN(); i < n; ++i) {
+        int j = findBin(href,hfit->GetX()[i]); if (j == -1) continue ;
+        if (fabs(href->GetY()[j]) < 0.05) continue; else ++k;
+        double r   = hfit->GetY()[i]/href->GetY()[j];
+        double rup = (hfit->GetY()[i] == 0 ? hfit->GetErrorYhigh(i)/(href->GetY()[j]) :
+                                             r*TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(j)/href->GetY()[j]));
+        double rdn = (hfit->GetY()[i] == 0 ? 0 :
+                                             r*TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(j)/href->GetY()[j]));
+        max = TMath::Max(max, fabs(r-1+rup));
+        max = TMath::Max(max, fabs(r-1-rdn));
+        ratio.SetPoint(k-1, hfit->GetX()[i], r);
+        ratio.SetPointError(k-1, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), rdn, rup);
+    }
+
+    ratio.Draw("AP");
+    TLine line(ratio.GetXaxis()->GetXmin(), 1, ratio.GetXaxis()->GetXmax(), 1);
+    line.SetLineWidth(2);
+    line.SetLineColor(kRed);
+    ratio.SetLineWidth(2);
+    ratio.SetLineColor(kBlack);
+    ratio.SetMarkerColor(kBlack);
+    ratio.SetMarkerStyle(20);
+    ratio.SetMarkerSize(1.6);
+    line.DrawClone("SAME");
+    ratio.Draw("P SAME");
+    ratio.GetYaxis()->SetRangeUser(1-1.2*max,1+1.2*max);
+    if (datalbl) ratio.GetYaxis()->SetTitle(datalbl+"/"+reflbl+" ratio");
+    gPad->Print(prefix+alias+"_ratio.png");
+    
+    TGraphAsymmErrors diff(hfit->GetN()), zero(hfit->GetN());
+    max = 0;
+    for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
+        int j = findBin(href,hfit->GetX()[i]);
+        if (j == -1) { std::cerr << "ERROR: missing bin in reference." << std::endl; return;  };
+        max = TMath::Max(max, fabs(hfit->GetY()[i] - href->GetY()[j]) + fabs(hfit->GetErrorYhigh(i)) + fabs(hfit->GetErrorYlow(i)));
+        max = TMath::Max(max, fabs(href->GetErrorYlow(j)) + fabs(href->GetErrorYhigh(j)));
+        diff.SetPoint(i, hfit->GetX()[i], hfit->GetY()[i] - href->GetY()[j]);
         diff.SetPointError(i, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), 
                               hfit->GetErrorYlow(i), hfit->GetErrorYhigh(i));
-        zero.SetPoint(i, href->GetX()[i], 0);
-        zero.SetPointError(i, href->GetErrorXlow(i), href->GetErrorXhigh(i), 
-                              href->GetErrorYlow(i), href->GetErrorYhigh(i));
+        zero.SetPoint(i, href->GetX()[j], 0);
+        zero.SetPointError(i, href->GetErrorXlow(j), href->GetErrorXhigh(j), 
+                              href->GetErrorYlow(j), href->GetErrorYhigh(j));
     }
     zero.SetLineWidth(2);
     zero.SetLineColor(kRed);
@@ -84,40 +132,10 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     zero.Draw("AP"); // SAME");
     diff.Draw("P SAME");
     zero.GetYaxis()->SetRangeUser(-1.2*max,1.2*max);
+    if (datalbl) zero.GetYaxis()->SetTitle(datalbl+" - "+reflbl+" difference");
     if (datalbl) doLegend(&diff,&zero,datalbl,reflbl);
     gPad->Print(prefix+alias+"_diff.png");
 
-    size_t nNZD = 0; // non-zero-denominator
-    for (size_t i = 0, n = href->GetN(); i < n; ++i) {
-        if (fabs(href->GetY()[i]) > 0.05) nNZD++;
-    }
-    TGraphAsymmErrors ratio(nNZD);
-    max = 0;
-    for (size_t i = 0, j = 0, n = hfit->GetN(); i < n; ++i, ++j) {
-        if (fabs(href->GetY()[i]) < 0.05) { --j; continue; }
-        double r   = hfit->GetY()[i]/href->GetY()[i];
-        double rup = (hfit->GetY()[i] == 0 ? hfit->GetErrorYhigh(i)/(href->GetY()[i]) :
-                                             r*TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(i)/href->GetY()[i]));
-        double rdn = (hfit->GetY()[i] == 0 ? 0 :
-                                             r*TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(i)/href->GetY()[i]));
-        max = TMath::Max(max, fabs(r-1+rup));
-        max = TMath::Max(max, fabs(r-1-rdn));
-        ratio.SetPoint(j, hfit->GetX()[i], r);
-        ratio.SetPointError(j, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), rdn, rup);
-    }
-    TLine line(hfit->GetX()[0]-hfit->GetErrorXlow(i), 1, hfit->GetX()[hfit->GetN()-1]+hfit->GetErrorXhigh(hfit->GetN()-1), 1);
-    line.SetLineWidth(2);
-    line.SetLineColor(kRed);
-    ratio.SetLineWidth(2);
-    ratio.SetLineColor(kBlack);
-    ratio.SetMarkerColor(kBlack);
-    ratio.SetMarkerStyle(20);
-    ratio.SetMarkerSize(1.6);
-    ratio.Draw("AP");
-    line.DrawClone("SAME");
-    ratio.Draw("P SAME");
-    ratio.GetYaxis()->SetRangeUser(1-1.2*max,1+1.2*max);
-    gPad->Print(prefix+alias+"_ratio.png");
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
