@@ -25,21 +25,22 @@ void plotTrigger_ICHEP(TString scenario) {
         ref = (TFile *) gROOT->GetListOfFiles()->At(1);
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
+
+    preliminary = "CMS Preliminary";
     plotTriggerData();
 }
 
 void plotTriggerData() {
-    //TString mu[4] = { "POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT" };
     TString mu[3] = { "POG_Glb", "Cal", "VBTFLike" };
-    //TString mu[1] = { "POG_Glb" };
     TString trig[2] = { "Mu3", "L1DoubleMuOpen" };
     for (size_t i = 0; i < 3; ++i) {
       for (size_t j = 0; j < 2; ++j) {
+        retitle = trig[j]+" efficiency";
         TString idname = mu[i]+"_To_"+trig[j];
         plotTriggerData(idname);
       }
-
       for (size_t j = 0; j < 1; ++j) {
+        retitle = trig[j]+"/L1 efficiency";
         TString idname = mu[i]+"_To_"+trig[j]+"overL1";
         plotTriggerData(idname);
       }
@@ -62,6 +63,7 @@ void plotTriggerData(TString idname) {
         TDirectory *mc_pt  = gFile->GetDirectory(basedir+"/"+idname+"_pt_mcTrue/");
         TDirectory *mc_eta = gFile->GetDirectory(basedir+"/"+idname+"_abseta_mcTrue/");
         if (mc_pt) {
+            datalbl = "T&P fit"; reflbl = "Sim. truth";
             mcstack(fit_pt,  mc_pt,  idname+"_pt_barrel",   "pt_PLOT_abseta_bin0_");
             mcstack(fit_pt,  mc_pt,  idname+"_pt_endcaps",  "pt_PLOT_abseta_bin1_");
             //if (!mu3) mcstack(fit_eta, mc_eta, idname+"_eta_pt-2-3",  "abseta_PLOT_pt_bin0_");

@@ -48,10 +48,14 @@ void plotMuonID_ICHEP(TString scenario, int fromTk=0) {
         ref = (TFile *) gROOT->GetListOfFiles()->At(1);
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
+
+    preliminary = "CMS Preliminary";
     plotMuonIDData();
 }
 
 void plotMuonIDData() {
+    retitle = "Efficiency";
+
     char *ids[3] = { "POG_Glb", "POG_TMLSAT", "VBTFLike" };
     for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
@@ -64,6 +68,7 @@ void plotMuonIDData() {
         } else {
             TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
             if (mc_pt_eta) {
+                datalbl = "T&P fit"; reflbl = "Sim. truth";
                 mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
                 mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             } else {
@@ -72,7 +77,7 @@ void plotMuonIDData() {
             }
         }
 
-        if (basedir2 == basedir) {
+        if ((basedir2 == basedir) && (ref == 0)) {
             doCanvas(fit_pt_eta, 1, 5, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
             doCanvas(fit_pt_eta, 1, 5, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
         }
