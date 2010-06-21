@@ -73,8 +73,8 @@ void plotMuonIDData() {
         }
 
         if (basedir2 == basedir) {
-            doCanvas(fit_pt_eta, 1, 4, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
-            doCanvas(fit_pt_eta, 1, 4, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
+            doCanvas(fit_pt_eta, 1, 5, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
+            doCanvas(fit_pt_eta, 1, 5, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
         }
     }
 

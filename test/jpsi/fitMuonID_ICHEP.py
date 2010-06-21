@@ -61,13 +61,21 @@ CONSTRAINTS = cms.PSet(
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
-    pt     = cms.vdouble(  0.5, 2.0, 3.0, 5.0, 12.0),
+    pt     = cms.vdouble(  0.5, 2.0, 3.0, 5.0, 7.0, 15.0),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
 
 
 process.TnP_MuonID = Template.clone(
-    InputFileNames = cms.vstring("tnpJPsi_Data.root"),
+    InputFileNames = cms.vstring(
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run132440to134987.root',
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run13509to135175.root',
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run135445to135575.root',
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run135735.root',
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run136033to136082.root',
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run136087to136119.root',
+        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run137027to137028.root',
+    ),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("histoMuFromCal"),
     OutputFileName = cms.string("TnP_ICHEP_MuonID_%s.root" % scenario),
@@ -79,8 +87,8 @@ if scenario == "data_all":
 
 if scenario == "datalike_mc":
     process.TnP_MuonID.InputFileNames = [
-        "tnpJPsi_JPsiMuMu_Spring10_0.117pb.root",
-        "tnpJPsi_ppMuX_Spring10_0.117pb.root"
+        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_JPsiMuMu_Spring10_0.117pb.root",
+        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_ppMuX_Spring10_0.117pb.root"
     ]
 
 
@@ -105,8 +113,7 @@ process.TnP_MuonID_Tk = process.TnP_MuonID.clone(
 )
 
 process.p = cms.Path(
-    process.TnP_MuonID
-    # +
-    #process.TnP_MuonID_Tk
+    process.TnP_MuonID    +
+    process.TnP_MuonID_Tk
 )
 
