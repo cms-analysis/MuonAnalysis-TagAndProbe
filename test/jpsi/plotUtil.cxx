@@ -61,7 +61,11 @@ void reTitleY(TCanvas *pl, TString ytitle) {
     TH1 *last = (TH1*) pl->GetListOfPrimitives()->At(pl->GetListOfPrimitives()->GetSize()-1);
     if (first) reTitleTAxis(first->GetYaxis(), ytitle);
     if (last)  reTitleTAxis(last->GetYaxis(), ytitle);
-}   
+}  
+const char * getXtitle(TCanvas *from) {
+    TH1 *frame = (TH1*) from->GetListOfPrimitives()->At(0);
+    return frame->GetXaxis()->GetTitle();
+} 
 void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.0) {
    ax->SetTitle(ytitle); 
    ax->SetTitleOffset(yoffset); 
@@ -83,7 +87,7 @@ void fixupErrors(TGraphAsymmErrors *gr) {
     }
 }
 
-void doRatio(RooHist *hfit, RooHist *href, TString alias) {
+void doRatio(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     size_t nNZD = 0; // non-zero-denominator
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
         int j = findBin(href,hfit->GetX()[i]); if (j == -1) continue ;
@@ -118,12 +122,13 @@ void doRatio(RooHist *hfit, RooHist *href, TString alias) {
     ratio.Draw("P SAME");
     ratio.GetYaxis()->SetRangeUser(1-1.5*max,1+1.2*max);
     ratio.GetXaxis()->SetRangeUser(ratio.GetX()[0]-ratio.GetErrorXlow(0), ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1));
+    ratio.GetXaxis()->SetTitle(xtitle);
     if (datalbl) reTitleTAxis(ratio.GetYaxis(), datalbl+"/"+reflbl+" ratio");
     if (preliminary != "") cmsprelim();
     gPad->Print(prefix+alias+"_ratio.png");
 }
 
-void doDiff(RooHist *hfit, RooHist *href, TString alias) {
+void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     double maxError = 0.7; 
     size_t nTP = 0; // non-trivial point (interval not equal to [0,1])
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
@@ -161,6 +166,7 @@ void doDiff(RooHist *hfit, RooHist *href, TString alias) {
     diff.Draw("P SAME");
     diff.GetXaxis()->SetRangeUser(diff.GetX()[0]-diff.GetErrorXlow(0), diff.GetX()[diff.GetN()-1]+diff.GetErrorXhigh(diff.GetN()-1));
     diff.GetYaxis()->SetRangeUser(-1.5*max,1.2*max);
+    diff.GetXaxis()->SetTitle(xtitle);
     if (datalbl) reTitleTAxis(diff.GetYaxis(), datalbl+" - "+reflbl+" difference");
     if (preliminary != "") cmsprelim();
     gPad->Print(prefix+alias+"_diff.png");
@@ -201,8 +207,8 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     if (datalbl) doLegend(hfit,href,datalbl,reflbl);
     gPad->Print(prefix+alias+".png");
 
-    doRatio(hfit,href,alias); 
-    doDiff(hfit,href,alias); 
+    doRatio(hfit,href,alias,getXtitle(pfit)); 
+    doDiff(hfit,href,alias,getXtitle(pfit)); 
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
@@ -232,8 +238,8 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
     doLegend(hfit,href,datalbl,reflbl);
     gPad->Print(prefix+alias+".png");
 
-    doRatio(hfit,href,alias); 
-    doDiff(hfit,href,alias); 
+    doRatio(hfit,href,alias,getXtitle(pfit)); 
+    doDiff(hfit,href,alias,getXtitle(pfit)); 
 }
 
 
