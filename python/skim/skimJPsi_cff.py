@@ -34,7 +34,7 @@ goodTracks = cms.EDFilter("TrackSelector",
 ## ==== Slim PAT jets, for B analysis that need dr(mu,jet) ====
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import patJetCorrFactors
 from PhysicsTools.PatAlgos.producersLayer1.jetProducer_cff import patJets as ak5CaloJetsPAT
-patJetCorrFactors.corrSample = "Summer09_7TeV_ReReco332" ## << TO BE IMPROVED
+patJetCorrFactors.corrSample = "Spring10" ## << TO BE IMPROVED
 patJetCorrFactors.corrLevels.L5Flavor = 'none' # save space
 patJetCorrFactors.corrLevels.L7Parton = 'none' # save space
 ak5CaloJetsPAT.addBTagInfo         = False # save
@@ -48,10 +48,24 @@ patJets = cms.EDFilter("PATJetSelector",
     cut = cms.string("pt > 20 && abs(eta) < 3 && (emEnergyFraction() > 0.01 && jetID.n90Hits > 1 && jetID.fHPD < 0.98)"),
 )
 
+## ==== Slim TRACK jets ====
+from CommonTools.RecoAlgos.TrackWithVertexRefSelector_cfi import *
+from RecoJets.JetProducers.TracksForJets_cff import *
+from RecoJets.JetProducers.ak5TrackJets_cfi import *
+from RecoJets.JetAssociationProducers.ak5JTA_cff import *
+from RecoBTag.Configuration.RecoBTag_cff import *
+ak5JetTracksAssociatorAtVertex.jets = "ak5TrackJets"
+btagSeqAK5 = cms.Sequence(
+    ak5JetTracksAssociatorAtVertex *
+    impactParameterTagInfos *
+    (trackCountingHighPurBJetTags + trackCountingHighEffBJetTags)
+)
+
 slimAOD = cms.Sequence(
     genMuons +
     goodTracks +
-    (patJetCorrFactors * ak5CaloJetsPAT) * patJets
+    (patJetCorrFactors * ak5CaloJetsPAT) * patJets +
+    trackWithVertexRefSelector * trackRefsForJets * ak5TrackJets * btagSeqAK5
 )
 
 
@@ -85,10 +99,18 @@ patMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
     cut = cms.string(ptMinCut),
 )
+
+IS_L1MU='hasFilterId(-81)'; IS_HLTMU='hasFilterId(83)'
+patTriggerMuons = cms.EDFilter("PATTriggerObjectStandAloneSelector",
+    src = cms.InputTag("patTrigger"),
+    cut = cms.string(IS_L1MU+" || "+IS_HLTMU),
+)
+
 patMuonSequence = cms.Sequence(
     mergedMuons *
     patMuonsWithTriggerSequence *
-    patMuons
+    patTriggerMuons +
+    patMuons 
 )
 
 ##    __  __       _                _   _                                                 
@@ -203,17 +225,21 @@ jpsiSkimOut = cms.OutputModule("PoolOutputModule",
     #fileName = cms.untracked.string("/tmp/gpetrucc/skimJPsi_ppMuX.root"),
     outputCommands = cms.untracked.vstring(
         "drop *",
-        "keep *_patMuons_*_Skim",
-        "keep *_goodTracks_*_Skim",
-        "keep *_genMuons_*_Skim",
+        "keep *_patMuons_*_*",
+        "keep *_patTriggerMuons_*_*",
+        "keep *_goodTracks_*_*",
+        "keep *_genMuons_*_*",
         "keep recoTrackExtras_standAloneMuons_*_*",          ## track states at the muon system, used both by patMuons and standAloneMuons
         "keep recoTracks_standAloneMuons_UpdatedAtVtx_*",    ## bare standalone muon tracks, using standalone muon momentum (with BS constraint)
-        "keep edmTriggerResults_*_*_Skim",                   ## to know which kind of skim channel got us the event   
-        "keep edmTriggerResults_*_*_HLT",                    ## to know what got us on tape
+        "keep edmTriggerResults_*_*_Skim",                   ##
+        "keep edmTriggerResults_*_*_HLT",                    ##
         "keep l1extraL1MuonParticles_l1extraParticles_*_*",  ## if we ever want to do L1 efficiency too ## <<--- Not in 3.1.X AODSIM
         "keep *_offlinePrimaryVertices__*",                  ## vertices and BS are not very useful on MC
         "keep *_offlineBeamSpot__*",                         ## but they can be important on data
         "keep patJets_patJets__*",                           ## for inclusive B and for top backgrounds
+        "keep recoTrackJets_ak5TrackJets__Skim",             ## for inclusive B and for top backgrounds
+        "keep *_trackCountingHighPurBJetTags__Skim",         ## for inclusive B and for top backgrounds
+        "keep *_trackCountingHighEffBJetTags__Skim",         ## for inclusive B and for top backgrounds
        #"keep *_jpsiMu_*_Skim", "keep *_jpsiTk_*_Skim", "keep *_jpsiSta_*_Skim",                       ## <<--- keep these for monitoring
     ),
     SelectEvents = cms.untracked.PSet( SelectEvents = cms.vstring(
@@ -229,7 +255,7 @@ def changeTriggerProcessName(process, triggerProcessName, oldProcessName="HLT"):
     if hasattr(process, 'filterHLT1Mu'): process.filterHLT1Mu.TriggerResultsTag = cms.InputTag('TriggerResults','',triggerProcessName)
     if hasattr(process, 'filterHLT2Mu'): process.filterHLT2Mu.TriggerResultsTag = cms.InputTag('TriggerResults','',triggerProcessName)
     process.jpsiSkimOut.outputCommands += [
-        "drop edmTriggerResults_*_*_"+oldProcessName,       ## to know what got us on tape
+        "drop edmTriggerResults_*_*_"+oldProcessName,       
         "keep edmTriggerResults_*_*_"+triggerProcessName,   ## to know what got us on tape
     ]
     
@@ -237,5 +263,8 @@ def Summer09_Trigger(process):
     changeTriggerProcessName(process, 'HLT8E29', process.patTrigger.processName.value())
 
 def Spring10ReDigi_Trigger(process):
-    changeTriggerProcessName(process, 'HLT8E29', process.patTrigger.processName.value())
+    changeTriggerProcessName(process, 'REDIGI', process.patTrigger.processName.value())
+
+def Summer10ReDigi_Trigger(process):
+    changeTriggerProcessName(process, 'REDIGI36X', process.patTrigger.processName.value())
 

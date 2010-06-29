@@ -27,3 +27,10 @@ process.source.fileNames =['root://pcmssd12.cern.ch//data/gpetrucc/7TeV/jpsi/BpT
 #
 process.jpsiSkimOut.fileName = "skimJPsiLoose_Spring10.root"
 
+#### Discard immediately events which don't have a global muon.
+#### This speeds up the skim significantly, about x5, when running on datasets like MinimumBias that are low on muons.
+# declare the filter
+process.fastPreFilter = cms.EDFilter("TrackCountFilter", src = cms.InputTag("globalMuons"), minNumber = cms.uint32(1))
+for pn in process.paths_().keys():          # loop on all paths names
+    p = getattr(process,pn)                 # get path object
+    p._seq = process.fastPreFilter + p._seq # prepend prefilter
