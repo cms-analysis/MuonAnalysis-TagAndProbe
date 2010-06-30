@@ -1,5 +1,5 @@
 //
-// $Id: MatchedCandidateSelector.cc,v 1.1 2009/06/24 08:48:52 gpetrucc Exp $
+// $Id: MatchedCandidateSelector.cc,v 1.1 2009/09/30 15:26:02 gpetrucc Exp $
 //
 
 /**
@@ -17,14 +17,14 @@
                 - the "src" can be a strict subset of the keys of the "match" map.
             
   \author   Giovanni Petrucciani
-  \version  $Id: MatchedCandidateSelector.cc,v 1.1 2009/06/24 08:48:52 gpetrucc Exp $
+  \version  $Id: MatchedCandidateSelector.cc,v 1.1 2009/09/30 15:26:02 gpetrucc Exp $
 */
 
 
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include <DataFormats/Candidate/interface/CandidateFwd.h>
 #include <DataFormats/Candidate/interface/Candidate.h>

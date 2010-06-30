@@ -1,5 +1,5 @@
 //
-// $Id: NearbyMuonsInfo.cc,v 1.1 2010/05/04 12:43:32 gpetrucc Exp $
+// $Id: NearbyMuonsInfo.cc,v 1.2 2010/05/27 21:43:57 gpetrucc Exp $
 //
 
 /**
@@ -7,7 +7,7 @@
   \brief    Matcher of reconstructed objects to L1 Muons 
             
   \author   Giovanni Petrucciani
-  \version  $Id: NearbyMuonsInfo.cc,v 1.1 2010/05/04 12:43:32 gpetrucc Exp $
+  \version  $Id: NearbyMuonsInfo.cc,v 1.2 2010/05/27 21:43:57 gpetrucc Exp $
 */
 
 
@@ -15,7 +15,7 @@
 #include "FWCore/Framework/interface/Event.h"
 #include "FWCore/Framework/interface/Run.h"
 #include "FWCore/ParameterSet/interface/ParameterSet.h"
-#include "FWCore/ParameterSet/interface/InputTag.h"
+#include "FWCore/Utilities/interface/InputTag.h"
 
 #include "DataFormats/Common/interface/ValueMap.h"
 #include "DataFormats/Common/interface/View.h"
