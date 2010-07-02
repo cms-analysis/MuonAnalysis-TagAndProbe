@@ -8,11 +8,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_1_1.root',
-        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_2_1.root',
-        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_3_1.root',
-        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_4_1.root',
-        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsiToMuMu_Spring10_skimJPsiLoose_v3/skimJPsiLoose_Spring10_5_1.root',
+        'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/skimJPsiLoose_Summer10ReDigi.root'
     )
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -25,7 +21,7 @@ process.load("Geometry.CommonDetUnit.globalTrackingGeometry_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAny_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorAlong_cfi")
 process.load("TrackPropagation.SteppingHelixPropagator.SteppingHelixPropagatorOpposite_cfi")
-process.GlobalTag.globaltag = cms.string('MC_3XY_V25::All')
+process.GlobalTag.globaltag = cms.string('START36_V9::All')
 
 process.load("MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_Tracking_cff")
 process.load("MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_MuonID_cff")
