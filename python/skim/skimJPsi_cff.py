@@ -268,3 +268,14 @@ def Spring10ReDigi_Trigger(process):
 def Summer10ReDigi_Trigger(process):
     changeTriggerProcessName(process, 'REDIGI36X', process.patTrigger.processName.value())
 
+def Add_CSCTF_Matching(process, isRealData=True):
+    process.load("Configuration.StandardSequences.RawToDigi_Data_cff")
+    from MuonAnalysis.MuonAssociators.muonL1MatchExtended_cfi import muonL1MatchExtended
+    process.muonL1MatchExtended = muonL1MatchExtended.clone(muons = "mergedMuons")
+    from MuonAnalysis.MuonAssociators.muonL1MatchExtended_cfi import addUserData as addMuonL1MatchExtended
+    addMuonL1MatchExtended(process.patMuonsWithoutTrigger, addExtraInfo=True)
+    process.patMuonSequence.replace(process.patMuonsWithoutTrigger,
+       process.csctfDigis +
+       process.muonL1MatchExtended +
+       process.patMuonsWithoutTrigger
+    )

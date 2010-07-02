@@ -47,3 +47,10 @@ tnpSequenceTrigger = cms.Sequence(
     tpGlbAny *
     histoTrigger
 )
+
+def Add_CSCTF_Flags(histoTrigger):
+    histoTrigger.flags.Ext_L1_Any   =  cms.string("userInt('muonL1MatchExtended') > 0")
+    histoTrigger.flags.Ext_L1_Geom  =  cms.string("userInt('muonL1MatchExtended') >= 10")
+    histoTrigger.flags.Ext_L1_CSC   =  cms.string("userInt('muonL1MatchExtended') != 0 && userInt('muonL1MatchExtended') != 10")
+    histoTrigger.flags.Ext_L1_CSC_S =  cms.string("userInt('muonL1MatchExtended:cscMode') == 11")
+    histoTrigger.flags.Ext_L1_CSC_M =  cms.string("userInt('muonL1MatchExtended') == 4 || userInt('muonL1MatchExtended') == 14")
