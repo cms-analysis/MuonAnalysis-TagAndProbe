@@ -33,8 +33,9 @@ PASS_HLT_Mu3 = "(!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty(
 PASS_HLT_L1DoubleMuOpen = "(!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty())"
 PASS_HLT_Mu0_Track0_Jpsi_New = ("(!triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').empty() && "+
                                "  triggerObjectMatchesByCollection('hltL3MuonCandidates::HLT').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered'))")
-PASS_HLT_Mu0_Track0_Jpsi_ReDigi = PASS_HLT_Mu0_Track0_Jpsi_New.replace("::HLT","::REDIGI")
-PASS_HLT_Mu0_Track0_Jpsi = "( %s || %s )" % ( PASS_HLT_Mu0_Track0_Jpsi_New, PASS_HLT_Mu0_Track0_Jpsi_ReDigi )
+PASS_HLT_Mu0_Track0_Jpsi_ReDigi    = PASS_HLT_Mu0_Track0_Jpsi_New.replace("::HLT","::REDIGI")
+PASS_HLT_Mu0_Track0_Jpsi_ReDigi362 = PASS_HLT_Mu0_Track0_Jpsi_New.replace("::HLT","::REDIGI36X")
+PASS_HLT_Mu0_Track0_Jpsi = "( %s || %s || %s )" % ( PASS_HLT_Mu0_Track0_Jpsi_New, PASS_HLT_Mu0_Track0_Jpsi_ReDigi, PASS_HLT_Mu0_Track0_Jpsi_ReDigi362 )
 PASS_HLT_Mu3_Track0_Jpsi = PASS_HLT_Mu0_Track0_Jpsi.replace("Mu0Track","Mu3Track")
 PASS_HLT_1MU = "( %s || %s )" % ( PASS_HLT_Mu3, PASS_HLT_Mu0_Track0_Jpsi)
 PASS_HLT_2MU = "( %s || %s )" % ( PASS_HLT_Mu3, PASS_HLT_L1DoubleMuOpen)
