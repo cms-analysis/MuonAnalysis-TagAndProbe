@@ -1,3 +1,5 @@
+#include <TPad.h>
+
 /** Grab a TObject from a directory
  *  even knowing only the beginning 
  *  of it's name.
@@ -24,6 +26,7 @@ bool doDiffPlot = false;
 bool doRatioPlot = true;
 bool doFillMC = false;
 bool doPdf = true;
+bool doLogX = false;
 
 void cmsprelim() {
     TPaveText *cmsprel = new TPaveText(.70,.16,.94,.21,"NDC");
@@ -71,10 +74,29 @@ const char * getXtitle(TCanvas *from) {
     TH1 *frame = (TH1*) from->GetListOfPrimitives()->At(0);
     return frame->GetXaxis()->GetTitle();
 } 
+void maybeLogX(TCanvas *c, TGraphAsymmErrors *h) {
+    if (doLogX) {
+        c->SetLogx(1);
+        for (size_t i = 0, n = c->GetListOfPrimitives()->GetSize(); i < n; ++i) {
+            TObject *o = c->GetListOfPrimitives()->At(i);
+            if (o->InheritsFrom("TH1")) {
+                TH1 *h1 = (TH1*) o;
+                if (h1->GetXaxis()) {
+                    h1->GetXaxis()->SetMoreLogLabels(1);
+                    h1->GetXaxis()->SetTitleOffset(1.1);
+                }
+            }
+        }
+    } else {
+        c->SetLogx(0);
+    }
+}
+
 void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.0) {
    ax->SetTitle(ytitle); 
    ax->SetTitleOffset(yoffset); 
    ax->SetDecimals(true);
+   ax->SetMoreLogLabels(true);
 }
 
 
@@ -133,9 +155,10 @@ void doRatio(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
         ratio.GetYaxis()->SetRangeUser(0.5,1.5);
     }
     ratio.GetXaxis()->SetRangeUser(ratio.GetX()[0]-ratio.GetErrorXlow(0), ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1));
-    ratio.GetXaxis()->SetTitle(xtitle);
+    ratio.GetXaxis()->SetTitle(xtitle); ratio.GetXaxis()->SetMoreLogLabels(1);
     if (datalbl) reTitleTAxis(ratio.GetYaxis(), datalbl+"/"+reflbl+" ratio");
     if (preliminary != "") cmsprelim();
+    gPad->SetLogx(doLogX && (diff.GetXaxis()->GetXmin() > 0));
     gPad->Print(prefix+alias+"_ratio.png");
     if (doPdf) gPad->Print(prefix+alias+"_ratio.pdf");
 }
@@ -182,9 +205,10 @@ void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     } else {
         diff.GetYaxis()->SetRangeUser(-0.5,0.5);
     }
-    diff.GetXaxis()->SetTitle(xtitle);
+    diff.GetXaxis()->SetTitle(xtitle); //diff.GetXaxis()->SetMoreLogLabels(1);
     if (datalbl) reTitleTAxis(diff.GetYaxis(), datalbl+" - "+reflbl+" difference");
     if (preliminary != "") cmsprelim();
+    //gPad->SetLogx(doLogX && (diff.GetXaxis()->GetXmin() > 0));
     gPad->Print(prefix+alias+"_diff.png");
     if (doPdf) gPad->Print(prefix+alias+"_diff.pdf");
 
@@ -231,6 +255,8 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     pref->Draw(doFillMC ? "A2" : "" );
     hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
     if (datalbl) doLegend(hfit,href,datalbl,reflbl);
+   
+    maybeLogX(pref, href); 
     gPad->Print(prefix+alias+".png");
     if (doPdf) gPad->Print(prefix+alias+".pdf");
 
@@ -263,6 +289,7 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
     hfit->Draw("P SAME");
 
     doLegend(hfit,href,datalbl,reflbl);
+    maybeLogX(pref, href); 
     gPad->Print(prefix+alias+".png");
     if (doPdf) gPad->Print(prefix+alias+".pdf");
 
@@ -288,6 +315,7 @@ void single( TDirectory *fit, TString alias, TString fitname) {
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
     if (preliminary != "") cmsprelim();
+    maybeLogX(pfit, hfit); 
     pfit->Print(prefix+alias+".png"); 
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
 }
