@@ -19,6 +19,11 @@ void plotUtil() { }
 TString preliminary = ""; //"CMS Preliminary"
 TString retitle = "";
 TString datalbl = "Data", reflbl = "Sim.";
+bool autoScale = false;
+bool doDiffPlot = false;
+bool doRatioPlot = true;
+bool doFillMC = false;
+bool doPdf = true;
 
 void cmsprelim() {
     TPaveText *cmsprel = new TPaveText(.70,.16,.94,.21,"NDC");
@@ -74,6 +79,7 @@ void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.0) {
 
 
 void fixupErrors(TGraphAsymmErrors *gr) {
+    /*
     for (size_t i = 0; i < gr->GetN(); ++i) {
         if (gr->GetErrorYhigh(i) == 0 && gr->GetErrorYlow(i) == 0) continue;
         if (gr->GetErrorYhigh(i) == 0 && gr->GetY()[i] != 1.0) {
@@ -85,6 +91,7 @@ void fixupErrors(TGraphAsymmErrors *gr) {
             gr->SetPointEYlow(i, gr->GetY()[i]);
         }
     }
+    */
 }
 
 void doRatio(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
@@ -120,12 +127,17 @@ void doRatio(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     ratio.SetMarkerStyle(20);
     ratio.SetMarkerSize(1.6);
     ratio.Draw("P SAME");
-    ratio.GetYaxis()->SetRangeUser(1-1.5*max,1+1.2*max);
+    if (autoScale) {
+        ratio.GetYaxis()->SetRangeUser(1-1.5*max,1+1.2*max);
+    } else {
+        ratio.GetYaxis()->SetRangeUser(0.5,1.5);
+    }
     ratio.GetXaxis()->SetRangeUser(ratio.GetX()[0]-ratio.GetErrorXlow(0), ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1));
     ratio.GetXaxis()->SetTitle(xtitle);
     if (datalbl) reTitleTAxis(ratio.GetYaxis(), datalbl+"/"+reflbl+" ratio");
     if (preliminary != "") cmsprelim();
     gPad->Print(prefix+alias+"_ratio.png");
+    if (doPdf) gPad->Print(prefix+alias+"_ratio.pdf");
 }
 
 void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
@@ -165,11 +177,16 @@ void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     line.DrawClone("SAME");
     diff.Draw("P SAME");
     diff.GetXaxis()->SetRangeUser(diff.GetX()[0]-diff.GetErrorXlow(0), diff.GetX()[diff.GetN()-1]+diff.GetErrorXhigh(diff.GetN()-1));
-    diff.GetYaxis()->SetRangeUser(-1.5*max,1.2*max);
+    if (autoScale) {
+        diff.GetYaxis()->SetRangeUser(-1.5*max,1.2*max);
+    } else {
+        diff.GetYaxis()->SetRangeUser(-0.5,0.5);
+    }
     diff.GetXaxis()->SetTitle(xtitle);
     if (datalbl) reTitleTAxis(diff.GetYaxis(), datalbl+" - "+reflbl+" difference");
     if (preliminary != "") cmsprelim();
     gPad->Print(prefix+alias+"_diff.png");
+    if (doPdf) gPad->Print(prefix+alias+"_diff.pdf");
 
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
@@ -181,11 +198,20 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     }
     RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
     fixupErrors(href);
-    href->SetLineWidth(2);
-    href->SetLineColor(kRed);
-    href->SetMarkerColor(kRed);
-    href->SetMarkerStyle(25);
-    href->SetMarkerSize(2.0);
+    if (doFillMC) {
+        href->SetLineColor(2);
+        href->SetFillColor(208);
+        href->SetLineStyle(0);
+        href->SetMarkerColor(2);
+        href->SetMarkerStyle(21);
+        href->SetMarkerSize(0.4);
+    } else {
+        href->SetLineWidth(2);
+        href->SetLineColor(kRed);
+        href->SetMarkerColor(kRed);
+        href->SetMarkerStyle(25);
+        href->SetMarkerSize(2.0);
+    }
 
     TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
@@ -202,13 +228,14 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
 
     if (retitle != "") reTitleY(pref, retitle);
 
-    pref->Draw();
-    hfit->Draw("P SAME");
+    pref->Draw(doFillMC ? "A2" : "" );
+    hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
     if (datalbl) doLegend(hfit,href,datalbl,reflbl);
     gPad->Print(prefix+alias+".png");
+    if (doPdf) gPad->Print(prefix+alias+".pdf");
 
-    doRatio(hfit,href,alias,getXtitle(pfit)); 
-    doDiff(hfit,href,alias,getXtitle(pfit)); 
+    if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
+    if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
@@ -237,9 +264,10 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 
     doLegend(hfit,href,datalbl,reflbl);
     gPad->Print(prefix+alias+".png");
+    if (doPdf) gPad->Print(prefix+alias+".pdf");
 
-    doRatio(hfit,href,alias,getXtitle(pfit)); 
-    doDiff(hfit,href,alias,getXtitle(pfit)); 
+    if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
+    if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
 }
 
 
@@ -261,6 +289,7 @@ void single( TDirectory *fit, TString alias, TString fitname) {
     hfit->SetMarkerSize(1.6);
     if (preliminary != "") cmsprelim();
     pfit->Print(prefix+alias+".png"); 
+    if (doPdf) pfit->Print(prefix+alias+".pdf"); 
 }
 
 /** Reset line styles and colors, which get messed up by tdrStyle */
