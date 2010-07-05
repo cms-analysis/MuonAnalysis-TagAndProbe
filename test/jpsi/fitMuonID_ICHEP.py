@@ -13,6 +13,16 @@ if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
+doTk, doCal = True, True
+if scenario.find("_tk") != -1: 
+    print "Running only eff from tracks"
+    doCal = False
+    scenario = scenario.replace("_tk","")
+if scenario.find("_cal") != -1: 
+    print "Running only eff from calo"
+    doTk = False
+    scenario = scenario.replace("_cal","")
+
 
 process = cms.Process("TagProbe")
 
@@ -30,6 +40,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         mass = cms.vstring("Tag-Probe Mass", "2.8", "3.5", "GeV/c^{2}"),
         pt = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
         #p = cms.vstring("Probe p", "0", "1000", "GeV/c"),
+        #eta = cms.vstring("Probe #eta", "-2.5", "2.5", ""),
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         #phi = cms.vstring("Probe #phi", "-3.1416", "3.1416", ""),
         tag_pt = cms.vstring("Tag p_{T}", "2.6", "1000", "GeV/c"),
@@ -66,15 +77,17 @@ PT_ETA_BINS = cms.PSet(
 )
 
 
+#PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/"
+PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
+#PREFIX=""
 process.TnP_MuonID = Template.clone(
     InputFileNames = cms.vstring(
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run132440to134987.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run13509to135175.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run135445to135575.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run135735.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run136033to136082.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run136087to136119.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run137027to137028.root',
+        PREFIX+'tnpJPsi_Data_run132440to135735.root',
+        PREFIX+'tnpJPsi_Data_run136033to137028.root',
+        PREFIX+'tnpJPsi_Data_run138560to138751.root',
+        PREFIX+'tnpJPsi_Data_run138919to139100.root',
+        PREFIX+'tnpJPsi_Data_run139102to139195.root',
+        PREFIX+'tnpJPsi_Data_run139239to139365.root',
     ),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("histoMuFromCal"),
@@ -87,8 +100,8 @@ if scenario == "data_all":
 
 if scenario == "datalike_mc":
     process.TnP_MuonID.InputFileNames = [
-        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_JPsiMuMu_Spring10_0.117pb.root",
-        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_ppMuX_Spring10_0.117pb.root"
+        PREFIX+"tnpJPsi_MC_JPsiToMuMu_0.122pb.root",
+        PREFIX+"tnpJPsi_MC_ppMuX_0.122pb.root",
     ]
 
 
@@ -112,8 +125,6 @@ process.TnP_MuonID_Tk = process.TnP_MuonID.clone(
     OutputFileName = cms.string("TnP_ICHEP_MuonID_FromTK_%s.root" % scenario),
 )
 
-process.p = cms.Path(
-    process.TnP_MuonID    +
-    process.TnP_MuonID_Tk
-)
+if doTk:  process.pTk  = cms.Path(process.TnP_MuonID_Tk)
+if doCal: process.pCal = cms.Path(process.TnP_MuonID)
 

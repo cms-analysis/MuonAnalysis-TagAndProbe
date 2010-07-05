@@ -49,6 +49,9 @@ void plotMuonID_ICHEP(TString scenario, int fromTk=0) {
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
 
+    doRatioPlot = false;
+    doDiffPlot = false;
+
     preliminary = "CMS Preliminary";
     plotMuonIDData();
 }

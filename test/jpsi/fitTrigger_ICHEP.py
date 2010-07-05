@@ -72,23 +72,23 @@ PT_ETA_BINS_DET = cms.PSet(
 )
 PT_ETA_BINS_PH = cms.PSet(
     CONSTRAINTS,
-    pt     = cms.vdouble(  2.0, 3.0, 5.0, 7.0, 15),
-    abseta = cms.vdouble(  0.0, 1.2, 2.4),
+    pt     = cms.vdouble(  0.0, 2.0, 3.0, 5.0, 7.0, 15),
+    abseta = cms.vdouble(  0.0, 1.2, 2.1),
 )
 PT_ETA_BINS = PT_ETA_BINS_DET
 
 
 
-
+#PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/"
+PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
 process.TnP_Trigger = Template.clone(
     InputFileNames = cms.vstring(
-        #'/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run132440to134987.root', # NO: taken online with 3.5.4
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run13509to135175.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run135445to135575.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run135735.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run136033to136082.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run136087to136119.root',
-        '/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_Data_run137027to137028.root',
+        PREFIX+'tnpJPsi_Data_run132440to135735.root',
+        PREFIX+'tnpJPsi_Data_run136033to137028.root',
+        PREFIX+'tnpJPsi_Data_run138560to138751.root',
+        PREFIX+'tnpJPsi_Data_run138919to139100.root',
+        PREFIX+'tnpJPsi_Data_run139102to139195.root',
+        PREFIX+'tnpJPsi_Data_run139239to139365.root',
     ),
     InputDirectoryName = cms.string("histoTrigger"),
     InputTreeName = cms.string("fitter_tree"),
@@ -101,16 +101,17 @@ if scenario == "data_all":
 
 if scenario == "datalike_mc":
     process.TnP_Trigger.InputFileNames = [
-        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_JPsiMuMu_Spring10_0.117pb.root",
-        "/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/tnpJPsi_ppMuX_Spring10_0.117pb.root"
+        PREFIX+"tnpJPsi_MC_JPsiToMuMu_0.122pb.root",
+        PREFIX+"tnpJPsi_MC_ppMuX_0.122pb.root",
     ]
 
 
 
-for T in [ "L1DoubleMuOpen", "Mu3" ]:
-    #for M in ["POG_Glb", "POG_GlbPT", "POG_TMA", "POG_TMLSAT"]:
-    for M in ["POG_Glb", "VBTFLike", "Cal"]:
-        for BN,BV in (('abseta',PT_ETA_BINS_DET),('pt',PT_ETA_BINS_PH)):
+#for T in [ "L1DoubleMuOpen" , "Mu3" ]:
+#    for M in ["POG_Glb", "VBTFLike", "Cal"]:
+for (T,M) in [ ("Mu3","Cal"), ("Mu3", "VBTFLike"), ("L1DoubleMuOpen","Cal")]:
+        #for BN,BV in (('abseta',PT_ETA_BINS_DET),('pt',PT_ETA_BINS_PH)):
+        for BN,BV in [('pt',PT_ETA_BINS_PH)]:
             BINNEDVARS = BV.clone()
             setattr(BINNEDVARS, M, cms.vstring("pass"))
             setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_"+BN, cms.PSet(
@@ -125,7 +126,10 @@ for T in [ "L1DoubleMuOpen", "Mu3" ]:
                     UnbinnedVariables = cms.vstring("mass"),
                     BinnedVariables = BINNEDVARS.clone(mcTrue = cms.vstring("true"))
                 ))
-            if T != "L1DoubleMuOpen":
+            else:
+                process.TnP_Trigger.Variables.run = cms.vstring("Run number", "13500", "9999999", "");
+            #if T != "L1DoubleMuOpen":
+            if False:
                 setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"overL1_"+BN, cms.PSet(
                     EfficiencyCategoryAndState = cms.vstring(T,"pass"),
                     UnbinnedVariables = cms.vstring("mass"),
