@@ -54,3 +54,33 @@ def Add_CSCTF_Flags(histoTrigger):
     histoTrigger.flags.Ext_L1_CSC   =  cms.string("userInt('muonL1MatchExtended') != 0 && userInt('muonL1MatchExtended') != 10")
     histoTrigger.flags.Ext_L1_CSC_S =  cms.string("userInt('muonL1MatchExtended:cscMode') == 11")
     histoTrigger.flags.Ext_L1_CSC_M =  cms.string("userInt('muonL1MatchExtended') == 4 || userInt('muonL1MatchExtended') == 14")
+
+def ReMatchL1(process):
+    from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_8E29_cff import muonMatchHLTL1
+    process.muonReMatchL1DoubleMuOpen = muonMatchHLTL1.clone(
+        src     = cms.InputTag("patMuons"),
+        matched = cms.InputTag("patTriggerMuons"),
+        filterLabels = cms.vstring('hltDoubleMuLevel1PathL1OpenFiltered'),
+        maxDeltaR   = cms.double(1.2),
+        maxDeltaEta = cms.double(0.2),
+        fallbackToME1 = cms.bool(True),
+    )
+    process.patMuonsL1Rematched = cms.EDProducer( "PATTriggerMatchMuonEmbedder",
+        src     = cms.InputTag(  "patMuons" ),
+        matches = cms.VInputTag(cms.InputTag("muonReMatchL1DoubleMuOpen"))
+    )
+    process.tagMuons1MuL1Rematched = process.tagMuons1Mu.clone(src = "patMuonsL1Rematched")
+    process.anyProbeMuons.src = "patMuonsL1Rematched"
+    process.tpGlbAny.decay = "tagMuons1MuL1Rematched@+ anyProbeMuons@-"
+    process.tnpSequenceTrigger.replace(process.anyProbeMuons, 
+        process.muonReMatchL1DoubleMuOpen * 
+        process.patMuonsL1Rematched *
+        ( process.tagMuons1MuL1Rematched + process.anyProbeMuons )
+    )
+
+## Make a copy of the T&P tree requiring the HLT_L1DoubleMuOpen bit, to debug matching issues
+def Force_L1DoubleMuOpen(process):
+    from HLTrigger.HLTfilters.hltHighLevelDev_cfi import hltHighLevelDev
+    process.forceL1DoubleMuOpen = hltHighLevelDev.clone(HLTPaths = ['HLT_L1DoubleMuOpen'], HLTPathsPrescales = [1])
+    process.histoTriggerL1DoubleMuOpen = process.histoTrigger.clone()
+    process.tagAndProbeL1DoubleMuOpen = cms.Path(process.tagAndProbe._seq + process.forceL1DoubleMuOpen + process.histoTriggerL1DoubleMuOpen)
