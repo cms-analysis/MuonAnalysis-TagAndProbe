@@ -69,8 +69,17 @@ betterTracks = cms.EDFilter("TrackSelector",
     src = cms.InputTag("goodTracks"),
     cut = cms.string(TRACK_CUTS.replace("track.","")), # this is a Track object, so I have to remove the 'track.'
 )
+justhpTracks = cms.EDFilter("TrackSelector",
+    src = cms.InputTag("goodTracks"),
+    cut = cms.string("quality('highPurity')"), 
+)
+
 tkTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
     src = cms.InputTag("betterTracks"),      
+    particleType = cms.string("mu+"),
+) 
+justhpTkTracks = cms.EDProducer("ConcreteChargedCandidateProducer",
+    src = cms.InputTag("justhpTracks"),      
     particleType = cms.string("mu+"),
 ) 
 
@@ -160,9 +169,30 @@ tnpTreeProducer = cms.EDAnalyzer("TagProbeFitTreeProducer",
     allProbes     = cms.InputTag("REPLACE_ME"), 
 )
 
+ntracksTemplate = cms.EDProducer("TrackMultiplicityCounter", 
+    probes = cms.InputTag("REPLACE_ME"),
+    objects = cms.InputTag("goodTracks"),
+    objectSelection = cms.string("quality('highPurity')"),
+)
+nverticesTemplate = cms.EDProducer("VertexMultiplicityCounter", 
+    probes = cms.InputTag("REPLACE_ME"),
+    objects = cms.InputTag("offlinePrimaryVertices"),
+    objectSelection = cms.string("!isFake && ndof > 2 && abs(z) <= 15 && position.Rho <= 2"),
+)
+njetsTemplate = cms.EDProducer("CandMultiplicityCounter", 
+    probes = cms.InputTag("REPLACE_ME"),
+    objects = cms.InputTag("patJets"),
+    objectSelection = cms.string(""),
+)
+ntrackjetsTemplate = cms.EDProducer("CandMultiplicityCounter", 
+    probes = cms.InputTag("REPLACE_ME"),
+    objects = cms.InputTag("ak5TrackJets"),
+    objectSelection = cms.string("pt > 5 && numberOfTracks > 2"),
+)
 
 tnpCommonSequence = cms.Sequence(
     betterTracks * tkTracks +
+    justhpTracks * justhpTkTracks +
     staTracks   +
     staOneValidHit * staTracksValidHits +
     tagMuons1Mu + 
@@ -192,3 +222,20 @@ def allTPTreeProducers(process):
         if V.type_() == "TagProbeFitTreeProducer":
             yield (K,V)
 
+def addCountVariable(what, process, sequence, treeProducer):
+    tpp = treeProducer.tagProbePairs.moduleLabel
+    templ = getattr(process, "n"+what+"Template")
+    if not hasattr(process, tpp+"N"+what):
+        setattr(process, tpp+"N"+what, templ.clone(probes = treeProducer.tagProbePairs))
+        sequence.replace(getattr(process,tpp), getattr(process,tpp) + getattr(process, tpp+"N"+what))
+    if not hasattr(treeProducer, 'pairVariables'):
+        treeProducer.pairVariables = cms.PSet()
+        treeProducer.pairFlags     = cms.PSet()
+    setattr(treeProducer.pairVariables,"N"+what, cms.InputTag(tpp+"N"+what))
+
+def addCountVariables(process, sequence, treeProducer):
+    for w in [ "tracks", "vertices", "jets", "trackjets" ]: 
+        addCountVariable(w, process, sequence, treeProducer)
+   
+    
+    

@@ -24,6 +24,8 @@ tkTracksNoJPsi = cms.EDProducer("CandidateResonanceInefficiencyCreator",
     outputMode = cms.string("RefToBaseVector"),
 )
 tkTracksNoBestJPsi = tkTracksNoJPsi.clone(onlyBestMatch = True)
+justhpTkTracksNoJPsi     = tkTracksNoJPsi.clone(src = 'justhpTkTracks')
+justhpTkTracksNoBestJPsi = tkTracksNoBestJPsi.clone(src = 'justhpTkTracks')
 
 ##    ____               _               ____            _                   _____               _    _             
 ##   |  _ \ __ _ ___ ___(_)_ __   __ _  |  _ \ _ __ ___ | |__   ___  ___ _  |_   _| __ __ _  ___| | _(_)_ __   __ _ 
@@ -56,10 +58,20 @@ staToTkMatchNoBestJPsi = staToTkMatch.clone(matched = 'tkTracksNoBestJPsi')
 staPassingTkNoJPsi     = staPassingTk.clone(match = 'staToTkMatchNoJPsi')
 staPassingTkNoBestJPsi = staPassingTk.clone(match = 'staToTkMatchNoBestJPsi')
 
+staToHpTkMatch           = staToTkMatch.clone(matched = 'justhpTkTracks')
+staToHpTkMatchNoJPsi     = staToTkMatch.clone(matched = 'justhpTkTracksNoJPsi')
+staToHpTkMatchNoBestJPsi = staToTkMatch.clone(matched = 'justhpTkTracksNoBestJPsi')
+staPassingHpTk           = staPassingTk.clone(match = 'staToHpTkMatch')
+staPassingHpTkNoJPsi     = staPassingTk.clone(match = 'staToHpTkMatchNoJPsi')
+staPassingHpTkNoBestJPsi = staPassingTk.clone(match = 'staToHpTkMatchNoBestJPsi')
+
 allProbesTracking = cms.Sequence(
     staTracks * staProbes 
 )
 allPassingProbesTracking = cms.Sequence(
+    staToHpTkMatch           * staPassingHpTk           +
+    staToHpTkMatchNoJPsi     * staPassingHpTkNoJPsi     +
+    staToHpTkMatchNoBestJPsi * staPassingHpTkNoBestJPsi +
     staToTkMatch           * staPassingTk           +
     staToTkMatchNoJPsi     * staPassingTkNoJPsi     +
     staToTkMatchNoBestJPsi * staPassingTkNoBestJPsi  
@@ -85,6 +97,18 @@ allTPPairsTracking = cms.Sequence(
 staMcMatch = muMcMatch.clone(src = "staTracks", distMin = 0.6)
 allMcMatchesTracking = cms.Sequence(staMcMatch)
 
+##    _____      _               ___        __       
+##   | ____|_  _| |_ _ __ __ _  |_ _|_ __  / _| ___  
+##   |  _| \ \/ / __| '__/ _` |  | || '_ \| |_ / _ \ 
+##   | |___ >  <| |_| | | (_| |  | || | | |  _| (_) |
+##   |_____/_/\_\\__|_|  \__,_| |___|_| |_|_|  \___/ 
+##                                                   
+##   
+countNearbyTracks4Tracking = cms.EDProducer("NearbyCandCountComputer",
+    probes  = cms.InputTag("staTracks"),
+    objects = cms.InputTag("justhpTkTracks"),
+    deltaR  = cms.double(1.0)
+)
 
 ##    _____           _       _ ____            _            _   _ _____            _      
 ##   |_   _|_ _  __ _( )_ __ ( )  _ \ _ __ ___ | |__   ___  | \ | |_   _|   _ _ __ | | ___ 
@@ -113,16 +137,32 @@ histoTracking.variables.match_deltaR_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi
 histoTracking.variables.match_deltaEta_NoJPsi = cms.InputTag("staToTkMatchNoJPsi", "deltaEta")
 histoTracking.variables.match_deltaR_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi", "deltaR")
 histoTracking.variables.match_deltaEta_NoBestJPsi = cms.InputTag("staToTkMatchNoBestJPsi", "deltaEta")
+histoTracking.variables.ntracksDR1 = cms.InputTag("countNearbyTracks4Tracking")
+
+histoTrackingHp = histoTracking.clone()
+histoTrackingHp.flags.passing           = cms.InputTag('staPassingTk')
+histoTrackingHp.flags.passingNoJPsi     = cms.InputTag('staPassingTkNoJPsi')
+histoTrackingHp.flags.passingNoBestJPsi = cms.InputTag('staPassingTkNoBestJPsi')
+histoTrackingHp.variables.match_deltaR   = cms.InputTag("staToHpTkMatch", "deltaR")
+histoTrackingHp.variables.match_deltaEta = cms.InputTag("staToHpTkMatch", "deltaEta")
+histoTrackingHp.variables.match_deltaR_NoJPsi   = cms.InputTag("staToHpTkMatchNoJPsi", "deltaR")
+histoTrackingHp.variables.match_deltaEta_NoJPsi = cms.InputTag("staToHpTkMatchNoJPsi", "deltaEta")
+histoTrackingHp.variables.match_deltaR_NoBestJPsi   = cms.InputTag("staToHpTkMatchNoBestJPsi", "deltaR")
+histoTrackingHp.variables.match_deltaEta_NoBestJPsi = cms.InputTag("staToHpTkMatchNoBestJPsi", "deltaEta")
+histoTrackingHp.variables.ntracksDR1 = cms.InputTag("countNearbyTracks4Tracking")
 
 allTPHistosTracking = cms.Sequence(
         histoTracking     
+        + histoTrackingHp     
 )
 
 tnpSequenceTracking = cms.Sequence(
     allProbesTracking *
-    (tkTracksNoJPsi + tkTracksNoBestJPsi) *
+    (tkTracksNoJPsi + tkTracksNoBestJPsi +
+     justhpTkTracksNoJPsi + justhpTkTracksNoBestJPsi) *
     allPassingProbesTracking *
     allTPPairsTracking   *
     allMcMatchesTracking * 
+    countNearbyTracks4Tracking *
     allTPHistosTracking
 )

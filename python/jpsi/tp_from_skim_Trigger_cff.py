@@ -34,8 +34,10 @@ histoTrigger = tnpTreeProducer.clone(
         DoubleMu0  = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered').empty()"),
         DoubleMu3  = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered0').empty()"),
         L1DoubleMuOpen = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
+        L1DoubleMuOpenS2 = cms.string("!triggerObjectMatchesByFilter('propagatedToM2').empty() && !triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
         ## Acceptance
         Acc_JPsi   = cms.string(JPSI_ACCEPTANCE_CUT),
+        Prop_M2    = cms.string("!triggerObjectMatchesByFilter('propagatedToM2').empty()"),
     ),
     probeMatches  = cms.InputTag("muMcMatch"),
     allProbes = cms.InputTag("anyProbeMuons"),
@@ -77,6 +79,14 @@ def ReMatchL1(process):
         process.patMuonsL1Rematched *
         ( process.tagMuons1MuL1Rematched + process.anyProbeMuons )
     )
+    if process.histoTrigger.isMC.value():
+        process.muMcMatchL1Rematched = process.muMcMatch.clone(src = "patMuonsL1Rematched")
+        process.histoTrigger.tagMatches = "muMcMatchL1Rematched"
+        process.histoTrigger.probeMatches = "muMcMatchL1Rematched"
+        process.tnpSequenceTrigger.replace(process.histoTrigger,
+            process.muMcMatchL1Rematched *
+            process.histoTrigger
+        )
 
 ## Make a copy of the T&P tree requiring the HLT_L1DoubleMuOpen bit, to debug matching issues
 def Force_L1DoubleMuOpen(process):
