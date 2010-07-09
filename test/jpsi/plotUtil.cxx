@@ -8,7 +8,7 @@ TObject *getFromPrefix(TDirectory *dir, TString prefixName) {
     TIter next(dir->GetListOfKeys());
     TKey *key;
     while ((key = (TKey *) next())) {
-        if (strstr(key->GetName(), prefixName.Data())) {
+        if (strstr(key->GetName(), prefixName.Data()) == key->GetName() ) {
             return dir->Get(key->GetName());
         }
     }
@@ -20,17 +20,20 @@ void plotUtil() { }
 
 TString preliminary = ""; //"CMS Preliminary"
 TString retitle = "";
-TString datalbl = "Data", reflbl = "Sim.";
+TString datalbl = "Data, xx nb^{-1}", reflbl = "Simulation";
 bool autoScale = false;
 bool doDiffPlot = false;
 bool doRatioPlot = true;
-bool doFillMC = false;
+bool doFillMC = true;
 bool doPdf = true;
 bool doLogX = false;
+bool doSquare = false;
+double yMax = 1.0;
+TString extraSpam = "";
 
 void cmsprelim() {
-    TPaveText *cmsprel = new TPaveText(.70,.16,.94,.21,"NDC");
-    cmsprel->SetTextSize(0.05);
+    TPaveText *cmsprel = new TPaveText(doSquare ? 0.40 : .55,.16,.94,.21,"NDC");
+    cmsprel->SetTextSize(doSquare ? 0.040 : 0.05);
     cmsprel->SetFillColor(0);
     cmsprel->SetFillStyle(0);
     cmsprel->SetLineStyle(2);
@@ -43,10 +46,39 @@ void cmsprelim() {
 
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TString lab2) {
     double legend_y_offset = (preliminary != "" ? 0.07 : 0);
-    TLegend *leg = new TLegend(.78,.15 + legend_y_offset,.92,.27 + legend_y_offset);
+    double legend_y_size   = (extraSpam == "" ? .12 : .18);
+    if (g1->GetY()[g1->GetN()-1] < 0.4) {
+        legend_y_offset = 0.75 - legend_y_size;
+    }
+    TLegend *leg = new TLegend(doSquare ? .62 : .68,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
+    if (extraSpam != "") {
+        leg->SetHeader(extraSpam);
+        //leg->AddEntry("", extraSpam, "");
+    }
+    leg->AddEntry(g1, lab1, "LP");
+    leg->AddEntry(g2, lab2, doFillMC ? "F" : "LP");
+    leg->SetTextSize(doSquare ? 0.04 : 0.05);
+    leg->SetTextFont(42);
+    leg->SetShadowColor(0);
+    leg->SetFillColor(0);
+    if (preliminary != "") cmsprelim();
+    leg->Draw();
+}
+void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3, TString lab1, TString lab2, TString lab3) {
+    double legend_y_offset = (preliminary != "" ? 0.07 : 0);
+    double legend_y_size   = (extraSpam == "" ? .17 : .23);
+    if (g1->GetY()[g1->GetN()-1] < 0.4) {
+        legend_y_offset = 0.75 - legend_y_size;
+    }
+    TLegend *leg = new TLegend(doSquare ? .52 : .58,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
+    if (extraSpam != "") {
+        leg->SetHeader(extraSpam);
+        //leg->AddEntry("", extraSpam, "");
+    }
     leg->AddEntry(g1, lab1, "LP");
     leg->AddEntry(g2, lab2, "LP");
-    leg->SetTextSize(0.05);
+    leg->AddEntry(g3, lab3, "LP");
+    leg->SetTextSize(doSquare ? 0.04 : 0.05);
     leg->SetTextFont(42);
     leg->SetShadowColor(0);
     leg->SetFillColor(0);
@@ -54,6 +86,11 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TStrin
     leg->Draw();
 }
 
+
+void squareCanvas(TCanvas *c) {
+    c->SetCanvasSize(600,600);
+    gStyle->SetPaperSize(20.,20.);
+}
 
 int findBin(TGraphAsymmErrors *g, double x) {
     for (int i = 0; i < g->GetN(); ++i) {
@@ -70,6 +107,12 @@ void reTitleY(TCanvas *pl, TString ytitle) {
     if (first) reTitleTAxis(first->GetYaxis(), ytitle);
     if (last)  reTitleTAxis(last->GetYaxis(), ytitle);
 }  
+void setRangeY(TCanvas *c, double min=0, double max=1.1) {
+    for (size_t i = 0, n = c->GetListOfPrimitives()->GetSize(); i < n; ++i) {
+        TObject *o = c->GetListOfPrimitives()->At(i);
+        if (o->InheritsFrom("TH1")) ((TH1*) o)->GetYaxis()->SetRangeUser(min,max);
+    }
+}
 const char * getXtitle(TCanvas *from) {
     TH1 *frame = (TH1*) from->GetListOfPrimitives()->At(0);
     return frame->GetXaxis()->GetTitle();
@@ -99,22 +142,6 @@ void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.0) {
    ax->SetMoreLogLabels(true);
 }
 
-
-void fixupErrors(TGraphAsymmErrors *gr) {
-    /*
-    for (size_t i = 0; i < gr->GetN(); ++i) {
-        if (gr->GetErrorYhigh(i) == 0 && gr->GetErrorYlow(i) == 0) continue;
-        if (gr->GetErrorYhigh(i) == 0 && gr->GetY()[i] != 1.0) {
-            std::cerr << "Fixup error high for " << gr->GetName() << ", efficiency = " << gr->GetY()[i] << std::endl;
-            gr->SetPointEYhigh(i, 1.0-gr->GetY()[i]);
-        }
-        if (gr->GetErrorYlow(i) == 0 && gr->GetY()[i] != 0.0) {
-            std::cerr << "Fixup error low for " << gr->GetName() << ", efficiency = " << gr->GetY()[i] << std::endl;
-            gr->SetPointEYlow(i, gr->GetY()[i]);
-        }
-    }
-    */
-}
 
 void doRatio(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     size_t nNZD = 0; // non-zero-denominator
@@ -221,7 +248,6 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
         return;
     }
     RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
-    fixupErrors(href);
     if (doFillMC) {
         href->SetLineColor(2);
         href->SetFillColor(208);
@@ -243,19 +269,21 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
         return;
     }
     RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
-    fixupErrors(hfit);
     hfit->SetLineWidth(2);
     hfit->SetLineColor(kBlack);
     hfit->SetMarkerColor(kBlack);
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
 
+    setRangeY(pref, 0, yMax);
     if (retitle != "") reTitleY(pref, retitle);
 
-    pref->Draw(doFillMC ? "A2" : "" );
+    pref->Draw( "" );
+    if (doFillMC) href->Draw("E2 SAME");
     hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
     if (datalbl) doLegend(hfit,href,datalbl,reflbl);
    
+    if (doSquare) squareCanvas(pref);
     maybeLogX(pref, href); 
     gPad->Print(prefix+alias+".png");
     if (doPdf) gPad->Print(prefix+alias+".pdf");
@@ -264,11 +292,58 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
 }
 
+/** Plot FIT from file 1 plus FIT from file 2 plus CNT from file 3 */
+void refstack3(TDirectory *fit, TDirectory *ref, TDirectory *mc, TString alias, TString fitname) {
+    TCanvas *pref = getFromPrefix(ref->GetDirectory("fit_eff_plots"), fitname);
+    if (pref == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << ref->GetName() << std::endl;
+        return;
+    }
+    RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
+    href->SetLineWidth(2);
+    href->SetLineColor(kRed);
+    href->SetMarkerColor(kRed);
+    href->SetMarkerStyle(25);
+    href->SetMarkerSize(2.0);
+
+    TCanvas *pmc = getFromPrefix(mc->GetDirectory("cnt_eff_plots"), fitname);
+    RooHist *hmc = (RooHist *) pmc->FindObject("hxy_cnt_eff");
+    hmc->SetLineWidth(2);
+    hmc->SetLineColor(209);
+    hmc->SetMarkerColor(209);
+    hmc->SetMarkerStyle(21);
+    hmc->SetMarkerSize(1.6);
+
+    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    if (pfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        return;
+    }
+    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    hfit->SetLineWidth(2);
+    hfit->SetLineColor(kBlack);
+    hfit->SetMarkerColor(kBlack);
+    hfit->SetMarkerStyle(20);
+    hfit->SetMarkerSize(1.6);
+
+    setRangeY(pref, 0, yMax);
+    if (retitle != "") reTitleY(pref, retitle);
+
+    pref->Draw("");
+    hmc->Draw("P SAME");
+    hfit->Draw("P SAME");
+    if (datalbl) doLegend(hfit,href,hmc,"T&P "+datalbl,"T&P "+reflbl, "Simulation truth");
+   
+    if (doSquare) squareCanvas(pref);
+    maybeLogX(pref, href); 
+    gPad->Print(prefix+alias+".png");
+    if (doPdf) gPad->Print(prefix+alias+".pdf");
+}
+
 /** Plot FIT from file 1 plus CNT from file 2 */
 void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
     TCanvas *pref = getFromPrefix(ref->GetDirectory("cnt_eff_plots"), name);
     RooHist *href = (RooHist *) pref->FindObject("hxy_cnt_eff");
-    fixupErrors(href);
     href->SetLineWidth(2);
     href->SetLineColor(209);
     href->SetMarkerColor(209);
@@ -277,13 +352,14 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 
     TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), name);
     RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
-    fixupErrors(hfit);
     hfit->SetLineWidth(2);
     hfit->SetLineColor(206);
     hfit->SetMarkerColor(206);
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
 
+    setRangeY(pref, 0, yMax);
+    if (doSquare) squareCanvas(pref);
     if (retitle != "") reTitleY(pref, retitle);
     pref->Draw();
     hfit->Draw("P SAME");
@@ -308,12 +384,19 @@ void single( TDirectory *fit, TString alias, TString fitname) {
     if (retitle != "") reTitleY(pfit, retitle);
 
     RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
-    fixupErrors(hfit);
+    if (hfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << "/hxy_fit_eff in " << fit->GetName() << std::endl;
+        pfit->ls();
+        return;
+    }
     hfit->SetLineWidth(2);
     hfit->SetLineColor(kBlue);
     hfit->SetMarkerColor(kBlue);
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
+
+    setRangeY(pfit, 0, yMax);
+    if (doSquare) squareCanvas(pfit);
     if (preliminary != "") cmsprelim();
     maybeLogX(pfit, hfit); 
     pfit->Print(prefix+alias+".png"); 

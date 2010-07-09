@@ -36,6 +36,12 @@ void plotMuonID_BPH_10_002(TString scenario, int fromTk=0) {
         ref = (TFile *) gROOT->GetListOfFiles()->At(1);
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
+
+    datalbl = "Data, 77 nb^{-1}";
+    preliminary = "";
+    doRatioPlot = false; doDiffPlot = false;
+    doPdf = false;
+    doLogX = true;
     plotMuonIDData();
 }
 
@@ -44,25 +50,25 @@ void plotMuonIDData() {
     for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
 
-        TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
+        TDirectory *fit_pt = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
         if (ref != 0) {
-            TDirectory *ref_pt_eta = ref->GetDirectory(basedir2+"/"+idname+"_pt_abseta/");
-            refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-            refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+            TDirectory *ref_pt = ref->GetDirectory(basedir2+"/"+idname+"_pt_abseta/");
+            refstack(fit_pt, ref_pt, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
+            refstack(fit_pt, ref_pt, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
         } else {
-            TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
-            if (mc_pt_eta) {
-                mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-                mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+            TDirectory *mc_pt = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
+            if (mc_pt) {
+                mcstack(fit_pt, mc_pt, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
+                mcstack(fit_pt, mc_pt, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             } else {
-                single(fit_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-                single(fit_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+                single(fit_pt, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
+                single(fit_pt, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             }
         }
 
-        if (basedir2 == basedir) {
-            doCanvas(fit_pt_eta, 1, 5, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
-            doCanvas(fit_pt_eta, 1, 5, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
+        if ((ref == 0) && (basedir2 == basedir)) {
+            doCanvas(fit_pt, 1, 8, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
+            doCanvas(fit_pt, 1, 8, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
         }
     }
 

@@ -51,32 +51,41 @@ void plotMuonID_ICHEP(TString scenario, int fromTk=0) {
 
     doRatioPlot = false;
     doDiffPlot = false;
-
-    preliminary = "CMS Preliminary";
+    doPdf = true;
+    doSquare = true; yMax = 1.1;
+    datalbl = "Data, 77 nb^{-1}";
+    reflbl  = "Simulation";
+    preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
     plotMuonIDData();
 }
 
 void plotMuonIDData() {
     retitle = "Efficiency";
 
-    char *ids[3] = { "POG_Glb", "POG_TMLSAT", "VBTFLike" };
+    char *ids[3]    = { "POG_Glb", "POG_TMLSAT", "VBTFLike" };
+    char *titles[3] = { "Global",  "Soft",       "Tight" };
     for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
-
+        retitle = TString(titles[i])+" muon efficiency";
         TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
         if (ref != 0) {
             TDirectory *ref_pt_eta = ref->GetDirectory(basedir2+"/"+idname+"_pt_abseta/");
-            refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-            refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+            extraSpam = "        |#eta| < 1.2"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
+            extraSpam = "  1.2 < |#eta| < 2.1"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+            TDirectory *mc_pt_eta  = ref->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
+            if (0 && mc_pt_eta) {
+                extraSpam = "            |#eta| < 1.2"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_barrel_3",  "pt_PLOT_abseta_bin0_");
+                extraSpam = "       1.2 < |#eta| < 2.1"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_endcaps_3", "pt_PLOT_abseta_bin1_");
+            }
         } else {
             TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
             if (mc_pt_eta) {
                 datalbl = "T&P fit"; reflbl = "Sim. truth";
-                mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-                mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+                extraSpam = "        |#eta| < 1.2"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
+                extraSpam = "  1.2 < |#eta| < 2.1"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             } else {
-                single(fit_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-                single(fit_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+                extraSpam = "        |#eta| < 1.2"; single(fit_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
+                extraSpam = "  1.2 < |#eta| < 2.1"; single(fit_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             }
         }
 

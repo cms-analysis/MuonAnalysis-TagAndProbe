@@ -72,13 +72,15 @@ CONSTRAINTS = cms.PSet(
 )
 PT_ETA_BINS = cms.PSet(
     CONSTRAINTS,
-    pt     = cms.vdouble(  0.5, 2.0, 3.0, 5.0, 7.0, 15.0),
+    pt     = cms.vdouble(  0.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.0, 14.0),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
 
 
 #PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/"
-PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
+#PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-07.07.2010-10am/"
+#PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
+PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul08-v1/"
 #PREFIX=""
 process.TnP_MuonID = Template.clone(
     InputFileNames = cms.vstring(
@@ -88,21 +90,27 @@ process.TnP_MuonID = Template.clone(
         PREFIX+'tnpJPsi_Data_run138919to139100.root',
         PREFIX+'tnpJPsi_Data_run139102to139195.root',
         PREFIX+'tnpJPsi_Data_run139239to139365.root',
+        PREFIX+'tnpJPsi_Data_run139368to139400.root',
+        PREFIX+'tnpJPsi_Data_run139407to139459.root',
     ),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("histoMuFromCal"),
     OutputFileName = cms.string("TnP_ICHEP_MuonID_%s.root" % scenario),
     Efficiencies = cms.PSet(),
 )
+#PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
 
 if scenario == "data_all":
-    process.TnP_MuonID.binsForMassPlots = cms.uint32(35)
+    process.TnP_MuonID.binsForMassPlots = cms.uint32(70)
 
 if scenario == "datalike_mc":
     process.TnP_MuonID.InputFileNames = [
         PREFIX+"tnpJPsi_MC_JPsiToMuMu_0.122pb.root",
         PREFIX+"tnpJPsi_MC_ppMuX_0.122pb.root",
     ]
+
+if scenario == "signal_mc":
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_JPsiToMuMu_1.0pb.root" ]
 
 
 
@@ -125,6 +133,6 @@ process.TnP_MuonID_Tk = process.TnP_MuonID.clone(
     OutputFileName = cms.string("TnP_ICHEP_MuonID_FromTK_%s.root" % scenario),
 )
 
-if doTk:  process.pTk  = cms.Path(process.TnP_MuonID_Tk)
+#if doTk:  process.pTk  = cms.Path(process.TnP_MuonID_Tk)
 if doCal: process.pCal = cms.Path(process.TnP_MuonID)
 
