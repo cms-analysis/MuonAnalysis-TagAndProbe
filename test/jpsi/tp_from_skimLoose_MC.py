@@ -31,8 +31,14 @@ from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
 
 from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import addDiMuonSeparationVariables
 addDiMuonSeparationVariables(process, process.tnpSequenceTrigger, process.histoTrigger)
-addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromTk)
-addDiMuonSeparationVariables(process, process.tnpSequenceMuonID,  process.histoMuFromCal)
+addCountVariables(process, process.tnpSequenceTrigger,  process.histoTrigger)
+addCountVariables(process, process.tnpSequenceMuonID,   process.histoMuFromTk)
+addCountVariables(process, process.tnpSequenceMuonID,   process.histoMuFromCal)
+addCountVariables(process, process.tnpSequenceTracking, process.histoTracking)
+addCountVariables(process, process.tnpSequenceTracking, process.histoTrackingHp)
+
+from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_Trigger_cff import ReMatchL1
+ReMatchL1(process)
 
 process.tagAndProbe = cms.Path( 
     process.tnpCommonSequence    *
