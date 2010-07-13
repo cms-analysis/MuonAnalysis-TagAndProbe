@@ -156,6 +156,57 @@ allTPHistosTracking = cms.Sequence(
         + histoTrackingHp     
 )
 
+##    _____               _       ___              _ _ _         
+##   |_   _| __ __ _  ___| | __  / _ \ _   _  __ _| (_) |_ _   _ 
+##     | || '__/ _` |/ __| |/ / | | | | | | |/ _` | | | __| | | |
+##     | || | | (_| | (__|   <  | |_| | |_| | (_| | | | |_| |_| |
+##     |_||_|  \__,_|\___|_|\_\  \__\_\\__,_|\__,_|_|_|\__|\__, |
+##                                                         |___/ 
+##    _____  __  __ _      _                 _           
+##   | ____|/ _|/ _(_) ___(_) ___ _ __   ___(_) ___  ___ 
+##   |  _| | |_| |_| |/ __| |/ _ \ '_ \ / __| |/ _ \/ __|
+##   | |___|  _|  _| | (__| |  __/ | | | (__| |  __/\__ \
+##   |_____|_| |_| |_|\___|_|\___|_| |_|\___|_|\___||___/
+##                                                       
+##   
+
+muonsNoTrackQualityCuts = cms.EDFilter("PATMuonRefSelector",
+    src = cms.InputTag("patMuons"),
+    cut = cms.string("isGlobalMuon || muonID('TMLastStationAngTight')"),
+)
+tpGlbMuNoTkQ = cms.EDProducer("CandViewShallowCloneCombiner",
+    decay = cms.string("tagMuons2Mu@+ muonsNoTrackQualityCuts@-"), # charge coniugate states are implied
+    cut   = cms.string("%f < mass < %f" % MASS_RANGE_STA),
+)
+histoTrackQuality = tnpTreeProducer.clone(
+    tagProbePairs = cms.InputTag("tpGlbMuNoTkQ"),
+    flags = cms.PSet(
+        # Passing definition
+        highPurity  = cms.string("track.quality('highPurity')"),
+        QTF_Tracks  = cms.string(TRACK_CUTS),
+        VBTF_Tracks = cms.string("track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0 && abs(dB) < 0.2"),
+        Hits12      = cms.string("track.numberOfValidHits >= 12"),
+        PxlLay2     = cms.string("track.hitPattern.pixelLayersWithMeasurement >= 2"),
+        Chi2Ndf4    = cms.string("track.normalizedChi2 < 4"),
+    ),
+    # MC Matching configurables
+    probeMatches  = cms.InputTag("muMcMatch"),
+    allProbes = cms.InputTag("muonsNoTrackQualityCuts"),
+)
+histoTrackQuality.variables.hits = cms.string("track.numberOfValidHits")
+histoTrackQuality.variables.pixelHits = cms.string("track.hitPattern.numberOfValidPixelHits")
+histoTrackQuality.variables.pixelLayers = cms.string("track.hitPattern.pixelLayersWithMeasurement")
+histoTrackQuality.variables.expHitsOut = cms.string("track.trackerExpectedHitsOuter.numberOfLostHits")
+histoTrackQuality.variables.expHitsIn  = cms.string("track.trackerExpectedHitsInner.numberOfLostHits")
+histoTrackQuality.variables.dB    = cms.string("dB")
+histoTrackQuality.variables.chi2n = cms.string("track.normalizedChi2")
+
+tnpSequenceTrackQuality = cms.Sequence(
+    muonsNoTrackQualityCuts +
+    tpGlbMuNoTkQ +
+    histoTrackQuality
+)
+
 tnpSequenceTracking = cms.Sequence(
     allProbesTracking *
     (tkTracksNoJPsi + tkTracksNoBestJPsi +
@@ -164,5 +215,6 @@ tnpSequenceTracking = cms.Sequence(
     allTPPairsTracking   *
     allMcMatchesTracking * 
     countNearbyTracks4Tracking *
-    allTPHistosTracking
+    allTPHistosTracking +
+    tnpSequenceTrackQuality
 )
