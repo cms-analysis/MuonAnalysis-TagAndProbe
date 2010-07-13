@@ -9,7 +9,7 @@ from MuonAnalysis.TagAndProbe.jpsi.tp_from_skim_common_cff import *
 ##   |____/ \__\__,_|_| |_|\__,_/_/   \_\_|\___/|_| |_|\___| |_|   |_|  \___/|_.__/ \___||___/
 ##                                                                                            
 ##   
-staProbes = cms.EDProducer("CandViewRefSelector",
+staProbes = cms.EDFilter("CandViewRefSelector",
     src = cms.InputTag("staTracks"),
     cut = cms.string(PT_ETA_CUTS),
 )

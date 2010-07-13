@@ -89,7 +89,7 @@ justhpTkTracks = cms.EDProducer("ConcreteChargedCandidateProducer",
 ##    ___) | || (_| | | | | (_| |/ ___ \| | (_) | | | |  __/
 ##   |____/ \__\__,_|_| |_|\__,_/_/   \_\_|\___/|_| |_|\___|
 ##                                 
-staOneValidHit = cms.EDProducer("TrackSelector",
+staOneValidHit = cms.EDFilter("TrackSelector",
     src = cms.InputTag("standAloneMuons","UpdatedAtVtx"), 
     cut = cms.string("numberOfValidHits > 0"),
 )
@@ -112,7 +112,7 @@ staTracksValidHits = staTracks.clone(src = "staOneValidHit")
 ##   | |  | | |___  | |  | | (_| | || (__| | | |  __/\__ \
 ##   |_|  |_|\____| |_|  |_|\__,_|\__\___|_| |_|\___||___/
 ##                                                        
-muMcMatch = cms.EDFilter("MCTruthDeltaRMatcherNew",
+muMcMatch = cms.EDProducer("MCTruthDeltaRMatcherNew",
     pdgId = cms.vint32(13),
     src = cms.InputTag("patMuons"),
     distMin = cms.double(0.3),
