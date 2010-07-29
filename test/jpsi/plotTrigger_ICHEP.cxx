@@ -30,7 +30,7 @@ void plotTrigger_ICHEP(TString scenario) {
     doDiffPlot = false;
     doPdf = true; 
     doSquare = true; yMax = 1.1;
-    datalbl = "Data, 77 nb^{-1}";
+    datalbl = "Data, 84 nb^{-1}";
     reflbl  = "Simulation";
     preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
 
@@ -40,11 +40,11 @@ void plotTrigger_ICHEP(TString scenario) {
 bool extended = false;
 void plotTriggerData() {
     TString mu[2] = { "Cal", "VBTFLike" };
-    TString trig[2] = { "Mu3", "L1DoubleMuOpen" };
+    TString trig[3] = { "Mu3", "L1DoubleMuOpenS2", "L1DoubleMuOpen" };
     for (size_t i = 0; i < 2; ++i) {
-      for (size_t j = 0; j < 2; ++j) {
+      for (size_t j = 0; j < 3; ++j) {
         if (i == 1 && j > 0 && !extended) continue;
-        retitle = TString(j == 0 ? "HLT+L1" : "L1")+" efficiency";
+        retitle = TString(j == 0 ? "L1+HLT" : "L1")+" efficiency";
         TString idname = mu[i]+"_To_"+trig[j];
         plotTriggerData(idname);
       }
@@ -73,7 +73,7 @@ void plotTriggerData(TString idname) {
         extraSpam = "  1.2 < |#eta| < 2.1"; refstack(fit_pt,  ref_pt,  idname+"_pt_endcaps",  "pt_PLOT_abseta_bin1_");
         if (extended && fit_eta) { extraSpam = "p_{T} = 3-5 GeV/c";  refstack(fit_eta, ref_eta, idname+"_eta_pt-3-5",  "abseta_PLOT_pt_bin1_"); }
         if (extended && fit_eta) { extraSpam = "p_{T} = 5-20 GeV/c"; refstack(fit_eta, ref_eta, idname+"_eta_pt-5-20", "abseta_PLOT_pt_bin2_"); }
-        if (mc_pt) {
+        if (extended && mc_pt) {
             extraSpam = "            |#eta| < 1.2"; refstack3(fit_pt, ref_pt, mc_pt, idname+"_pt_barrel_3",  "pt_PLOT_abseta_bin0_");
             extraSpam = "       1.2 < |#eta| < 2.1"; refstack3(fit_pt, ref_pt, mc_pt, idname+"_pt_endcaps_3", "pt_PLOT_abseta_bin1_");
         } 

@@ -6,7 +6,13 @@ if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
-
+doHp = True; doMu = True; noEta = False
+if scenario.find("_hp") != -1:
+    doMu = False; scenario = scenario.replace("_hp","")
+if scenario.find("_mu") != -1:
+    doHp = False; scenario = scenario.replace("_mu","")
+#if scenario.find("_noeta") != -1:
+#    noEta = True; scenario = scenario.replace("_noeta","")
 
 CONSTRAINTS = cms.PSet(
     hasValidHits = cms.vstring("pass"),
@@ -15,7 +21,7 @@ CONSTRAINTS = cms.PSet(
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 0, 20 ),
-    abseta = cms.vdouble(0, 2.1),
+    abseta = cms.vdouble(0, 2.4),
     #eta = cms.vdouble(-2.1, 2.1),
 )
 ETA_BINS = ONE_BIN.clone(
@@ -36,8 +42,11 @@ PT_BINS = ONE_BIN.clone(
     pt     = cms.vdouble(1, 2, 4, 8, 20),
     abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4),
 )
-
-
+VTX_BINS = ONE_BIN.clone(
+    pair_Nvertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5)
+)
+if noEta:
+    VTX_BINS = ONE_BIN.clone(pair_Nvertices =  VTX_BINS.pair_Nvertices)
 
 process = cms.Process("TagProbe")
 
@@ -65,6 +74,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         match_deltaEta_NoJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
         match_deltaR_NoBestJPsi   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
         match_deltaEta_NoBestJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
+        pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
         run    = cms.vstring("Run Number", "132440", "999999", ""),
     ),
 
@@ -103,10 +113,11 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     )
 )
 
-matches = [ (1.0,0.4) ] #, (0.5,0.2) ]
-#effs   = [ "", "_NoJPsi", "_NoBestJPsi" ]
-effs = [ "", "_NoBestJPsi" ]
-if True:
+matches = [ (1.0,0.4), (0.5,0.2) ]
+#matches = [ (0.5,0.2) ]
+effs   = [ "", "_NoJPsi", "_NoBestJPsi" ]
+#effs = [ "", "_NoBestJPsi" ]
+if False:
     matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.3,0.15), (0.1,0.1) ]
     #matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.4,0.2), (0.3,0.15), (0.2,0.1), (0.1,0.1), (0.05,0.05) ]
     #effs = [ "", "_NoBestJPsi" ]
@@ -130,11 +141,11 @@ process.TnP_Tracking = Template.clone(
     OutputFileName = cms.string("TnP_Tracking_%s.root" % scenario),
     Efficiencies = cms.PSet()
 )
+if noEta: process.TnP_Tracking.OutputFileName = "TnP_Tracking_NoEta_%s.root" % scenario
 
+PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-14.07.2010/"
+PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul16/"
 if scenario == "data_all":
-    #PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
-    #PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-07.07.2010-10am/"
-    PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul08-v1/"
     process.TnP_Tracking.InputFileNames = cms.vstring(
         PREFIX+'tnpJPsi_Data_run132440to135735.root',
         PREFIX+'tnpJPsi_Data_run136033to137028.root',
@@ -144,16 +155,19 @@ if scenario == "data_all":
         PREFIX+'tnpJPsi_Data_run139239to139365.root',
         PREFIX+'tnpJPsi_Data_run139368to139400.root',
         PREFIX+'tnpJPsi_Data_run139407to139459.root',
+        PREFIX+'tnpJPsi_Data_run139779to139790.root',
+        PREFIX+'tnpJPsi_Data_run139965to139980.root',
+        PREFIX+'tnpJPsi_Data_run140058to140076.root',
     )
     process.TnP_Tracking.binsForMassPlots = cms.uint32(23)
 elif scenario == "datalike_mc":
-    #PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
-    #PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-07.07.2010-10am/"
-    PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul08-v1/"
     process.TnP_Tracking.InputFileNames = [
         PREFIX+"tnpJPsi_MC_JPsiToMuMu_0.122pb.root",
         PREFIX+"tnpJPsi_MC_ppMuX_0.122pb.root",
     ]
+elif scenario == "signal_mc":
+    process.TnP_Tracking.InputFileNames = [ PREFIX+"tnpJPsi_MC_JPsiToMuMu_1.0pb.root" ]
+
 
 sampleToPdfMap = { "": "gaussPlusCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic" }
 #sampleToPdfMap = { "": "gaussPlusFloatCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic" }
@@ -165,22 +179,20 @@ for M in tofit:
             UnbinnedVariables = cms.vstring("mass"),
             BinToPDFmap = cms.vstring(sampleToPdfMap[X])
         )
-        if False:
-            setattr(process.TnP_Tracking.Efficiencies, "eff_"    +M+X, cms.PSet(common, BinnedVariables = ONE_BIN))
-        isSpecial = True #(M == "dr100de040" or M == "dr050de020");
-        if True:
-            setattr(process.TnP_Tracking.Efficiencies, "eff_abseta_"+M+X, cms.PSet(common, BinnedVariables = ETA_BINS))
-        if False and isSpecial:
-            setattr(process.TnP_Tracking.Efficiencies, "eff_pt_"+M+X,  cms.PSet(common, BinnedVariables = PT_BINS))
-        if False and isSpecial and scenario == "data_all":
+        #if noEta:
+        setattr(process.TnP_Tracking.Efficiencies, "eff_"    +M+X, cms.PSet(common, BinnedVariables = ONE_BIN))
+        #else:
+        setattr(process.TnP_Tracking.Efficiencies, "eff_abseta_"+M+X, cms.PSet(common, BinnedVariables = ETA_BINS))
+        if False and scenario == "data_all":
             setattr(process.TnP_Tracking.Efficiencies, "eff_run_"+M+X, cms.PSet(common, BinnedVariables = RUN_BINS))
+        if True and scenario == "data_all":
+            setattr(process.TnP_Tracking.Efficiencies, "eff_vxt_"+M+X, cms.PSet(common, BinnedVariables = VTX_BINS))
 
-process.p = cms.Path(
-    process.TnP_Tracking
-)
 
 process.TnP_Tracking_HP = process.TnP_Tracking.clone(
     InputDirectoryName = cms.string("histoTrackingHp"),
     OutputFileName = cms.string("TnP_Tracking_HP_%s.root" % scenario),
 )
-process.p_HP = cms.Path(process.TnP_Tracking_HP)
+
+if doMu: process.p = cms.Path( process.TnP_Tracking )
+if doHp: process.p_HP = cms.Path(process.TnP_Tracking_HP)

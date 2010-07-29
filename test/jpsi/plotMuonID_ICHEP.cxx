@@ -53,7 +53,7 @@ void plotMuonID_ICHEP(TString scenario, int fromTk=0) {
     doDiffPlot = false;
     doPdf = true;
     doSquare = true; yMax = 1.1;
-    datalbl = "Data, 77 nb^{-1}";
+    datalbl = "Data, 84 nb^{-1}";
     reflbl  = "Simulation";
     preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
     plotMuonIDData();
@@ -71,27 +71,37 @@ void plotMuonIDData() {
         if (ref != 0) {
             TDirectory *ref_pt_eta = ref->GetDirectory(basedir2+"/"+idname+"_pt_abseta/");
             extraSpam = "        |#eta| < 1.2"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-            extraSpam = "  1.2 < |#eta| < 2.1"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+            extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             TDirectory *mc_pt_eta  = ref->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
             if (0 && mc_pt_eta) {
                 extraSpam = "            |#eta| < 1.2"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_barrel_3",  "pt_PLOT_abseta_bin0_");
-                extraSpam = "       1.2 < |#eta| < 2.1"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_endcaps_3", "pt_PLOT_abseta_bin1_");
+                extraSpam = "       1.2 < |#eta| < 2.4"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_endcaps_3", "pt_PLOT_abseta_bin1_");
             }
         } else {
             TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_mcTrue/");
             if (mc_pt_eta) {
                 datalbl = "T&P fit"; reflbl = "Sim. truth";
                 extraSpam = "        |#eta| < 1.2"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-                extraSpam = "  1.2 < |#eta| < 2.1"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+                extraSpam = "  1.2 < |#eta| < 2.4"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             } else {
                 extraSpam = "        |#eta| < 1.2"; single(fit_pt_eta, idname+"_pt_barrel",  "pt_PLOT_abseta_bin0_");
-                extraSpam = "  1.2 < |#eta| < 2.1"; single(fit_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
+                extraSpam = "  1.2 < |#eta| < 2.4"; single(fit_pt_eta, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             }
         }
 
-        if ((basedir2 == basedir) && (ref == 0)) {
-            doCanvas(fit_pt_eta, 1, 5, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
-            doCanvas(fit_pt_eta, 1, 5, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
+        TDirectory *fit_vtx = gFile->GetDirectory(basedir+"/"+idname+"_vtx/");
+        if (0 && fit_vtx) {
+            char buff[1255], baff[1255];
+            for (int b = 0; b < 3; ++b) { for (int be = 0; be <= 1; ++be) {
+                sprintf(buff,"pair_Nvertices_PLOT_abseta_bin%d_&_pt_bin%d", be, b); 
+                sprintf(baff,"%s_vs_vtx_%s_pt_bin%d", idname.Data(), (be ? "endcaps":"barrel"), b); 
+                single(fit_vtx,baff,buff);
+            } }
+        }
+
+        if (1 || (basedir2 == basedir) && (ref == 0)) {
+            doCanvas(fit_pt_eta, 1, 7, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
+            doCanvas(fit_pt_eta, 1, 7, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
         }
     }
 

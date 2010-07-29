@@ -32,6 +32,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         #eta = cms.vstring("Probe #eta", "-2.5", "2.5", ""),
         tag_pt = cms.vstring("Tag p_{T}", "2.6", "1000", "GeV/c"),
+        pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""), 
     ),
 
     Categories = cms.PSet(
@@ -67,14 +68,20 @@ CONSTRAINTS = cms.PSet(
 )
 PT_ETA = cms.PSet(
     CONSTRAINTS,
-    pt  = cms.vdouble( 0.8, 1.5, 2, 2.5, 3.3, 4, 5, 8, 30 ),
+    #pt  = cms.vdouble( 0.8, 1.5, 2, 2.5, 3.3, 4, 5, 8, 30 ),
+    pt  = cms.vdouble( 0.8, 1, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3, 3.3, 5, 30 ),
     abseta = cms.vdouble( 0,   1.3, 2.4 ),
     #eta = cms.vdouble( -2.4, -1.3, 0, 1.3, 2.4 ),
 )
+VTX_BINS = cms.PSet(
+    CONSTRAINTS,
+    #pt  = cms.vdouble( 0.8, 1, 1.25, 1.5, 1.75, 2.0, 2.25, 2.5, 2.75, 3, 3.3, 5, 30 ),
+    abseta = cms.vdouble( 0,   1.3, 2.4 ),
+    pair_Nvertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5)
+)
 
-#PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
-#PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-07.07.2010-10am/"
-PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul08-v1/"
+PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-14.07.2010/"
+PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul16/"
 process.TnP_Trigger = Template.clone(
     InputFileNames = cms.vstring(
         PREFIX+'tnpJPsi_Data_run132440to135735.root',
@@ -85,6 +92,8 @@ process.TnP_Trigger = Template.clone(
         PREFIX+'tnpJPsi_Data_run139239to139365.root',
         PREFIX+'tnpJPsi_Data_run139368to139400.root',
         PREFIX+'tnpJPsi_Data_run139407to139459.root',
+        PREFIX+'tnpJPsi_Data_run139779to139790.root',
+        PREFIX+'tnpJPsi_Data_run139965to139980.root',
     ),
     InputDirectoryName = cms.string("histoTrigger"),
     InputTreeName = cms.string("fitter_tree"),
@@ -103,28 +112,30 @@ if scenario == "datalike_mc":
 
 if scenario == "signal_mc":
     process.TnP_Trigger.InputFileNames = [ PREFIX+"tnpJPsi_MC_JPsiToMuMu_1.0pb.root" ]
+if scenario == "signal_37X":
+    process.TnP_Trigger.InputFileNames = ["tnpJPsi_MC_37X.root" ]
 
 
+ALLBINS=[("pt_abseta", PT_ETA)]
+#if scenario == "data_all": ALLBINS += [ ("vtx", VTX_BINS) ]
+#for T,M in [ ("L1DoubleMuOpen","TM_Incl") ]:
 for T in [ "L1DoubleMuOpen", "Mu3" ]:
-    #for M in ["Glb", "TM_Excl", "TM_Incl"]:
-    for M in ["Glb", "TM_Incl"]:
-        #for X,B in [("barrel",PT_BARREL), ("endcaps",PT_ENDCAPS)]:
-            X="abseta";
-            BINNEDVARS = PT_ETA.clone()
+    for M in ["Glb", "TM_Incl", "TM_Excl"]:
+        for X, B in ALLBINS:
+            BINNEDVARS = B.clone()
             if M == "Glb":     setattr(BINNEDVARS, "Glb", cms.vstring("pass"))
             if M == "TM_Incl": setattr(BINNEDVARS, "TM", cms.vstring("pass"))
             if M == "TM_Excl": 
                 setattr(BINNEDVARS, "TM",  cms.vstring("pass"))
                 setattr(BINNEDVARS, "Glb", cms.vstring("fail"))
-            if scenario != "signal_all":
-                setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_pt_"+X, cms.PSet(
-                    EfficiencyCategoryAndState = cms.vstring(T,"pass"),
-                    UnbinnedVariables = cms.vstring("mass"),
-                    BinnedVariables = BINNEDVARS,
-                    BinToPDFmap = cms.vstring("gaussPlusExpo")
-                ))
-            if scenario == "datalike_mc" or scenario == "signal_all":
-                setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_pt_"+X+"_mcTrue", cms.PSet(
+            setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_"+X, cms.PSet(
+                EfficiencyCategoryAndState = cms.vstring(T,"pass"),
+                UnbinnedVariables = cms.vstring("mass"),
+                BinnedVariables = BINNEDVARS,
+                BinToPDFmap = cms.vstring("gaussPlusExpo")
+            ))
+            if scenario != "data_all":
+                setattr(process.TnP_Trigger.Efficiencies, M+"_To_"+T+"_"+X+"_mcTrue", cms.PSet(
                     EfficiencyCategoryAndState = cms.vstring(T,"pass"),
                     UnbinnedVariables = cms.vstring("mass"),
                     BinnedVariables = BINNEDVARS.clone(mcTrue = cms.vstring("true"))

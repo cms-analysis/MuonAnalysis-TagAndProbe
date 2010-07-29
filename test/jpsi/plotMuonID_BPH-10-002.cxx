@@ -24,7 +24,7 @@ TString basedir2 = "histoMuFromTk";
 TFile *ref = 0;
 
 TCanvas *c1 = 0;
-void plotMuonID_BPH_10_002(TString scenario, int fromTk=0) {
+void plotMuonID_BPH_10_002(TString scenario, int fromWhat=0) {
     prefix = prefix+scenario+"/";
     gSystem->mkdir(prefix,true);
 
@@ -32,12 +32,26 @@ void plotMuonID_BPH_10_002(TString scenario, int fromTk=0) {
     gStyle->SetOptStat(0);
     c1 = new TCanvas("c1","c1");
 
+    switch (fromWhat) {
+        case 0: break;
+        case 1:
+            basedir  = "histoMuFromCal";
+            basedir2 = "histoMuFromCal";
+            break;
+        case 2:
+            basedir  = "histoMuFromTkVtx";
+            basedir2 = "histoMuFromTkVtx";
+            break;
+
+    }
+    std::cout << "Using " << basedir << ", " << basedir2 << std::endl;
+
     if (gROOT->GetListOfFiles()->GetEntries() == 2) {
         ref = (TFile *) gROOT->GetListOfFiles()->At(1);
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
 
-    datalbl = "Data, 77 nb^{-1}";
+    datalbl = "Data, 84 nb^{-1}";
     preliminary = "";
     doRatioPlot = false; doDiffPlot = false;
     doPdf = false;
@@ -49,7 +63,6 @@ void plotMuonIDData() {
     char *ids[3] = { "Glb", "POG_TMLSAT", "TM" };
     for (size_t i = 0; i < 3; ++i) {
         TString idname(ids[i]);
-
         TDirectory *fit_pt = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
         if (ref != 0) {
             TDirectory *ref_pt = ref->GetDirectory(basedir2+"/"+idname+"_pt_abseta/");
@@ -65,10 +78,31 @@ void plotMuonIDData() {
                 single(fit_pt, idname+"_pt_endcaps", "pt_PLOT_abseta_bin1_");
             }
         }
+        /*
+        TDirectory *fit_vtx = gFile->GetDirectory(basedir+"/"+idname+"_vtx/");
+        if (fit_vtx) {
+            doLogX = false;
+            char buff[1255], baff[1255];
+            for (int b = 0; b < 4; ++b) { for (int be = 0; be <= 1; ++be) {
+                sprintf(buff,"pair_Nvertices_PLOT_abseta_bin%d_&_pt_bin%d", be, b); 
+                sprintf(baff,"%s_vs_vtx_%s_pt_bin%d", idname.Data(), (be ? "endcaps":"barrel"), b); 
+                //single(fit_vtx,baff,buff);
+            } }
+            doLogX = true;
+            reflbl = "Data, 1 Vtx";
+            preliminary = "";
+            datalbl = "Data, 2 Vtx";
+            refstackNamed(fit_vtx, idname+"_vs_2vtx_pt_barrel",  "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin1", "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin0");
+            refstackNamed(fit_vtx, idname+"_vs_2vtx_pt_endcaps", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin1", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin0");
+            datalbl = "Data, 3 Vtx";
+            refstackNamed(fit_vtx, idname+"_vs_3vtx_pt_barrel",  "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin2", "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin0");
+            refstackNamed(fit_vtx, idname+"_vs_3vtx_pt_endcaps", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin2", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin0");
+        }
+        */
 
-        if ((ref == 0) && (basedir2 == basedir)) {
-            doCanvas(fit_pt, 1, 8, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
-            doCanvas(fit_pt, 1, 8, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
+        if (1 || (ref == 0) && (basedir2 == basedir)) {
+            doCanvas(fit_pt, 1, 4, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
+            doCanvas(fit_pt, 1, 4, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
         }
     }
 

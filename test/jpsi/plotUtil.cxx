@@ -24,11 +24,12 @@ TString datalbl = "Data, xx nb^{-1}", reflbl = "Simulation";
 bool autoScale = false;
 bool doDiffPlot = false;
 bool doRatioPlot = true;
-bool doFillMC = true;
+bool doFillMC = false;
 bool doPdf = true;
 bool doLogX = false;
 bool doSquare = false;
 double yMax = 1.0;
+double yMin = 0.0;
 TString extraSpam = "";
 
 void cmsprelim() {
@@ -242,6 +243,11 @@ void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) {
+    if (ref == 0) {
+        std::cerr << "REFERENCE DIR FOUND: " << fit->GetName() << std::endl;
+        return;
+    }
+
     TCanvas *pref = getFromPrefix(ref->GetDirectory("fit_eff_plots"), fitname);
     if (pref == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << ref->GetName() << std::endl;
@@ -275,7 +281,58 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
 
-    setRangeY(pref, 0, yMax);
+    setRangeY(pref, yMin, yMax);
+    if (retitle != "") reTitleY(pref, retitle);
+
+    pref->Draw( "" );
+    if (doFillMC) href->Draw("E2 SAME");
+    hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
+    if (datalbl) doLegend(hfit,href,datalbl,reflbl);
+   
+    if (doSquare) squareCanvas(pref);
+    maybeLogX(pref, href); 
+    gPad->Print(prefix+alias+".png");
+    if (doPdf) gPad->Print(prefix+alias+".pdf");
+
+    if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
+    if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
+}
+/** Plot FIT from file 1 plus FIT from file 2 */
+void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refname) {
+    TCanvas *pref = getFromPrefix(fit->GetDirectory("fit_eff_plots"), refname);
+    if (pref == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+refname << " in " << ref->GetName() << std::endl;
+        return;
+    }
+    RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
+    if (doFillMC) {
+        href->SetLineColor(2);
+        href->SetFillColor(208);
+        href->SetLineStyle(0);
+        href->SetMarkerColor(2);
+        href->SetMarkerStyle(21);
+        href->SetMarkerSize(0.4);
+    } else {
+        href->SetLineWidth(2);
+        href->SetLineColor(kRed);
+        href->SetMarkerColor(kRed);
+        href->SetMarkerStyle(25);
+        href->SetMarkerSize(2.0);
+    }
+
+    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    if (pfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        return;
+    }
+    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    hfit->SetLineWidth(2);
+    hfit->SetLineColor(kBlack);
+    hfit->SetMarkerColor(kBlack);
+    hfit->SetMarkerStyle(20);
+    hfit->SetMarkerSize(1.6);
+
+    setRangeY(pref, yMin, yMax);
     if (retitle != "") reTitleY(pref, retitle);
 
     pref->Draw( "" );
@@ -326,7 +383,7 @@ void refstack3(TDirectory *fit, TDirectory *ref, TDirectory *mc, TString alias, 
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
 
-    setRangeY(pref, 0, yMax);
+    setRangeY(pref, yMin, yMax);
     if (retitle != "") reTitleY(pref, retitle);
 
     pref->Draw("");
@@ -358,7 +415,7 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
 
-    setRangeY(pref, 0, yMax);
+    setRangeY(pref, yMin, yMax);
     if (doSquare) squareCanvas(pref);
     if (retitle != "") reTitleY(pref, retitle);
     pref->Draw();
@@ -395,12 +452,59 @@ void single( TDirectory *fit, TString alias, TString fitname) {
     hfit->SetMarkerStyle(20);
     hfit->SetMarkerSize(1.6);
 
-    setRangeY(pfit, 0, yMax);
+    setRangeY(pfit, yMin, yMax);
     if (doSquare) squareCanvas(pfit);
     if (preliminary != "") cmsprelim();
     maybeLogX(pfit, hfit); 
     pfit->Print(prefix+alias+".png"); 
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
+}
+
+void EffPalette()
+{
+   static Int_t  colors[50];
+   static Bool_t initialized = kFALSE;
+
+   double mid = 0.5*(yMin+yMax);
+   Double_t Red[3]    = { 1.00, 1.00, 0.00 };
+   Double_t Green[3]  = { 0.00, 1.00, 1.00 };
+   Double_t Blue[3]   = { 0.00, 0.00, 0.00 };
+   Double_t Length[3] = { 0,    0.75,  1.0  };
+
+   if(!initialized){
+      Int_t FI = TColor::CreateGradientColorTable(3,Length,Red,Green,Blue,50);
+      for (int i=0; i<50; i++) colors[i] = FI+i;
+      initialized = kTRUE;
+   }
+   //gStyle->SetPalette(50,colors); // not needed??
+}
+
+
+/** Plot just one set */
+void single2D( TDirectory *fit, TString alias, TString fitname) {
+    gStyle->SetPaintTextFormat(".4f");
+    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    if (pfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        return;
+    }
+    TH2 *hfit = pfit->FindObject(pfit->GetName());
+    hfit->SetTitle(retitle == "" ?  "efficiency" : retitle);
+    hfit->GetZaxis()->SetTitle("");
+    hfit->GetZaxis()->SetRangeUser(yMin, yMax);
+
+    EffPalette();
+    //gStyle->SetPalette(99);
+
+    c1->cd();
+    double orm = c1->GetRightMargin();
+    c1->SetRightMargin(0.14);
+    hfit->Draw();
+    if (doSquare) squareCanvas(c1);
+    if (preliminary != "") cmsprelim();
+    pfit->Print(prefix+alias+".png"); 
+    if (doPdf) pfit->Print(prefix+alias+".pdf"); 
+    c1->SetRightMargin(orm);
 }
 
 /** Reset line styles and colors, which get messed up by tdrStyle */

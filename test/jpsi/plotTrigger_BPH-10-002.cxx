@@ -27,7 +27,7 @@ void plotTrigger_BPH_10_002(TString scenario) {
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
 
-    datalbl = "Data, 77 nb^{-1}";
+    datalbl = "Data, 84 nb^{-1}";
     preliminary = "";
     doRatioPlot = false; doDiffPlot = false;
     doPdf = false;
@@ -38,8 +38,8 @@ void plotTrigger_BPH_10_002(TString scenario) {
 void plotTriggerData() {
     TString mu[3] = { "Glb", "TM_Incl", "TM_Excl" };
     TString trig[2] = { "L1DoubleMuOpen", "Mu3"};
-    for (size_t i = 0; i < 2; ++i) {
-      for (size_t j = 0; j < 2; ++j) {
+    for (size_t i = 0; i < 3; ++i) {
+      for (size_t j = 0; j < 1; ++j) {
         TString idname = mu[i]+"_To_"+trig[j];
         plotTriggerData(idname);
       }
@@ -70,9 +70,29 @@ void plotTriggerData(TString idname) {
         }
     }
 
-    if (ref == 0) {
-        doCanvas(fit_pt, 1, 8, idname+"_barrel_pt_%d",  "abseta_bin0__pt_bin%d_");
-        doCanvas(fit_pt, 1, 8, idname+"_endcaps_pt_%d", "abseta_bin1__pt_bin%d_");
+    TDirectory *fit_vtx = gFile->GetDirectory(basedir+"/"+idname+"_vtx/");
+    if ((ref == 0) && (fit_vtx != 0)) {
+        doLogX = false;
+        char buff[1255], baff[1255];
+        for (int b = 0; b < 4; ++b) { for (int be = 0; be <= 1; ++be) {
+            sprintf(buff,"pair_Nvertices_PLOT_abseta_bin%d_&_pt_bin%d", be, b); 
+            sprintf(baff,"%s_vs_vtx_%s_pt_bin%d", idname.Data(), (be ? "endcaps":"barrel"), b); 
+            single(fit_vtx,baff,buff);
+        } }
+        doLogX = true;
+        reflbl = "Data, 1 Vtx";
+        preliminary = "";
+        datalbl = "Data, 2 Vtx";
+        refstackNamed(fit_vtx, idname+"_vs_2vtx_pt_barrel",  "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin1", "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin0");
+        refstackNamed(fit_vtx, idname+"_vs_2vtx_pt_endcaps", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin1", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin0");
+        datalbl = "Data, 3 Vtx";
+        refstackNamed(fit_vtx, idname+"_vs_3vtx_pt_barrel",  "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin2", "pt_PLOT_abseta_bin0_&_pair_Nvertices_bin0");
+        refstackNamed(fit_vtx, idname+"_vs_3vtx_pt_endcaps", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin2", "pt_PLOT_abseta_bin1_&_pair_Nvertices_bin0");
+    }
+
+    if (1 || ref == 0) {
+        doCanvas(fit_pt, 1, 12, idname+"_barrel_pt_%d",  "abseta_bin0__pt_bin%d_");
+        doCanvas(fit_pt, 1, 12, idname+"_endcaps_pt_%d", "abseta_bin1__pt_bin%d_");
     }
 }
 

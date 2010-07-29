@@ -44,6 +44,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         #phi = cms.vstring("Probe #phi", "-3.1416", "3.1416", ""),
         tag_pt = cms.vstring("Tag p_{T}", "2.6", "1000", "GeV/c"),
+        pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
     ),
 
     Categories = cms.PSet(
@@ -75,13 +76,16 @@ PT_ETA_BINS = cms.PSet(
     pt     = cms.vdouble(  0.5, 2.0, 2.5, 3.0, 4.0, 5.0, 7.0, 14.0),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
+VTX_BINS = cms.PSet(
+    CONSTRAINTS,
+    pt     = cms.vdouble(  0.5, 2.0, 4.5, 14.0),
+    abseta = cms.vdouble(  0.0, 1.2, 2.4),
+    pair_Nvertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5)
+)
 
 
-#PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/"
-#PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-07.07.2010-10am/"
-#PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
-PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul08-v1/"
-#PREFIX=""
+
+PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-14.07.2010/"
 process.TnP_MuonID = Template.clone(
     InputFileNames = cms.vstring(
         PREFIX+'tnpJPsi_Data_run132440to135735.root',
@@ -92,13 +96,13 @@ process.TnP_MuonID = Template.clone(
         PREFIX+'tnpJPsi_Data_run139239to139365.root',
         PREFIX+'tnpJPsi_Data_run139368to139400.root',
         PREFIX+'tnpJPsi_Data_run139407to139459.root',
+        PREFIX+'tnpJPsi_Data_run139779to139790.root',
     ),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("histoMuFromCal"),
     OutputFileName = cms.string("TnP_ICHEP_MuonID_%s.root" % scenario),
     Efficiencies = cms.PSet(),
 )
-#PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul02/"
 
 if scenario == "data_all":
     process.TnP_MuonID.binsForMassPlots = cms.uint32(70)
@@ -113,20 +117,22 @@ if scenario == "signal_mc":
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_JPsiToMuMu_1.0pb.root" ]
 
 
-
+ALLBINS=[("pt_abseta",PT_ETA_BINS)]
+if scenario == "data_all": ALLBINS += [ ("vtx",VTX_BINS)]
 for T in [ "POG_Glb", "POG_TMLSAT", "VBTFLike" ]:
-    setattr(process.TnP_MuonID.Efficiencies, T+"_pt_abseta", cms.PSet(
-        EfficiencyCategoryAndState = cms.vstring(T,"pass"),
-        UnbinnedVariables = cms.vstring("mass"),
-        BinnedVariables = PT_ETA_BINS,
-        BinToPDFmap = cms.vstring("gaussPlusExpo")
-    ))
-    if scenario == "datalike_mc":
-        setattr(process.TnP_MuonID.Efficiencies, T+"_pt_abseta_mcTrue", cms.PSet(
+    for  X,B in ALLBINS:
+        setattr(process.TnP_MuonID.Efficiencies, T+"_"+X, cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(T,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = PT_ETA_BINS.clone(mcTrue = cms.vstring("true"))
-        )) 
+            BinnedVariables = B,
+            BinToPDFmap = cms.vstring("gaussPlusExpo")
+        ))
+        if scenario == "datalike_mc" or scenario == "signal_mc":
+            setattr(process.TnP_MuonID.Efficiencies, T+"_"+X+"_mcTrue", cms.PSet(
+                EfficiencyCategoryAndState = cms.vstring(T,"pass"),
+                UnbinnedVariables = cms.vstring("mass"),
+                BinnedVariables = B.clone(mcTrue = cms.vstring("true"))
+            )) 
 
 process.TnP_MuonID_Tk = process.TnP_MuonID.clone(
     InputDirectoryName = cms.string("histoMuFromTk"),
