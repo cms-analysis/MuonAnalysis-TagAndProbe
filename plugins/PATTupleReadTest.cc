@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: PATTupleReadTest.cc,v 1.4 2010/06/01 06:59:02 jjhollar Exp $
+// $Id: PATTupleReadTest.cc,v 1.5 2010/06/02 11:37:28 jjhollar Exp $
 //
 //
 
@@ -88,13 +88,13 @@ PATTupleReadTest::analyze(const edm::Event& iEvent, const edm::EventSetup& iSetu
   edm::View<pat::Muon>::const_iterator patmuon;
   for (edm::View<pat::Muon>::const_iterator patmuon = patmuons->begin(), end = patmuons->end(); patmuon != end; ++patmuon) 
     {
-      std::string effname = "GlobalMuonFromTrackerTrackJpsi";
+      std::string effname = "GlobalMuon_Data_CaloMuonProbe_JPsi";
       pat::Muon myMuon = *patmuon; // copy
 
       cout << "\tRead PAT efficiency " 
-	   << (myMuon.efficiency("GlobalMuonFromTrackerTrackJpsi")).value() << " + " 
-	   << (myMuon.efficiency("GlobalMuonFromTrackerTrackJpsi_UpperError")).value() << " - " 
-	   << (myMuon.efficiency("GlobalMuonFromTrackerTrackJpsi_LowerError")).value() 
+	   << (myMuon.efficiency("GlobalMuon_Data_CaloMuonProbe_JPsi")).value() << " + " 
+	   << (myMuon.efficiency("GlobalMuon_Data_CaloMuonProbe_JPsi_UpperError")).value() << " - " 
+	   << (myMuon.efficiency("GlobalMuon_Data_CaloMuonProbe_JPsi_LowerError")).value() 
 	   << " (" <<  effname << ")" << endl;
     }
 }

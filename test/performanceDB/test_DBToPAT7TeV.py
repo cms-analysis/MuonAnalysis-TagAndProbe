@@ -21,9 +21,10 @@ process.source = cms.Source("PoolSource",
                             )
 
 process.selectedPatMuonsWithEff = cms.EDAnalyzer('MuTestPAT',
+                                    UseAbsEtaVals = cms.bool(True),             
                                     AlgoNames = cms.vstring(
-                                            'GlobalMuonFromTrackerTrackJpsi',
-                                            'TriggerMuonFromGlobalMuonJpsi'
+                                            'GlobalMuon_Data_CaloMuonProbe_JPsi',
+                                            'HLT_Mu3_Data_CaloMuonProbe_JPsi'
                                     ))
 
 process.out.fileName = 'file:jpsimm.pattuple.root'

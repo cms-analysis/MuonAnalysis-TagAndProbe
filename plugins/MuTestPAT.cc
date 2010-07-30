@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPAT.cc,v 1.5 2010/05/25 21:02:51 gpetrucc Exp $
+// $Id: MuTestPAT.cc,v 1.6 2010/06/02 11:37:28 jjhollar Exp $
 //
 //
 
@@ -63,6 +63,7 @@ public:
 private:
   std::vector<std::string> algonames;
   std::string rootfilename;
+  bool useAbsEtaVals;
   virtual void beginJob() ;
   //  virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
@@ -84,6 +85,7 @@ MuTestPAT::MuTestPAT(const edm::ParameterSet& iConfig)
 
 {
   algonames =  iConfig.getParameter< std::vector<std::string> >("AlgoNames");
+  useAbsEtaVals = iConfig.getParameter< bool >("UseAbsEtaVals"); 
 
   produces<std::vector<pat::Muon> >();
 
@@ -117,6 +119,9 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       patchg = patmuon->charge();
       pat::Muon myMuon = *patmuon; // copy
 
+      if(useAbsEtaVals == true)
+	pateta = fabs(pateta);
+
       sort(algonames.begin(), algonames.end());
 
       for(unsigned int i = 0; i < algonames.size(); ++i)
@@ -133,7 +138,6 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  double myefflowererr = effreader->getEff(patpt, pateta, patphi, patchg, muonefficiencylowererror); 
           double myeffuppererr = effreader->getEff(patpt, pateta, patphi, patchg, muonefficiencyuppererror);  
 	  double myefferr = 0.0;
-	  //	  double myefferr = effreader->getEffError(patpt, pateta, patphi, patchg, muonefficiency);
 
 	  cout << "\tDB efficiency " 
 	       << myeff << " + "
@@ -147,14 +151,6 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 	  
 	  // Fill asymmetric errors
 	  //      myMuon.setEfficiency(effname, pat::LookupTableRecord(myeff, myefferr, myefferr, myefferr, 0));
-	  // Fill only symmetric errors
-
-		  //	  cout << "\tPAT muon efficiency " 
-		  //	       << (myMuon.efficiency(effname)).value() << " +- " 
-		  //               << (myMuon.efficiency(effname)).error() << " ("
-	    //               << (myMuon.efficiency(effname)).errorUpper() << " - "
-	    //	       << (myMuon.efficiency(effname)).errorLower() << " (" 
-		  //	       << effname << ")" << endl;
 	}
       patCorrMuons->push_back(myMuon);
     }

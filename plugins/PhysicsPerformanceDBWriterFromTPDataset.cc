@@ -132,7 +132,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	tmp = 1001;
       else if(inputBinningVariables[i] == "charge")
 	tmp = 1002;
-      else if(inputBinningVariables[i] == "eta")
+      else if(inputBinningVariables[i] == "abseta" || inputBinningVariables[i] == "eta")
 	tmp = 1003;
       else if(inputBinningVariables[i] == "phi")
 	tmp = 1004;
@@ -188,7 +188,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
       datatmp = (RooDataSet *)f->Get(datasetname.c_str());
       const RooArgSet* vars = datatmp->get();
       RooRealVar* effvar = (RooRealVar*) vars->find("efficiency");
-      RooRealVar* etavar = (RooRealVar*) vars->find("eta");
+      RooRealVar* etavar = (RooRealVar*) vars->find("abseta");
       RooRealVar* ptvar = (RooRealVar*) vars->find("pt");
 
       // Fill DB tables
@@ -208,6 +208,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
       TH2F* hhi = (TH2F *)h->Clone("eff_hi");
 
       int l = 0;
+
       for(int j = 0;j < ptvar->getBinning().numBins();j++)
 	{
 	  for(int k = 0;k < etavar->getBinning().numBins();k++)
@@ -225,8 +226,6 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	      hlo->SetBinContent(b, effvar->getVal()+effvar->getErrorLo());
 	      hhi->SetBinContent(b, effvar->getVal()+effvar->getErrorHi());
 
-	      // NB. The "average" error her is temporary until the 
-	      // DB+PAT support asymmetric errors.
 	      if(m == 0)
 		bincontent = effvar->getVal();
 	      if(m == 1)

@@ -6,63 +6,81 @@ poolDBESSource = cms.ESSource("PoolDBESSource",
                               toGet = cms.VPSet(
     cms.PSet(
     record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('GLBMUJPSI_TEST7TEV_WP'),
-    label = cms.untracked.string('GLBMUJPSI_TEST7TEV_WP')
+    tag = cms.string('GLBMU_DATA_CALO_JPSI_WP'),
+    label = cms.untracked.string('GLBMU_DATA_CALO_JPSI_WP')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('GLBMUJPSI_TEST7TEV_TABLE'),
-    label = cms.untracked.string('GLBMUJPSI_TEST7TEV_TABLE')
+    tag = cms.string('GLBMU_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('GLBMU_DATA_CALO_JPSI_TABLE')
     ),
     cms.PSet(
     record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('TRGMUJPSI_TEST7TEV_WP'),
-    label = cms.untracked.string('TRGMUJPSI_TEST7TEV_WP')
+    tag = cms.string('HLTMU3_DATA_CALO_JPSI_WP'),
+    label = cms.untracked.string('HLTMU3_DATA_CALO_JPSI_WP')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('TRGMUJPSI_TEST7TEV_TABLE'),
-    label = cms.untracked.string('TRGMUJPSI_TEST7TEV_TABLE')
+    tag = cms.string('HLTMU3_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('HLTMU3_DATA_CALO_JPSI_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('TRKMULSAT_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('TRKMULSAT_DATA_CALO_JPSI_TABLE')
+    ),
+                                  
+    cms.PSet(
+    record = cms.string('PerformanceWPRecord'),
+    tag = cms.string('LOERR_GLBMU_DATA_CALO_JPSI_WP'),
+    label = cms.untracked.string('LOERR_GLBMU_DATA_CALO_JPSI_WP')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('LOERR_GLBMU_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('LOERR_GLBMU_DATA_CALO_JPSI_TABLE')
     ),
     cms.PSet(
     record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('LOERR_GLBMUJPSI_TEST7TEV_WP'),
-    label = cms.untracked.string('LOERR_GLBMUJPSI_TEST7TEV_WP')
+    tag = cms.string('LOERR_HLTMU3_DATA_CALO_JPSI_WP'),
+    label = cms.untracked.string('LOERR_HLTMU3_DATA_CALO_JPSI_WP')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE'),
-    label = cms.untracked.string('LOERR_GLBMUJPSI_TEST7TEV_TABLE')
+    tag = cms.string('LOERR_HLTMU3_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('LOERR_HLTMU3_DATA_CALO_JPSI_TABLE')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('LOERR_TRKMULSAT_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('LOERR_TRKMULSAT_DATA_CALO_JPSI_TABLE')
+    ),
+                                  
+
+    cms.PSet(
+    record = cms.string('PerformanceWPRecord'),
+    tag = cms.string('UPERR_GLBMU_DATA_CALO_JPSI_WP'),
+    label = cms.untracked.string('UPERR_GLBMU_DATA_CALO_JPSI_WP')
+    ),
+    cms.PSet(
+    record = cms.string('PerformancePayloadRecord'),
+    tag = cms.string('UPERR_GLBMU_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('UPERR_GLBMU_DATA_CALO_JPSI_TABLE')
     ),
     cms.PSet(
     record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('LOERR_TRGMUJPSI_TEST7TEV_WP'),
-    label = cms.untracked.string('LOERR_TRGMUJPSI_TEST7TEV_WP')
+    tag = cms.string('UPERR_HLTMU3_DATA_CALO_JPSI_WP'),
+    label = cms.untracked.string('UPERR_HLTMU3_DATA_CALO_JPSI_WP')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE'),
-    label = cms.untracked.string('LOERR_TRGMUJPSI_TEST7TEV_TABLE')
-    ),
-    cms.PSet(
-    record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('UPERR_GLBMUJPSI_TEST7TEV_WP'),
-    label = cms.untracked.string('UPERR_GLBMUJPSI_TEST7TEV_WP')
+    tag = cms.string('UPERR_HLTMU3_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('UPERR_HLTMU3_DATA_CALO_JPSI_TABLE')
     ),
     cms.PSet(
     record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE'),
-    label = cms.untracked.string('UPERR_GLBMUJPSI_TEST7TEV_TABLE')
-    ),
-    cms.PSet(
-    record = cms.string('PerformanceWPRecord'),
-    tag = cms.string('UPERR_TRGMUJPSI_TEST7TEV_WP'),
-    label = cms.untracked.string('UPERR_TRGMUJPSI_TEST7TEV_WP')
-    ),
-    cms.PSet(
-    record = cms.string('PerformancePayloadRecord'),
-    tag = cms.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE'),
-    label = cms.untracked.string('UPERR_TRGMUJPSI_TEST7TEV_TABLE')
+    tag = cms.string('UPERR_TRKMULSAT_DATA_CALO_JPSI_TABLE'),
+    label = cms.untracked.string('UPERR_TRKMULSAT_DATA_CALO_JPSI_TABLE')
     )))
 
 

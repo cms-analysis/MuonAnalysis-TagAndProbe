@@ -20,9 +20,10 @@ process.source = cms.Source("PoolSource",
 
 process.demo2 = cms.EDAnalyzer('MuTestPerformanceFW_ES',
                                outfilename = cms.untracked.string('EfficiencyCorrectionPlots.root'),
+                               UseAbsEtaVals = cms.bool(True),
                                AlgoNames = cms.vstring(
-    'GlobalMuonFromTrackerTrackJpsi',
-    'TriggerMuonFromGlobalMuonJpsi',
+    'GlobalMuon_Data_CaloMuonProbe_JPsi',
+    'HLT_Mu3_Data_CaloMuonProbe_JPsi',
     ))
 
 process.p = cms.Path(process.demo2)

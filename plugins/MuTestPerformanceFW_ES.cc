@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.5 2010/06/01 06:59:02 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.6 2010/06/02 14:47:54 jjhollar Exp $
 //
 //
 
@@ -58,6 +58,7 @@ public:
 private:
   std::vector<std::string> algonames;
   std::string rootfilename;
+  bool useAbsEtaVals;
   virtual void beginJob() ;
   virtual void analyze(const edm::Event&, const edm::EventSetup&);
   virtual void endJob() ;
@@ -89,6 +90,7 @@ MuTestPerformanceFW_ES::MuTestPerformanceFW_ES(const edm::ParameterSet& iConfig)
 {
   algonames =  iConfig.getParameter< std::vector<std::string> >("AlgoNames");
   rootfilename = iConfig.getUntrackedParameter<std::string>("outfilename","test.root");
+  useAbsEtaVals = iConfig.getParameter< bool >("UseAbsEtaVals");  
 }
 
 
@@ -123,6 +125,9 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
       eta = p.eta(); 
       phi = p.phi();
       pdgid=p.pdgId(); 
+
+      if(useAbsEtaVals == true)
+	eta = fabs(eta);
       
       /* Look at all true muons. */
       if(pdgid == 13 || pdgid == -13)
