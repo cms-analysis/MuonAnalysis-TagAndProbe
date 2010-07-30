@@ -176,9 +176,11 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	}
 
       cout << "Reading from Tag-&-Probe file " << infilename << endl; 
+      cout << "\tPayload " << tmprec1 << endl; 
+      cout << "\tWP " << tmprec2 << endl;
       cout << "\tReading efficiencies from RooDataset named " << datasetname << endl;
-      cout << "Algorithm name = " << tagger << endl;
-      cout << "Discriminator cut = " << cut << endl;
+      cout << "\tAlgorithm name = " << tagger << endl;
+      cout << "\tDiscriminator cut = " << cut << endl;
 
       RooDataSet *datatmp = 0;
 
@@ -241,20 +243,23 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
               pl.push_back(binlowedgey);
               pl.push_back(binhighedgey);
 
+	      
 	      cout << "(" << binlowedgex << " < pT < "  << binhighedgex << "), "
 		   << "(" << binlowedgey << " < eta < " << binhighedgey << ") "
 		   << " = " << h->GetBinContent(b)
 		   << "+" << (hhi->GetBinContent(b) - h->GetBinContent(b))
 		   << "-" << (h->GetBinContent(b) - hlo->GetBinContent(b)) << endl;
 
-              cout << " Inserting " << bincontent << " in position " << number
-                   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", "
-                   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl;
+	      cout << " Inserting " << bincontent << " in position " << number
+		   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", "
+		   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl;
+	      
               pl.push_back(bincontent);
               number++;
-              cout << " Inserting " << binerror << " in position " << number
-                   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", "
-                   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl;
+
+	      cout << " Inserting " << binerror << " in position " << number
+		   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", "
+		   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl;
               pl.push_back(binerror);
 
               number++;
@@ -266,11 +271,11 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 
       if (stride != nbin*2+nres)
 	{ 
-	  std::cout <<" Table not well formed"<<std::endl; 
+	  std::cout <<" \tTable not well formed"<<std::endl; 
 	} 
       if ((number % stride) != 0)
 	{ 
-	  std::cout <<" Table not well formed"<<std::endl; 
+	  std::cout <<"\tTable not well formed"<<std::endl; 
 	} 
 
       PerformanceWorkingPoint * wp = new PerformanceWorkingPoint(cut, tagger); 
@@ -283,10 +288,10 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	}
       else
 	{ 
-	  cout <<" Non existing request: " <<concreteType<<endl; 
+	  cout <<"\tNon existing request: " <<concreteType<<endl; 
 	} 
    
-      cout <<" Created the "<<concreteType <<" object"<<endl; 
+      cout <<"\tCreated the "<<concreteType <<" object"<<endl; 
 
       // 
       // now create pl etc etc 
@@ -308,7 +313,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 						     tmpiovBegin, 
 						     tmprec1); 
 	    } 
-	  cout << "Wrote payload" << endl;
+	  cout << "\tWrote payload" << endl;
 	} 
 
       // write also the WP 
@@ -329,7 +334,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 							  tmpiovBegin, 
 							  tmprec2); 
 	    } 
-	  cout << "Wrote Working Point" << endl;
+	  cout << "\tWrote Working Point" << endl;
 	}       
 
     }
