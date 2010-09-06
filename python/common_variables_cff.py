@@ -77,7 +77,13 @@ LowPtTriggerFlagsPhysics = cms.PSet(
 )
 
 LowPtTriggerFlagsEfficiencies = cms.PSet(
+   ## Single Mu (for early running)
+   Mu3       = cms.string("!triggerObjectMatchesByFilter('hltSingleMu3L3Filtered3').empty()"),
    ## Mu + Track
+   Mu0_Track0_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered')"),
+   Mu0_Track0_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered')"),
    Mu3_Track0_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                    " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu3TrackJpsiTrackMassFiltered')"),
    Mu3_Track0_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
@@ -97,4 +103,10 @@ LowPtTriggerFlagsEfficiencies = cms.PSet(
                              " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltDiMuonL2PreFiltered0')"),
 )
 
-
+def mkUnbiasCut(pset, triggers):
+    clist = []
+    for t in triggers:
+        if hasattr(pset,t+"_MU"): clist.append(getattr(pset,t+"_MU").value())
+        else: clist.append(getattr(pset,t))
+    cut = " || " . join(["(%s)" % c for c in clist])
+    return cut
