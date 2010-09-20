@@ -107,6 +107,6 @@ def mkUnbiasCut(pset, triggers):
     clist = []
     for t in triggers:
         if hasattr(pset,t+"_MU"): clist.append(getattr(pset,t+"_MU").value())
-        else: clist.append(getattr(pset,t))
+        else: clist.append(getattr(pset,t).value())
     cut = " || " . join(["(%s)" % c for c in clist])
     return cut
