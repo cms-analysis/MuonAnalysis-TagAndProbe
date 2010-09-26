@@ -326,6 +326,13 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
 
 process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPDataset",
 
+                                # If set to true, two consecutive datasets will be treated as a pair
+                                # and loaded into a single DB table. The first will fill pT bins below
+                                # the value given by inputMergeDatasetsPtBoundary, the second will fill
+                                # bins above that (e.g. for combining JPsi and Z measurements). 
+                                inputMergeTwoInputDatasets = cms.bool(False),
+                                inputMergeDatasetsPtBoundary = cms.double(25.0),
+
                                 # For each table to be loaded, set the name of the input T/P file, histogram, algorithm, and cut (if any)
                                 inputHistoFiles = cms.vstring('TnP_ICHEP_MuonID_data_all.root',
                                                               'TnP_ICHEP_MuonID_data_all.root', 
