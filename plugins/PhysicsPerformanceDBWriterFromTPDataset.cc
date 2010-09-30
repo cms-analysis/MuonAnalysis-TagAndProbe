@@ -247,11 +247,12 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 
       if(inputMergeTwoInputDatasets == true)
 	{
-	  h2 = new TH2F("eff", "eff", ptvar2->getBinning().numBins(),
+	  h2 = new TH2F("eff2", "eff2", ptvar2->getBinning().numBins(),
 			     ptvar2->getBinning().array(), etavar2->getBinning().numBins(),
 			     etavar2->getBinning().array());
-	  hlo2 = (TH2F *)h2->Clone("eff_lo");
-	  hhi2 = (TH2F *)h2->Clone("eff_hi");
+	  cout << "Cloning for efficiency bin boundaries" << endl;
+	  hlo2 = (TH2F *)h2->Clone("eff2_lo");
+	  hhi2 = (TH2F *)h2->Clone("eff2_hi");
 	}
 
       int l = 0;
@@ -284,7 +285,7 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 	      binerror = 0.0;
 
 	      if((inputMergeTwoInputDatasets == false) || 
-		 ((inputMergeTwoInputDatasets == true) && (bincenterx <= inputMergeDatasetsPtBoundary)))
+		 ((inputMergeTwoInputDatasets == true) && (binhighedgex <= inputMergeDatasetsPtBoundary)))
 		{
 		  pl.push_back(binlowedgex);
 		  pl.push_back(binhighedgex);
@@ -333,24 +334,24 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 		  binhighedgey = etavar2->getBinning().binHigh(k) ;
 		  bincenterx = ptvar2->getBinning().binCenter(j);
 		  bincentery = etavar2->getBinning().binCenter(k);
-		  int b = h->FindBin(bincenterx, bincentery);
+		  int b = h2->FindBin(bincenterx, bincentery);
 
-		  datatmp->get(l);
-		  h->SetBinContent(b, effvar->getVal());
-		  hlo->SetBinContent(b, effvar->getVal()+effvar->getErrorLo());
-		  hhi->SetBinContent(b, effvar->getVal()+effvar->getErrorHi());
+		  datatmp2->get(l);
+		  h2->SetBinContent(b, effvar2->getVal());
+		  hlo2->SetBinContent(b, effvar2->getVal()+effvar2->getErrorLo());
+		  hhi2->SetBinContent(b, effvar2->getVal()+effvar2->getErrorHi());
 
 		  if(m == 0)
-		    bincontent = effvar->getVal();
+		    bincontent = effvar2->getVal();
 		  if(m == 1)
-		    bincontent = effvar->getErrorLo();
+		    bincontent = effvar2->getErrorLo();
 		  if(m == 2)
-		    bincontent = effvar->getErrorHi();
+		    bincontent = effvar2->getErrorHi();
 
-		  //              binerror = fabs(effvar->getErrorHi() - effvar->getErrorLo())/2.0;
+		  //              binerror = fabs(effvar2->getErrorHi() - effvar2->getErrorLo())/2.0;
 		  binerror = 0.0;
 
-		  if(bincenterx > inputMergeDatasetsPtBoundary)
+		  if(binlowedgex >= inputMergeDatasetsPtBoundary)
 		    {
 		      pl.push_back(binlowedgex);
 		      pl.push_back(binhighedgex);
@@ -368,6 +369,12 @@ void PhysicsPerformanceDBWriterFromTPDataset::beginJob()
 			   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl;
 		      
 		      pl.push_back(bincontent);
+
+		      cout << " Inserting " << binerror << " in position " << number 
+			   << " (" << binlowedgex << " < " << inputBinningVariables[0] << " < " << binhighedgex << ", " 
+			   << binlowedgey << " < " << inputBinningVariables[1] << " < " << binhighedgey << ")" << endl; 
+		      pl.push_back(binerror); 
+
 		      number++;
 		      l++;
 		    }
