@@ -324,7 +324,7 @@ process.PoolDBOutputService = cms.Service("PoolDBOutputService",
 
 
 
-process.mywriter = cms.EDFilter("PhysicsPerformanceDBWriterFromTPDataset",
+process.mywriter = cms.EDAnalyzer("PhysicsPerformanceDBWriterFromTPDataset",
 
                                 # If set to true, two consecutive datasets will be treated as a pair
                                 # and loaded into a single DB table. The first will fill pT bins below
