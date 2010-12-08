@@ -1,0 +1,20 @@
+<export>
+</export>
+<library   name="MuonAnalysisTagAndProbe_plugins" file="*.cc">
+  <use   name="CondCore/DBCommon"/>
+  <use   name="CondCore/DBOutputService"/>
+  <use   name="CondCore/PluginSystem"/>
+  <use   name="CondFormats/DataRecord"/>
+  <use   name="CondFormats/PhysicsToolsObjects"/>
+  <use   name="DataFormats/Candidate"/>
+  <use   name="DataFormats/MuonReco"/>
+  <use   name="DataFormats/PatCandidates"/>
+  <use   name="FWCore/Framework"/>
+  <use   name="FWCore/MessageLogger"/>
+  <use   name="FWCore/ParameterSet"/>
+  <use   name="FWCore/PluginManager"/>
+  <use   name="FWCore/Utilities"/>
+  <use   name="RecoMuon/Records"/>
+  <use   name="MuonAnalysis/MuonAssociators"/>
+  <use   name="MuonAnalysis/TagAndProbe"/>
+</library>
