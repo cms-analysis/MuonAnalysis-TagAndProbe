@@ -39,15 +39,16 @@ process.TnP_MuonID = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     ),
 
     Categories = cms.PSet(
-        Calo = cms.vstring("POG_Glb",  "dummy[pass=1,fail=0]"),
-        Glb  = cms.vstring("POG_Glb",  "dummy[pass=1,fail=0]"),
-        VBTF = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
-        Isol = cms.vstring("MC true",  "dummy[pass=1,fail=0]"),
-        Mu9  = cms.vstring("MC true",  "dummy[pass=1,fail=0]"),
+        Calo = cms.vstring("",  "dummy[pass=1,fail=0]"),
+        TMA  = cms.vstring("",  "dummy[pass=1,fail=0]"),
+        Glb  = cms.vstring("",  "dummy[pass=1,fail=0]"),
+        VBTF = cms.vstring("", "dummy[pass=1,fail=0]"),
+        Isol = cms.vstring("",  "dummy[pass=1,fail=0]"),
+        Mu9  = cms.vstring("",  "dummy[pass=1,fail=0]"),
     ),
 
     PDFs = cms.PSet(
-        gaussPlusExpo = cms.vstring(
+        voigtPlusExpo = cms.vstring(
             "Voigtian::signal(mass, mean[90,80,100], width[2.495], sigma[3,1,20])",
             "Exponential::backgroundPass(mass, lp[0,-5,5])",
             "Exponential::backgroundFail(mass, lf[0,-5,5])",
@@ -60,7 +61,7 @@ process.TnP_MuonID = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 ONE_BIN = cms.PSet(
-    pt     = cms.vdouble(15, 100),
+    pt     = cms.vdouble(20, 100),
     abseta = cms.vdouble( 0, 2.4)
 )
 PT_BINS  = ONE_BIN.clone(pt = cms.vdouble(15, 35, 100))
@@ -79,14 +80,14 @@ for T in [ "Glb", "VBTF", "Isol" ]:
             EfficiencyCategoryAndState = cms.vstring(T,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = B,
-            BinToPDFmap = cms.vstring("gaussPlusExpo")
+            BinToPDFmap = cms.vstring("voigtPlusExpo")
         ))
 for  X,B in ALLBINS:
     setattr(process.TnP_MuonID.Efficiencies, "VBTF_Isol_"+X, cms.PSet(
         EfficiencyCategoryAndState = cms.vstring("VBTF","pass","Isol","pass"),
         UnbinnedVariables = cms.vstring("mass"),
         BinnedVariables = B,
-        BinToPDFmap = cms.vstring("gaussPlusExpo")
+        BinToPDFmap = cms.vstring("voigtPlusExpo")
     ))
 
 process.p = cms.Path(process.TnP_MuonID)

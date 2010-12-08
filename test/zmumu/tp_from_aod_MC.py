@@ -8,12 +8,15 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_3_8_0/RelValZMM/GEN-SIM-RECO/START38_V7-v1/0005/5AE92533-3D95-DF11-8784-003048678F9C.root',
-	'/store/relval/CMSSW_3_8_0/RelValZMM/GEN-SIM-RECO/START38_V7-v1/0004/78DF3A0F-F794-DF11-8920-003048678B88.root',
-	'/store/relval/CMSSW_3_8_0/RelValZMM/GEN-SIM-RECO/START38_V7-v1/0004/68666746-F994-DF11-B168-003048D15E24.root',
-	'/store/relval/CMSSW_3_8_0/RelValZMM/GEN-SIM-RECO/START38_V7-v1/0004/4CC4F3F5-F894-DF11-8A07-003048678FAE.root',
-	'/store/relval/CMSSW_3_8_0/RelValZMM/GEN-SIM-RECO/START38_V7-v1/0004/30A3A23A-F794-DF11-84F0-003048678D52.root',
-	'/store/relval/CMSSW_3_8_0/RelValZMM/GEN-SIM-RECO/START38_V7-v1/0004/182179E1-1895-DF11-968A-0018F3D0970E.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/F4F2F178-51FD-DF11-8F90-0018F3D096BA.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/F20DD3FB-51FD-DF11-B818-0018F3D096E6.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/E8BC8D79-51FD-DF11-A85A-0018F3D09688.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/C0D281F6-51FD-DF11-A602-0018F3D09660.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/BA091172-52FD-DF11-B101-001A92971AA8.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/B2BC3477-51FD-DF11-811E-0018F3D0961E.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/B0377FFF-50FD-DF11-A97E-0018F3D096BA.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/AED16F70-52FD-DF11-A060-001A92971BA0.root',
+	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/A6B82E73-52FD-DF11-B27F-001A92971AA4.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -22,7 +25,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('START38_V7::All')
+process.GlobalTag.globaltag = cms.string('START39_V6::All')
 
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
@@ -57,7 +60,7 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByFilter('hltSingleMu9L3Filtered9').empty()"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && (!triggerObjectMatchesByPath('HLT_Mu9').empty())"),
 )
 
 process.probeMuons = cms.EDFilter("PATMuonSelector",

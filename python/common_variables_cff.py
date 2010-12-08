@@ -60,8 +60,13 @@ MuonIDFlags = cms.PSet(
 )
 
 HighPtTriggerFlags = cms.PSet(
-   Mu9       = cms.string("!triggerObjectMatchesByFilter('hltSingleMu9L3Filtered9').empty()"),
-   DoubleMu3 = cms.string("(!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered').empty())"),
+   Mu9       = cms.string("!triggerObjectMatchesByPath('HLT_Mu9').empty()"),
+   Mu11      = cms.string("!triggerObjectMatchesByPath('HLT_Mu11').empty()"),
+   Mu15      = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v1').empty()"),
+   IsoMu9    = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu9').empty()"),
+   IsoMu13   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu13_v1').empty()"),
+   DoubleMu3 = cms.string("(!triggerObjectMatchesByPath('HLT_DoubleMu3').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu3_v1').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu3_v2').empty() )"),
+   DoubleMu5 = cms.string("(!triggerObjectMatchesByPath('HLT_DoubleMu5').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu5_v1').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu5_v2').empty() )"),
 )
 
 LowPtTriggerFlagsPhysics = cms.PSet(
