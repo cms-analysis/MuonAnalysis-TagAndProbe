@@ -8,18 +8,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/F4F2F178-51FD-DF11-8F90-0018F3D096BA.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/F20DD3FB-51FD-DF11-B818-0018F3D096E6.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/E8BC8D79-51FD-DF11-A85A-0018F3D09688.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/C0D281F6-51FD-DF11-A602-0018F3D09660.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/BA091172-52FD-DF11-B101-001A92971AA8.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/B2BC3477-51FD-DF11-811E-0018F3D0961E.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/B0377FFF-50FD-DF11-A97E-0018F3D096BA.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/AED16F70-52FD-DF11-A060-001A92971BA0.root',
-	'/store/relval/CMSSW_3_8_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_38Y_V13_PU_E7TeV_AVE_2_BX2808-v1/0018/A6B82E73-52FD-DF11-B27F-001A92971AA4.root',
+        '/store/mc/Fall10/DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/0000/2CEF8004-17E4-DF11-8960-00237DA1680E.root',
+        #'/store/mc/Fall10/DYJetsToLL_TuneD6T_M-50_7TeV-madgraph-tauola/AODSIM/START38_V12-v2/0017/CCEE6478-EFE1-DF11-85E9-0026B94D1A94.root',
+	#/store/relval/CMSSW_3_9_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_39Y_V7_PU_E7TeV_AVE_2_BX2808-v1/0054/08350812-AD0F-E011-9C92-001A92810AA6.root',
     ),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )    
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -36,7 +30,8 @@ process.GlobalTag.globaltag = cms.string('START39_V6::All')
 ## ==== Merge CaloMuons and Tracks into the collection of reco::Muons  ====
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
 process.mergedMuons = cms.EDProducer("CaloMuonMerger",
-    mergeTracks = cms.bool(True),
+    mergeCaloMuons = cms.bool(False), # AOD
+    mergeTracks    = cms.bool(True),
     muons     = cms.InputTag("muons"), 
     caloMuons = cms.InputTag("calomuons"),
     tracks    = cms.InputTag("generalTracks"),
@@ -54,6 +49,7 @@ process.muonMatchHLTL2.maxDeltaR = 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
+changeTriggerProcessName(process, "*") # auto-guess
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
@@ -69,7 +65,7 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
 )
 
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
-    cut = cms.string('40 < mass < 140'),
+    cut = cms.string('60 < mass < 140'),
     decay = cms.string('tagMuons@+ probeMuons@-')
 )
 
@@ -99,25 +95,34 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVertices = cms.InputTag("nverticesModule"),
     ),
     tagFlags = cms.PSet(),
+    pairVariables = cms.PSet(
+        dZ      = cms.string("daughter(0).vz - daughter(1).vz"),
+        nJets15 = cms.InputTag("njets15Module"),
+        nJets30 = cms.InputTag("njets30Module"),
+    ),
+    pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
     probeMatches     = cms.InputTag("probeMuonsMCMatch"),
     motherPdgId      = cms.vint32(22, 23),
-    makeMCUnbiasTree       = cms.bool(True),
+    makeMCUnbiasTree       = cms.bool(False), # save space
     checkMotherInUnbiasEff = cms.bool(True),
     allProbes              = cms.InputTag("probeMuons"),
 )
+
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
-    process.nverticesModule +
     process.probeMuons * process.probeMuonsMCMatch +
     process.tpPairs    +
+    process.nverticesModule +
+    process.njets15Module +
+    process.njets30Module +
     process.tpTree
 )
 
 process.tagAndProbe = cms.Path( 
     process.mergedMuons                 *
-    process.patMuonsWithTriggerSequence *
+    process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
 )
 
@@ -164,10 +169,12 @@ process.staToTkMatch = cms.EDProducer("MatcherUsingTracks",
     maxDeltaLocalPos = cms.double(100),
     sortBy           = cms.string("deltaR"),
 )
+process.staToTkNoZMatch = process.staToTkMatch.clone(matched = "tkTracksNoZ")
 process.staPassingTk = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("probeMuonsSta"),
     match = cms.InputTag("staToTkMatch"),
 )
+process.staPassingTkNoZ = process.staPassingTk.clone(match = "staToTkNoZMatch")
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
@@ -184,13 +191,22 @@ process.tpTreeSta = process.tpTree.clone(
         tk_deltaPtRel = cms.InputTag("staToTkMatch","deltaPtRel"),
         tk_deltaEta   = cms.InputTag("staToTkMatch","deltaEta"),
         tk_deltaPhi   = cms.InputTag("staToTkMatch","deltaPhi"),
+        ## track matching variables for fake rates
+        tkNoZ_deltaR     = cms.InputTag("staToTkNoZMatch","deltaR"),
+        tkNoZ_deltaPtRel = cms.InputTag("staToTkNoZMatch","deltaPtRel"),
+        tkNoZ_deltaEta   = cms.InputTag("staToTkNoZMatch","deltaEta"),
+        tkNoZ_deltaPhi   = cms.InputTag("staToTkNoZMatch","deltaPhi"),
     ),
     flags = cms.PSet(
-        HighPtTriggerFlags, 
-        hasTrack = cms.InputTag("staPassingTk"),
-        L1DoubleMuOpen       = LowPtTriggerFlagsPhysics.L1DoubleMuOpen,
-        L1DoubleMuOpen_Tight = LowPtTriggerFlagsPhysics.L1DoubleMuOpen_Tight,
-        L2DoubleMu0          = LowPtTriggerFlagsPhysics.L2DoubleMu0,
+        #HighPtTriggerFlags, 
+        Glb      = MuonIDFlags.Glb,
+        TM       = MuonIDFlags.TM,
+        TMA      = MuonIDFlags.TMA,
+        hasTrack    = cms.InputTag("staPassingTk"),
+        hasTrackNoZ = cms.InputTag("staPassingTkNoZ"),
+        #L1DoubleMuOpen       = LowPtTriggerFlagsPhysics.L1DoubleMuOpen,
+        #L1DoubleMuOpen_Tight = LowPtTriggerFlagsPhysics.L1DoubleMuOpen_Tight,
+        #L2DoubleMu0          = LowPtTriggerFlagsPhysics.L2DoubleMu0,
     ),
     allProbes     = "probeMuonsSta",
     probeMatches  = "probeMuonsMCMatchSta",
@@ -198,15 +214,21 @@ process.tpTreeSta = process.tpTree.clone(
 process.tpTreeSta.variables.l1pt = process.tpTreeSta.variables.l1pt.value().replace("muonL1Info","muonL1InfoSta")
 process.tpTreeSta.variables.l1q  = process.tpTreeSta.variables.l1q.value( ).replace("muonL1Info","muonL1InfoSta")
 process.tpTreeSta.variables.l1dr = process.tpTreeSta.variables.l1dr.value().replace("muonL1Info","muonL1InfoSta")
-process.tpTreeSta.tagFlags = process.tpTreeSta.flags.clone(hasTrack = cms.string(""))
-
+process.tpTreeSta.tagFlags = process.tpTreeSta.flags.clone(hasTrack = cms.string(""), hasTrackNoZ  = cms.string(""))
+process.tpTreeSta.pairVariables.nJets15 = "njets15ModuleSta"
+process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
+process.njets15ModuleSta = process.njets15Module.clone(pairs = "tpPairsSta")
+process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
-    process.nverticesModule +
     process.probeMuonsSta * process.probeMuonsMCMatchSta +
-    ( process.tkTracks * process.staToTkMatch * process.staPassingTk ) +
+    ( process.tkTracks    * process.staToTkMatch    * process.staPassingTk    ) +
+    ( process.tkTracksNoZ * process.staToTkNoZMatch * process.staPassingTkNoZ ) +
     process.tpPairsSta      +
+    process.nverticesModule +
+    process.njets15ModuleSta +
+    process.njets30ModuleSta +
     process.tpTreeSta
 )
 

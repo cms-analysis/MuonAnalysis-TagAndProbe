@@ -57,7 +57,8 @@ process.GlobalTag.globaltag = cms.string('GR_R_39X_V4::All')
 ## ==== Merge CaloMuons and Tracks into the collection of reco::Muons  ====
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
 process.mergedMuons = cms.EDProducer("CaloMuonMerger",
-    mergeTracks = cms.bool(True),
+    mergeCaloMuons = cms.bool(False), # AOD
+    mergeTracks    = cms.bool(True),
     muons     = cms.InputTag("muons"), 
     caloMuons = cms.InputTag("calomuons"),
     tracks    = cms.InputTag("generalTracks"),
@@ -90,7 +91,7 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
 )
 
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
-    cut = cms.string('40 < mass < 140'),
+    cut = cms.string('60 < mass < 140'),
     decay = cms.string('tagMuons@+ probeMuons@-')
 )
 
@@ -112,20 +113,28 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVertices = cms.InputTag("nverticesModule"),
     ),
     tagFlags = cms.PSet(),
+    pairVariables = cms.PSet(
+        dZ      = cms.string("daughter(0).vz - daughter(1).vz"),
+        nJets15 = cms.InputTag("njets15Module"),
+        nJets30 = cms.InputTag("njets30Module"),
+    ),
+    pairFlags = cms.PSet(),
     isMC           = cms.bool(False),
     addRunLumiInfo = cms.bool(True),
 )
 
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   *
-    process.nverticesModule +
     process.probeMuons +
-    process.tpPairs    *
+    process.tpPairs    +
+    process.nverticesModule +
+    process.njets15Module +
+    process.njets30Module +
     process.tpTree
 )
 
 process.tagAndProbe = cms.Path( 
-    process.mergedMuons                 +
+    process.mergedMuons                 *
     process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
 )
@@ -172,10 +181,12 @@ process.staToTkMatch = cms.EDProducer("MatcherUsingTracks",
     maxDeltaLocalPos = cms.double(100),
     sortBy           = cms.string("deltaR"),
 )
+process.staToTkNoZMatch = process.staToTkMatch.clone(matched = "tkTracksNoZ")
 process.staPassingTk = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("probeMuonsSta"),
     match = cms.InputTag("staToTkMatch"),
 )
+process.staPassingTkNoZ = process.staPassingTk.clone(match = "staToTkNoZMatch")
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
@@ -192,26 +203,42 @@ process.tpTreeSta = process.tpTree.clone(
         tk_deltaPtRel = cms.InputTag("staToTkMatch","deltaPtRel"),
         tk_deltaEta   = cms.InputTag("staToTkMatch","deltaEta"),
         tk_deltaPhi   = cms.InputTag("staToTkMatch","deltaPhi"),
+        ## track matching variables for fake rates
+        tkNoZ_deltaR     = cms.InputTag("staToTkNoZMatch","deltaR"),
+        tkNoZ_deltaPtRel = cms.InputTag("staToTkNoZMatch","deltaPtRel"),
+        tkNoZ_deltaEta   = cms.InputTag("staToTkNoZMatch","deltaEta"),
+        tkNoZ_deltaPhi   = cms.InputTag("staToTkNoZMatch","deltaPhi"),
     ),
     flags = cms.PSet(
-        HighPtTriggerFlags, 
-        hasTrack = cms.InputTag("staPassingTk"),
-        L1DoubleMuOpen       = LowPtTriggerFlagsPhysics.L1DoubleMuOpen,
-        L1DoubleMuOpen_Tight = LowPtTriggerFlagsPhysics.L1DoubleMuOpen_Tight,
-        L2DoubleMu0          = LowPtTriggerFlagsPhysics.L2DoubleMu0,
-    )
+        #HighPtTriggerFlags, 
+        Glb      = MuonIDFlags.Glb,
+        TM       = MuonIDFlags.TM,
+        TMA      = MuonIDFlags.TMA,
+        hasTrack    = cms.InputTag("staPassingTk"),
+        hasTrackNoZ = cms.InputTag("staPassingTkNoZ"),
+        #L1DoubleMuOpen       = LowPtTriggerFlagsPhysics.L1DoubleMuOpen,
+        #L1DoubleMuOpen_Tight = LowPtTriggerFlagsPhysics.L1DoubleMuOpen_Tight,
+        #L2DoubleMu0          = LowPtTriggerFlagsPhysics.L2DoubleMu0,
+    ),
 )
 process.tpTreeSta.variables.l1pt = process.tpTreeSta.variables.l1pt.value().replace("muonL1Info","muonL1InfoSta")
 process.tpTreeSta.variables.l1q  = process.tpTreeSta.variables.l1q.value( ).replace("muonL1Info","muonL1InfoSta")
 process.tpTreeSta.variables.l1dr = process.tpTreeSta.variables.l1dr.value().replace("muonL1Info","muonL1InfoSta")
-process.tpTreeSta.tagFlags = process.tpTreeSta.flags.clone(hasTrack = cms.string(""))
+process.tpTreeSta.tagFlags = process.tpTreeSta.flags.clone(hasTrack = cms.string(""), hasTrackNoZ  = cms.string(""))
+process.tpTreeSta.pairVariables.nJets15 = "njets15ModuleSta"
+process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
+process.njets15ModuleSta = process.njets15Module.clone(pairs = "tpPairsSta")
+process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
     process.tagMuons        +
-    process.nverticesModule +
     process.probeMuonsSta   +
-    ( process.tkTracks * process.staToTkMatch * process.staPassingTk ) +
+    ( process.tkTracks    * process.staToTkMatch    * process.staPassingTk    ) +
+    ( process.tkTracksNoZ * process.staToTkNoZMatch * process.staPassingTkNoZ ) +
     process.tpPairsSta      +
+    process.nverticesModule +
+    process.njets15ModuleSta +
+    process.njets30ModuleSta +
     process.tpTreeSta
 )
 
