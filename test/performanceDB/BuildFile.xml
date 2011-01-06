@@ -1,0 +1,11 @@
+<use name="CondFormats/PhysicsToolsObjects"/>
+<use name="RecoBTag/Records"/>
+<use name="RecoMuon/Records"/>
+<use name="CondFormats/DataRecord"/>
+<use name="FWCore/Framework"/>
+<use name="FWCore/PluginManager"/>
+<use name="MuonAnalysis/TagAndProbe"/>
+
+<library file="MuTestPerformanceFW_ES.cc" name="testMuonAnalysisTagAndProbePerformanceDBPlugins">
+       <flags EdmPlugin="1"/>
+ </library>
