@@ -43,7 +43,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_38X_V14::All')
+process.GlobalTag.globaltag = cms.string('GR_R_39X_V5::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -201,12 +201,27 @@ process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-",
 process.onePairSta = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairsSta"), minNumber = cms.uint32(1))
 
 ## Now I have to define the passing probes for tracking
-process.tkTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
+## first remove low pt tracks which are not
+process.pCutTracks = cms.EDFilter("TrackSelector", 
     src = cms.InputTag("generalTracks"),      
+    cut = cms.string("pt > 2 || (abs(eta) > 1 && p > 2)"),
+)
+process.tkTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
+    src = cms.InputTag("pCutTracks"),
     particleType = cms.string("mu+"),
 )
 ## Then filter out the J/Psi's, to compute fake matching rate
 process.tkTracksNoJPsi = cms.EDProducer("CandidateResonanceInefficiencyCreator",
+    src = cms.InputTag("tkTracks"),
+    tags = cms.InputTag("tagMuons"),
+    mass    = cms.double(3.096),
+    massMin = cms.double(2.85), ## Should cut away
+    massMax = cms.double(3.25), ## 99.5% of signal
+    onlyBestMatch = cms.bool(False),
+    outputMode = cms.string("RefToBaseVector"),
+)
+## Then filter out the J/Psi's, to compute fake matching rate
+process.tkTracksNoBestJPsi = cms.EDProducer("CandidateResonanceInefficiencyCreator",
     src = cms.InputTag("tkTracks"),
     tags = cms.InputTag("tagMuons"),
     mass    = cms.double(3.096),
@@ -229,11 +244,13 @@ process.staToTkMatch = cms.EDProducer("MatcherUsingTracks",
     sortBy           = cms.string("deltaR"),
 )
 process.staToTkMatchNoJPsi = process.staToTkMatch.clone(matched = 'tkTracksNoJPsi')
+process.staToTkMatchNoBestJPsi = process.staToTkMatch.clone(matched = 'tkTracksNoBestJPsi')
 process.staPassingTk = cms.EDProducer("MatchedCandidateSelector",
     src   = cms.InputTag("probeMuonsSta"),
     match = cms.InputTag("staToTkMatch"),
 )
 process.staPassingTkNoJPsi = process.staPassingTk.clone(match = 'staToTkMatchNoJPsi')
+process.staPassingTkNoBestJPsi = process.staPassingTk.clone(match = 'staToTkMatchNoBestJPsi')
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
@@ -254,12 +271,19 @@ process.tpTreeSta = process.tpTree.clone(
         tk_deltaPtRel_NoJPsi = cms.InputTag("staToTkMatchNoJPsi","deltaPtRel"),
         tk_deltaEta_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi","deltaEta"),
         tk_deltaPhi_NoJPsi   = cms.InputTag("staToTkMatchNoJPsi","deltaPhi"),
+        tk_deltaR_NoBestJPsi     = cms.InputTag("staToTkMatchNoBestJPsi","deltaR"),
+        tk_deltaPtRel_NoBestJPsi = cms.InputTag("staToTkMatchNoBestJPsi","deltaPtRel"),
+        tk_deltaEta_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi","deltaEta"),
+        tk_deltaPhi_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi","deltaPhi"),
     ),
     flags = cms.PSet(
         #LowPtTriggerFlagsPhysics,
         #LowPtTriggerFlagsEfficienciesProbe,
+        TM  = cms.string("isTrackerMuon"),
+        Glb = cms.string("isGlobalMuon"),
         hasTrack       = cms.InputTag("staPassingTk"),
         hasTrackNoJPsi = cms.InputTag("staPassingTkNoJPsi"),
+        hasTrackNoBestJPsi = cms.InputTag("staPassingTkNoBestJPsi"),
     ),
     pairVariables = cms.PSet(),
     pairFlags     = cms.PSet(),
@@ -273,10 +297,12 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.oneTag     +
     process.nverticesModule +
     process.probeMuonsSta +
-    ( process.tkTracks       * process.staToTkMatch       * process.staPassingTk       +
-      process.tkTracksNoJPsi * process.staToTkMatchNoJPsi * process.staPassingTkNoJPsi ) +
     process.tpPairsSta      +
     process.onePairSta      +
+    ( process.pCutTracks *
+      process.tkTracks           * process.staToTkMatch           * process.staPassingTk             +
+      process.tkTracksNoJPsi     * process.staToTkMatchNoJPsi     * process.staPassingTkNoJPsi       +
+      process.tkTracksNoBestJPsi * process.staToTkMatchNoBestJPsi * process.staPassingTkNoBestJPsi ) +
     process.tpTreeSta
 )
 
