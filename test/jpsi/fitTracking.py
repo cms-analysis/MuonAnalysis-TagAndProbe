@@ -6,47 +6,27 @@ if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
-doHp = True; doMu = True; noEta = False
-if scenario.find("_hp") != -1:
-    doMu = False; scenario = scenario.replace("_hp","")
-if scenario.find("_mu") != -1:
-    doHp = False; scenario = scenario.replace("_mu","")
-#if scenario.find("_noeta") != -1:
-#    noEta = True; scenario = scenario.replace("_noeta","")
+noEta = True
 
 CONSTRAINTS = cms.PSet(
-    hasValidHits = cms.vstring("pass"),
-    #tag_Mu3 = cms.vstring("pass"),
-    tag_L1DoubleMuOpen = cms.vstring("pass"),
+    outerValidHits = cms.vstring("pass"),
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 0, 20 ),
     abseta = cms.vdouble(0, 2.4),
-    #eta = cms.vdouble(-2.1, 2.1),
 )
 ETA_BINS = ONE_BIN.clone(
-    #eta = cms.vdouble(-2.4, -2.1, -1.1, 1.1, 2.1, 2.4)
     abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4)
 )
 ETA_PHI_BINS =  ETA_BINS.clone(
    phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,4)]), # 6 bins
 )
-RUN_BINS = ONE_BIN.clone(
-   run = cms.vdouble(135000,136000,138000,139103,139239,139375,139459),
-)
-PT_BINS = ONE_BIN.clone(
-    pt     = cms.vdouble(1, 2, 4, 8, 20),
-    abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4),
-)
-PT_BINS = ONE_BIN.clone(
-    pt     = cms.vdouble(1, 2, 4, 8, 20),
-    abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4),
-)
+
 VTX_BINS = ONE_BIN.clone(
-    pair_Nvertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5)
+    tag_Nvertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5)
 )
 if noEta:
-    VTX_BINS = ONE_BIN.clone(pair_Nvertices =  VTX_BINS.pair_Nvertices)
+    VTX_BINS = ONE_BIN.clone(tag_Nvertices =  VTX_BINS.tag_Nvertices)
 
 process = cms.Process("TagProbe")
 
@@ -68,26 +48,19 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         phi    = cms.vstring("Probe #phi", "-3.1416", "3.1416", ""),
         tag_pt = cms.vstring("Tag p_{T}", "2.6", "1000", "GeV/c"),
-        match_deltaR   = cms.vstring("Match #Delta R",    "0", "1000", ""),
-        match_deltaEta = cms.vstring("Match #Delta #eta", "0", "1000", ""),
-        match_deltaR_NoJPsi   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
-        match_deltaEta_NoJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
-        match_deltaR_NoBestJPsi   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
-        match_deltaEta_NoBestJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
-        pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
+        tk_deltaR   = cms.vstring("Match #Delta R",    "0", "1000", ""),
+        tk_deltaEta = cms.vstring("Match #Delta #eta", "0", "1000", ""),
+        tk_deltaR_NoJPsi   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
+        tk_deltaEta_NoJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
+        tk_deltaR_NoBestJPsi   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
+        tk_deltaEta_NoBestJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
+        tag_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
         run    = cms.vstring("Run Number", "132440", "999999", ""),
     ),
 
     Categories = cms.PSet(
-        passing            = cms.vstring("passing",           "dummy[pass=1,fail=0]"),
-        passingNoJPsi      = cms.vstring("passingNoJPsi",     "dummy[pass=1,fail=0]"),
-        passingNoBestJPsi  = cms.vstring("passingNoBestJPsi", "dummy[pass=1,fail=0]"),
-        ## Quality cut
-        hasValidHits = cms.vstring("hasValidHits",  "dummy[pass=1,fail=0]"),
-        ## Trigger
-        tag_Mu3 = cms.vstring("tag_HLTMu3", "dummy[pass=1,fail=0]"),
-        tag_L1DoubleMuOpen = cms.vstring("tag_HLTL1DoubleMuOpen", "dummy[pass=1,fail=0]"),
-        ## MC
+        hasTrack = cms.vstring("has track",  "dummy[pass=1,fail=0]"),
+        outerValidHits = cms.vstring("hasValidHits",  "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
 
@@ -97,7 +70,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     PDFs = cms.PSet(
         gaussPlusCubic = cms.vstring(
             "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.15,0.05,0.25])",
-            "Chebychev::backgroundPass(mass, {c1[0,-0.4,0.4], c2[0,-0.3,0.3], c3[0,-0.3,0.3]})",
+            "Chebychev::backgroundPass(mass, {c1[0,-0.5,0.5], c2[0,-0.4,0.4], c3[0,-0.4,0.4]})",
             "Chebychev::backgroundFail(mass, {c1,c2,c3})",
             "efficiency[0.9,0,1]",
             "signalFractionInPassing[0.5]"
@@ -110,68 +83,59 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
             "signalFractionInPassing[0.5]"
         )
 
-    )
+    ),
+
+    binnedFit = cms.bool(True),
+    binsForFit = cms.uint32(40),
 )
 
-matches = [ (1.0,0.4), (0.5,0.2) ]
-#matches = [ (0.5,0.2) ]
+matches = [ (0.3,0.15), (0.05,0.05), (0.025,0.025) ]
 effs   = [ "", "_NoJPsi", "_NoBestJPsi" ]
-#effs = [ "", "_NoBestJPsi" ]
 if False:
     matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.3,0.15), (0.1,0.1) ]
     #matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.4,0.2), (0.3,0.15), (0.2,0.1), (0.1,0.1), (0.05,0.05) ]
-    #effs = [ "", "_NoBestJPsi" ]
-if False:
-    matches = [ (0.5,0.2) ]
+if True:
+    #effs   =  [ "" ]
+    matches = [ (0.3,0.15) ]
 
 tofit = []
 for (dr,de) in matches: 
     tofit.append("dr%03de%03d" % (100*dr, 100*de))
     for X in effs:
         name = "dr%03de%03d%s" % (100*dr, 100*de, X.replace("_",""))
-        cut  = "match_deltaR%s < %f && match_deltaEta%s < %f" % (X, dr, X, de)
-        setattr(Template.Expressions, name, cms.vstring(cut,cut,"match_deltaR"+X, "match_deltaEta"+X))
+        cut  = "tk_deltaR%s < %f && tk_deltaEta%s < %f" % (X, dr, X, de)
+        setattr(Template.Expressions, name, cms.vstring(cut,cut,"tk_deltaR"+X, "tk_deltaEta"+X))
 for N in Template.Expressions.parameterNames_(): 
     setattr(Template.Cuts, "cut_"+N, cms.vstring(N, N, "0.5"))
+    
 
 process.TnP_Tracking = Template.clone(
     InputFileNames = cms.vstring(),
-    InputDirectoryName = cms.string("histoTracking"),
+    InputDirectoryName = cms.string("tpTreeSta"),
     InputTreeName = cms.string("fitter_tree"),
     OutputFileName = cms.string("TnP_Tracking_%s.root" % scenario),
     Efficiencies = cms.PSet()
 )
 if noEta: process.TnP_Tracking.OutputFileName = "TnP_Tracking_NoEta_%s.root" % scenario
 
-PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/trees-14.07.2010/"
-PREFIX="/data/gpetrucc/7TeV/tnp/trees/dev-jul16/"
+PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2010.01.10"
+PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/CMSSW_3_9_7/src/MuonAnalysis/TagAndProbe/test/jpsi/"
 if scenario == "data_all":
     process.TnP_Tracking.InputFileNames = cms.vstring(
-        PREFIX+'tnpJPsi_Data_run132440to135735.root',
-        PREFIX+'tnpJPsi_Data_run136033to137028.root',
-        PREFIX+'tnpJPsi_Data_run138560to138751.root',
-        PREFIX+'tnpJPsi_Data_run138919to139100.root',
-        PREFIX+'tnpJPsi_Data_run139102to139195.root',
-        PREFIX+'tnpJPsi_Data_run139239to139365.root',
-        PREFIX+'tnpJPsi_Data_run139368to139400.root',
-        PREFIX+'tnpJPsi_Data_run139407to139459.root',
-        PREFIX+'tnpJPsi_Data_run139779to139790.root',
-        PREFIX+'tnpJPsi_Data_run139965to139980.root',
-        PREFIX+'tnpJPsi_Data_run140058to140076.root',
+        PREFIX+'tnpJPsi_Data_2010B_Nov4.partial.root',
     )
     process.TnP_Tracking.binsForMassPlots = cms.uint32(23)
-elif scenario == "datalike_mc":
-    process.TnP_Tracking.InputFileNames = [
-        PREFIX+"tnpJPsi_MC_JPsiToMuMu_0.122pb.root",
-        PREFIX+"tnpJPsi_MC_ppMuX_0.122pb.root",
-    ]
 elif scenario == "signal_mc":
-    process.TnP_Tracking.InputFileNames = [ PREFIX+"tnpJPsi_MC_JPsiToMuMu_1.0pb.root" ]
+    process.TnP_Tracking.InputFileNames = [
+        PREFIX+"tnpJPsi_MC_JPsi_Fall10_NoPU.partial.root",
+    ]
+elif scenario == "relval_mc":
+    process.TnP_Tracking.InputFileNames = [
+        PREFIX+"tnpJPsi_MC_RelVal.root",
+    ]
 
 
-sampleToPdfMap = { "": "gaussPlusCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic" }
-#sampleToPdfMap = { "": "gaussPlusFloatCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic" }
-#sampleToPdfMap = { "": "gaussPlusFloatCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic" }
+sampleToPdfMap = { "": "gaussPlusCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic"}
 for M in tofit:
     for X in [x.replace("_","") for x in effs]:
         common = cms.PSet(
@@ -181,18 +145,12 @@ for M in tofit:
         )
         #if noEta:
         setattr(process.TnP_Tracking.Efficiencies, "eff_"    +M+X, cms.PSet(common, BinnedVariables = ONE_BIN))
-        #else:
-        setattr(process.TnP_Tracking.Efficiencies, "eff_abseta_"+M+X, cms.PSet(common, BinnedVariables = ETA_BINS))
+        if noEta == False:
+            setattr(process.TnP_Tracking.Efficiencies, "eff_abseta_"+M+X, cms.PSet(common, BinnedVariables = ETA_BINS))
         if False and scenario == "data_all":
             setattr(process.TnP_Tracking.Efficiencies, "eff_run_"+M+X, cms.PSet(common, BinnedVariables = RUN_BINS))
-        if True and scenario == "data_all":
+        if False and scenario == "data_all":
             setattr(process.TnP_Tracking.Efficiencies, "eff_vxt_"+M+X, cms.PSet(common, BinnedVariables = VTX_BINS))
 
 
-process.TnP_Tracking_HP = process.TnP_Tracking.clone(
-    InputDirectoryName = cms.string("histoTrackingHp"),
-    OutputFileName = cms.string("TnP_Tracking_HP_%s.root" % scenario),
-)
-
-if doMu: process.p = cms.Path( process.TnP_Tracking )
-if doHp: process.p_HP = cms.Path(process.TnP_Tracking_HP)
+process.p = cms.Path( process.TnP_Tracking )
