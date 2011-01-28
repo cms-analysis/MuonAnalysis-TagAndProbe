@@ -6,27 +6,27 @@ if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
-noEta = True
+noEta = True # if scenario == "data_all" else True
 
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 0, 20 ),
-    abseta = cms.vdouble(0, 2.4),
+    #abseta = cms.vdouble(0, 2.4),
+    eta = cms.vdouble(-2.4, 2.4),
 )
 ETA_BINS = ONE_BIN.clone(
-    abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4)
+   eta = cms.vdouble(*[0.2*i for i in range(-12,13)])
 )
-ETA_PHI_BINS =  ETA_BINS.clone(
-   phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,4)]), # 6 bins
+ETA_PHI_BINS =  ONE_BIN.clone(
+   eta = cms.vdouble(*[0.4*i for i in range(-6,7)]),
+   phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,3)]), 
 )
 
 VTX_BINS = ONE_BIN.clone(
-    tag_Nvertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5)
+    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5)
 )
-if noEta:
-    VTX_BINS = ONE_BIN.clone(tag_Nvertices =  VTX_BINS.tag_Nvertices)
 
 process = cms.Process("TagProbe")
 
@@ -54,7 +54,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tk_deltaEta_NoJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
         tk_deltaR_NoBestJPsi   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
         tk_deltaEta_NoBestJPsi = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
-        tag_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
+        tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
         run    = cms.vstring("Run Number", "132440", "999999", ""),
     ),
 
@@ -70,8 +70,8 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     PDFs = cms.PSet(
         gaussPlusCubic = cms.vstring(
             "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.15,0.05,0.25])",
-            "Chebychev::backgroundPass(mass, {c1[0,-0.5,0.5], c2[0,-0.4,0.4], c3[0,-0.4,0.4]})",
-            "Chebychev::backgroundFail(mass, {c1,c2,c3})",
+            "Chebychev::backgroundPass(mass, {c1p[0,-1,1], c2p[0,-1,1], c3p[0,-1,1]})",
+            "Chebychev::backgroundFail(mass, {c1f[0,-1,1], c2f[0,-1,1], c3f[0,-1,1]})",
             "efficiency[0.9,0,1]",
             "signalFractionInPassing[0.5]"
         ),
@@ -87,14 +87,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     binnedFit = cms.bool(True),
     binsForFit = cms.uint32(40),
-    saveDistributionsPlot = cms.bool(False),
 )
 
 matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.3,0.15), (0.1,0.1) ]
 effs    = [ "", "_NoJPsi", "_NoBestJPsi" ]
 if False:
     matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.3,0.15), (0.1,0.1) ]
-    #matches = [ (1.0,0.4), (0.7,0.3), (0.5,0.2), (0.4,0.2), (0.3,0.15), (0.2,0.1), (0.1,0.1), (0.05,0.05) ]
 if False:
     effs   =  [ "_NoBestJPsi" ]
     matches = [ (0.3,0.15) ]
@@ -108,9 +106,10 @@ process.TnP_Tracking = Template.clone(
 )
 if noEta: process.TnP_Tracking.OutputFileName = "TnP_Tracking_NoEta_%s.root" % scenario
 
-PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2010.01.10/"
+PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
 PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/CMSSW_3_9_7/src/MuonAnalysis/TagAndProbe/test/jpsi/"
-PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2010.01.10/"
+PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
+PREFIX="root://castorpublic.cern.ch//castor/cern.ch/user/g/gpetrucc/TnP/JPsiMuMu/"
 if scenario == "data_all":
     process.TnP_Tracking.InputFileNames = cms.vstring(
         PREFIX+'tnpJPsi_Data_2010B_Nov4.root',
@@ -141,12 +140,13 @@ for (dr,de) in matches:
             BinToPDFmap = cms.vstring(sampleToPdfMap[X.replace("_","")])
         )
         #if noEta:
-        setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
+        #setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
         if noEta == False:
             setattr(module.Efficiencies, "eff_abseta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
+            setattr(module.Efficiencies, "eff_etaphi_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
         if False and scenario == "data_all":
             setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS))
-        if False and scenario == "data_all":
+        if True and scenario == "data_all":
             setattr(module.Efficiencies, "eff_vxt_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
         setattr(process,"TnP_Tracking_"+label, module)
         setattr(process,"p_TnP_Tracking_"+label, cms.Path(module))
