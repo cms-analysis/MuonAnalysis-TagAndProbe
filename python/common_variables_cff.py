@@ -55,8 +55,26 @@ MuonIDFlags = cms.PSet(
     TM     = cms.string("isTrackerMuon"),
     TMA    = cms.string("muonID('TrackerMuonArbitrated')"),
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
+    TMOST = cms.string("muonID('TMOneStationTight')"),
     VBTF   = cms.string("numberOfMatches > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
-                        "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0")
+                        "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
+    BMuons = cms.string("(isGlobalMuon && globalTrack.chi2 / globalTrack.ndof < 20. && "+ 
+                        " globalTrack.hitPattern.numberOfValidMuonHits > 0 && isTrackerMuon && muonID('TrackerMuonArbitrated') )"+
+                        "|| (isTrackerMuon && muonID('TrackerMuonArbitrated') )"),
+    BMuQual = cms.string("((isGlobalMuon && globalTrack.chi2 / globalTrack.ndof < 20. && " + 
+                        " globalTrack.hitPattern.numberOfValidMuonHits > 0 && isTrackerMuon && muonID('TrackerMuonArbitrated') )"+
+                        "|| (isTrackerMuon && muonID('TrackerMuonArbitrated') ) ) && " +
+                        "(track.numberOfValidHits > 11 && track.chi2 / track.ndof < 1.8 && muonID('TMOneStationTight') && "+
+                        " track.hitPattern.pixelLayersWithMeasurement > 1 && abs(dB) < 3.0 && abs(track.dz) < 15.0)"),
+    BBbarCSWithIP = cms.string("isGlobalMuon && isTrackerMuon "
+                               +"&& track.pt > 4 && abs(track.eta) < 2.1 "
+                               +"&& track.numberOfValidHits > 11"
+                               +"&& track.hitPattern.numberOfValidPixelHits > 1 "
+                               +"&& track.normalizedChi2 < 2 && globalTrack.normalizedChi2 < 10 "
+                               +"&& globalTrack.hitPattern.numberOfValidMuonHits > 0 && numberOfMatches > 1"
+                               +"&& muonID('TrackerMuonArbitrated') && muonID('TMOneStationTight')"),
+
+
 )
 
 HighPtTriggerFlags = cms.PSet(
@@ -73,15 +91,23 @@ LowPtTriggerFlagsPhysics = cms.PSet(
    #L1DoubleMuOpen       = cms.string("!triggerObjectMatchesByFilter('hltDoubleMuLevel1PathL1OpenFiltered').empty()"),
    #L1DoubleMuOpen_Tight = cms.string("!triggerObjectMatchesByFilter('hltL1DoubleMuOpenTightL1Filtered').empty()"),
    #L2DoubleMu0          = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL2PreFiltered0').empty()"),
+   DoubleMu0             = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered0').empty()"),
    DoubleMu0_Quarkonium  = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu0').empty() || "+
                                       "!triggerObjectMatchesByPath('HLT_DoubleMu0_Quarkonium').empty() || "+
                                       "!triggerObjectMatchesByPath('HLT_DoubleMu0_Quarkonium_v1').empty()"),
+
    ## Mu + Tracker Mu
+
+   Mu0_TkMu0_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                  " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu0TkMuJpsiTkMuMassFiltered')"),
+   Mu0_TkMu0_Jpsi_TM = cms.string("!triggerObjectMatchesByCollection('hltMuTkMuJpsiTrackerMuonCands').empty() && "+
+                                  " triggerObjectMatchesByCollection('hltMuTkMuJpsiTrackerMuonCands').at(0).hasFilterLabel('hltMu0TkMuJpsiTkMuMassFiltered')"),
+
    Mu0_TkMu0_OST_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                       " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasPathName('HLT_Mu0_TkMu0_OST_Jpsi')"),
    Mu0_TkMu0_OST_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTkMuJpsiTrackerMuonCands').empty() && "+
                                       " triggerObjectMatchesByCollection('hltMuTkMuJpsiTrackerMuonCands').at(0).hasPathName('HLT_Mu0_TkMu0_OST_Jpsi')"),
-   ## Mu + Tracker Mu
+  
    Mu0_TkMu0_OST_Tight_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                             " (triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasPathName('HLT_Mu0_TkMu0_OST_Jpsi_Tight_v1') || "+
                                             "  triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasPathName('HLT_Mu0_TkMu0_OST_Jpsi_Tight_v2') || "+
@@ -93,7 +119,13 @@ LowPtTriggerFlagsPhysics = cms.PSet(
 )
 
 LowPtTriggerFlagsEfficienciesTag = cms.PSet(
+
    ## Mu + Track
+
+   Mu0_Track0_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered')"),
+   Mu3_Track0_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu3TrackJpsiTrackMassFiltered')"),
    Mu5_Track0_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                    " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5TrackJpsiTrackMassFiltered')"),
    Mu3_Track3_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
@@ -101,21 +133,54 @@ LowPtTriggerFlagsEfficienciesTag = cms.PSet(
    Mu3_Track5_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                    " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu3Track5JpsiTrackMassFiltered')"),
    ## Mu + L2Mu
+
+   Mu0_L2Mu0_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                             " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu0L2Mu0L3Filtered0')"),
+   Mu3_L2Mu0_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                             " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu3L2Mu0L3Filtered3')"),
    Mu5_L2Mu0_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                              " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5L2Mu0L3Filtered5')"),
+
 )
+
+
 LowPtTriggerFlagsEfficienciesProbe = cms.PSet(
+
+
    ## Mu + Track
+
+   Mu0_Track0_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered')"),
+   Mu3_Track0_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu3TrackJpsiTrackMassFiltered')"),
    Mu5_Track0_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
                                    " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu5TrackJpsiTrackMassFiltered')"),
    Mu3_Track5_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
                                    " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu3Track5JpsiTrackMassFiltered')"),
    Mu3_Track3_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
                                    " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu3Track3JpsiTrackMassFiltered')"),
+
+   MuX_Track0_Jpsi_Or_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
+                                      "(triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu0TrackJpsiTrackMassFiltered')"+
+                                      "||triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu3TrackJpsiTrackMassFiltered')"+                                        
+                                      "||triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu5TrackJpsiTrackMassFiltered'))"
+                                      ), 
+   
    ## Mu + L2Mu
+
+   
+   #Mu0_L2Mu0_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && "+
+   #                          " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltDiMuonL2PreFiltered0')"),
+   #Mu3_L2Mu0_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && "+
+   #                          " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltDiMuonL2PreFiltered0')"),
    Mu5_L2Mu0_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && "+
                              " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltDiMuonL2PreFiltered0')"),
+
+   
+
+
 )
+
 LowPtTriggerFlagsEfficiencies = cms.PSet(LowPtTriggerFlagsEfficienciesTag,LowPtTriggerFlagsEfficienciesProbe)
 
 def mkUnbiasCut(pset, triggers):
