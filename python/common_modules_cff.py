@@ -44,3 +44,6 @@ tkTracksNoZ = cms.EDProducer("CandidateResonanceInefficiencyCreator",
     outputMode = cms.string("RefToBaseVector"),
 )
 
+moreProbeInfo = cms.EDProducer("MoreProbeInfo",
+    probes = cms.InputTag("probeMuons"),
+)
