@@ -64,8 +64,8 @@ process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Jet*' )
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = True
 process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
-process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu5_L2Mu0' ])
-process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu5_L2Mu0', 'HLT_Mu3_Track*_Jpsi*', 'HLT_Mu5_Track*_Jpsi*' ])
+process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0' ])
+process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0', 'HLT_Mu3_Track*_Jpsi*', 'HLT_Mu5_Track*_Jpsi*' ])
 
 ## ==== Merge CaloMuons and Tracks into the collection of reco::Muons  ====
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
@@ -109,17 +109,16 @@ process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
 )
 process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
 
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
     arbitration   = cms.string("OneProbe"),
     # probe variables: all useful ones
-    variables = cms.PSet(
-        KinematicVariables, 
-        MuonIDVariables, 
-        TrackQualityVariables, 
-        #L1Variables, L2Variables, L3Variables
-    ),
+    variables = cms.PSet(AllVariables,
+                         dxyPVdzmin       = cms.InputTag("moreProbeInfo","dxyPVdzmin"),
+                         ),
+   
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
@@ -138,8 +137,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVertices = cms.InputTag("nverticesModule"),
     ),
     tagFlags     = cms.PSet(
-        #LowPtTriggerFlagsPhysics,
-        #LowPtTriggerFlagsEfficienciesTag,
+        LowPtTriggerFlagsPhysics,
+        LowPtTriggerFlagsEfficienciesTag,
     ),
     pairVariables = cms.PSet(
         dphiVtxTimesQ = cms.InputTag("tagProbeSeparation", "dphiVtxTimesQ"),
@@ -156,6 +155,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
+    process.moreProbeInfo +
     process.nverticesModule +
     process.probeMuons +
     process.tpPairs    +

@@ -8,12 +8,14 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0048/5256A51F-B70D-E011-BF95-002618943836.root',
-	'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/FAB16CB1-910D-E011-941A-003048678A6A.root',
-	'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/D697B653-8E0D-E011-9E44-002618FDA277.root',
-	'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/6E1B7762-8F0D-E011-BCA8-00304867C1B0.root',
-	'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/5E79B339-8D0D-E011-A842-0026189438F5.root',
-	'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/3A073491-960D-E011-9732-002354EF3BE0.root',
+    'root://pcmssd12.cern.ch//data/gpetrucc/7TeV/jpsi/JPsiMuMu_Summer10_REDIGI_START36_V9_S09_GEN-SIM-RECODEBUG_52819337-FF7B-DF11-B0F5-E0CB4E1A118E.root'
+    
+	#'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0048/5256A51F-B70D-E011-BF95-002618943836.root',
+	#'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/FAB16CB1-910D-E011-941A-003048678A6A.root',
+	#'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/D697B653-8E0D-E011-9E44-002618FDA277.root',
+	#'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/6E1B7762-8F0D-E011-BCA8-00304867C1B0.root',
+	#'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/5E79B339-8D0D-E011-A842-0026189438F5.root',
+	#'/store/relval/CMSSW_3_9_7/RelValJpsiMM/GEN-SIM-RECO/START39_V8-v1/0047/3A073491-960D-E011-9732-002354EF3BE0.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -23,7 +25,9 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('START39_V8::All')
+#process.GlobalTag.globaltag = cms.string('START39_V8::All')
+process.GlobalTag.globaltag = cms.string('START38_V9::All')
+
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -43,9 +47,10 @@ process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Jet*' )
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = True
-process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
-process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu5_L2Mu0' ])
-process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu5_L2Mu0', 'HLT_Mu3_Track*_Jpsi*', 'HLT_Mu5_Track*_Jpsi*' ])
+process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "REDIGI36X" )
+process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0' ])
+process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0', 'HLT_Mu3_Track*_Jpsi*', 'HLT_Mu5_Track*_Jpsi*' ])
+
 
 ## ==== Merge CaloMuons and Tracks into the collection of reco::Muons  ====
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
@@ -98,17 +103,16 @@ process.tagMuonsMCMatch = cms.EDProducer("MCTruthDeltaRMatcherNew",
 )
 process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons")
 
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
     arbitration   = cms.string("OneProbe"),
     # probe variables: all useful ones
-    variables = cms.PSet(
-        KinematicVariables, 
-        MuonIDVariables, 
-        TrackQualityVariables, 
-        #L1Variables, L2Variables, L3Variables
-    ),
+    variables = cms.PSet(AllVariables,
+                         dxyPVdzmin       = cms.InputTag("moreProbeInfo","dxyPVdzmin"),
+                         ),
+                                
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
@@ -127,8 +131,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVertices = cms.InputTag("nverticesModule"),
     ),
     tagFlags     = cms.PSet(
-        #LowPtTriggerFlagsPhysics,
-        #LowPtTriggerFlagsEfficienciesTag,
+        LowPtTriggerFlagsPhysics,
+        LowPtTriggerFlagsEfficienciesTag,
     ),
     pairVariables = cms.PSet(
         dphiVtxTimesQ = cms.InputTag("tagProbeSeparation", "dphiVtxTimesQ"),
@@ -143,13 +147,14 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
     probeMatches     = cms.InputTag("probeMuonsMCMatch"),
     motherPdgId      = cms.vint32(443),
-    makeMCUnbiasTree       = cms.bool(False),
+    makeMCUnbiasTree       = cms.bool(True),
     checkMotherInUnbiasEff = cms.bool(True),
     allProbes              = cms.InputTag("probeMuons"),
 )
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.oneTag     +
+    process.moreProbeInfo +
     process.nverticesModule +
     process.probeMuons * process.probeMuonsMCMatch +
     process.tpPairs    +
