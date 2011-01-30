@@ -17,4 +17,5 @@
   <use   name="RecoMuon/Records"/>
   <use   name="MuonAnalysis/MuonAssociators"/>
   <use   name="MuonAnalysis/TagAndProbe"/>
+  <use   name="TrackingTools/IPTools"/>
 </library>
