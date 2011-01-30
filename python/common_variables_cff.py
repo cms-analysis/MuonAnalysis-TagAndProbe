@@ -67,7 +67,6 @@ MuonIDFlags = cms.PSet(
                         "(track.numberOfValidHits > 11 && track.chi2 / track.ndof < 1.8 && muonID('TMOneStationTight') && "+
                         " track.hitPattern.pixelLayersWithMeasurement > 1 && abs(dB) < 3.0 && abs(track.dz) < 15.0)"),
     BBbarCSWithIP = cms.string("isGlobalMuon && isTrackerMuon "
-                               +"&& track.pt > 4 && abs(track.eta) < 2.1 "
                                +"&& track.numberOfValidHits > 11"
                                +"&& track.hitPattern.numberOfValidPixelHits > 1 "
                                +"&& track.normalizedChi2 < 2 && globalTrack.normalizedChi2 < 10 "
