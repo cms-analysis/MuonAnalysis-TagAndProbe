@@ -115,19 +115,21 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagProbePairs = cms.InputTag("tpPairs"),
     arbitration   = cms.string("OneProbe"),
     # probe variables: all useful ones
-    variables = cms.PSet(AllVariables,
-                         dxyPVdzmin       = cms.InputTag("moreProbeInfo","dxyPVdzmin"),
-                         ),
-   
+    variables = cms.PSet(
+        AllVariables,
+        dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
+    ),
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
        LowPtTriggerFlagsPhysics,
        LowPtTriggerFlagsEfficienciesProbe,
+       ## ParticleFlow
+       PF = cms.InputTag("muonsPassingPF"),
        ## A few other flags
        Track_QTF  = cms.string("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithMeasurement > 1 && track.normalizedChi2 < 4 && abs(dB) < 3 && abs(track.dz) < 30"),
-       Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && track.normalizedChi2 < 4 && abs(dB) < 0.2"),
+       Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
        ## Acceptance definition
        Acc_JPsi = cms.string("(abs(eta) <= 1.3 && pt > 3.3) || (1.3 < abs(eta) <= 2.2 && p > 2.9) || (2.2 < abs(eta) <= 2.4  && pt > 0.8)"),
     ),
@@ -141,12 +143,12 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         LowPtTriggerFlagsEfficienciesTag,
     ),
     pairVariables = cms.PSet(
+        pt = cms.string("pt"),
         dphiVtxTimesQ = cms.InputTag("tagProbeSeparation", "dphiVtxTimesQ"),
         drM2          = cms.InputTag("tagProbeSeparation", "drM2"),
         dphiM2        = cms.InputTag("tagProbeSeparation", "dphiM2"),
         distM2        = cms.InputTag("tagProbeSeparation", "distM2"),
-        #drStaIn       = cms.InputTag("tagProbeSeparation", "drStaIn"),
-        #dphiStaIn     = cms.InputTag("tagProbeSeparation", "dphiStaIn"),
+        drVtx         = cms.InputTag("tagProbeSeparation", "drVtx"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(False),
@@ -155,12 +157,13 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
-    process.moreProbeInfo +
-    process.nverticesModule +
     process.probeMuons +
     process.tpPairs    +
     process.onePair    +
+    process.muonDxyPVdzmin +
+    process.nverticesModule +
     process.tagProbeSeparation +
+    process.muonsPassingPF +
     process.tpTree
 )
 
@@ -200,58 +203,6 @@ process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-",
 
 process.onePairSta = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairsSta"), minNumber = cms.uint32(1))
 
-## Now I have to define the passing probes for tracking
-## first remove low pt tracks which are not
-process.pCutTracks = cms.EDFilter("TrackSelector", 
-    src = cms.InputTag("generalTracks"),      
-    cut = cms.string("pt > 2 || (abs(eta) > 1 && p > 2)"),
-)
-process.tkTracks = cms.EDProducer("ConcreteChargedCandidateProducer", 
-    src = cms.InputTag("pCutTracks"),
-    particleType = cms.string("mu+"),
-)
-## Then filter out the J/Psi's, to compute fake matching rate
-process.tkTracksNoJPsi = cms.EDProducer("CandidateResonanceInefficiencyCreator",
-    src = cms.InputTag("tkTracks"),
-    tags = cms.InputTag("tagMuons"),
-    mass    = cms.double(3.096),
-    massMin = cms.double(2.85), ## Should cut away
-    massMax = cms.double(3.25), ## 99.5% of signal
-    onlyBestMatch = cms.bool(False),
-    outputMode = cms.string("RefToBaseVector"),
-)
-## Then filter out the J/Psi's, to compute fake matching rate
-process.tkTracksNoBestJPsi = cms.EDProducer("CandidateResonanceInefficiencyCreator",
-    src = cms.InputTag("tkTracks"),
-    tags = cms.InputTag("tagMuons"),
-    mass    = cms.double(3.096),
-    massMin = cms.double(2.85), ## Should cut away
-    massMax = cms.double(3.25), ## 99.5% of signal
-    onlyBestMatch = cms.bool(True),
-    outputMode = cms.string("RefToBaseVector"),
-)
-
-process.staToTkMatch = cms.EDProducer("MatcherUsingTracks",
-    src     = cms.InputTag("probeMuonsSta"),
-    matched = cms.InputTag("tkTracks"),  
-    algorithm = cms.string("byDirectComparison"), 
-    srcTrack     = cms.string("muon"),    srcState = cms.string("atVertex"), 
-    matchedTrack = cms.string("tracker"), matchedState = cms.string("atVertex"),
-    maxDeltaR        = cms.double(1.),   # large range in DR (we can tighten it later)
-    maxDeltaEta      = cms.double(0.4),  # small in eta, which is more precise
-    maxDeltaLocalPos = cms.double(100),
-    maxDeltaPtRel    = cms.double(5),   # |pt(sta) - pt(tk)|/pt(tk)
-    sortBy           = cms.string("deltaR"),
-)
-process.staToTkMatchNoJPsi = process.staToTkMatch.clone(matched = 'tkTracksNoJPsi')
-process.staToTkMatchNoBestJPsi = process.staToTkMatch.clone(matched = 'tkTracksNoBestJPsi')
-process.staPassingTk = cms.EDProducer("MatchedCandidateSelector",
-    src   = cms.InputTag("probeMuonsSta"),
-    match = cms.InputTag("staToTkMatch"),
-)
-process.staPassingTkNoJPsi = process.staPassingTk.clone(match = 'staToTkMatchNoJPsi')
-process.staPassingTkNoBestJPsi = process.staPassingTk.clone(match = 'staToTkMatchNoBestJPsi')
-
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
     variables = cms.PSet(
@@ -281,28 +232,19 @@ process.tpTreeSta = process.tpTree.clone(
         #LowPtTriggerFlagsEfficienciesProbe,
         TM  = cms.string("isTrackerMuon"),
         Glb = cms.string("isGlobalMuon"),
-        hasTrack       = cms.InputTag("staPassingTk"),
-        hasTrackNoJPsi = cms.InputTag("staPassingTkNoJPsi"),
-        hasTrackNoBestJPsi = cms.InputTag("staPassingTkNoBestJPsi"),
     ),
     pairVariables = cms.PSet(),
     pairFlags     = cms.PSet(),
 )
-#process.tpTreeSta.variables.l1pt = process.tpTreeSta.variables.l1pt.value().replace("muonL1Info","muonL1InfoSta")
-#process.tpTreeSta.variables.l1q  = process.tpTreeSta.variables.l1q.value( ).replace("muonL1Info","muonL1InfoSta")
-#process.tpTreeSta.variables.l1dr = process.tpTreeSta.variables.l1dr.value().replace("muonL1Info","muonL1InfoSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
-    process.nverticesModule +
     process.probeMuonsSta +
     process.tpPairsSta      +
     process.onePairSta      +
-    ( process.pCutTracks *
-      process.tkTracks           * process.staToTkMatch           * process.staPassingTk             +
-      process.tkTracksNoJPsi     * process.staToTkMatchNoJPsi     * process.staPassingTkNoJPsi       +
-      process.tkTracksNoBestJPsi * process.staToTkMatchNoBestJPsi * process.staPassingTkNoBestJPsi ) +
+    process.nverticesModule +
+    process.staToTkMatchSequenceJPsi +
     process.tpTreeSta
 )
 
