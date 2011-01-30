@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.6 2010/06/02 14:47:54 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.7 2010/07/30 07:43:39 jjhollar Exp $
 //
 //
 
@@ -147,12 +147,12 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
 	      std::string effnamelowererror = effname + "_LowerError"; 
  
 	      const MuonPerformance &muonefficiency = effreader->getPerformanceRecord(effname, iSetup); 
-	      const MuonPerformance &muonefficiencyuppererror = effreader->getPerformanceRecord(effnameuppererror, iSetup);  
-	      const MuonPerformance &muonefficiencylowererror = effreader->getPerformanceRecord(effnamelowererror, iSetup);  
- 
-	      double myeff = effreader->getEff(pt, eta, phi, chg, muonefficiency); 
-	      double myefflowererr = effreader->getEff(pt, eta, phi, chg, muonefficiencylowererror);  
-	      double myeffuppererr = effreader->getEff(pt, eta, phi, chg, muonefficiencyuppererror);   
+	      //const MuonPerformance &muonefficiencyuppererror = effreader->getPerformanceRecord(effnameuppererror, iSetup);  
+	      //const MuonPerformance &muonefficiencylowererror = effreader->getPerformanceRecord(effnamelowererror, iSetup);  
+
+	      //double myeff = effreader->getEff(pt, eta, phi, chg, muonefficiency); 
+	      //double myefflowererr = effreader->getEff(pt, eta, phi, chg, muonefficiencylowererror);  
+	      //double myeffuppererr = effreader->getEff(pt, eta, phi, chg, muonefficiencyuppererror);   
  
 	      /* Fill a histogram of the pT spectrum for all true muons */
 	      hMCtruth->Fill(pt); 
