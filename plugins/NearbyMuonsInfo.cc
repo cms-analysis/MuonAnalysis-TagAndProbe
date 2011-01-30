@@ -1,5 +1,5 @@
 //
-// $Id: NearbyMuonsInfo.cc,v 1.2 2010/05/27 21:43:57 gpetrucc Exp $
+// $Id: NearbyMuonsInfo.cc,v 1.3 2010/06/30 12:36:28 ahunt Exp $
 //
 
 /**
@@ -7,7 +7,7 @@
   \brief    Matcher of reconstructed objects to L1 Muons 
             
   \author   Giovanni Petrucciani
-  \version  $Id: NearbyMuonsInfo.cc,v 1.2 2010/05/27 21:43:57 gpetrucc Exp $
+  \version  $Id: NearbyMuonsInfo.cc,v 1.3 2010/06/30 12:36:28 ahunt Exp $
 */
 
 
@@ -50,6 +50,7 @@ NearbyMuonsInfo::NearbyMuonsInfo(const edm::ParameterSet & iConfig) :
     prop_(iConfig)
 {
     produces<edm::ValueMap<float> >("dphiVtxTimesQ");
+    produces<edm::ValueMap<float> >("drVtx");
     produces<edm::ValueMap<float> >("drM2");
     produces<edm::ValueMap<float> >("dphiM2");
     produces<edm::ValueMap<float> >("distM2");
@@ -71,7 +72,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
     iEvent.getByLabel(src_, src);
 
     size_t n = src->size();
-    std::vector<float> dphiVtxTimesQ(n);
+    std::vector<float> dphiVtxTimesQ(n), drVtx(n);
     std::vector<float> drStaIn(n, -999), dphiStaIn(n, -999);
     std::vector<float> drM2(n,    -999),    dphiM2(n, -999), distM2(n, -999);
     for (size_t i = 0; i < n; ++i) {
@@ -80,6 +81,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
             "NearbyMuonsInfo should be used on composite candidates with two daughters, this one has " << ci.numberOfDaughters() << "\n";
         const reco::Candidate &d1 = *ci.daughter(0), &d2 = *ci.daughter(1);
         dphiVtxTimesQ[i] = d1.charge() * deltaPhi(d1.phi(), d2.phi());
+        drVtx[i] = deltaR(d1,d2);
         const reco::RecoCandidate *mu1 = dynamic_cast<const reco::RecoCandidate *>(&*d1.masterClone());
         const reco::RecoCandidate *mu2 = dynamic_cast<const reco::RecoCandidate *>(&*d2.masterClone());
         if (mu1 == 0) throw cms::Exception("CorruptData") << "First daughter of candidate is not a ShallowClone of a reco::RecoCandidate\n";
@@ -100,6 +102,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
     }
 
     writeValueMap(iEvent, src, dphiVtxTimesQ,  "dphiVtxTimesQ");
+    writeValueMap(iEvent, src, drVtx,          "drVtx");
     writeValueMap(iEvent, src, drStaIn,        "drStaIn");
     writeValueMap(iEvent, src, dphiStaIn,      "dphiStaIn");
     writeValueMap(iEvent, src, drM2,           "drM2");
