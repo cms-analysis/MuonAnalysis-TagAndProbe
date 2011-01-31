@@ -6,8 +6,9 @@ if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
 scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
-noEta = True # if scenario == "data_all" else True
-ichep = False
+doEta = True
+doIchep = True
+doVtx = True
 
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
@@ -113,7 +114,6 @@ process.TnP_Tracking = Template.clone(
     OutputFileName = cms.string("TnP_Tracking_%s.root" % scenario),
     Efficiencies = cms.PSet()
 )
-if noEta: process.TnP_Tracking.OutputFileName = "TnP_Tracking_NoEta_%s.root" % scenario
 
 PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
 PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/CMSSW_3_9_7/src/MuonAnalysis/TagAndProbe/test/jpsi/"
@@ -149,14 +149,14 @@ for (dr,de) in matches:
             BinToPDFmap = cms.vstring(sampleToPdfMap[X.replace("_","")])
         )
         setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
-        if ichep:
+        if doIchep:
             setattr(module.Efficiencies, "eff_ichep_"    +label, cms.PSet(common, BinnedVariables = ICHEP_BINS))
-        if noEta == False:
+        if doEta:
             setattr(module.Efficiencies, "eff_abseta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
             #setattr(module.Efficiencies, "eff_etaphi_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
         if False and scenario == "data_all":
             setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS))
-        if True and scenario == "data_all":
+        if doVtx and scenario == "data_all":
             setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
         setattr(process,"TnP_Tracking_"+label, module)
         setattr(process,"p_TnP_Tracking_"+label, cms.Path(module))
