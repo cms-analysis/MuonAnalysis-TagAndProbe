@@ -8,6 +8,7 @@ TObject *getFromPrefix(TDirectory *dir, TString prefixName, bool prefixOnly=true
     TIter next(dir->GetListOfKeys());
     TKey *key;
     while ((key = (TKey *) next())) {
+        if (key->GetName() == 0) continue;
         const char *match = strstr(key->GetName(), prefixName.Data());
         if (match == key->GetName() || (!prefixOnly && match != 0)) {
             return dir->Get(key->GetName());
@@ -137,7 +138,7 @@ void maybeLogX(TCanvas *c, TGraphAsymmErrors *h) {
     }
 }
 
-void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.0) {
+void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.3) {
    ax->SetTitle(ytitle); 
    ax->SetTitleOffset(yoffset); 
    ax->SetDecimals(true);
@@ -145,7 +146,7 @@ void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.0) {
 }
 
 
-void doRatio(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
+void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, const char *xtitle) {
     size_t nNZD = 0; // non-zero-denominator
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
         int j = findBin(href,hfit->GetX()[i]); if (j == -1) continue ;

@@ -47,10 +47,9 @@ void plotTracking(TString scenario="data",TString match="dr050e020") {
 }
 
 void plotTracking_(TString match) {
-
-    const int nplots = 2;
-    const char *plots[nplots] = { "eff_ichep", "eff_vxt" };
-    const char * vars[nplots] = { "abseta",    "tag_nVertices" };
+    const int nplots = 3;
+    const char *plots[nplots] = { "eff_ichep", "eff_abseta",  "eff_vxt"       };
+    const char * vars[nplots] = { "abseta",    "eta",         "tag_nVertices" };
     for (size_t i = 0; i < nplots; ++i) {
         TString plotname(plots[i]); plotname += "_"+match;
         TString varname(vars[i]);
@@ -69,6 +68,37 @@ void plotTracking_(TString match) {
             yMin = 0.0; yMax = 1.1;
             if (fit_1 && ref_1) refstack(fit_1, ref_1, plotname+"_fake1", varname+"_PLOT_");
             if (fit_2 && ref_2) refstack(fit_2, ref_2, plotname+"_fake2", varname+"_PLOT_");
+            if (fit_0 && fit_1 && fit_2 && ref_0 && ref_1 && ref_2 ) {
+                yMin = 0.9; yMax = 1.05; retitle = "Corrected efficiency";
+                TGraphAsymmErrors *corr = corrsingle2(fit_0, fit_1, fit_2, plotname+"_corr",     varname+"_PLOT_", false);
+                TGraphAsymmErrors *cref = corrsingle2(ref_0, ref_1, ref_2, plotname+"_corr_ref", varname+"_PLOT_", false);
+                if (doFillMC) {
+                    cref->SetLineColor(2);
+                    cref->SetFillColor(208);
+                    cref->SetLineStyle(0);
+                    cref->SetMarkerColor(2);
+                    cref->SetMarkerStyle(21);
+                    cref->SetMarkerSize(0.4);
+                } else {
+                    cref->SetLineWidth(2);
+                    cref->SetLineColor(kRed);
+                    cref->SetMarkerColor(kRed);
+                    cref->SetMarkerStyle(25);
+                    cref->SetMarkerSize(2.0);
+                }
+                corr->SetLineWidth(2);
+                corr->SetLineColor(kBlack);
+                corr->SetMarkerColor(kBlack);
+                corr->SetMarkerStyle(20);
+                corr->SetMarkerSize(1.6);
+                cref->Draw("AP");
+                corr->Draw("P SAME");
+                if (datalbl) doLegend(corr,cref,datalbl,reflbl);
+                gPad->Print(prefix+plotname+"_corr"+".png");
+                if (doPdf) gPad->Print(prefix+plotname+"_corr"+".pdf");
+                autoScale = true; 
+                doRatio(corr,cref,plotname+"_corr",corr->GetXaxis()->GetTitle()); 
+            }
         } else {
             TDirectory *mc_pt_eta = 0;
             if (mc_pt_eta) {
@@ -84,10 +114,11 @@ void plotTracking_(TString match) {
                 yMin = 0.9; yMax = 1.05; retitle = "Corrected efficiency";
                 if (fit_0 && fit_1) corrsingle(fit_0, fit_1, plotname+"_corr1", varname+"_PLOT_");
                 if (fit_0 && fit_2) corrsingle(fit_0, fit_2, plotname+"_corr2", varname+"_PLOT_");
+                if (fit_0 && fit_1 && fit_2) corrsingle2(fit_0, fit_1, fit_2, plotname+"_corr", varname+"_PLOT_");
             }
         }
 
-        if (1) {
+        if (ref == 0) {
             if (fit_0) doCanvas(fit_0, 1, 50, plotname+"_"+varname+"_%d", varname+"_bin%d__");
             if (fit_1) doCanvas(fit_1, 1, 50, plotname+"_fake1_"+varname+"_%d", varname+"_bin%d__");
             if (fit_2) doCanvas(fit_1, 1, 50, plotname+"_fake2_"+varname+"_%d", varname+"_bin%d__");
@@ -96,7 +127,7 @@ void plotTracking_(TString match) {
 }
 
 
-void corrsingle(TDirectory *fit, TDirectory *fake, TString alias, TString fitname) {
+TGraphAsymmErrors* corrsingle(TDirectory *fit, TDirectory *fake, TString alias, TString fitname, bool print=true) {
     if (fake == 0 || fit == 0) return;
     TCanvas *pfake = getFromPrefix(fake->GetDirectory("fit_eff_plots"), fitname);
     if (pfake == 0) {
@@ -143,12 +174,94 @@ void corrsingle(TDirectory *fit, TDirectory *fake, TString alias, TString fitnam
     out->GetXaxis()->SetMoreLogLabels(1);
     out->GetXaxis()->SetRangeUser(out->GetX()[0]-out->GetErrorXlow(0), out->GetX()[out->GetN()-1]+out->GetErrorXhigh(out->GetN()-1));
     out->GetYaxis()->SetRangeUser(yMin, yMax);
+    out->GetYaxis()->SetDecimals(true);
+    out->GetYaxis()->SetTitleOffset(1.5);
     if (retitle != "") out->GetYaxis()->SetTitle(retitle);
     
     if (doSquare) squareCanvas(c1);
     if (preliminary != "") cmsprelim();
 
-    gPad->Print(prefix+alias+".png");
-    if (doPdf) gPad->Print(prefix+alias+".pdf");
+    if (print) {
+        gPad->Print(prefix+alias+".png");
+        if (doPdf) gPad->Print(prefix+alias+".pdf");
+    }
+
+    return out;
 }
+
+TGraphAsymmErrors* corrsingle2(TDirectory *fit, TDirectory *fake, TDirectory *fake2, TString alias, TString fitname, bool print=true) {
+    if (fake == 0 || fake2 == 0 || fit == 0) return;
+    TCanvas *pfake = getFromPrefix(fake->GetDirectory("fit_eff_plots"), fitname);
+    if (pfake == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fake->GetName() << std::endl;
+        return;
+    }
+    RooHist *hfake = (RooHist *) pfake->FindObject("hxy_fit_eff");
+
+    TCanvas *pfake2 = getFromPrefix(fake2->GetDirectory("fit_eff_plots"), fitname);
+    if (pfake2 == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fake2->GetName() << std::endl;
+        return;
+    }
+    RooHist *hfake2 = (RooHist *) pfake2->FindObject("hxy_fit_eff");
+
+    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    if (pfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        return;
+    }
+    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+
+    TGraphAsymmErrors *out = new TGraphAsymmErrors();
+    for (int i = 0, n = hfit->GetN(), k = 0; i < n; ++i) {
+        double x = hfit->GetX()[i], y = hfit->GetY()[i], eyh = hfit->GetErrorYhigh(i), eyl = hfit->GetErrorYlow(i);
+        int j = findBin(hfake, x); if (j == -1) continue;
+        double yf1  = hfake->GetY()[j], eyhf1 = hfake->GetErrorYhigh(j), eylf1 = hfake->GetErrorYlow(j);
+        int j2 = findBin(hfake2, x); if (j2 == -1) continue;
+        double yf2  = hfake2->GetY()[j2], eyhf2 = hfake2->GetErrorYhigh(j2), eylf2 = hfake2->GetErrorYlow(j2);
+        double yf = 0.5*(yf1+yf2); 
+        double ylf = TMath::Min(yf1-eylf1, yf2-eylf2);
+        double yhf = TMath::Max(yf1+eylf1, yf2+eylf2);
+        double ycorr =    (   y   -yf )/(1-yf );
+        double ycorr_hi = ((y+eyh)-ylf)/(1-ylf);
+        double ycorr_lo = ((y-eyl)-yhf)/(1-yhf);
+        /*
+        std::cout << "x = " << x << " [" << (x-hfit->GetErrorXlow(i)) << ", " << (x+hfit->GetErrorXhigh(i)) << "] \t" <<
+                     "y  = " << y  << " -"<<eyl <<"/+"<<eyh << " \t " <<
+                     "yf = " << yf << " -"<<eylf<<"/+"<<eyhf<< " \t " <<
+                     "yc = " << ycorr << "[ " << ycorr_lo << ", " << ycorr_hi << "]" << std::endl;
+        */
+        out->Set(k+1);
+        out->SetPoint(k, x, ycorr);
+        out->SetPointError(k, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), ycorr - ycorr_lo, ycorr_hi - ycorr );
+        k++;
+    }
+
+    c1->Clear(); c1->cd();
+    c1->SetLeftMargin(0.16);
+    out->SetLineWidth(2);
+    out->SetLineColor(kBlack);
+    out->SetMarkerColor(kBlack);
+    out->SetMarkerStyle(20);
+    out->SetMarkerSize(1.6);
+    out->Draw("AP");
+    out->GetXaxis()->SetTitle(getXtitle(pfit)); 
+    out->GetXaxis()->SetMoreLogLabels(1);
+    out->GetXaxis()->SetRangeUser(out->GetX()[0]-out->GetErrorXlow(0), out->GetX()[out->GetN()-1]+out->GetErrorXhigh(out->GetN()-1));
+    out->GetYaxis()->SetRangeUser(yMin, yMax);
+    out->GetYaxis()->SetDecimals(true);
+    out->GetYaxis()->SetTitleOffset(1.35);
+    if (retitle != "") out->GetYaxis()->SetTitle(retitle);
+    
+    if (doSquare) squareCanvas(c1);
+    if (preliminary != "") cmsprelim();
+
+    if (print) {
+        gPad->Print(prefix+alias+".png");
+        if (doPdf) gPad->Print(prefix+alias+".pdf");
+    }
+
+    return out;
+}
+
 
