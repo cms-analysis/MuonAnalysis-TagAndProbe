@@ -4,11 +4,12 @@
  *  even knowing only the beginning 
  *  of it's name.
  */
-TObject *getFromPrefix(TDirectory *dir, TString prefixName) {
+TObject *getFromPrefix(TDirectory *dir, TString prefixName, bool prefixOnly=true) {
     TIter next(dir->GetListOfKeys());
     TKey *key;
     while ((key = (TKey *) next())) {
-        if (strstr(key->GetName(), prefixName.Data()) == key->GetName() ) {
+        const char *match = strstr(key->GetName(), prefixName.Data());
+        if (match == key->GetName() || (!prefixOnly && match != 0)) {
             return dir->Get(key->GetName());
         }
     }
@@ -539,9 +540,9 @@ void doCanvas(TDirectory *dir, int binsx, int binsy, const char * easyname, cons
                 sprintf(buff,easyname);
                 sprintf(baff,truename);
             }
-            TDirectory *subdir = (TDirectory *) getFromPrefix(dir, baff);
+            TDirectory *subdir = (TDirectory *) getFromPrefix(dir, baff, /*prefixOnly=*/false);
             if (subdir == 0) {
-                std::cerr << "Didn't find '" << baff << "*' in " << dir->GetName() << std::endl;
+                //std::cerr << "Didn't find '" << baff << "*' in " << dir->GetName() << std::endl;
                 continue;
             }
             TCanvas *fitc = (TCanvas *) subdir->Get("fit_canvas");

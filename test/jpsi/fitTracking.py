@@ -7,9 +7,12 @@ scenario = "data_all"
 if len(args) > 0: scenario = args[0]
 print "Will run scenario ", scenario 
 noEta = True # if scenario == "data_all" else True
+ichep = False
 
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
+    MuX_L2Mu0_L2     = cms.vstring("pass"),
+    tag_Mu5_L2Mu0_Mu = cms.vstring("pass"),
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 0, 20 ),
@@ -17,15 +20,20 @@ ONE_BIN = cms.PSet(CONSTRAINTS,
     eta = cms.vdouble(-2.4, 2.4),
 )
 ETA_BINS = ONE_BIN.clone(
-   eta = cms.vdouble(*[0.2*i for i in range(-12,13)])
+   eta = cms.vdouble(-2.4, -2.1, -1.8, -1.6, -1.4, -1.2, -1.0, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.1, 2.4)
 )
+ICHEP_BINS = cms.PSet(CONSTRAINTS,
+    pt = cms.vdouble( 0, 20 ),
+    abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4)
+)
+
 ETA_PHI_BINS =  ONE_BIN.clone(
    eta = cms.vdouble(*[0.4*i for i in range(-6,7)]),
    phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,3)]), 
 )
 
 VTX_BINS = ONE_BIN.clone(
-    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5,7.5)
+    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
 )
 
 process = cms.Process("TagProbe")
@@ -59,8 +67,9 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     ),
 
     Categories = cms.PSet(
-        hasTrack = cms.vstring("has track",  "dummy[pass=1,fail=0]"),
         outerValidHits = cms.vstring("hasValidHits",  "dummy[pass=1,fail=0]"),
+        MuX_L2Mu0_L2     = cms.vstring("probeL2Mu0",  "dummy[pass=1,fail=0]"),
+        tag_Mu5_L2Mu0_Mu = cms.vstring("tagMu5L2Mu0", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
 
@@ -112,11 +121,11 @@ PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
 PREFIX="root://castorpublic.cern.ch//castor/cern.ch/user/g/gpetrucc/TnP/JPsiMuMu/"
 if scenario == "data_all":
     process.TnP_Tracking.InputFileNames = cms.vstring(
-        PREFIX+'tnpJPsi_Data_2010B_Nov4.root',
+        PREFIX+'tnpJPsi_Data2010B_Nov4.root',
     )
 elif scenario == "signal_mc":
     process.TnP_Tracking.InputFileNames = [
-        PREFIX+"tnpJPsi_MC_JPsi_Fall10_NoPU.root",
+        PREFIX+"tnpJPsi_JPsiToMuMu_Fall10.root",
     ]
 elif scenario == "relval_mc":
     process.TnP_Tracking.InputFileNames = [
@@ -139,14 +148,15 @@ for (dr,de) in matches:
             UnbinnedVariables = cms.vstring("mass"),
             BinToPDFmap = cms.vstring(sampleToPdfMap[X.replace("_","")])
         )
-        #if noEta:
-        #setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
+        setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
+        if ichep:
+            setattr(module.Efficiencies, "eff_ichep_"    +label, cms.PSet(common, BinnedVariables = ICHEP_BINS))
         if noEta == False:
             setattr(module.Efficiencies, "eff_abseta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
-            setattr(module.Efficiencies, "eff_etaphi_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
+            #setattr(module.Efficiencies, "eff_etaphi_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
         if False and scenario == "data_all":
             setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS))
         if True and scenario == "data_all":
-            setattr(module.Efficiencies, "eff_vxt_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
+            setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
         setattr(process,"TnP_Tracking_"+label, module)
         setattr(process,"p_TnP_Tracking_"+label, cms.Path(module))
