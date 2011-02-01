@@ -17,15 +17,14 @@ CONSTRAINTS = cms.PSet(
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 0, 20 ),
-    #abseta = cms.vdouble(0, 2.4),
     eta = cms.vdouble(-2.4, 2.4),
 )
 ETA_BINS = ONE_BIN.clone(
-   eta = cms.vdouble(-2.4, -2.1, -1.8, -1.6, -1.4, -1.2, -1.0, -0.8, -0.6, -0.4, -0.2, 0, 0.2, 0.4, 0.5, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.1, 2.4)
+   eta = cms.vdouble(-2.4, -2.1, -1.8, -1.5, -1.2, -0.9, -0.6, -0.3, 0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4)
 )
 ICHEP_BINS = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 0, 20 ),
-    abseta = cms.vdouble(0, 1.1, 1.6, 2.1, 2.4)
+    abseta = cms.vdouble(0, 0.6, 1.1, 1.6, 2.1, 2.4)
 )
 
 ETA_PHI_BINS =  ONE_BIN.clone(
