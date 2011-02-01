@@ -32,6 +32,8 @@ bool doLogX = false;
 bool doSquare = false;
 double yMax = 1.0;
 double yMin = 0.0;
+double yMaxR = 1.5;
+double yMinR = 0.5;
 TString extraSpam = "";
 
 void cmsprelim() {
@@ -182,7 +184,7 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
     if (autoScale) {
         ratio.GetYaxis()->SetRangeUser(1-1.5*max,1+1.2*max);
     } else {
-        ratio.GetYaxis()->SetRangeUser(0.5,1.5);
+        ratio.GetYaxis()->SetRangeUser(yMinR,yMaxR);
     }
     ratio.GetXaxis()->SetRangeUser(ratio.GetX()[0]-ratio.GetErrorXlow(0), ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1));
     ratio.GetXaxis()->SetTitle(xtitle); ratio.GetXaxis()->SetMoreLogLabels(1);
