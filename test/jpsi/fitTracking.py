@@ -114,10 +114,10 @@ process.TnP_Tracking = Template.clone(
     Efficiencies = cms.PSet()
 )
 
-PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
+PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2011.01.31/"
 PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/CMSSW_3_9_7/src/MuonAnalysis/TagAndProbe/test/jpsi/"
-PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
 PREFIX="root://castorpublic.cern.ch//castor/cern.ch/user/g/gpetrucc/TnP/JPsiMuMu/"
+PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2011.01.31/"
 if scenario == "data_all":
     process.TnP_Tracking.InputFileNames = cms.vstring(
         PREFIX+'tnpJPsi_Data2010B_Nov4.root',
@@ -134,11 +134,12 @@ elif scenario == "relval_mc":
 
 sampleToPdfMap = { "": "gaussPlusCubic", "NoJPsi":"gaussPlusFloatCubic", "NoBestJPsi":"gaussPlusFloatCubic"}
 for (dr,de) in matches:
+    label = "dr%03de%03d" % (100*dr, 100*de)
+    if len(args) > 1 and args[1] != label: 
+        print "Skipping "+label
+        continue
     for X in effs:
         label = "dr%03de%03d%s" % (100*dr, 100*de, X.replace("_",""))
-        if len(args) > 1 and args[1] != label: 
-            print "Skipping "+label
-            continue
         module = process.TnP_Tracking.clone(OutputFileName = cms.string("TnP_Tracking_%s_%s.root" % (label,scenario)))
         setattr(module.Cuts, "dr_cut",   cms.vstring("tk_deltaR"  +X, "tk_deltaR"  +X, str(dr)))
         setattr(module.Cuts, "deta_cut", cms.vstring("tk_deltaEta"+X, "tk_deltaEta"+X, str(de)))
@@ -147,7 +148,7 @@ for (dr,de) in matches:
             UnbinnedVariables = cms.vstring("mass"),
             BinToPDFmap = cms.vstring(sampleToPdfMap[X.replace("_","")])
         )
-        setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
+        #setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
         if doIchep:
             setattr(module.Efficiencies, "eff_ichep_"    +label, cms.PSet(common, BinnedVariables = ICHEP_BINS))
         if doEta:
