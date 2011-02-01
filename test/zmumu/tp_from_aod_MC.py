@@ -156,7 +156,8 @@ process.probeMuonsSta = cms.EDFilter("PATMuonSelector",
     cut = cms.string("outerTrack.isNonnull"), # no real cut now
 )
 process.probeMuonsMCMatchSta = process.tagMuonsMCMatch.clone(src = "probeMuonsSta")
-process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-")
+
+process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-", cut = '40 < mass < 150')
 
 process.staToTkMatch.maxDeltaR     = 0.3
 process.staToTkMatch.maxDeltaPtRel = 2.

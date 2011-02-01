@@ -188,7 +188,8 @@ process.probeMuonsSta = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTriggerSta"),
     cut = cms.string("outerTrack.isNonnull"), # no real cut now
 )
-process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-")
+
+process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-", cut = '40 < mass < 150')
 
 process.onePairSta = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairsSta"), minNumber = cms.uint32(1))
 
