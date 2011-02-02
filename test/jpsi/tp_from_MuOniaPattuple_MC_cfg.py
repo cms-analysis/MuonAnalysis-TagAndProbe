@@ -51,7 +51,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
                                 arbitration   = cms.string("OneProbe"),
                                 # probe variables 
                                 variables = cms.PSet(AllVariables,
-                                                     dxyPVdzmin       = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
+                                                     dxyPVdzmin       = cms.InputTag("moreProbeInfo","dxyPVdzmin"),
                                                      ),
                                
                                 flags = cms.PSet(
@@ -100,7 +100,7 @@ process.tnpSimpleSequence = cms.Sequence(
 
     process.tagMuonsMCMatch    +
     process.probeMuonsMCMatch  +
-    process.muonDxyPVdzmin      +
+    process.moreProbeInfo      +
     process.nverticesModule    +
     process.tagProbeSeparation +
     process.tpTree
