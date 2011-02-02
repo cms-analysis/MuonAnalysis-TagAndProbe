@@ -7,11 +7,21 @@
 TObject *getFromPrefix(TDirectory *dir, TString prefixName, bool prefixOnly=true) {
     TIter next(dir->GetListOfKeys());
     TKey *key;
-    while ((key = (TKey *) next())) {
-        if (key->GetName() == 0) continue;
-        const char *match = strstr(key->GetName(), prefixName.Data());
-        if (match == key->GetName() || (!prefixOnly && match != 0)) {
-            return dir->Get(key->GetName());
+    if (prefixName.MaybeRegexp()) {
+        TPRegexp pat(prefixName);
+        while ((key = (TKey *) next())) {
+            if (key->GetName() == 0) continue;
+            if (TString(key->GetName())->Contains(pat)) {
+                return dir->Get(key->GetName());
+            }
+        }
+    } else {
+        while ((key = (TKey *) next())) {
+            if (key->GetName() == 0) continue;
+            const char *match = strstr(key->GetName(), prefixName.Data());
+            if (match == key->GetName() || (!prefixOnly && match != 0)) {
+                return dir->Get(key->GetName());
+            }
         }
     }
     return 0;
@@ -105,6 +115,14 @@ int findBin(TGraphAsymmErrors *g, double x) {
         }
     }
     return -1;
+}
+double xmaxGraph(TGraphAsymmErrors *g) {
+    double ret = 0;
+    if (g != 0) {
+        int n = g->GetN();
+        if (n) ret =  g->GetX()[n-1] + g->GetErrorXhigh(n-1);
+    }
+    return ret;
 }
 void reTitleY(TCanvas *pl, TString ytitle) {
     TH1 *first = (TH1*) pl->GetListOfPrimitives()->At(0);
@@ -436,7 +454,7 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 
 
 /** Plot just one set */
-void single( TDirectory *fit, TString alias, TString fitname) {
+TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
     TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
@@ -462,6 +480,8 @@ void single( TDirectory *fit, TString alias, TString fitname) {
     maybeLogX(pfit, hfit); 
     pfit->Print(prefix+alias+".png"); 
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
+
+    return (TGraphAsymmErrors *) hfit->Clone();
 }
 
 void EffPalette()
@@ -559,3 +579,48 @@ void doCanvas(TDirectory *dir, int binsx, int binsy, const char * easyname, cons
         }
     }
 }
+
+TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3=0, TGraphAsymmErrors *g4=0, double yMin = 0.001) {
+    TGraphAsymmErrors *graphs[4];
+    graphs[0] = g1;
+    graphs[1] = g2;
+    graphs[2] = g3;
+    graphs[3] = g4;
+    int ng = 0; 
+    for (int i = 0; i < 4; ++i) { if (graphs[i]) ng++; else break; }
+    int n = (g1 ? g1->GetN() : 0);
+    TGraphAsymmErrors *ret = new TGraphAsymmErrors(n);
+    for (int i = 0; i < n; ++i) {
+        double syw2 = 0, sw2 = 0, slo = 0, shi = 0;
+        double xbin = g1->GetX()[i], sxw2 = 0;
+        double xmax = xbin + g1->GetErrorXhigh(i), xmin = xbin - g1->GetErrorXlow(i);
+        double ytry = 0, ntry = 0;
+        for (int j = 0; j < ng; ++j) {
+            int k = (j == 0 ? i : findBin(graphs[j], xbin));
+            if (k == -1) continue;
+            double y = graphs[j]->GetY()[k];
+            ytry += y; ntry += 1;
+        }
+        for (int j = 0; j < ng; ++j) {
+            int k = (j == 0 ? i : findBin(graphs[j], xbin));
+            if (k == -1) continue;
+            double x = graphs[j]->GetX()[k];
+            double y = graphs[j]->GetY()[k];
+            if (ytry/ntry > yMin && y < yMin) continue;
+            double ylo = graphs[j]->GetErrorYlow(k);
+            double yhi = graphs[j]->GetErrorYhigh(k);
+            double w2 = 1.0/TMath::Max(ylo,yhi); w2 *= w2;
+            //std::cout << "For graph " << j << " use point  " << k << ", x = " << x << ", y = " << y << "  -" << ylo << "/+" << yhi  << std::endl;
+            sw2  += w2;
+            syw2 += w2*y;
+            sxw2 += w2*x;
+            shi  += yhi*yhi*w2*w2;
+            slo  += ylo*ylo*w2*w2;
+        }
+        ret->SetPoint(i, sxw2/sw2, syw2/sw2);
+        ret->SetPointError(i, sxw2/sw2 - xmin, xmax - sxw2/sw2, sqrt(shi)/sw2, sqrt(slo)/sw2);
+    }
+    return ret;
+}    
+
+
