@@ -28,6 +28,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     Variables = cms.PSet(
         mass = cms.vstring("Tag-Probe Mass", "70", "130", "GeV/c^{2}"),
         pt = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
+        eta    = cms.vstring("Probe #eta", "-2.5", "2.5", ""),
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         tag_pt = cms.vstring("Tag p_{T}",    "0", "1000", "GeV/c"),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
@@ -38,6 +39,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         VBTF  = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
         TMOST = cms.vstring("TMOneStationTight", "dummy[pass=1,fail=0]"),
         PF    = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
+        Mu15  = cms.vstring("MC true", "dummy[true=1,false=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
 
@@ -61,6 +63,11 @@ PT_ETA_BINS = cms.PSet(
     pt     = cms.vdouble(  10, 20, 30, 40, 60, 100 ),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
+ETA_BINS = cms.PSet(
+    pt     = cms.vdouble(20,100),
+    abseta = cms.vdouble(0, 0.15, 0.4, 0.75, 1.25, 1.75, 2.1, 2.4)
+)
+ETA_BINS_HLT = ETA_BINS.clone(Mu15 = cms.vstring("pass"))
 VTX_BINS  = cms.PSet(
     pt     = cms.vdouble(  20, 120 ),
     abseta = cms.vdouble(  0.0, 2.4),
@@ -83,6 +90,8 @@ if scenario == "signal_mc":
 IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
 ALLBINS=[("pt_abseta",PT_ETA_BINS)]
 if scenario == "data_all": ALLBINS += [ ("vtx",VTX_BINS)]
+
+IDS = [ "VBTF" ]; ALLBINS=[("eta",ETA_BINS),("eta_passinghlt",ETA_BINS_HLT)]; scenario = "Eta_data_all"
 
 for ID in IDS:
     module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s.root" % (scenario, ID)))
