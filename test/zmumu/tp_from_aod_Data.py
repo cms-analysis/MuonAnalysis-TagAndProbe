@@ -82,6 +82,10 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracksCut    = cms.string("pt > 5"),
 )
 
+import MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi
+process.expectedHitsMu = MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi.expectedHitsComputer.clone()
+process.expectedHitsMu.inputColl  = cms.InputTag("mergedMuons")
+
 ## ==== Trigger matching
 process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
@@ -89,6 +93,12 @@ process.muonMatchHLTL2.maxDeltaR = 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
+process.patMuonsWithoutTrigger.userData.userInts.src = cms.VInputTag(
+    cms.InputTag('expectedHitsMu','in'),
+    cms.InputTag('expectedHitsMu','out')
+)
+
+
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
@@ -160,6 +170,7 @@ process.tnpSimpleSequence = cms.Sequence(
 process.tagAndProbe = cms.Path( 
     process.fastFilter +
     process.mergedMuons                 *
+    process.expectedHitsMu              *
     process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
 )
