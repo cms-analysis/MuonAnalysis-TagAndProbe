@@ -14,6 +14,7 @@ IsolationVariables = cms.PSet(
 MuonIDVariables = cms.PSet(
     caloCompatibility = cms.string("? isCaloCompatibilityValid ? caloCompatibility : -1"),
     numberOfMatches   = cms.string("? isMatchesValid ? numberOfMatches : -1"),
+    numberOfMatchedStations = cms.string("? isMatchesValid ? numberOfMatchedStations : -1"),
 )
 TrackQualityVariables = cms.PSet(
     dB          = cms.string("dB"),
@@ -21,6 +22,9 @@ TrackQualityVariables = cms.PSet(
     tkPixelHits = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidPixelHits"),
     tkPixelLay  = cms.string("? track.isNull ? 0 : track.hitPattern.pixelLayersWithMeasurement"),
     tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner.numberOfLostHits"),
+    tkExpHitInNew  =cms.string("userInt('expectedHitsMu:in')"),
+    tkExpHitOutNew =cms.string("userInt('expectedHitsMu:out')")
+    
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
@@ -56,7 +60,10 @@ MuonIDFlags = cms.PSet(
     TMA    = cms.string("muonID('TrackerMuonArbitrated')"),
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
     TMOST = cms.string("muonID('TMOneStationTight')"),
-    VBTF   = cms.string("numberOfMatches > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
+     
+    VBTF   = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
+                        "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
+    VBTFold   = cms.string("numberOfMatches > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
     BMuons = cms.string("(isGlobalMuon && globalTrack.chi2 / globalTrack.ndof < 20. && "+ 
                         " globalTrack.hitPattern.numberOfValidMuonHits > 0 && isTrackerMuon && muonID('TrackerMuonArbitrated') )"+
