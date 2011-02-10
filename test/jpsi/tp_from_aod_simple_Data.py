@@ -81,19 +81,29 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracksCut    = cms.string("pt > 2 || (abs(eta) > 1 && p > 2)"),
 )
 
+import MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi
+process.expectedHitsMu = MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi.expectedHitsComputer.clone()
+process.expectedHitsMu.inputColl  = cms.InputTag("mergedMuons")
+
+
 ## ==== Trigger matching
 process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 #useL1MatchingWindowForSinglets(process) ## No longer used
+process.patMuonsWithoutTrigger.userData.userInts.src = cms.VInputTag(
+    cms.InputTag('expectedHitsMu','in'),
+    cms.InputTag('expectedHitsMu','out')
+)
+
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("isGlobalMuon  && pt > 3 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
+    cut = cms.string("(isGlobalMuon || numberOfMatchedStations > 1 ) && pt > 3 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
@@ -174,6 +184,7 @@ process.tagAndProbe = cms.Path(
     process.fastFilter +
     process.HLTBoth    +
     process.mergedMuons                 *
+    process.expectedHitsMu              *
     process.patMuonsWithTriggerSequence *
     process.tnpSimpleSequence
 )
