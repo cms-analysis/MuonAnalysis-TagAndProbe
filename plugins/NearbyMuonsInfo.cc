@@ -1,5 +1,5 @@
 //
-// $Id: NearbyMuonsInfo.cc,v 1.3 2010/06/30 12:36:28 ahunt Exp $
+// $Id: NearbyMuonsInfo.cc,v 1.4 2011/01/30 12:08:25 gpetrucc Exp $
 //
 
 /**
@@ -7,7 +7,7 @@
   \brief    Matcher of reconstructed objects to L1 Muons 
             
   \author   Giovanni Petrucciani
-  \version  $Id: NearbyMuonsInfo.cc,v 1.3 2010/06/30 12:36:28 ahunt Exp $
+  \version  $Id: NearbyMuonsInfo.cc,v 1.4 2011/01/30 12:08:25 gpetrucc Exp $
 */
 
 
@@ -35,7 +35,7 @@ class NearbyMuonsInfo : public edm::EDProducer {
       virtual void beginRun(edm::Run & iRun, const edm::EventSetup & iSetup);
     private:
         edm::InputTag src_;
-        PropagateToMuon prop_;
+        PropagateToMuon prop1_, prop2_;
 
         /// Write a ValueMap<float> in the event
         void writeValueMap(edm::Event &iEvent,
@@ -47,10 +47,14 @@ class NearbyMuonsInfo : public edm::EDProducer {
 
 NearbyMuonsInfo::NearbyMuonsInfo(const edm::ParameterSet & iConfig) :
     src_(iConfig.getParameter<edm::InputTag>("src")),
-    prop_(iConfig)
+    prop1_(iConfig.getParameter<edm::ParameterSet>("propM1")),
+    prop2_(iConfig.getParameter<edm::ParameterSet>("propM2"))
 {
     produces<edm::ValueMap<float> >("dphiVtxTimesQ");
     produces<edm::ValueMap<float> >("drVtx");
+    produces<edm::ValueMap<float> >("drM1");
+    produces<edm::ValueMap<float> >("dphiM1");
+    produces<edm::ValueMap<float> >("distM1");
     produces<edm::ValueMap<float> >("drM2");
     produces<edm::ValueMap<float> >("dphiM2");
     produces<edm::ValueMap<float> >("distM2");
@@ -60,7 +64,8 @@ NearbyMuonsInfo::NearbyMuonsInfo(const edm::ParameterSet & iConfig) :
 
 void 
 NearbyMuonsInfo::beginRun(edm::Run & iRun, const edm::EventSetup & iSetup) {
-    prop_.init(iSetup);
+    prop1_.init(iSetup);
+    prop2_.init(iSetup);
 }
 
 void 
@@ -74,6 +79,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
     size_t n = src->size();
     std::vector<float> dphiVtxTimesQ(n), drVtx(n);
     std::vector<float> drStaIn(n, -999), dphiStaIn(n, -999);
+    std::vector<float> drM1(n,    -999),    dphiM1(n, -999), distM1(n, -999);
     std::vector<float> drM2(n,    -999),    dphiM2(n, -999), distM2(n, -999);
     for (size_t i = 0; i < n; ++i) {
         const reco::Candidate & ci = (*src)[i];
@@ -92,12 +98,21 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
             dphiStaIn[i] = deltaPhi(mu1->standAloneMuon()->innerPosition().Phi(), mu2->standAloneMuon()->innerPosition().Phi());
             drStaIn[i]   = hypot(dphiStaIn[i], std::abs(mu1->standAloneMuon()->innerPosition().Eta() - mu2->standAloneMuon()->innerPosition().Eta()));
         }
-        TrajectoryStateOnSurface prop1 = prop_.extrapolate(*mu1);
-        TrajectoryStateOnSurface prop2 = prop_.extrapolate(*mu2);
-        if (prop1.isValid() && prop2.isValid()) {
-            dphiM2[i] = deltaPhi<float>(prop1.globalPosition().phi(), prop2.globalPosition().phi());
-            drM2[i]   = hypot(dphiM2[i], std::abs<float>(prop1.globalPosition().eta() - prop2.globalPosition().eta()));
-            distM2[i] = (prop1.globalPosition()-prop2.globalPosition()).mag();
+        // Propagate to station 1
+        TrajectoryStateOnSurface prop1_M1 = prop1_.extrapolate(*mu1);
+        TrajectoryStateOnSurface prop2_M1 = prop1_.extrapolate(*mu2);
+        if (prop1_M1.isValid() && prop2_M1.isValid()) {
+            dphiM1[i] = deltaPhi<float>(prop1_M1.globalPosition().phi(), prop2_M1.globalPosition().phi());
+            drM1[i]   = hypot(dphiM1[i], std::abs<float>(prop1_M1.globalPosition().eta() - prop2_M1.globalPosition().eta()));
+            distM1[i] = (prop1_M1.globalPosition()-prop2_M1.globalPosition()).mag();
+        }
+        // Propagate to station 2
+        TrajectoryStateOnSurface prop1_M2 = prop2_.extrapolate(*mu1);
+        TrajectoryStateOnSurface prop2_M2 = prop2_.extrapolate(*mu2);
+        if (prop1_M2.isValid() && prop2_M2.isValid()) {
+            dphiM2[i] = deltaPhi<float>(prop1_M2.globalPosition().phi(), prop2_M2.globalPosition().phi());
+            drM2[i]   = hypot(dphiM2[i], std::abs<float>(prop1_M2.globalPosition().eta() - prop2_M2.globalPosition().eta()));
+            distM2[i] = (prop1_M2.globalPosition()-prop2_M2.globalPosition()).mag();
         }
     }
 
@@ -105,6 +120,9 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
     writeValueMap(iEvent, src, drVtx,          "drVtx");
     writeValueMap(iEvent, src, drStaIn,        "drStaIn");
     writeValueMap(iEvent, src, dphiStaIn,      "dphiStaIn");
+    writeValueMap(iEvent, src, drM1,           "drM1");
+    writeValueMap(iEvent, src, dphiM1,         "dphiM1");
+    writeValueMap(iEvent, src, distM1,         "distM1");
     writeValueMap(iEvent, src, drM2,           "drM2");
     writeValueMap(iEvent, src, dphiM2,         "dphiM2");
     writeValueMap(iEvent, src, distM2,         "distM2");
