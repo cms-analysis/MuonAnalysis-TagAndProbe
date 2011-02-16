@@ -30,9 +30,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         pt = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
         abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
         eta    = cms.vstring("Probe |#eta|", "-2.5", "2.5", ""),
+        phi    = cms.vstring("Probe #phi", "-3.1416", "3.1416", ""),
         pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
         tkPixelLay  = cms.vstring("Pixel layers", "0", "5",  ""),
         tkValidHits = cms.vstring("Pixel layers", "0", "50", ""),
+        tkExpHitInNew = cms.vstring("Tk expected hits in", "-1", "50", ""),
+        tkExpHitOutNew = cms.vstring("Tk expected hits in", "-1", "50", ""),
     ),
 
     Categories = cms.PSet(
@@ -51,6 +54,10 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         Cut_gt7Hits  = cms.vstring("TenHits","tkValidHits",  "7.5"),
         Cut_gt10Hits = cms.vstring("TenHits","tkValidHits", "10.5"),
         Cut_gt11Hits = cms.vstring("TenHits","tkValidHits", "11.5"),
+        Cut_0missingIn = cms.vstring("xx", "tkExpHitInNew", "0.5"),
+        Cut_1missingIn = cms.vstring("xx", "tkExpHitInNew", "1.5"),
+        Cut_0missingOut = cms.vstring("xx", "tkExpHitOutNew", "0.5"),
+        Cut_1missingOut = cms.vstring("xx", "tkExpHitOutNew", "1.5"),
     ),
 
     PDFs = cms.PSet(
@@ -81,11 +88,16 @@ ONE_BIN = cms.PSet(CONSTRAINTS,
 ETA_BINS = ONE_BIN.clone(
    eta = cms.vdouble(-2.4, -2.1, -1.8, -1.5, -1.2, -0.9, -0.6, -0.3, 0, 0.3, 0.6, 0.9, 1.2, 1.5, 1.8, 2.1, 2.4)
 )
+PHI_BINS =  cms.PSet(CONSTRAINTS,
+    pt  = cms.vdouble( 3, 20 ),
+    abseta = cms.vdouble(0, 0.8, 1.4, 2.1, 2.4),
+    phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,3)]), 
+)
 
 
-PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2011.01.31/"
+PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.11/"
 process.TnP_TrackQuality = Template.clone(
-    InputFileNames = cms.vstring(PREFIX+'tnpJPsi_Data2010B_Nov4.root'),
+    InputFileNames = cms.vstring(PREFIX+'tnpJPsi_MuOnia_Run2010B_Nov4.root'),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_Paper2010_TrackQuality_%s.root" % scenario),
@@ -93,16 +105,22 @@ process.TnP_TrackQuality = Template.clone(
 )
 
 if scenario == "signal_mc":
-    process.TnP_TrackQuality.InputFileNames = [ PREFIX+"tnpJPsi_JPsiToMuMu_Fall10.root" ]
+    process.TnP_TrackQuality.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt.root" ]
+if scenario == "some_mc":
+    process.TnP_TrackQuality.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt.crop.root" ]
+if scenario == "beauty_mc":
+    process.TnP_TrackQuality.InputFileNames = [ PREFIX+"tnpJPsi_MC_Bp.root" ]
 
-IDS = [ "Track_HP", "Track_QTF", "Track_VBTF", "Cut_OnePixel", "Cut_TwoPixel", "Cut_gt10Hits", "Cut_gt11Hits" ]
-ALLBINS=[("eta",ETA_BINS)]
+IDS = [ "Track_HP", "Track_QTF", "Track_VBTF", "Cut_OnePixel", "Cut_TwoPixel", "Cut_gt10Hits", "Cut_gt11Hits", 
+        "Cut_0missingIn", "Cut_1missingIn", "Cut_0missingOut", "Cut_1missingOut" ]
+ALLBINS=[("eta",ETA_BINS),("phi",PHI_BINS)]
 
 for ID in IDS:
     module = process.TnP_TrackQuality.clone(OutputFileName = cms.string("TnP_Paper2010_TrackQuality_%s_%s.root" % (scenario, ID)))
     for X,B in ALLBINS:
         DEN=B.clone()
         passing = "above" if ID.startswith("Cut_") else "pass";
+        if ID.startswith("Cut_") and ID.find("missing") != -1: passing = "below"
         setattr(module.Efficiencies, ID+"_"+X, cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(ID,passing),
             UnbinnedVariables = cms.vstring("mass"),

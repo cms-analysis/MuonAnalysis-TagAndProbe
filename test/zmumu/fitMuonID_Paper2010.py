@@ -36,7 +36,8 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     Categories = cms.PSet(
         Glb   = cms.vstring("Global", "dummy[pass=1,fail=0]"),
-        VBTF  = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
+        VBTF     = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
+        VBTFold  = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
         TMOST = cms.vstring("TMOneStationTight", "dummy[pass=1,fail=0]"),
         PF    = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
         Mu15  = cms.vstring("MC true", "dummy[true=1,false=0]"),
@@ -64,10 +65,9 @@ PT_ETA_BINS = cms.PSet(
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
 ETA_BINS = cms.PSet(
-    pt     = cms.vdouble(20,100),
-    abseta = cms.vdouble(0, 0.15, 0.4, 0.75, 1.25, 1.75, 2.1, 2.4)
+    pt  = cms.vdouble(20,100),
+    eta = cms.vdouble(-2.4, -2.1, -1.6, -1.1, -0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4),
 )
-ETA_BINS_HLT = ETA_BINS.clone(Mu15 = cms.vstring("pass"))
 VTX_BINS  = cms.PSet(
     pt     = cms.vdouble(  20, 120 ),
     abseta = cms.vdouble(  0.0, 2.4),
@@ -75,9 +75,9 @@ VTX_BINS  = cms.PSet(
 )
 
 
-PREFIX=""
+PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.11/"
 process.TnP_MuonID = Template.clone(
-    InputFileNames = cms.vstring(PREFIX+'tnpZ_Data2010B_Nov4.root'),
+    InputFileNames = cms.vstring(PREFIX+'tnpZ_Mu_Run2010B_Nov4.root'),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_Paper2010_MuonID_%s.root" % scenario),
@@ -85,13 +85,11 @@ process.TnP_MuonID = Template.clone(
 )
 
 if scenario == "signal_mc":
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMMpowhegZ2_Fall10PU.root" ]
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg.crop.root" ]
 
-IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
-ALLBINS=[("pt_abseta",PT_ETA_BINS)]
-if scenario == "data_all": ALLBINS += [ ("vtx",VTX_BINS)]
-
-IDS = [ "VBTF" ]; ALLBINS=[("eta",ETA_BINS),("eta_passinghlt",ETA_BINS_HLT)]; scenario = "Eta_data_all"
+IDS = [ "Glb", "TMOST", "VBTF", "PF", "VBTFold" ]
+ALLBINS=[("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
+ALLBINS += [ ("vtx",VTX_BINS)]
 
 for ID in IDS:
     module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s.root" % (scenario, ID)))

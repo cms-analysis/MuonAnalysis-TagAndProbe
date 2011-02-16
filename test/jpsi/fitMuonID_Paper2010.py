@@ -32,6 +32,8 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tag_pt = cms.vstring("Tag p_{T}",    "0", "1000", "GeV/c"),
         pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
         pair_dphiVtxTimesQ = cms.vstring("q1 * (#phi1-#phi2)", "-6", "6", ""),
+        pair_distM1  = cms.vstring("q1 * (#phi1-#phi2)", "-99999", "999999", ""),
+        tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
     ),
 
     Categories = cms.PSet(
@@ -50,7 +52,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     PDFs = cms.PSet(
         cbPlusPoly = cms.vstring(
-            "CBShape::signal(mass, mean[3.1,3.0,3.2], sigma[0.05,0.02,0.1], alpha[3., 0.5, 5.], n[1, 0., 100.])",
+            "CBShape::signal(mass, mean[3.1,3.0,3.2], sigma[0.05,0.02,0.06], alpha[3., 0.5, 5.], n[1, 0., 100.])",
             "Chebychev::backgroundPass(mass, {cPass[0,-0.5,0.5], cPass2[0,-0.5,0.5]})",
             "Chebychev::backgroundFail(mass, {cFail[0,-0.5,0.5], cFail2[0,-0.5,0.5]})",
             "efficiency[0.9,0,1]",
@@ -65,18 +67,32 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 # pick muons that bend apart from each other
-SEAGULL = cms.PSet(pair_dphiVtxTimesQ = cms.vdouble(-2,0))
+SEAGULL   = cms.PSet(pair_dphiVtxTimesQ = cms.vdouble(-2,0))
+SEPARATED = cms.PSet(pair_distM1 = cms.vdouble(200,1000))
 
 PT_ETA_BINS = cms.PSet(
     pt     = cms.vdouble(  0.5, 1.0, 1.5, 2, 2.5, 3.0, 3.5, 4.0, 5.0, 6.0, 7.0, 9.0, 11.0, 14.0, 17.0, 20.0),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
-PT_ETA_BINS_SEAGULL = cms.PSet(PT_ETA_BINS, SEAGULL)
+PT_ETA_BINS_SEP = cms.PSet(PT_ETA_BINS, SEAGULL, SEPARATED)
+
+VTX_BINS_BARREL = cms.PSet(
+    SEAGULL, SEPARATED,
+    abseta = cms.vdouble(0.0, 1.2),
+    pt     = cms.vdouble(6.0, 20.0),
+    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
+)
+VTX_BINS_ENDCAPS = cms.PSet(
+    SEAGULL, SEPARATED,
+    abseta = cms.vdouble(1.2, 2.4),
+    pt     = cms.vdouble(4.0, 20.0),
+    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
+)
 
 
-PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2011.01.31/"
+PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.11/"
 process.TnP_MuonID = Template.clone(
-    InputFileNames = cms.vstring(PREFIX+'tnpJPsi_Data2010B_Nov4.root'),
+    InputFileNames = cms.vstring(PREFIX+'tnpJPsi_MuOnia_Run2010B_Nov4.root'),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_Paper2010_MuonID_%s.root" % scenario),
@@ -84,19 +100,22 @@ process.TnP_MuonID = Template.clone(
 )
 
 if scenario == "signal_mc":
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_JPsiToMuMu_Fall10.root" ]
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt.root" ]
+if scenario == "some_mc":
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt.crop.root" ]
+if scenario == "beauty_mc":
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Bp.root" ]
 
 IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
 TRIGS = [ (0,'Mu5_Track0'), (3,'Mu3_Track3'), (5,'Mu3_Track5') ]
-#TRIGS = [ (3,'Mu3_Track3') ]
-ALLBINS=[("pt_abseta",PT_ETA_BINS),("pt_abseta_sg",PT_ETA_BINS_SEAGULL)]
-#if scenario == "data_all": ALLBINS += [ ("vtx",VTX_BINS)]
+ALLBINS=[("pt_abseta",PT_ETA_BINS_SEP), ("vtx_barrel",VTX_BINS_BARREL), ("vtx_endcaps",VTX_BINS_ENDCAPS)]
 
 for ID in IDS:
     module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s.root" % (scenario, ID)))
     for PTMIN, TRIG in TRIGS: 
         for X,B in ALLBINS:
             DEN=B.clone(pt = cms.vdouble(*[i for i in B.pt if i >= PTMIN]))
+            if len(DEN.pt) == 1: DEN.pt = cms.vdouble(PTMIN, DEN.pt[0])
             setattr(DEN, "tag_%s_Jpsi_MU" % TRIG, cms.vstring("pass"))
             setattr(DEN,     "%s_Jpsi_TK" % TRIG, cms.vstring("pass"))
             setattr(module.Efficiencies, ID+"_"+X+"_"+TRIG, cms.PSet(
