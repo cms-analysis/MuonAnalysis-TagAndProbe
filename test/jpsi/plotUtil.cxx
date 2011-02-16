@@ -11,7 +11,7 @@ TObject *getFromPrefix(TDirectory *dir, TString prefixName, bool prefixOnly=true
         TPRegexp pat(prefixName);
         while ((key = (TKey *) next())) {
             if (key->GetName() == 0) continue;
-            if (TString(key->GetName())->Contains(pat)) {
+            if (TString(key->GetName()).Contains(pat)) {
                 return dir->Get(key->GetName());
             }
         }
@@ -62,9 +62,9 @@ void cmsprelim() {
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TString lab2) {
     double legend_y_offset = (preliminary != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .12 : .18);
-    if (g1->GetY()[g1->GetN()-1] < 0.4) {
-        legend_y_offset = 0.75 - legend_y_size;
-    }
+    //if (g1->GetY()[g1->GetN()-1] < 0.4) {
+    //    legend_y_offset = 0.75 - legend_y_size;
+    //}
     TLegend *leg = new TLegend(doSquare ? .62 : .68,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
     if (extraSpam != "") {
         leg->SetHeader(extraSpam);
@@ -453,6 +453,22 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 }
 
 
+TGraphAsymmErrors *getFit(TDirectory *fit, TString fitname) {
+    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    if (pfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        return;
+    }
+    if (retitle != "") reTitleY(pfit, retitle);
+
+    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    if (hfit == 0) {
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << "/hxy_fit_eff in " << fit->GetName() << std::endl;
+        pfit->ls();
+        return;
+    }
+    return hfit;
+}
 /** Plot just one set */
 TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
     TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
@@ -580,7 +596,8 @@ void doCanvas(TDirectory *dir, int binsx, int binsy, const char * easyname, cons
     }
 }
 
-TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3=0, TGraphAsymmErrors *g4=0, double yMin = 0.001) {
+enum GraphMergeAlgo { Combine, LowestUnc, Last };
+TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3=0, TGraphAsymmErrors *g4=0, GraphMergeAlgo algo=LowestUnc, double yMin = 0.001) {
     TGraphAsymmErrors *graphs[4];
     graphs[0] = g1;
     graphs[1] = g2;
@@ -606,16 +623,36 @@ TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGr
             if (k == -1) continue;
             double x = graphs[j]->GetX()[k];
             double y = graphs[j]->GetY()[k];
-            if (ytry/ntry > yMin && y < yMin) continue;
+            if (algo == Combine && ytry/ntry > yMin && y < yMin) continue;
             double ylo = graphs[j]->GetErrorYlow(k);
             double yhi = graphs[j]->GetErrorYhigh(k);
             double w2 = 1.0/TMath::Max(ylo,yhi); w2 *= w2;
             //std::cout << "For graph " << j << " use point  " << k << ", x = " << x << ", y = " << y << "  -" << ylo << "/+" << yhi  << std::endl;
-            sw2  += w2;
-            syw2 += w2*y;
-            sxw2 += w2*x;
-            shi  += yhi*yhi*w2*w2;
-            slo  += ylo*ylo*w2*w2;
+            switch (algo) {
+                case Combine:
+                    sw2  += w2;
+                    syw2 += w2*y;
+                    sxw2 += w2*x;
+                    shi  += yhi*yhi*w2*w2;
+                    slo  += ylo*ylo*w2*w2;
+                    break;
+                case LowestUnc:
+                    if (w2 > sw2) {
+                        sw2  = w2;
+                        syw2 = w2*y;
+                        sxw2 = w2*x;
+                        shi  = yhi*yhi*w2*w2;
+                        slo  = ylo*ylo*w2*w2;
+                    }
+                    break;
+                case Last:
+                    sw2  = w2;
+                    syw2 = w2*y;
+                    sxw2 = w2*x;
+                    shi  = yhi*yhi*w2*w2;
+                    slo  = ylo*ylo*w2*w2;
+                    break;
+            }
         }
         ret->SetPoint(i, sxw2/sw2, syw2/sw2);
         ret->SetPointError(i, sxw2/sw2 - xmin, xmax - sxw2/sw2, sqrt(shi)/sw2, sqrt(slo)/sw2);

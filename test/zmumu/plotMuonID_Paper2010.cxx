@@ -24,7 +24,7 @@ void plotMuonID_Paper2010(TString scenario="data") {
     doRatioPlot = false;
     doDiffPlot = false;
     doPdf = false;
-    doSquare = true; yMin = 0; yMax = 1.1;
+    doSquare = true; yMin = 0.7; yMax = 1.048;
     datalbl = "Data, 2010B";
     reflbl  = "Simulation";
     preliminary = ""; //CMS Preliminary,   #sqrt{s} = 7 TeV";
@@ -34,9 +34,9 @@ void plotMuonID_Paper2010(TString scenario="data") {
 void plotMuonIDData() {
     retitle = "Efficiency";
 
-    const int nids  = 4;
-    char *ids[nids]    = { "Glb",    "TMOST",   "VBTF",  "PF" };
-    char *titles[nids] = { "Global",  "Soft",   "Tight", "PF" };
+    const int nids  = 5;
+    char *ids[nids]    = { "Glb",    "TMOST",   "VBTF",  "VBTFold",    "PF" };
+    char *titles[nids] = { "Global",  "Soft",   "Tight", "Old Tight",  "PF" };
 
    
     for (size_t i = 0; i < nids; ++i) {
@@ -68,6 +68,49 @@ void plotMuonIDData() {
             doCanvas(fit_pt_eta, 1, 27, idname+"_barrel_pt_%d",   "abseta_bin0__pt_bin%d_");
             doCanvas(fit_pt_eta, 1, 27, idname+"_endcaps_pt_%d",  "abseta_bin1__pt_bin%d_");
         }
+
+        TDirectory *fit_eta = gFile->GetDirectory(basedir+"/"+idname+"_eta/");
+        if (ref != 0) {
+            TDirectory *ref_eta = ref->GetDirectory(basedir+"/"+idname+"_eta/");
+            refstack(fit_eta, ref_eta, idname+"_eta",  "eta_PLOT_");
+            TDirectory *mc_eta  = ref->GetDirectory(basedir+"/"+idname+"_eta_mcTrue/");
+            if (0 && mc_eta) {
+                refstack3(fit_eta, ref_eta, mc_eta, idname+"_eta_3",  "eta_PLOT_");
+            }
+        } else {
+            TDirectory *mc_eta  = gFile->GetDirectory(basedir+"/"+idname+"_eta_mcTrue/");
+            if (mc_eta) {
+                datalbl = "T&P fit"; reflbl = "Sim. truth";
+                mcstack(fit_eta, mc_eta, idname+"_eta",  "eta_PLOT_");
+            } else {
+                single(fit_eta, idname+"_eta",  "eta_PLOT_");
+            }
+        }
+        if (ref == 0) {
+            doCanvas(fit_eta, 1, 27, idname+"_eta_%d",   "eta_bin%d_");
+        }
+
+        TDirectory *fit_vtx = gFile->GetDirectory(basedir+"/"+idname+"_vtx/");
+        if (ref != 0) {
+            TDirectory *ref_vtx = ref->GetDirectory(basedir+"/"+idname+"_vtx/");
+            refstack(fit_vtx, ref_vtx, idname+"_vtx",  "tag_nVertices_PLOT_");
+            TDirectory *mc_vtx  = ref->GetDirectory(basedir+"/"+idname+"_vtx_mcTrue/");
+            if (0 && mc_vtx) {
+                refstack3(fit_vtx, ref_vtx, mc_vtx, idname+"_vtx_3",  "tag_nVertices_PLOT_");
+            }
+        } else {
+            TDirectory *mc_vtx  = gFile->GetDirectory(basedir+"/"+idname+"_vtx_mcTrue/");
+            if (mc_vtx) {
+                datalbl = "T&P fit"; reflbl = "Sim. truth";
+                mcstack(fit_vtx, mc_vtx, idname+"_vtx",  "tag_nVertices_PLOT_");
+            } else {
+                single(fit_vtx, idname+"_vtx",  "tag_nVertices_PLOT_");
+            }
+        }
+        if (ref == 0) {
+            doCanvas(fit_vtx, 1, 27, idname+"_vtx_%d",   "tag_nVertices_bin%d_");
+        }
+
     }
 }
 
