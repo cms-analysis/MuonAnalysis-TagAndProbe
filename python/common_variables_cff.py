@@ -6,6 +6,7 @@ KinematicVariables = cms.PSet(
     eta = cms.string("eta"),
     phi = cms.string("phi"),
     abseta = cms.string("abs(eta)"),
+    charge = cms.string("charge")
 )
 IsolationVariables = cms.PSet(
     tkIso  = cms.string("isolationR03.sumPt"),
@@ -28,7 +29,7 @@ TrackQualityVariables = cms.PSet(
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
-    l1q  = cms.string("userFloat('muonL1Info:quality')"),
+    l1q  = cms.string("userInt('muonL1Info:quality')"),
     l1dr = cms.string("userFloat('muonL1Info:deltaR')"),
 )
 L2Variables = cms.PSet(
@@ -71,10 +72,10 @@ MuonIDFlags = cms.PSet(
     BMuQual = cms.string("((isGlobalMuon && globalTrack.chi2 / globalTrack.ndof < 20. && " + 
                         " globalTrack.hitPattern.numberOfValidMuonHits > 0 && isTrackerMuon && muonID('TrackerMuonArbitrated') )"+
                         "|| (isTrackerMuon && muonID('TrackerMuonArbitrated') ) ) && " +
-                        "(track.numberOfValidHits > 11 && track.chi2 / track.ndof < 1.8 && muonID('TMOneStationTight') && "+
+                        "(track.numberOfValidHits > 10 && track.chi2 / track.ndof < 1.8 && muonID('TMOneStationTight') && "+
                         " track.hitPattern.pixelLayersWithMeasurement > 1 && abs(dB) < 3.0 && abs(track.dz) < 15.0)"),
     BBbarCSWithIP = cms.string("isGlobalMuon && isTrackerMuon "
-                               +"&& track.numberOfValidHits > 11"
+                               +"&& track.numberOfValidHits > 10"
                                +"&& track.hitPattern.numberOfValidPixelHits > 1 "
                                +"&& track.normalizedChi2 < 2 && globalTrack.normalizedChi2 < 10 "
                                +"&& globalTrack.hitPattern.numberOfValidMuonHits > 0 && numberOfMatches > 1"
