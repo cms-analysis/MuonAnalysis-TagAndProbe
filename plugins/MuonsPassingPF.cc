@@ -1,8 +1,8 @@
 /** \class MuonsPassingPF
  *  Selector of muons identified by PF
  *
- *  $Date: 2010/10/12 16:46:13 $
- *  $Revision: 1.2 $
+ *  $Date: 2011/01/30 12:09:24 $
+ *  $Revision: 1.1 $
  *  \author G. Petrucciani (UCSD)
  */
 
@@ -20,6 +20,8 @@
 #include "DataFormats/MuonReco/interface/Muon.h"
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
+#include "CommonTools/Utils/interface/StringCutObjectSelector.h"
+
 class MuonsPassingPF : public edm::EDProducer {
 
     public:
@@ -35,6 +37,8 @@ class MuonsPassingPF : public edm::EDProducer {
         /// Input collection of muons and of partice flow
         edm::InputTag muons_, pf_;
 
+        StringCutObjectSelector<reco::PFCandidate> pfCut_;
+
         /// Perform matching by reference (works only if muons_ = "muons")
         bool matchByReference_;
 
@@ -44,6 +48,7 @@ class MuonsPassingPF : public edm::EDProducer {
 MuonsPassingPF::MuonsPassingPF(const edm::ParameterSet &iConfig) :
     muons_(iConfig.getParameter<edm::InputTag>("muons")),
     pf_(iConfig.getParameter<edm::InputTag>("pf")),
+    pfCut_(iConfig.getParameter<std::string>("pfCut")),
     matchByReference_(iConfig.getParameter<bool>("matchByReference"))
 {
     produces<edm::RefToBaseVector<reco::Muon> >();    
@@ -79,6 +84,7 @@ MuonsPassingPF::produce(edm::Event &iEvent, const edm::EventSetup &iSetup)
             // Get muon ref, skip those that don't have one
             reco::MuonRef pfRef = pfit->muonRef(); 
             if (pfRef.isNull()) continue;
+            if (!pfCut_(*pfit)) continue;
 
             // Perform the matching
             if (matchByReference_) {
