@@ -54,7 +54,7 @@ process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 changeTriggerProcessName(process, "*") # auto-guess
-process.patMuonsWithoutTrigger.userData.userInts.src = cms.VInputTag(
+process.patMuonsWithoutTrigger.userData.userInts.src += cms.VInputTag(
     cms.InputTag('expectedHitsMu','in'),
     cms.InputTag('expectedHitsMu','out')
 )

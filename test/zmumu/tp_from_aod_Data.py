@@ -93,7 +93,7 @@ process.muonMatchHLTL2.maxDeltaR = 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-process.patMuonsWithoutTrigger.userData.userInts.src = cms.VInputTag(
+process.patMuonsWithoutTrigger.userData.userInts.src += cms.VInputTag(
     cms.InputTag('expectedHitsMu','in'),
     cms.InputTag('expectedHitsMu','out')
 )
@@ -250,4 +250,4 @@ process.tagAndProbeSta = cms.Path(
     process.tnpSimpleSequenceSta
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.root"))
