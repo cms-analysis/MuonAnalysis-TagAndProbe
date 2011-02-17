@@ -43,7 +43,8 @@ process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Jet*' )
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = True
-process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
+process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "REDIGI38XPU" )
+#process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
 process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0' ])
 process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0', 'HLT_Mu3_Track*_Jpsi*', 'HLT_Mu5_Track*_Jpsi*' ])
 
@@ -74,7 +75,7 @@ from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 #useL1MatchingWindowForSinglets(process) ## No longer used
 changeTriggerProcessName(process, "*")
-process.patMuonsWithoutTrigger.userData.userInts.src = cms.VInputTag(
+process.patMuonsWithoutTrigger.userData.userInts.src += cms.VInputTag(
     cms.InputTag('expectedHitsMu','in'),
     cms.InputTag('expectedHitsMu','out')
 )
@@ -152,6 +153,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dphiM2        = cms.InputTag("tagProbeSeparation", "dphiM2"),
         distM2        = cms.InputTag("tagProbeSeparation", "distM2"),
         drVtx         = cms.InputTag("tagProbeSeparation", "drVtx"),
+        dz            = cms.vstring("daughter(0).vz - daughter(1).vz") 
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
