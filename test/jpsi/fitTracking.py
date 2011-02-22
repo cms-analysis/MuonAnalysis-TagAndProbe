@@ -114,21 +114,19 @@ process.TnP_Tracking = Template.clone(
     Efficiencies = cms.PSet()
 )
 
-PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2011.01.31/"
-PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/CMSSW_3_9_7/src/MuonAnalysis/TagAndProbe/test/jpsi/"
-PREFIX="root://castorpublic.cern.ch//castor/cern.ch/user/g/gpetrucc/TnP/JPsiMuMu/"
-PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2011.01.31/"
+PREFIX="root://lxcms06//data2/b/botta/TnP_Paper2010_Tree/"
+PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.17/"
 if scenario == "data_all":
     process.TnP_Tracking.InputFileNames = cms.vstring(
-        PREFIX+'tnpJPsi_Data2010B_Nov4.root',
+        PREFIX+'tnpJPsi_Data_Nov4B.root',
     )
 elif scenario == "signal_mc":
     process.TnP_Tracking.InputFileNames = [
-        PREFIX+"tnpJPsi_JPsiToMuMu_Fall10.root",
+        PREFIX+"tnpJPsi_MC_Prompt.crop.root",
     ]
-elif scenario == "relval_mc":
+elif scenario == "beauty_mc":
     process.TnP_Tracking.InputFileNames = [
-        PREFIX+"tnpJPsi_MC_RelVal.root",
+        PREFIX+"tnpJPsi_MC_Bp.root",
     ]
 
 
@@ -156,7 +154,7 @@ for (dr,de) in matches:
             #setattr(module.Efficiencies, "eff_etaphi_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
         if False and scenario == "data_all":
             setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS))
-        if doVtx and scenario == "data_all":
+        if doVtx:
             setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
         setattr(process,"TnP_Tracking_"+label, module)
         setattr(process,"p_TnP_Tracking_"+label, cms.Path(module))

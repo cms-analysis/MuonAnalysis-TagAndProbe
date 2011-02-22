@@ -23,11 +23,11 @@ void plotMuonID_Paper2010(TString scenario="data") {
 
     doRatioPlot = false;
     doDiffPlot = false;
-    doPdf = false;
+    doPdf = true;
     doSquare = true; yMin = 0.7; yMax = 1.048;
-    datalbl = "Data, 2010B";
+    datalbl = "Data, 2010";
     reflbl  = "Simulation";
-    preliminary = ""; //CMS Preliminary,   #sqrt{s} = 7 TeV";
+    preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
     plotMuonIDData();
 }
 
@@ -71,6 +71,7 @@ void plotMuonIDData() {
 
         TDirectory *fit_eta = gFile->GetDirectory(basedir+"/"+idname+"_eta/");
         if (ref != 0) {
+            extraSpam = "    p_{T} > 20 GeV"; retitleX = "muon #eta";
             TDirectory *ref_eta = ref->GetDirectory(basedir+"/"+idname+"_eta/");
             refstack(fit_eta, ref_eta, idname+"_eta",  "eta_PLOT_");
             TDirectory *mc_eta  = ref->GetDirectory(basedir+"/"+idname+"_eta_mcTrue/");

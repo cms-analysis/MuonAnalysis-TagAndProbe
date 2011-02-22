@@ -31,7 +31,7 @@ void plotUtil() { }
 /* Other useful plotting macros */
 
 TString preliminary = ""; //"CMS Preliminary"
-TString retitle = "";
+TString retitle = "", retitleX = "";
 TString datalbl = "Data, xx nb^{-1}", reflbl = "Simulation";
 bool autoScale = false;
 bool doDiffPlot = false;
@@ -100,6 +100,28 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g
     if (preliminary != "") cmsprelim();
     leg->Draw();
 }
+void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3, TGraphAsymmErrors *g4, TString lab1, TString lab2, TString lab3, TString lab4) {
+    double legend_y_offset = (preliminary != "" ? 0.07 : 0);
+    double legend_y_size   = (extraSpam == "" ? .22 : .28);
+    if (g1->GetY()[g1->GetN()-1] < 0.4) {
+        legend_y_offset = 0.75 - legend_y_size;
+    }
+    TLegend *leg = new TLegend(doSquare ? .52 : .58,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
+    if (extraSpam != "") {
+        leg->SetHeader(extraSpam);
+        //leg->AddEntry("", extraSpam, "");
+    }
+    leg->AddEntry(g1, lab1, "LP");
+    leg->AddEntry(g2, lab2, "LP");
+    leg->AddEntry(g3, lab3, "LP");
+    leg->AddEntry(g4, lab4, "LP");
+    leg->SetTextSize(doSquare ? 0.04 : 0.05);
+    leg->SetTextFont(42);
+    leg->SetShadowColor(0);
+    leg->SetFillColor(0);
+    if (preliminary != "") cmsprelim();
+    leg->Draw();
+}
 
 
 void squareCanvas(TCanvas *c) {
@@ -129,6 +151,12 @@ void reTitleY(TCanvas *pl, TString ytitle) {
     TH1 *last = (TH1*) pl->GetListOfPrimitives()->At(pl->GetListOfPrimitives()->GetSize()-1);
     if (first) reTitleTAxis(first->GetYaxis(), ytitle);
     if (last)  reTitleTAxis(last->GetYaxis(), ytitle);
+}  
+void reTitleX(TCanvas *pl, TString xtitle) {
+    TH1 *first = (TH1*) pl->GetListOfPrimitives()->At(0);
+    TH1 *last = (TH1*) pl->GetListOfPrimitives()->At(pl->GetListOfPrimitives()->GetSize()-1);
+    if (first) reTitleTAxis(first->GetXaxis(), xtitle, 0.9);
+    if (last)  reTitleTAxis(last->GetXaxis(), xtitle, 0.9);
 }  
 void setRangeY(TCanvas *c, double min=0, double max=1.1) {
     for (size_t i = 0, n = c->GetListOfPrimitives()->GetSize(); i < n; ++i) {
@@ -265,8 +293,11 @@ void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) {
+    if (fit == 0) {
+        std::cerr << "ERROR: refstack called with missing dirs: alias = " << alias << std::endl;
+    }
     if (ref == 0) {
-        std::cerr << "REFERENCE DIR FOUND: " << fit->GetName() << std::endl;
+        std::cerr << "REFERENCE NOT DIR FOUND FOR: " << fit->GetName() << std::endl;
         return;
     }
 
@@ -304,7 +335,8 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     hfit->SetMarkerSize(1.6);
 
     setRangeY(pref, yMin, yMax);
-    if (retitle != "") reTitleY(pref, retitle);
+    if (retitle  != "") reTitleY(pref, retitle);
+    if (retitleX != "") reTitleX(pref, retitleX);
 
     pref->Draw( "" );
     if (doFillMC) href->Draw("E2 SAME");
