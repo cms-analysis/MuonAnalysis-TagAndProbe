@@ -26,11 +26,11 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     SaveWorkspace = cms.bool(False),
 
     Variables = cms.PSet(
-        mass = cms.vstring("Tag-Probe Mass", "70", "130", "GeV/c^{2}"),
-        pt = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
-        eta    = cms.vstring("Probe #eta", "-2.5", "2.5", ""),
-        abseta = cms.vstring("Probe |#eta|", "0", "2.5", ""),
-        tag_pt = cms.vstring("Tag p_{T}",    "0", "1000", "GeV/c"),
+        mass = cms.vstring("Tag-muon Mass", "70", "130", "GeV/c^{2}"),
+        pt = cms.vstring("muon p_{T}", "0", "1000", "GeV/c"),
+        eta    = cms.vstring("muon #eta", "-2.5", "2.5", ""),
+        abseta = cms.vstring("muon |#eta|", "0", "2.5", ""),
+        charge = cms.vstring("muon charge", "-2.5", "2.5", ""),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
     ),
 
@@ -113,20 +113,20 @@ if scenario.find("signal_mc") != -1:
 if scenario.find("some_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg_1.root" ]
 
-IDS = [ "Glb", "TMOST", "VBTF", "PF", "VBTFold" ]
+IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
 ALLBINS=[("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
 ALLBINS += [ ("vtx",VTX_BINS)]
 #if scenario.find("set2"):
 ALLBINS+=[("eta_fine",ETA_BINS_FINE), ("overall",OVERALL), ("charge",CHARGE)]
 #if scenario.find("set3"):
-ALLBINS+=[("overall_vv",OVERALL)]
 
 for ID in IDS:
     if len(args) > 1 and ID != args[1]: continue
-    module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s.root" % (scenario, ID)))
     for X,B in ALLBINS:
-        shape = "voigtPlusExpo"
-        if X.find("_vv"): shape = "vpvPlusExpo"
+        module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
+        shape = "vpvPlusExpo"
+        if X.find("eta") != -1: shape = "voigtPlusExpo"
+        if X.find("overall") != -1: module.binsForFit = 120
         setattr(module.Efficiencies, ID+"_"+X, cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
@@ -139,6 +139,6 @@ for ID in IDS:
                 UnbinnedVariables = cms.vstring("mass"),
                 BinnedVariables = B.clone(mcTrue = cms.vstring("true"))
             ))
-    setattr(process, "TnP_MuonID_"+ID, module)        
-    setattr(process, "run_"+ID, cms.Path(module))
+        setattr(process, "TnP_MuonID_"+ID+"_"+X, module)        
+        setattr(process, "run_"+ID+"_"+X, cms.Path(module))
 

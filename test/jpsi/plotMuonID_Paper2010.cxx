@@ -10,6 +10,7 @@ TCanvas *c1 = 0;
 void plotMuonID_Paper2010(TString scenario="data") {
 
     prefix = prefix+scenario+"/";
+
     gSystem->mkdir(prefix,true);
 
     gROOT->ProcessLine(".x /afs/cern.ch/user/g/gpetrucc/cpp/tdrstyle.cc");
@@ -21,12 +22,20 @@ void plotMuonID_Paper2010(TString scenario="data") {
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
 
+    fOut = TFile::Open(prefix+"plots.root", "RECREATE");
+    ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
+
+    doFillMC = true;
     doRatioPlot = false;
     doDiffPlot = false;
     doPdf = true;
     doSquare = true; yMin = 0; yMax = 1.1;
     datalbl = "Data, 2010";
     reflbl  = "Simulation";
+    if (scenario.Contains("tk_vs_calo")) {
+        datalbl = "All tracks";
+        reflbl  = "MIP tracks";
+    }
     preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
     //doLogX = true;
 
@@ -63,10 +72,12 @@ void plotMuonIDData() {
 
     const int ntrig = 4;
     char *trig[ntrig] = { "Mu3_Track0", "Mu5_Track0", "Mu3_Track3", "Mu3_Track5" };
-    TGraphAsymmErrors *fits[nids][ntrig][2];
-    TGraphAsymmErrors *refs[nids][ntrig][2];
-    for (size_t i = 0; i < nids; ++i) { for (size_t j = 0; j < ntrig; ++j) { fits[i][j][0] = 0; fits[i][j][1] = 0; } }
-    for (size_t i = 0; i < nids; ++i) { for (size_t j = 0; j < ntrig; ++j) { refs[i][j][0] = 0; refs[i][j][1] = 0; } }
+
+    const int neta = 2;
+    TGraphAsymmErrors *fits[nids][ntrig][neta];
+    TGraphAsymmErrors *refs[nids][ntrig][neta];
+    for (size_t i = 0; i < nids; ++i) { for (size_t j = 0; j < ntrig; ++j) { for (size_t k = 0; k < neta; ++k) { fits[i][j][k] = 0; } } }
+    for (size_t i = 0; i < nids; ++i) { for (size_t j = 0; j < ntrig; ++j) { for (size_t k = 0; k < neta; ++k) { refs[i][j][k] = 0; } } }
     
     for (size_t i = 0; i < nids; ++i) {
         for (size_t j = 0; j < ntrig; ++j) {
@@ -75,40 +86,49 @@ void plotMuonIDData() {
             TString tname(trig[j]);
             retitle = TString(titles[i])+" muon efficiency";
             TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_"+tname+"/");
+            TDirectory *fit_p_eta  = gFile->GetDirectory(basedir+"/"+idname+"_p_abseta_"+tname+"/");
             if (fit_pt_eta == 0) { if (i == 0) { gFile->GetDirectory(basedir)->ls(); } ; continue; }
             TDirectory *ref_pt_eta = ref ? ref->GetDirectory(basedir+"/"+idname+"_pt_abseta_"+tname+"/") : 0;
+            TDirectory *ref_p_eta = ref ? ref->GetDirectory(basedir+"/"+idname+"_p_abseta_"+tname+"/") : 0;
             if (ref_pt_eta) {
                 fits[i][j][0] = getFit(fit_pt_eta, "pt_PLOT_abseta_bin0_");
                 fits[i][j][1] = getFit(fit_pt_eta, "pt_PLOT_abseta_bin1_");
                 refs[i][j][0] = getFit(ref_pt_eta, "pt_PLOT_abseta_bin0_");
                 refs[i][j][1] = getFit(ref_pt_eta, "pt_PLOT_abseta_bin1_");
-                extraSpam = "        |#eta| < 0.9"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
-                extraSpam = "  0.9 < |#eta| < 2.4"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
+                if (neta >= 3) fits[i][j][2] = getFit(fit_p_eta, "p_PLOT_abseta_bin0_");
+                if (neta >= 3) refs[i][j][2] = getFit(ref_p_eta, "p_PLOT_abseta_bin0_");
+                extraSpam = "        |#eta| < 1.2"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
+                //extraSpam = "  0.9 < |#eta| < 1.2"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_overlap_"+tname, "pt_PLOT_abseta_bin1_");
+                extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
+                if (neta >= 3) extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_p_eta, ref_p_eta, idname+"_p_endcaps_"+tname, "p_PLOT_abseta_bin0_");
                 TDirectory *mc_pt_eta  = ref->GetDirectory(basedir+"/"+idname+"_pt_abseta_"+tname+"_mcTrue/");
                 if (0 && mc_pt_eta) {
-                    extraSpam = "             |#eta| < 0.9"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_barrel_3_"+tname,  "pt_PLOT_abseta_bin0_");
-                    extraSpam = "       0.9 < |#eta| < 2.4"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_endcaps_3_"+tname, "pt_PLOT_abseta_bin1_");
+                    extraSpam = "             |#eta| < 1.2"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_barrel_3_"+tname,  "pt_PLOT_abseta_bin0_");
+                    //extraSpam = "       0.9 < |#eta| < 1.2"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_overlap_3_"+tname, "pt_PLOT_abseta_bin1_");
+                    extraSpam = "       1.2 < |#eta| < 2.4"; refstack3(fit_pt_eta, ref_pt_eta, mc_pt_eta, idname+"_pt_endcaps_3_"+tname, "pt_PLOT_abseta_bin1_");
                 }
             } else {
                 TDirectory *mc_pt_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta_"+tname+"_mcTrue/");
                 if (mc_pt_eta) {
                     datalbl = "T&P fit"; reflbl = "Sim. truth";
-                    extraSpam = "        |#eta| < 0.9"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
-                    extraSpam = "  0.9 < |#eta| < 2.4"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
+                    extraSpam = "        |#eta| < 1.2"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
+                    extraSpam = "  1.2 < |#eta| < 2.4"; mcstack(fit_pt_eta, mc_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
                 } else {
-                    extraSpam = "        |#eta| < 0.9"; fits[i][j][0] = single(fit_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
-                    extraSpam = "  0.9 < |#eta| < 2.4"; fits[i][j][1] = single(fit_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
+                    extraSpam = "        |#eta| < 1.2"; fits[i][j][0] = single(fit_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
+                    extraSpam = "  1.2 < |#eta| < 2.4"; fits[i][j][1] = single(fit_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
+                    if (neta >= 3) extraSpam = "  1.2 < |#eta| < 2.4"; fits[i][j][2] = single(fit_p_eta,  idname+"_p_endcaps_"+tname,  "p_PLOT_abseta_bin1_");
                 }
             }
             if (tname == "Mu3_Track3") {
-                yMin = 0.59; yMax = 1.049;
+                //yMin = 0.59; yMax = 1.049;
+                yMin = 0.0; yMax = 1.1;
                 TDirectory *fit_vtx_barrel  = gFile->GetDirectory(basedir+"/"+idname+"_vtx_barrel_" +tname+"/");
                 TDirectory *fit_vtx_endcaps = gFile->GetDirectory(basedir+"/"+idname+"_vtx_endcaps_"+tname+"/");
                 if (ref) {
                     TDirectory *ref_vtx_barrel  = ref->GetDirectory(basedir+"/"+idname+"_vtx_barrel_" +tname+"/");
                     TDirectory *ref_vtx_endcaps = ref->GetDirectory(basedir+"/"+idname+"_vtx_endcaps_"+tname+"/");
                     extraSpam = "        |#eta| < 0.9"; refstack(fit_vtx_barrel,  ref_vtx_barrel,  idname+"_vtx_barrel_"+tname,  "tag_nVertices_PLOT_");
-                    extraSpam = "  0.9 < |#eta| < 2.4"; refstack(fit_vtx_endcaps, ref_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
+                    extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_vtx_endcaps, ref_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
                 } else {
                     single(fit_vtx_barrel,  idname+"_vtx_barrel_"+tname,  "tag_nVertices_PLOT_");
                     single(fit_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
@@ -116,22 +136,31 @@ void plotMuonIDData() {
                     doCanvas(fit_vtx_endcaps, 1, 10, idname+"_vtx_endcaps_"+tname+"_vtx_%d",  ".*tag_nVertices_bin%d_");
                 }
             }
-            if (ref == 0) {
-                doCanvas(fit_pt_eta, 1, 37, idname+"_barrel_"+tname+"_pt_%d",   "abseta_bin0__.*pt_bin%d_");
-                doCanvas(fit_pt_eta, 1, 37, idname+"_endcaps_"+tname+"_pt_%d",  "abseta_bin1__.*pt_bin%d_");
+
+            yMin = 0.0; yMax = 1.1;
+            TDirectory *fit_pt5_eta  = gFile->GetDirectory(basedir+"/"+idname+"_pt5_eta_" +tname+"/");
+            if (fit_pt5_eta) {
+                if (ref) {
+                    TDirectory *ref_pt5_eta  = ref->GetDirectory(basedir+"/"+idname+"_pt5_eta_" +tname+"/");
+                    extraSpam = "  p_{T} > 5 GeV/c"; refstack(fit_pt5_eta,  ref_pt5_eta,  idname+"_pt5_eta_"+tname,  "eta_PLOT_");
+                } else {
+                    single(fit_pt5_eta,  idname+"_pt5_eta_"+tname,  "eta_PLOT_");
+                    doCanvas(fit_pt5_eta,  1, 20, idname+"_pt5_eta_" +tname+"_eta_%d",  ".*eta_bin%d_");
+                }
             }
         }
     }
 
     c1->cd(); c1->Clear(); 
     if (doSquare) squareCanvas(c1);
-    double xmax = 0; TH1F *frame = 0;
+    double xmax = 0, pmax = 0; TH1F *frame = 0, *pframe = 0;
     for (size_t i = 0; i < nids; ++i) {
         int nfound = 0, jfound = -1;
         for (size_t j = 0; j < ntrig; ++j) {
-            if (fits[i][j][0] && fits[i][j][1]) {
+            if (fits[i][j][0] && fits[i][j][1] && fits[i][j][0]->GetN() && fits[i][j][1]->GetN()) {
                 xmax = TMath::Max(xmax, xmaxGraph(fits[i][j][0])); 
                 xmax = TMath::Max(xmax, xmaxGraph(fits[i][j][1])); 
+                if (neta >= 3) pmax = TMath::Max(pmax, xmaxGraph(fits[i][j][2])); 
                 jfound = j;
             }
         }
@@ -142,14 +171,20 @@ void plotMuonIDData() {
             frame->GetYaxis()->SetTitle(fits[i][jfound][0]->GetYaxis()->GetTitle());
             frame->GetXaxis()->SetTitle(fits[i][jfound][0]->GetXaxis()->GetTitle());
         }
+        if (neta >= 3 && pframe == 0) {
+            pframe = new TH1F("pframe","pframe",1,0.,pmax); 
+            pframe->GetYaxis()->SetRangeUser(yMin,yMax);
+            pframe->GetYaxis()->SetTitle(fits[i][jfound][2]->GetYaxis()->GetTitle());
+            pframe->GetXaxis()->SetTitle(fits[i][jfound][2]->GetXaxis()->GetTitle());
+        }
         int founds[ntrig];
         int colors[6] = { 1, 2, 4, 209, 6, 9 };
-        for (int be = 0; be <= 1; ++be) {
+        for (int be = 0; be < neta; ++be) {
             frame->Draw();
-            extraSpam = (be == 0 ? "        |#eta| < 0.9" : "  0.9 < |#eta| < 2.4");
+            extraSpam = (be == 0 ? "        |#eta| < 1.2" : "  1.2 < |#eta| < 2.4");
             nfound = 0;
             for (size_t j = 0; j < ntrig; ++j) {
-                if (fits[i][j][be]) { 
+                if (fits[i][j][be]  && fits[i][j][be]->GetN()) { 
                     fits[i][j][be]->SetLineColor(colors[nfound]);
                     fits[i][j][be]->SetMarkerColor(colors[nfound]);
                     fits[i][j][be]->Draw("P");
@@ -161,7 +196,7 @@ void plotMuonIDData() {
             else if (nfound == 4) doLegend(fits[i][founds[0]][be], fits[i][founds[1]][be], fits[i][founds[2]][be], fits[i][founds[3]][be], trig[founds[0]], trig[founds[1]], trig[founds[2]], trig[founds[3]]);
             else if (nfound > 1) { std::cerr << "ERROR: can have at most 4 triggers, sorry." << std::endl; }
             maybeLogX(c1, fits[i][founds[0]][be]); 
-            TString label = TString::Format("%s_%s", ids[i], (be == 0 ? "barrel" : "endcaps"));
+            TString label = TString::Format("%s_%s", ids[i], (be == 0 ? "barrel" : (be == 1 ? "endcaps" : "endcaps_p") ));
             c1->Print(prefix+label+"_all.png");
             if (doPdf) c1->Print(prefix+label+"_all.pdf");
             if (nfound > 1) {
@@ -173,23 +208,33 @@ void plotMuonIDData() {
                 merged->Draw("P");
                 c1->Print(prefix+label+"_merge.png");
                 if (doPdf) c1->Print(prefix+label+"_merge.pdf");
+                if (fOut) fOut->WriteTObject(merged, "fit_"+label+"_merge");
             }
         }
     }
     if (ref) {
         for (size_t i = 0; i < nids; ++i) {
-            for (int be = 0; be <= 1; ++be) {
-                TString label = TString::Format("%s_%s", ids[i], (be == 0 ? "barrel" : "endcaps"));
-                TGraphAsymmErrors *mref = merge(refs[i], ntrig, 2, be);
-                TGraphAsymmErrors *mfit = merge(fits[i], ntrig, 2, be);
+            for (int be = 0; be < neta; ++be) {
+                TString label = TString::Format("%s_%s", ids[i], (be == 0 ? "barrel" : (be == 1 ? "endcaps" : "endcaps_p") ));
+                TGraphAsymmErrors *mref = merge(refs[i], ntrig, neta, be);
+                TGraphAsymmErrors *mfit = merge(fits[i], ntrig, neta, be);
                 if (mref == 0) std::cerr << "No mref for " << label << std::endl;
                 if (mfit == 0) std::cerr << "No mfit for " << label << std::endl;
                 if (mref ==0 || mfit == 0) continue;
-                mref->SetLineWidth(2);
-                mref->SetLineColor(kRed);
-                mref->SetMarkerColor(kRed);
-                mref->SetMarkerStyle(25);
-                mref->SetMarkerSize(2.0);
+                if (doFillMC) {
+                    mref->SetLineColor(2);
+                    mref->SetFillColor(208);
+                    mref->SetLineStyle(0);
+                    mref->SetMarkerColor(2);
+                    mref->SetMarkerStyle(21);
+                    mref->SetMarkerSize(0.4);
+                } else {
+                    mref->SetLineWidth(2);
+                    mref->SetLineColor(kRed);
+                    mref->SetMarkerColor(kRed);
+                    mref->SetMarkerStyle(25);
+                    mref->SetMarkerSize(2.0);
+                }
                 mfit->SetLineWidth(2);
                 mfit->SetLineColor(kBlack);
                 mfit->SetMarkerColor(kBlack);
@@ -197,15 +242,17 @@ void plotMuonIDData() {
                 mfit->SetMarkerSize(1.6);
                 if (retitle != "") 
                 frame->GetYaxis()->SetTitle(TString(titles[i])+" muon efficiency");
-                frame->GetXaxis()->SetTitle("muon p_{T}  (GeV/c)");
-                extraSpam = (be == 0 ? "        |#eta| < 0.9" : "  0.9 < |#eta| < 2.4");
+                frame->GetXaxis()->SetTitle(be <= 1 ? "muon p_{T}  (GeV/c)" : "muon p  (GeV/c)");
+                extraSpam = (be == 0 ? "        |#eta| < 1.2" : "  1.2 < |#eta| < 2.4");
                 frame->Draw();
-                mref->Draw("P SAME");
+                mref->Draw(doFillMC ? "E2 SAME" : "P SAME");
                 mfit->Draw("P SAME");
                 doLegend(mfit, mref, datalbl, reflbl);
                 maybeLogX(c1, mfit); 
                 c1->Print(prefix+label+"_merge.png");
                 if (doPdf) c1->Print(prefix+label+"_merge.pdf");
+                if (fOut) fOut->WriteTObject(mfit, "fit_"+label+"_merge");
+                if (fOut) fOut->WriteTObject(mref, "ref_"+label+"_merge");
             }
         }
     }
