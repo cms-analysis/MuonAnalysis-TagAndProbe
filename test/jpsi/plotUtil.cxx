@@ -45,6 +45,7 @@ double yMin = 0.0;
 double yMaxR = 1.5;
 double yMinR = 0.5;
 TString extraSpam = "";
+TFile *fOut = 0;
 
 void cmsprelim() {
     TPaveText *cmsprel = new TPaveText(doSquare ? 0.40 : .55,.16,.94,.21,"NDC");
@@ -82,9 +83,9 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TStrin
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3, TString lab1, TString lab2, TString lab3) {
     double legend_y_offset = (preliminary != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .17 : .23);
-    if (g1->GetY()[g1->GetN()-1] < 0.4) {
-        legend_y_offset = 0.75 - legend_y_size;
-    }
+    //if (g1->GetY()[g1->GetN()-1] < 0.4) {
+    //    legend_y_offset = 0.75 - legend_y_size;
+    //}
     TLegend *leg = new TLegend(doSquare ? .52 : .58,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
     if (extraSpam != "") {
         leg->SetHeader(extraSpam);
@@ -350,6 +351,7 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
 
     if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
     if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
+    if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); fOut->WriteTObject(href,"ref_"+alias); }
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refname) {
@@ -401,6 +403,7 @@ void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refn
 
     if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
     if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
+    if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); fOut->WriteTObject(href,"ref_"+alias); }
 }
 
 /** Plot FIT from file 1 plus FIT from file 2 plus CNT from file 3 */
@@ -482,6 +485,7 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 
     if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
     if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
+    if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); fOut->WriteTObject(href,"mc_"+alias); }
 }
 
 
@@ -503,6 +507,9 @@ TGraphAsymmErrors *getFit(TDirectory *fit, TString fitname) {
 }
 /** Plot just one set */
 TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
+    if (fit == 0) {
+        std::cerr << "ERROR: signle called with missing dirs: alias = " << alias << std::endl;
+    }
     TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
@@ -529,6 +536,7 @@ TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
     pfit->Print(prefix+alias+".png"); 
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
 
+    if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); }
     return (TGraphAsymmErrors *) hfit->Clone();
 }
 
@@ -635,14 +643,20 @@ TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGr
     graphs[1] = g2;
     graphs[2] = g3;
     graphs[3] = g4;
-    int ng = 0; 
-    for (int i = 0; i < 4; ++i) { if (graphs[i]) ng++; else break; }
-    int n = (g1 ? g1->GetN() : 0);
+    int ng = 0; int n = 0;
+    TGraphAsymmErrors *gFirst = 0;
+    for (int i = 0; i < 4; ++i) { 
+        if (graphs[i] != 0 && graphs[i]->GetN() > 0) {
+            ng++; n = TMath::Max(n, graphs[i]->GetN());
+            if (gFirst == 0) gFirst = graphs[i];
+        }
+    }
+    if (gFirst == 0) return 0;
     TGraphAsymmErrors *ret = new TGraphAsymmErrors(n);
     for (int i = 0; i < n; ++i) {
         double syw2 = 0, sw2 = 0, slo = 0, shi = 0;
-        double xbin = g1->GetX()[i], sxw2 = 0;
-        double xmax = xbin + g1->GetErrorXhigh(i), xmin = xbin - g1->GetErrorXlow(i);
+        double xbin = gFirst->GetX()[i], sxw2 = 0;
+        double xmax = xbin + gFirst->GetErrorXhigh(i), xmin = xbin - gFirst->GetErrorXlow(i);
         double ytry = 0, ntry = 0;
         for (int j = 0; j < ng; ++j) {
             int k = (j == 0 ? i : findBin(graphs[j], xbin));
