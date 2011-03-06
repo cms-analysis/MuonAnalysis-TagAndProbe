@@ -153,7 +153,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dphiM2        = cms.InputTag("tagProbeSeparation", "dphiM2"),
         distM2        = cms.InputTag("tagProbeSeparation", "distM2"),
         drVtx         = cms.InputTag("tagProbeSeparation", "drVtx"),
-        dz            = cms.vstring("daughter(0).vz - daughter(1).vz") 
+        dz            = cms.string("daughter(0).vz - daughter(1).vz") 
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
