@@ -106,11 +106,13 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     tagVariables = cms.PSet(
         nVertices = cms.InputTag("nverticesModule"),
+        combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
     ),
     tagFlags = cms.PSet(),
     pairVariables = cms.PSet(
         nJets15 = cms.InputTag("njets15Module"),
         nJets30 = cms.InputTag("njets30Module"),
+        dz      = cms.vstring("daughter(0).vz - daughter(1).vz"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
@@ -133,7 +135,9 @@ process.tnpSimpleSequence = cms.Sequence(
     process.tpTree
 )
 
+#process.fastFilter = cms.EDFilter("MuonSelector", src = cms.InputTag("muons"), cut = cms.string("pt > 15"), filter = cms.bool(True))
 process.tagAndProbe = cms.Path( 
+    #process.fastFilter                  *
     process.mergedMuons                 *
     process.expectedHitsMu              *
     process.patMuonsWithTriggerSequence +
@@ -208,6 +212,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
 )
 
 process.tagAndProbeSta = cms.Path( 
+    #process.fastFilter                  *
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
