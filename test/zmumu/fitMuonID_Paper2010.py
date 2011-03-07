@@ -32,6 +32,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         abseta = cms.vstring("muon |#eta|", "0", "2.5", ""),
         charge = cms.vstring("muon charge", "-2.5", "2.5", ""),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
+        caloCompatibility = cms.vstring("Calo comp", "-2", "2", ""),
     ),
 
     Categories = cms.PSet(
@@ -40,6 +41,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         VBTFold  = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
         TMOST = cms.vstring("TMOneStationTight", "dummy[pass=1,fail=0]"),
         PF    = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
+        IsolTk3 = cms.vstring("Tk Abs Iso < 3", "dummy[pass=1,fail=0]"),
         Mu15  = cms.vstring("MC true", "dummy[true=1,false=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
@@ -71,7 +73,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
 PT_ETA_BINS = cms.PSet(
     pt     = cms.vdouble(  10, 20, 30, 40, 60, 100 ),
-    abseta = cms.vdouble(  0.0, 0.9, 2.4)
+    abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
 ETA_BINS = cms.PSet(
     pt  = cms.vdouble(20,100),
@@ -91,6 +93,11 @@ OVERALL = cms.PSet(
     pt  = cms.vdouble(20,100),
     abseta = cms.vdouble(0.0, 2.4),
 )
+OVERALL_ABSETA = cms.PSet(
+    pt  = cms.vdouble(20,100),
+    abseta = cms.vdouble(0.0, 1.2, 2.4),
+)
+
 CHARGE = cms.PSet(
     pt     = cms.vdouble(20,100),
     abseta = cms.vdouble(0.0, 2.4),
@@ -112,32 +119,42 @@ if scenario.find("signal_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg.root" ]
 if scenario.find("some_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg_1.root" ]
+if scenario.find("realistic_mc") != -1:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg.197pb.root", 
+                                          PREFIX+"tnpZ_MC_WJetsPU.197pb.root", 
+                                          PREFIX+"tnpZ_MC_QCDMuPt15PU.197pb.root", ]
 
-IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
+#IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
+IDS = [ "TMOST", "VBTF", "PF" ]
 ALLBINS=[("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
 ALLBINS += [ ("vtx",VTX_BINS)]
 #if scenario.find("set2"):
-ALLBINS+=[("eta_fine",ETA_BINS_FINE), ("overall",OVERALL), ("charge",CHARGE)]
+ALLBINS+=[("eta_fine",ETA_BINS_FINE), ("overall",OVERALL), ("charge",CHARGE), ("overall_abseta",OVERALL_ABSETA)]
 #if scenario.find("set3"):
+#IDS = [ "Glb" ]
 
 for ID in IDS:
     if len(args) > 1 and ID != args[1]: continue
     for X,B in ALLBINS:
         module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         shape = "vpvPlusExpo"
-        if X.find("eta") != -1: shape = "voigtPlusExpo"
+        if X.find("eta") != -1 and X.find("abseta") == -1: shape = "voigtPlusExpo"
+        if X.find("pt_abseta") != -1: module.Variables.mass[1]="77";
         if X.find("overall") != -1: module.binsForFit = 120
+        DEN = B.clone()
+        #if scenario.find("iso") != -1:  DEN.IsolTk3 = cms.vstring("pass") ## doesn't work, tracks don't have isolation filled in :-(
+        #if scenario.find("calo") != -1: DEN.caloCompatibility = cms.vdouble(0.9,1.1)  # same as above, I think.
         setattr(module.Efficiencies, ID+"_"+X, cms.PSet(
             EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
-            BinnedVariables = B.clone(),
+            BinnedVariables = DEN,
             BinToPDFmap = cms.vstring(shape)
         ))
         if scenario.find("mc") != -1:
             setattr(module.Efficiencies, ID+"_"+X+"_mcTrue", cms.PSet(
                 EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
                 UnbinnedVariables = cms.vstring("mass"),
-                BinnedVariables = B.clone(mcTrue = cms.vstring("true"))
+                BinnedVariables = DEN.clone(mcTrue = cms.vstring("true"))
             ))
         setattr(process, "TnP_MuonID_"+ID+"_"+X, module)        
         setattr(process, "run_"+ID+"_"+X, cms.Path(module))

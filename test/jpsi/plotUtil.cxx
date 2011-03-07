@@ -38,17 +38,24 @@ bool doDiffPlot = false;
 bool doRatioPlot = true;
 bool doFillMC = false;
 bool doPdf = true;
+bool doTxt = true;
 bool doLogX = false;
 bool doSquare = false;
 double yMax = 1.0;
 double yMin = 0.0;
 double yMaxR = 1.5;
 double yMinR = 0.5;
+double yMaxD = +0.5;
+double yMinD = -0.5;
 TString extraSpam = "";
 TFile *fOut = 0;
 
-void cmsprelim() {
-    TPaveText *cmsprel = new TPaveText(doSquare ? 0.40 : .55,.16,.94,.21,"NDC");
+double cmsprel_xoffs = 0;
+double cmsprel_yoffs = 0;
+void cmsprelim(double xoffs=-99,double yoffs=-99) {
+    if (xoffs = -99) xoffs = cmsprel_xoffs;
+    if (yoffs = -99) yoffs = cmsprel_yoffs;
+    TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.40 : .55),yoffs+.16,xoffs+.94,yoffs+.21,"NDC");
     cmsprel->SetTextSize(doSquare ? 0.040 : 0.05);
     cmsprel->SetFillColor(0);
     cmsprel->SetFillStyle(0);
@@ -60,13 +67,15 @@ void cmsprelim() {
     cmsprel->Draw("same");
 }
 
+double doLegend_xoffs = 0;
+double doLegend_yoffs = 0;
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TString lab2) {
-    double legend_y_offset = (preliminary != "" ? 0.07 : 0);
+    double legend_y_offset = doLegend_yoffs+(preliminary != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .12 : .18);
     //if (g1->GetY()[g1->GetN()-1] < 0.4) {
     //    legend_y_offset = 0.75 - legend_y_size;
     //}
-    TLegend *leg = new TLegend(doSquare ? .62 : .68,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
+    TLegend *leg = new TLegend(doLegend_xoffs+(doSquare ? .62 : .68),.15 + legend_y_offset,doLegend_xoffs+.92,.15 + legend_y_size + legend_y_offset);
     if (extraSpam != "") {
         leg->SetHeader(extraSpam);
         //leg->AddEntry("", extraSpam, "");
@@ -81,12 +90,12 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TStrin
     leg->Draw();
 }
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3, TString lab1, TString lab2, TString lab3) {
-    double legend_y_offset = (preliminary != "" ? 0.07 : 0);
+    double legend_y_offset = doLegend_yoffs+(preliminary != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .17 : .23);
     //if (g1->GetY()[g1->GetN()-1] < 0.4) {
     //    legend_y_offset = 0.75 - legend_y_size;
     //}
-    TLegend *leg = new TLegend(doSquare ? .52 : .58,.15 + legend_y_offset,.92,.15 + legend_y_size + legend_y_offset);
+    TLegend *leg = new TLegend(doLegend_xoffs+(doSquare ? .52 : .58),.15 + legend_y_offset,doLegend_xoffs+.92,.15 + legend_y_size + legend_y_offset);
     if (extraSpam != "") {
         leg->SetHeader(extraSpam);
         //leg->AddEntry("", extraSpam, "");
@@ -139,6 +148,15 @@ int findBin(TGraphAsymmErrors *g, double x) {
     }
     return -1;
 }
+double xminGraph(TGraphAsymmErrors *g) {
+    double ret = 0;
+    if (g != 0) {
+        int n = g->GetN();
+        if (n) ret =  g->GetX()[0] - g->GetErrorXlow(0);
+    }
+    return ret;
+}
+
 double xmaxGraph(TGraphAsymmErrors *g) {
     double ret = 0;
     if (g != 0) {
@@ -147,6 +165,17 @@ double xmaxGraph(TGraphAsymmErrors *g) {
     }
     return ret;
 }
+double ymaxGraph(TGraphAsymmErrors *g) {
+    double ret = 0;
+    if (g != 0) {
+        int n = g->GetN();
+        for (int i = 0; i < n; ++i) {
+            ret = TMath::Max(ret, g->GetY()[i] + g->GetErrorYhigh(i));
+        }
+    }
+    return ret;
+}
+
 void reTitleY(TCanvas *pl, TString ytitle) {
     TH1 *first = (TH1*) pl->GetListOfPrimitives()->At(0);
     TH1 *last = (TH1*) pl->GetListOfPrimitives()->At(pl->GetListOfPrimitives()->GetSize()-1);
@@ -187,6 +216,39 @@ void maybeLogX(TCanvas *c, TGraphAsymmErrors *h) {
     }
 }
 
+void printGraph(TGraphAsymmErrors *graph, TString alias) {
+    if (graph == 0 || graph->GetN() == 0) return;
+    FILE *text = fopen((prefix+alias+".txt").Data(), "w");
+    fprintf(text, " %7s  %7s  %7s    %6s   -%4s/ +%4s\n","  x min","  x avg","  x max","  eff ","err ","err ");
+    fprintf(text, " %7s  %7s  %7s    %6s  %6s/%6s\n"," ------"," ------"," ------"," -----","------","------");
+    for (int i = 0; i < graph->GetN(); ++i) {
+        double x = graph->GetX()[i], xlo = graph->GetErrorXlow(i), xhi = graph->GetErrorXhigh(i);
+        double y = graph->GetY()[i], ylo = graph->GetErrorYlow(i), yhi = graph->GetErrorYhigh(i);
+        fprintf(text, " %7.3f  %7.3f  %7.3f    %6.2f  -%5.2f/+%5.2f\n", x-xlo,x,x+xhi,y*100,ylo*100,yhi*100);
+    }
+    fclose(text);
+}
+void printGraphs(TGraphAsymmErrors *graph, TGraphAsymmErrors *graph2, TString alias) {
+    if (graph == 0 || graph->GetN() == 0) return;
+    FILE *text = fopen((prefix+alias+".txt").Data(), "w");
+    fprintf(text, " %7s  %7s  %7s    %6s   -%4s/ +%4s    %6s   -%4s/ +%4s\n","  x min","  x avg","  x max","  eff "," err"," err","  ref "," err"," err");
+    fprintf(text, " %7s  %7s  %7s    %6s  %6s/%6s    %6s  %6s/%6s\n"," ------"," ------"," ------"," -----","------","------"," -----","------","------");
+    for (int i = 0; i < graph->GetN(); ++i) {
+        double x = graph->GetX()[i], xlo = graph->GetErrorXlow(i), xhi = graph->GetErrorXhigh(i);
+        double y = graph->GetY()[i], ylo = graph->GetErrorYlow(i), yhi = graph->GetErrorYhigh(i);
+        int j = findBin(graph2, x);
+        if (j == -1) {
+            fprintf(text, " %7.3f  %7.3f  %7.3f    %6.2f  -%5.2f/+%5.2f    %6s  %6s/%6s\n", x-xlo,x,x+xhi,y*100,ylo*100,yhi*100,"--.--","-.--","-.--");
+        } else {
+            double x2 = graph2->GetX()[i], x2lo = graph2->GetErrorXlow(i), x2hi = graph2->GetErrorXhigh(i);
+            double y2 = graph2->GetY()[i], y2lo = graph2->GetErrorYlow(i), y2hi = graph2->GetErrorYhigh(i);
+            fprintf(text, " %7.3f  %7.3f  %7.3f    %6.2f  -%5.2f/+%5.2f    %6.2f  -%5.2f/+%5.2f\n", x-xlo,x,x+xhi,y*100,ylo*100,yhi*100, y2*100,y2lo*100,y2hi*100);
+        }
+    }
+    fclose(text);
+}
+
+
 void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.3) {
    ax->SetTitle(ytitle); 
    ax->SetTitleOffset(yoffset); 
@@ -217,7 +279,9 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
         ratio.SetPointError(k-1, hfit->GetErrorXlow(i), hfit->GetErrorXhigh(i), rdn, rup);
     }
 
-    ratio.Draw("AP");
+    TH1F *frame = new TH1F("frameratio","frameratio",1, ratio.GetX()[0]-ratio.GetErrorXlow(0), ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1));
+    frame->Draw("");
+    frame->GetXaxis()->SetTitle(xtitle); frame->GetXaxis()->SetMoreLogLabels(1); frame->GetXaxis()->SetNoExponent(1);
     TLine line(ratio.GetX()[0]-ratio.GetErrorXlow(0), 1, ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1), 1);
     line.SetLineWidth(2);
     line.SetLineColor(kRed);
@@ -229,20 +293,21 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
     ratio.SetMarkerSize(1.6);
     ratio.Draw("P SAME");
     if (autoScale) {
-        ratio.GetYaxis()->SetRangeUser(1-1.5*max,1+1.2*max);
+        frame->GetYaxis()->SetRangeUser(1-1.5*max,1+1.2*max);
     } else {
-        ratio.GetYaxis()->SetRangeUser(yMinR,yMaxR);
+        frame->GetYaxis()->SetRangeUser(yMinR,yMaxR);
     }
-    ratio.GetXaxis()->SetRangeUser(ratio.GetX()[0]-ratio.GetErrorXlow(0), ratio.GetX()[ratio.GetN()-1]+ratio.GetErrorXhigh(ratio.GetN()-1));
-    ratio.GetXaxis()->SetTitle(xtitle); ratio.GetXaxis()->SetMoreLogLabels(1);
-    if (datalbl) reTitleTAxis(ratio.GetYaxis(), datalbl+"/"+reflbl+" ratio");
+    if (datalbl) reTitleTAxis(frame->GetYaxis(), datalbl+" / "+reflbl+" ratio");
     if (preliminary != "") cmsprelim();
-    gPad->SetLogx(doLogX && (diff.GetXaxis()->GetXmin() > 0));
+    if (doSquare) squareCanvas(gPad);
+    gPad->SetLogx(doLogX && (frame->GetXaxis()->GetXmin() > 0));
     gPad->Print(prefix+alias+"_ratio.png");
     if (doPdf) gPad->Print(prefix+alias+"_ratio.pdf");
+    if (doTxt) printGraph(&ratio,alias+"_ratio");
+    delete frame;
 }
 
-void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
+void doDiff(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, const char *xtitle) {
     double maxError = 0.7; 
     size_t nTP = 0; // non-trivial point (interval not equal to [0,1])
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
@@ -275,22 +340,25 @@ void doDiff(RooHist *hfit, RooHist *href, TString alias, const char *xtitle) {
     line.SetLineWidth(2);
     line.SetLineColor(kRed);
 
-    diff.Draw("AP");
+    TH1F *frame = new TH1F("frameDiff","frameDiff",1, diff.GetX()[0]-diff.GetErrorXlow(0), diff.GetX()[diff.GetN()-1]+diff.GetErrorXhigh(diff.GetN()-1));
+    frame->Draw("");
+    frame->GetXaxis()->SetTitle(xtitle); frame->GetXaxis()->SetMoreLogLabels(1); frame->GetXaxis()->SetNoExponent(1);
+    if (autoScale) {
+        frame->GetYaxis()->SetRangeUser(-1.5*max,1.2*max);
+    } else {
+        frame->GetYaxis()->SetRangeUser(yMinD, yMaxD);
+    }
     line.DrawClone("SAME");
     diff.Draw("P SAME");
-    diff.GetXaxis()->SetRangeUser(diff.GetX()[0]-diff.GetErrorXlow(0), diff.GetX()[diff.GetN()-1]+diff.GetErrorXhigh(diff.GetN()-1));
-    if (autoScale) {
-        diff.GetYaxis()->SetRangeUser(-1.5*max,1.2*max);
-    } else {
-        diff.GetYaxis()->SetRangeUser(-0.5,0.5);
-    }
-    diff.GetXaxis()->SetTitle(xtitle); //diff.GetXaxis()->SetMoreLogLabels(1);
-    if (datalbl) reTitleTAxis(diff.GetYaxis(), datalbl+" - "+reflbl+" difference");
+    frame->GetXaxis()->SetTitle(xtitle); //diff.GetXaxis()->SetMoreLogLabels(1);
+    if (datalbl) reTitleTAxis(frame->GetYaxis(), datalbl+" - "+reflbl+" difference");
     if (preliminary != "") cmsprelim();
-    //gPad->SetLogx(doLogX && (diff.GetXaxis()->GetXmin() > 0));
+    if (doSquare) squareCanvas(gPad);
+    gPad->SetLogx(doLogX && (frame->GetXaxis()->GetXmin() > 0));
     gPad->Print(prefix+alias+"_diff.png");
     if (doPdf) gPad->Print(prefix+alias+"_diff.pdf");
-
+    if (doTxt) printGraph(&diff,alias+"_diff");
+    delete frame;
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) {
@@ -352,6 +420,9 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
     if (doRatioPlot) doRatio(hfit,href,alias,getXtitle(pfit)); 
     if (doDiffPlot) doDiff(hfit,href,alias,getXtitle(pfit)); 
     if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); fOut->WriteTObject(href,"ref_"+alias); }
+    if (doTxt)  printGraph(hfit,"fit_"+alias);
+    if (doTxt)  printGraph(href,"ref_"+alias);
+    if (doTxt)  printGraphs(hfit, href, alias);
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refname) {
@@ -452,6 +523,7 @@ void refstack3(TDirectory *fit, TDirectory *ref, TDirectory *mc, TString alias, 
     maybeLogX(pref, href); 
     gPad->Print(prefix+alias+".png");
     if (doPdf) gPad->Print(prefix+alias+".pdf");
+    if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); fOut->WriteTObject(href,"ref_"+alias); fOut->WriteTObject(hmc,"mct_"+alias); }
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
@@ -489,17 +561,17 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 }
 
 
-TGraphAsymmErrors *getFit(TDirectory *fit, TString fitname) {
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+TGraphAsymmErrors *getFit(TDirectory *fit, TString fitname, TString algo="fit") {
+    TCanvas *pfit = getFromPrefix(fit->GetDirectory(algo+"_eff_plots"), fitname);
     if (pfit == 0) {
-        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
+        std::cerr << "NOT FOUND: " << algo+"_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
         return;
     }
     if (retitle != "") reTitleY(pfit, retitle);
 
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_"+algo+"_eff");
     if (hfit == 0) {
-        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << "/hxy_fit_eff in " << fit->GetName() << std::endl;
+        std::cerr << "NOT FOUND: " << algo+"_eff_plots/"+fitname << "/hxy_"+algo+"_eff in " << fit->GetName() << std::endl;
         pfit->ls();
         return;
     }
@@ -537,6 +609,7 @@ TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
 
     if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias); }
+    if (doTxt)  printGraph(hfit,alias);
     return (TGraphAsymmErrors *) hfit->Clone();
 }
 
