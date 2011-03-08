@@ -96,6 +96,37 @@ staToTkMatchSequenceZ = cms.Sequence(
 )
 
 #########################################################################################
+##        Isolation modules                                                            ##
+#########################################################################################
+
+import RecoMuon.MuonIsolationProducers.muIsoDepositTk_cfi
+probeMuonsIsoDepositTk = RecoMuon.MuonIsolationProducers.muIsoDepositTk_cfi.muIsoDepositTk.clone()
+probeMuonsIsoDepositTk.IOPSet.inputMuonCollection = 'probeMuons'
+probeMuonsIsoFromDepsTk = cms.EDProducer("CandIsolatorFromDeposits", 
+    deposits = cms.VPSet( cms.PSet(
+        src = cms.InputTag("probeMuonsIsoDepositTk"),
+        mode = cms.string('sum'),
+        weight = cms.string('1'),
+        deltaR = cms.double(0.3),
+        vetos = cms.vstring('0.01'),
+        skipDefaultVeto = cms.bool(True),
+        label = cms.string('tkDep'),
+    ))
+)
+probeMuonsRelIsoFromDepsTk = probeMuonsIsoFromDepsTk.clone()
+probeMuonsRelIsoFromDepsTk.deposits[0].mode = "sumRelative"
+probeMuonsIsoValueMaps = cms.EDProducer("AnyNumbersToValueMaps",
+    collection = cms.InputTag("probeMuons"),
+    associations = cms.VInputTag(cms.InputTag("probeMuonsIsoFromDepsTk"), cms.InputTag("probeMuonsRelIsoFromDepsTk")),
+)
+probeMuonsIsoSequence = cms.Sequence(
+    ( probeMuonsIsoDepositTk * 
+        ( probeMuonsIsoFromDepsTk + probeMuonsRelIsoFromDepsTk) 
+    ) * probeMuonsIsoValueMaps
+)
+
+
+#########################################################################################
 ##        Other modules                                                                ##
 #########################################################################################
 

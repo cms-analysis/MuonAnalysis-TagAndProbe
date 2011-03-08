@@ -8,9 +8,16 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        '/store/mc/Fall10/DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/0000/2CEF8004-17E4-DF11-8960-00237DA1680E.root',
+        #'/store/mc/Fall10/DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/0000/2CEF8004-17E4-DF11-8960-00237DA1680E.root',
         #'/store/mc/Fall10/DYJetsToLL_TuneD6T_M-50_7TeV-madgraph-tauola/AODSIM/START38_V12-v2/0017/CCEE6478-EFE1-DF11-85E9-0026B94D1A94.root',
-	#/store/relval/CMSSW_3_9_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_39Y_V7_PU_E7TeV_AVE_2_BX2808-v1/0054/08350812-AD0F-E011-9C92-001A92810AA6.root',
+        #'/store/relval/CMSSW_3_9_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_39Y_V7_PU_E7TeV_AVE_2_BX2808-v1/0054/08350812-AD0F-E011-9C92-001A92810AA6.root',
+        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0048/BE734917-B50D-E011-8C78-00261894386B.root',
+        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/DE03BC23-720D-E011-8CFB-001A92811728.root',
+        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/D0D8D039-710D-E011-9242-001A92811728.root',
+        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/947253B7-720D-E011-8DF2-002354EF3BE4.root',
+        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/8AB6303D-7B0D-E011-9EFC-00261894395C.root',
+        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/28C4302A-790D-E011-AAFA-002618B27F8A.root',
+
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )    
@@ -90,7 +97,11 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagProbePairs = cms.InputTag("tpPairs"),
     arbitration   = cms.string("OneProbe"),
     # probe variables: all useful ones
-    variables = AllVariables,
+    variables = cms.PSet(
+        AllVariables,
+        isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
+        isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
+    ),
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
@@ -132,6 +143,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets15Module +
     process.njets30Module +
     process.muonsPassingPF +
+    process.probeMuonsIsoSequence +
     process.tpTree
 )
 
