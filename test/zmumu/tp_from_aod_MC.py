@@ -123,7 +123,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     pairVariables = cms.PSet(
         nJets15 = cms.InputTag("njets15Module"),
         nJets30 = cms.InputTag("njets30Module"),
-        dz      = cms.vstring("daughter(0).vz - daughter(1).vz"),
+        dz      = cms.string("daughter(0).vz - daughter(1).vz"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
