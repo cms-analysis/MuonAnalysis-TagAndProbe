@@ -44,7 +44,9 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         Track_QTF  = cms.vstring("TM", "dummy[pass=1,fail=0]"),
         Track_VBTF = cms.vstring("TM", "dummy[pass=1,fail=0]"),
         MuX_L2Mu0_L2     = cms.vstring("X", "dummy[pass=1,fail=0]"),
-        tag_Mu5_L2Mu0_Mu = cms.vstring("X", "dummy[pass=1,fail=0]"),
+        tag_Mu5_L2Mu0_MU = cms.vstring("X", "dummy[pass=1,fail=0]"),
+        Mu3_Track5_Jpsi_TK     = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
+        tag_Mu3_Track5_Jpsi_MU = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
 
@@ -79,7 +81,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 CONSTRAINTS = cms.PSet(
     TM  = cms.bool(True),
     MuX_L2Mu0_L2     = cms.vstring("pass"),
-    tag_Mu5_L2Mu0_Mu = cms.vstring("pass"),
+    tag_Mu5_L2Mu0_MU = cms.vstring("pass"),
+)
+BIASCONSTRAINTS  = cms.PSet(
+    TM  = cms.bool(True),
+    Mu3_Track5_Jpsi_TK     = cms.vstring("pass"),
+    tag_Mu3_Track5_Jpsi_MU = cms.vstring("pass"),
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt  = cms.vdouble( 0, 20 ),
@@ -94,10 +101,28 @@ PHI_BINS =  cms.PSet(CONSTRAINTS,
     phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,3)]), 
 )
 
+PLATEAU_ABSETA = cms.PSet(CONSTRAINTS,
+    abseta = cms.vdouble(0.0,  1.2, 2.4),
+    pt     = cms.vdouble(4.0, 20.0),
+)
+PLATEAU_ENDCAPS21 = cms.PSet(CONSTRAINTS,
+    abseta = cms.vdouble(1.2, 2.1),
+    pt     = cms.vdouble(4.0, 20.0),
+)
+PLATEAU_ABSETA_BIAS = cms.PSet(BIASCONSTRAINTS,
+    abseta = cms.vdouble(0.0,  1.2, 2.4),
+    pt     = cms.vdouble(4.0, 20.0),
+)
+PLATEAU_ENDCAPS21_BIAS = cms.PSet(BIASCONSTRAINTS,
+    abseta = cms.vdouble(1.2, 2.1),
+    pt     = cms.vdouble(4.0, 20.0),
+)
 
-PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.11/"
+
+
+PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.17/"
 process.TnP_TrackQuality = Template.clone(
-    InputFileNames = cms.vstring(PREFIX+'tnpJPsi_MuOnia_Run2010B_Nov4.root'),
+    InputFileNames = cms.vstring(PREFIX+'tnpJPsi_Data_Nov4B.root'),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_Paper2010_TrackQuality_%s.root" % scenario),
@@ -115,9 +140,15 @@ IDS = [ "Track_HP", "Track_QTF", "Track_VBTF", "Cut_OnePixel", "Cut_TwoPixel", "
         "Cut_0missingIn", "Cut_1missingIn", "Cut_0missingOut", "Cut_1missingOut" ]
 ALLBINS=[("eta",ETA_BINS),("phi",PHI_BINS)]
 
+ALLBINS =[("plateau_abseta",PLATEAU_ABSETA),          ("plateau_endcaps21",PLATEAU_ABSETA)]
+#ALLBINS+=[("plateau_abseta_bias",PLATEAU_ABSETA_BIAS),("plateau_endcaps21_bias",PLATEAU_ABSETA_BIAS)]
+
+IDS = [ "Track_VBTF" ]
+process.TnP_TrackQuality.Cuts = cms.PSet()
+
 for ID in IDS:
-    module = process.TnP_TrackQuality.clone(OutputFileName = cms.string("TnP_Paper2010_TrackQuality_%s_%s.root" % (scenario, ID)))
     for X,B in ALLBINS:
+        module = process.TnP_TrackQuality.clone(OutputFileName = cms.string("TnP_Paper2010_TrackQuality_%s_%s_%s.root" % (scenario, ID, X)))
         DEN=B.clone()
         passing = "above" if ID.startswith("Cut_") else "pass";
         if ID.startswith("Cut_") and ID.find("missing") != -1: passing = "below"
@@ -127,12 +158,12 @@ for ID in IDS:
             BinnedVariables = DEN,
             BinToPDFmap = cms.vstring("cbPlusPoly")
         ))
-        if scenario == "datalike_mc" or scenario == "signal_mc":
+        if "mc" in scenario:
             setattr(module.Efficiencies, ID+"_"+X+"_mcTrue", cms.PSet(
                 EfficiencyCategoryAndState = cms.vstring(ID,passing),
                 UnbinnedVariables = cms.vstring("mass"),
                 BinnedVariables = DEN.clone(mcTrue = cms.vstring("true"))
             ))
-    setattr(process, "TnP_TrackQuality_"+ID, module)        
-    setattr(process, "run_"+ID, cms.Path(module))
+        setattr(process, "TnP_TrackQuality_"+ID+"_"+X, module)        
+        setattr(process, "run_"+ID+"_"+X, cms.Path(module))
 

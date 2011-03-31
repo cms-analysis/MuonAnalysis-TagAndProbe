@@ -258,6 +258,7 @@ void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.3) {
 
 
 void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, const char *xtitle) {
+    if (hfit->GetN() == 0 || href->GetN() == 0) return;
     size_t nNZD = 0; // non-zero-denominator
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
         int j = findBin(href,hfit->GetX()[i]); if (j == -1) continue ;
@@ -308,6 +309,7 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
 }
 
 void doDiff(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, const char *xtitle) {
+    if (hfit->GetN() == 0 || href->GetN() == 0) return;
     double maxError = 0.7; 
     size_t nTP = 0; // non-trivial point (interval not equal to [0,1])
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {

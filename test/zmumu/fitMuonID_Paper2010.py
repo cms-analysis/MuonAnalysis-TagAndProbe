@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
-
 ### USAGE:
-###    cmsRun fitMuonID_Paper2010.py <scenario>
+###    cmsRun fitMuonID_Paper2010.py <scenario> [ <id> [ <binning1> ... <binningN> ] ]
+###
 ### scenarios:
 ###   - data_all (default)  
 ###   - signal_mc
@@ -30,9 +30,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         pt = cms.vstring("muon p_{T}", "0", "1000", "GeV/c"),
         eta    = cms.vstring("muon #eta", "-2.5", "2.5", ""),
         abseta = cms.vstring("muon |#eta|", "0", "2.5", ""),
+        phi    = cms.vstring("muon #phi at vertex", "-3.1416", "3.1416", ""),
         charge = cms.vstring("muon charge", "-2.5", "2.5", ""),
+        tag_pt = cms.vstring("Tag p_{T}", "0", "1000", "GeV/c"),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
-        caloCompatibility = cms.vstring("Calo comp", "-2", "2", ""),
+        isoTrk03Abs    = cms.vstring("Probe abs trk iso", "-2", "9999999", ""),
+        tag_combRelIso = cms.vstring("Tag comb rel iso", "-2", "9999999", ""),
     ),
 
     Categories = cms.PSet(
@@ -79,6 +82,10 @@ ETA_BINS = cms.PSet(
     pt  = cms.vdouble(20,100),
     eta = cms.vdouble(-2.4, -2.1, -1.6, -1.1, -0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4),
 )
+ETA_PHI_BINS = ETA_BINS.clone(
+   eta = cms.vdouble(-2.4, -1.6, -8.0, 0, 0.8, 1.6, 2.4),
+   phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,4)]), 
+)
 VTX_BINS  = cms.PSet(
     pt     = cms.vdouble(  20, 120 ),
     abseta = cms.vdouble(  0.0, 2.4),
@@ -98,6 +105,12 @@ OVERALL_ABSETA = cms.PSet(
     abseta = cms.vdouble(0.0, 1.2, 2.4),
 )
 
+OVERALL_ENDCAPS21 = cms.PSet(
+    pt  = cms.vdouble(20,100),
+    abseta = cms.vdouble(1.2, 2.1),
+)
+
+
 CHARGE = cms.PSet(
     pt     = cms.vdouble(20,100),
     abseta = cms.vdouble(0.0, 2.4),
@@ -115,44 +128,58 @@ process.TnP_MuonID = Template.clone(
     Efficiencies = cms.PSet(),
 )
 
+if "39X" in scenario and "data" in scenario:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_Data_Dec22B.root" ]
 if scenario.find("signal_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg.root" ]
 if scenario.find("some_mc") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg_1.root" ]
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MCDYPoweg_38X_dzIso.334pb.root" ]
+if scenario.find("39X_mc") != -1:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_39XDY_1.root" ]
 if scenario.find("realistic_mc") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYPoweg.197pb.root", 
-                                          PREFIX+"tnpZ_MC_WJetsPU.197pb.root", 
-                                          PREFIX+"tnpZ_MC_QCDMuPt15PU.197pb.root", ]
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MCDYPoweg_38X_dzIso.334pb.root", 
+                                          PREFIX+"tnpZ_MC_WJetsPU.334pb.root", 
+                                          PREFIX+"tnpZ_MC_QCDMuPt15PU.334pb.root", ]
+if "tag35" in scenario:
+    process.TnP_MuonID.Variables.tag_pt[1]='35'
 
-#IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
 IDS = [ "TMOST", "VBTF", "PF" ]
-ALLBINS=[("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
+IDS += [ "Glb" ]
+ALLBINS = [("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
 ALLBINS += [ ("vtx",VTX_BINS)]
-#if scenario.find("set2"):
-ALLBINS+=[("eta_fine",ETA_BINS_FINE), ("overall",OVERALL), ("charge",CHARGE), ("overall_abseta",OVERALL_ABSETA)]
-#if scenario.find("set3"):
-#IDS = [ "Glb" ]
+#ALLBINS+=[("eta_fine",ETA_BINS_FINE)]
+ALLBINS += [("overall",OVERALL), ("charge",CHARGE), ("overall_abseta",OVERALL_ABSETA),("overall_endcaps21",OVERALL_ENDCAPS21)]
+ALLBINS+=[("eta_phi",ETA_PHI_BINS)]
 
+if len(args) > 1 and args[1] not in IDS: IDS += [ args[1] ]
 for ID in IDS:
     if len(args) > 1 and ID != args[1]: continue
     for X,B in ALLBINS:
+        if len(args) > 2 and X not in args[2:]: continue
         module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         shape = "vpvPlusExpo"
         if X.find("eta") != -1 and X.find("abseta") == -1: shape = "voigtPlusExpo"
         if X.find("pt_abseta") != -1: module.Variables.mass[1]="77";
         if X.find("overall") != -1: module.binsForFit = 120
-        DEN = B.clone()
-        #if scenario.find("iso") != -1:  DEN.IsolTk3 = cms.vstring("pass") ## doesn't work, tracks don't have isolation filled in :-(
+        DEN = B.clone(); num = ID;
+        if "_from_" in ID:
+            parts = ID.split("_from_")
+            num = parts[0]
+            setattr(DEN, parts[1], cms.vstring("pass"))
+        if scenario.find("tagiso") != -1:  
+            DEN.tag_combRelIso = cms.vdouble(-1, 0.1)
+        if scenario.find("probeiso") != -1:
+            DEN.isoTrk03Abs = cms.vdouble(-1, 3)
         #if scenario.find("calo") != -1: DEN.caloCompatibility = cms.vdouble(0.9,1.1)  # same as above, I think.
         setattr(module.Efficiencies, ID+"_"+X, cms.PSet(
-            EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
+            EfficiencyCategoryAndState = cms.vstring(num,"pass"),
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = DEN,
             BinToPDFmap = cms.vstring(shape)
         ))
         if scenario.find("mc") != -1:
             setattr(module.Efficiencies, ID+"_"+X+"_mcTrue", cms.PSet(
-                EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
+                EfficiencyCategoryAndState = cms.vstring(num,"pass"),
                 UnbinnedVariables = cms.vstring("mass"),
                 BinnedVariables = DEN.clone(mcTrue = cms.vstring("true"))
             ))

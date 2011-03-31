@@ -7,6 +7,7 @@ void printEffTable(TString dir, TString meas, TString vars="pt:eta", TString met
         } else {
             gFile->ls();
         }
+    } else {
+        ds->tree()->Scan("efficiency:efficiency_aerr_lo:efficiency_aerr_hi:"+vars);
     }
-    ds->tree()->Scan("efficiency:efficiency_aerr_lo:efficiency_aerr_hi:"+vars);
 }

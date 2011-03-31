@@ -115,6 +115,18 @@ PLATEAU_ENDCAPS = cms.PSet(
     abseta = cms.vdouble(1.2, 2.4),
     pt     = cms.vdouble(4.0, 20.0),
 )
+PLATEAU_ENDCAPS21 = cms.PSet(
+    SEAGULL, SEPARATED,
+    abseta = cms.vdouble(1.2, 2.1),
+    pt     = cms.vdouble(4.0, 20.0),
+)
+
+SEPARATION = cms.PSet(
+    pair_dphiVtxTimesQ = cms.vdouble(-2,0,2),
+    pt = cms.vdouble(5.0, 20.0),
+    abseta = cms.vdouble(  0.0, 1.2, 2.4),
+    pair_distM1 = cms.vdouble(50,100,150,200,250,300,350,400,500,600,800,1000)
+)
 
 
 PREFIX="root://lxcms06//data2/b/botta/TnP_Paper2010_Tree/"
@@ -134,6 +146,10 @@ if scenario.find("signal_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt.root" ]
 if scenario.find("some_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt.crop.root" ]
+if scenario.find("some_mc_39X") != -1:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Prompt_39X.crop.root" ]
+if scenario.find("data_39X") != -1:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_Data_Dec22B.root" ]
 if scenario.find("beauty_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpJPsi_MC_Bp.root" ]
 
@@ -144,8 +160,8 @@ if scenario.find("calomu") != -1:
 
 ALLBINS=[("pt_abseta",PT_ETA_BINS), ("vtx_barrel",VTX_BINS_BARREL), ("vtx_endcaps",VTX_BINS_ENDCAPS)]
 ALLBINS += [ ("p_abseta",P_ETA_BINS), ("pt6_eta",ETA_BINS) ]
-ALLBINS += [("plateau_barrel",PLATEAU_BARREL),("plateau_endcaps",PLATEAU_ENDCAPS)]
-#ALLBINS += [("pt_barrel",PT_BARREL)]
+ALLBINS += [("plateau_barrel",PLATEAU_BARREL),("plateau_endcaps",PLATEAU_ENDCAPS),("plateau_endcaps21",PLATEAU_ENDCAPS21)]
+ALLBINS += [("pt_barrel",PT_BARREL)]
 
 if scenario.find("gaussExpo") != -1:
     IDS = [ "TMOST", "VBTF" ]
@@ -157,6 +173,14 @@ if scenario.find("gaussExpo") != -1:
         "efficiency[0.9,0,1]",
         "signalFractionInPassing[0.9]"
     )
+
+if scenario.find("separation") != -1:
+    IDS = [ "TMOST", "VBTF" ]
+    ALLBINS = [ ("separation", SEPARATION) ]
+    if scenario.find("mc") != -1:
+        TRIGS = [ (3,'Mu3_Track3') ]
+    else: 
+        TRIGS = [ (5,'Mu3_Track5') ]
 
 for ID in IDS:
     if len(args) > 1 and args[1] in IDS and ID != args[1]: continue

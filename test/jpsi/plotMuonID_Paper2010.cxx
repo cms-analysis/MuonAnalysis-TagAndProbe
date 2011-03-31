@@ -38,15 +38,28 @@ void plotMuonID_Paper2010(TString scenario="data") {
         yMinD = -0.2; yMaxD = 0.2;
         yMinR =  0.8; yMaxR = 1.2;
     }
-    if (scenario.Contains("promopt_vs_bdecay")) {
+    if (scenario.Contains("39X_vs_38X")) {
+        TString what = (scenario.Contains("mc") ? " MC" : " Data");
+        datalbl = "3.9.X"+what;
+        reflbl  = "3.8.X"+what;
+        yMinD = -0.2; yMaxD = 0.2;
+        yMinR =  0.8; yMaxR = 1.2;
+    }
+
+    if (scenario.Contains("promopt_vs_bdecay") || scenario.Contains("prompt_vs_bdecay") ) {
         datalbl = "B decays";
         reflbl  = "Prompt";
         yMinD = -0.1; yMaxD = 0.1;
         yMinR =  0.9; yMaxR = 1.1;
     }
     if (scenario.Contains("cbq_vs_gaussexp")) {
-        datalbl = "CB + Pol2";
-        reflbl  = "Gaus + Exp";
+        if (TString(gFile->GetName()).Contains("gaussExpo")) {
+            datalbl  = "Gaus + Exp";
+            reflbl = "CB + Pol2";
+        } else {
+            datalbl = "CB + Pol2";
+            reflbl  = "Gaus + Exp";
+        }
         yMinD = -0.2; yMaxD = 0.2;
         yMinR =  0.8; yMaxR = 1.2;
     }
@@ -123,7 +136,9 @@ void plotMuonIDData() {
                 doLogX = false;
                 //extraSpam = "  0.9 < |#eta| < 1.2"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_overlap_"+tname, "pt_PLOT_abseta_bin1_");
                 extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_pt_eta, ref_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
-                if (neta >= 3) extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_p_eta, ref_p_eta, idname+"_p_endcaps_"+tname, "p_PLOT_abseta_bin0_");
+                if (neta >= 3 && fits[i][j][2] && refs[i][j][2]) {
+                    extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_p_eta, ref_p_eta, idname+"_p_endcaps_"+tname, "p_PLOT_abseta_bin0_");
+                }
                 TDirectory *mc_pt_eta  = ref->GetDirectory(basedir+"/"+idname+"_pt_abseta_"+tname+"_mcTrue/");
                 if (mc_pt_eta) {
                     mcts[i][j][0] = getFit(mc_pt_eta, "pt_PLOT_abseta_bin0_", "cnt");
@@ -145,7 +160,9 @@ void plotMuonIDData() {
                 } else {
                     extraSpam = "        |#eta| < 1.2"; fits[i][j][0] = single(fit_pt_eta, idname+"_pt_barrel_"+tname,  "pt_PLOT_abseta_bin0_");
                     extraSpam = "  1.2 < |#eta| < 2.4"; fits[i][j][1] = single(fit_pt_eta, idname+"_pt_endcaps_"+tname, "pt_PLOT_abseta_bin1_");
-                    if (neta >= 3) extraSpam = "  1.2 < |#eta| < 2.4"; fits[i][j][2] = single(fit_p_eta,  idname+"_p_endcaps_"+tname,  "p_PLOT_abseta_bin1_");
+                    if (neta >= 3) {
+                        extraSpam = "  1.2 < |#eta| < 2.4"; fits[i][j][2] = single(fit_p_eta,  idname+"_p_endcaps_"+tname,  "p_PLOT_abseta_bin1_");
+                    }
                 }
             }
             if (tname == "Mu3_Track3") {
@@ -153,16 +170,18 @@ void plotMuonIDData() {
                 yMin = 0.0; yMax = 1.1;
                 TDirectory *fit_vtx_barrel  = gFile->GetDirectory(basedir+"/"+idname+"_vtx_barrel_" +tname+"/");
                 TDirectory *fit_vtx_endcaps = gFile->GetDirectory(basedir+"/"+idname+"_vtx_endcaps_"+tname+"/");
-                if (ref) {
-                    TDirectory *ref_vtx_barrel  = ref->GetDirectory(basedir+"/"+idname+"_vtx_barrel_" +tname+"/");
-                    TDirectory *ref_vtx_endcaps = ref->GetDirectory(basedir+"/"+idname+"_vtx_endcaps_"+tname+"/");
-                    extraSpam = "        |#eta| < 0.9"; refstack(fit_vtx_barrel,  ref_vtx_barrel,  idname+"_vtx_barrel_"+tname,  "tag_nVertices_PLOT_");
-                    extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_vtx_endcaps, ref_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
-                } else {
-                    single(fit_vtx_barrel,  idname+"_vtx_barrel_"+tname,  "tag_nVertices_PLOT_");
-                    single(fit_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
-                    doCanvas(fit_vtx_barrel,  1, 10, idname+"_vtx_barrel_" +tname+"_vtx_%d",  ".*tag_nVertices_bin%d_");
-                    doCanvas(fit_vtx_endcaps, 1, 10, idname+"_vtx_endcaps_"+tname+"_vtx_%d",  ".*tag_nVertices_bin%d_");
+                if (fit_vtx_barrel && fit_vtx_endcaps) {
+                    if (ref) {
+                        TDirectory *ref_vtx_barrel  = ref->GetDirectory(basedir+"/"+idname+"_vtx_barrel_" +tname+"/");
+                        TDirectory *ref_vtx_endcaps = ref->GetDirectory(basedir+"/"+idname+"_vtx_endcaps_"+tname+"/");
+                        extraSpam = "        |#eta| < 0.9"; refstack(fit_vtx_barrel,  ref_vtx_barrel,  idname+"_vtx_barrel_"+tname,  "tag_nVertices_PLOT_");
+                        extraSpam = "  1.2 < |#eta| < 2.4"; refstack(fit_vtx_endcaps, ref_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
+                    } else {
+                        single(fit_vtx_barrel,  idname+"_vtx_barrel_"+tname,  "tag_nVertices_PLOT_");
+                        single(fit_vtx_endcaps, idname+"_vtx_endcaps_"+tname, "tag_nVertices_PLOT_");
+                        doCanvas(fit_vtx_barrel,  1, 10, idname+"_vtx_barrel_" +tname+"_vtx_%d",  ".*tag_nVertices_bin%d_");
+                        doCanvas(fit_vtx_endcaps, 1, 10, idname+"_vtx_endcaps_"+tname+"_vtx_%d",  ".*tag_nVertices_bin%d_");
+                    }
                 }
             }
 
@@ -181,10 +200,16 @@ void plotMuonIDData() {
             yMin = 0.85; yMax = 1.019;
             TDirectory *fit_plateau_barrel  = gFile->GetDirectory(basedir+"/"+idname+"_plateau_barrel_" +tname+"/");
             TDirectory *fit_plateau_endcaps  = gFile->GetDirectory(basedir+"/"+idname+"_plateau_endcaps_" +tname+"/");
+            TDirectory *fit_plateau_endcaps21  = gFile->GetDirectory(basedir+"/"+idname+"_plateau_endcaps21_" +tname+"/");
             if (fit_plateau_barrel) {
-                TString tmcname = (tname == "Mu3_Track5" ? "Mu3_Track3" : tname);
+                TString tmcname = tname;
+                if (tname == "Mu3_Track5" && ref != 0 && 
+                        ref->GetDirectory(basedir+"/"+idname+"_plateau_barrel_"+tmcname+"/") == 0) {
+                    tmcname = "Mu3_Track3";
+                }
                 TDirectory *ref_plateau_barrel  = ref ? ref->GetDirectory(basedir+"/"+idname+"_plateau_barrel_"  +tmcname+"/") : 0;
                 TDirectory *ref_plateau_endcaps = ref ? ref->GetDirectory(basedir+"/"+idname+"_plateau_endcaps_" +tmcname+"/") : 0;
+                TDirectory *ref_plateau_endcaps21 = ref ? ref->GetDirectory(basedir+"/"+idname+"_plateau_endcaps21_" +tmcname+"/") : 0;
                 if (ref_plateau_barrel) {
                     extraSpam = (idname == "VBTF" ? "  p_{T} > 10 GeV/c" : "  p_{T} > 6 GeV/c"); 
                     refstack(fit_plateau_barrel,  ref_plateau_barrel,  idname+"_plateau_barrel_"+tname,  "abseta_PLOT_");
@@ -195,6 +220,13 @@ void plotMuonIDData() {
                     single(fit_plateau_endcaps,  idname+"_plateau_endcaps_"+tname,  "abseta_PLOT_");
                     doCanvas(fit_plateau_barrel,  1, 1, idname+"_plateau_barrel_" +tname,  "abseta_bin1_");
                     doCanvas(fit_plateau_endcaps,  1, 1, idname+"_plateau_endcaps_" +tname,  "abseta_bin1_");
+                }
+                if (ref_plateau_endcaps21) {
+                    extraSpam = (idname == "VBTF" ? "  p_{T} > 10 GeV/c" : "  p_{T} > 4 GeV/c"); 
+                    refstack(fit_plateau_endcaps21,  ref_plateau_endcaps21,  idname+"_plateau_endcaps21_"+tname,  "abseta_PLOT_");
+                } else if (fit_plateau_endcaps21) {
+                    single(fit_plateau_endcaps21,  idname+"_plateau_endcaps21_"+tname,  "abseta_PLOT_");
+                    doCanvas(fit_plateau_endcaps21,  1, 1, idname+"_plateau_endcaps21_" +tname,  "abseta_bin1_");
                 }
             }
 
