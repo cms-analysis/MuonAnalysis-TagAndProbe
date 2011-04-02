@@ -48,8 +48,8 @@ PhysicsPerformanceDBWriterFromTPHist::PhysicsPerformanceDBWriterFromTPHist
 {
   rec1 = p.getParameter< std::vector <std::string> >("RecordPayloads");
   rec2 = p.getParameter< std::vector <std::string> >("RecordWPs");
-  iovBegin = p.getParameter<boost::uint64_t>("IOVBegin"); 
-  iovEnd = p.getParameter<boost::uint64_t>("IOVEnd"); 
+  iovBegin = p.getParameter<unsigned long long>("IOVBegin"); 
+  iovEnd = p.getParameter<unsigned long long>("IOVEnd"); 
   inputHistoFiles = p.getParameter< std::vector<std::string> >("inputHistoFiles");
   inputHistogramNames = p.getParameter< std::vector<std::string> >("inputHistogramNames"); 
   inputAlgorithmNames = p.getParameter< std::vector<std::string> >("inputAlgorithmNames");

@@ -56,8 +56,8 @@ PhysicsPerformanceDBWriterFromTPDataset::PhysicsPerformanceDBWriterFromTPDataset
 {
   rec1 = p.getParameter< std::vector <std::string> >("RecordPayloads");
   rec2 = p.getParameter< std::vector <std::string> >("RecordWPs");
-  iovBegin = p.getParameter<boost::uint64_t>("IOVBegin"); 
-  iovEnd = p.getParameter<boost::uint64_t>("IOVEnd"); 
+  iovBegin = p.getParameter<unsigned long long>("IOVBegin"); 
+  iovEnd = p.getParameter<unsigned long long>("IOVEnd"); 
   inputHistoFiles = p.getParameter< std::vector<std::string> >("inputHistoFiles");
   inputDatasetNames = p.getParameter< std::vector<std::string> >("inputDatasetNames"); 
   inputAlgorithmNames = p.getParameter< std::vector<std::string> >("inputAlgorithmNames");
