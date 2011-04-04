@@ -20,12 +20,10 @@ MuonIDVariables = cms.PSet(
 TrackQualityVariables = cms.PSet(
     dB          = cms.string("dB"),
     tkValidHits = cms.string("? track.isNull ? 0 : track.numberOfValidHits"),
-    tkPixelHits = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidPixelHits"),
     tkPixelLay  = cms.string("? track.isNull ? 0 : track.hitPattern.pixelLayersWithMeasurement"),
     tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner.numberOfLostHits"),
-    tkExpHitInNew  =cms.string("userInt('expectedHitsMu:in')"),
-    tkExpHitOutNew =cms.string("userInt('expectedHitsMu:out')")
-    
+    tkExpHitOut = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsOuter.numberOfLostHits"),
+    tkHitFract  = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidHits/(track.hitPattern.numberOfValidHits+track.hitPattern.numberOfLostHits+track.trackerExpectedHitsInner.numberOfLostHits+track.trackerExpectedHitsOuter.numberOfLostHits)"),
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
@@ -60,38 +58,24 @@ MuonIDFlags = cms.PSet(
     TM     = cms.string("isTrackerMuon"),
     TMA    = cms.string("muonID('TrackerMuonArbitrated')"),
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
-    TMOST = cms.string("muonID('TMOneStationTight')"),
-     
+    TMOSL  = cms.string("muonID('TMOneStationLoose')"),
+    TMOST  = cms.string("muonID('TMOneStationTight')"),
     VBTF   = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
-    VBTFold   = cms.string("numberOfMatches > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
-                        "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
-    BMuons = cms.string("(isGlobalMuon && globalTrack.chi2 / globalTrack.ndof < 20. && "+ 
-                        " globalTrack.hitPattern.numberOfValidMuonHits > 0 && isTrackerMuon && muonID('TrackerMuonArbitrated') )"+
-                        "|| (isTrackerMuon && muonID('TrackerMuonArbitrated') )"),
-    BMuQual = cms.string("((isGlobalMuon && globalTrack.chi2 / globalTrack.ndof < 20. && " + 
-                        " globalTrack.hitPattern.numberOfValidMuonHits > 0 && isTrackerMuon && muonID('TrackerMuonArbitrated') )"+
-                        "|| (isTrackerMuon && muonID('TrackerMuonArbitrated') ) ) && " +
-                        "(track.numberOfValidHits > 10 && track.chi2 / track.ndof < 1.8 && muonID('TMOneStationTight') && "+
-                        " track.hitPattern.pixelLayersWithMeasurement > 1 && abs(dB) < 3.0 && abs(track.dz) < 15.0)"),
-    BBbarCSWithIP = cms.string("isGlobalMuon && isTrackerMuon "
-                               +"&& track.numberOfValidHits > 10"
-                               +"&& track.hitPattern.numberOfValidPixelHits > 1 "
-                               +"&& track.normalizedChi2 < 2 && globalTrack.normalizedChi2 < 10 "
-                               +"&& globalTrack.hitPattern.numberOfValidMuonHits > 0 && numberOfMatches > 1"
-                               +"&& muonID('TrackerMuonArbitrated') && muonID('TMOneStationTight')"),
-
-
 )
 
 HighPtTriggerFlags = cms.PSet(
+   # legacy
    Mu9       = cms.string("!triggerObjectMatchesByPath('HLT_Mu9').empty()"),
-   Mu11      = cms.string("!triggerObjectMatchesByPath('HLT_Mu11').empty()"),
-   Mu15      = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v1').empty()"),
-   IsoMu9    = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu9').empty()"),
-   IsoMu13   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu13_v1').empty() || !triggerObjectMatchesByPath('HLT_IsoMu13_v2').empty() || !triggerObjectMatchesByPath('HLT_IsoMu13_v3').empty() || !triggerObjectMatchesByPath('HLT_IsoMu13_v4').empty()"),
-   DoubleMu3 = cms.string("(!triggerObjectMatchesByPath('HLT_DoubleMu3').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu3_v1').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu3_v2').empty() )"),
-   DoubleMu5 = cms.string("(!triggerObjectMatchesByPath('HLT_DoubleMu5').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu5_v1').empty() || !triggerObjectMatchesByPath('HLT_DoubleMu5_v2').empty() )"),
+   DoubleMu3 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu3*').empty()"),
+   # current or new
+   Mu15      = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*').empty()"),
+   Mu20      = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*').empty()"),
+   Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*').empty()"),
+   IsoMu15   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_v*').empty()"),
+   IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*').empty()"),
+   IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*').empty()"),
+   DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7*').empty()"),
 )
 
 LowPtTriggerFlagsPhysics = cms.PSet(
