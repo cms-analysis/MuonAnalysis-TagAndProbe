@@ -31,8 +31,8 @@ public:
 private:
   std::vector<std::string> rec1;
   std::vector<std::string> rec2;
-  boost::uint64_t iovBegin;
-  boost::uint64_t iovEnd;  
+  unsigned long long iovBegin;
+  unsigned long long iovEnd;  
   std::vector<std::string> inputHistoFiles;
   std::vector<std::string> inputHistogramNames; 
   std::vector<std::string> inputBinningVariables;
@@ -87,7 +87,7 @@ void PhysicsPerformanceDBWriterFromTPHist::beginJob()
   int nres, nbin;  
   int number = 0;
   std::string tmprec1, tmprec2;
-  boost::uint64_t tmpiovBegin, tmpiovEnd;
+  unsigned long long tmpiovBegin, tmpiovEnd;
 
   std::vector<PerformanceResult::ResultType> res;   
   std::vector<BinningVariables::BinningVariablesType> bin; 
