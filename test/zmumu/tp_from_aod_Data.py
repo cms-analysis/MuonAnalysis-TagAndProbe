@@ -8,36 +8,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/5ADD41D8-AEFA-DF11-8712-001A92971BD6.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/5618434E-B0FA-DF11-90B9-00261894389E.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/46336845-B1FA-DF11-A075-001A92971AA8.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/3E59C4E7-A8FA-DF11-BCE2-0018F3D09630.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/3629706C-A6FA-DF11-AABF-003048679044.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/0CE0A6C3-B3FA-DF11-AFEF-0018F3D0962A.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/0C8A93EF-A5FA-DF11-BCF7-0018F3D0961E.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0009/005823E0-A9FA-DF11-8949-002618943849.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/FE39D06D-99FA-DF11-9576-0018F3D096E4.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/F89C6E54-99FA-DF11-AF09-00304867BFC6.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/F6795867-99FA-DF11-9513-0018F3D09620.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/F6325427-9DFA-DF11-82A0-0018F3D096BA.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/F2E40049-99FA-DF11-99D9-00304867D838.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/EEE27061-99FA-DF11-9C06-001A92811724.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/EEE27061-99FA-DF11-84D9-001A92811724.root',
-	'/store/relval/CMSSW_3_9_5/Mu/RECO/GR_R_39X_V3_RelVal_wzMu2010B_realData-v1/0000/E837E490-A7FA-DF11-B97C-0018F3D09604.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/F62B224C-09E4-DF11-8813-003048F117B6.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/E8E4D990-1BE4-DF11-9A0D-001D09F242EF.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/E25D7CF7-1CE4-DF11-AC3C-001D09F251B8.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/C45B1E12-FEE3-DF11-81BA-0030487C60AE.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/8840D649-EDE3-DF11-9429-003048D2C1C4.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/6AFEA573-EAE3-DF11-B597-0030487CD812.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/62DA1B87-14E4-DF11-B9CC-001D09F24F65.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/546FB2D5-E4E3-DF11-B43F-003048D2C0F0.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/46908DDD-E4E3-DF11-8E3A-003048D37580.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/4431849D-EEE3-DF11-925E-001D09F25217.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/3C95E446-EDE3-DF11-ADFD-003048D2C108.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/32671F77-19E4-DF11-A416-001D09F2462D.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/18682728-F2E3-DF11-B7F2-001617E30CD4.root',
-	#'/store/data/Run2010B/Mu/RECO/PromptReco-v2/000/149/181/02D5E9A6-F5E3-DF11-9FCA-0030487CD6B4.root',
+        '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/161/103/FE4260FF-8556-E011-8184-003048F1BF68.root',
+        '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/161/103/7654B872-8B56-E011-A7EB-001617C3B77C.root',
+        '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/161/103/506BD24F-E956-E011-9681-000423D9890C.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -46,7 +19,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_39X_V5::All')
+process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -82,10 +55,6 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracksCut    = cms.string("pt > 5"),
 )
 
-import MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi
-process.expectedHitsMu = MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi.expectedHitsComputer.clone()
-process.expectedHitsMu.inputColl  = cms.InputTag("mergedMuons")
-
 ## ==== Trigger matching
 process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
@@ -93,10 +62,6 @@ process.muonMatchHLTL2.maxDeltaR = 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-process.patMuonsWithoutTrigger.userData.userInts.src += cms.VInputTag(
-    cms.InputTag('expectedHitsMu','in'),
-    cms.InputTag('expectedHitsMu','out')
-)
 
 
 
@@ -105,7 +70,7 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && (!triggerObjectMatchesByPath('HLT_Mu9').empty() || !triggerObjectMatchesByPath('HLT_Mu15_v1').empty())"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByPath('HLT_Mu15_v*').empty()"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
@@ -177,7 +142,6 @@ process.tnpSimpleSequence = cms.Sequence(
 process.tagAndProbe = cms.Path( 
     process.fastFilter +
     process.mergedMuons                 *
-    process.expectedHitsMu              *
     process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
 )

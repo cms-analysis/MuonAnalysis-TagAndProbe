@@ -8,16 +8,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        #'/store/mc/Fall10/DYToMuMu_M-20_CT10_TuneZ2_7TeV-powheg-pythia/GEN-SIM-RECO/E7TeV_ProbDist_2010Data_BX156_START38_V12-v1/0000/2CEF8004-17E4-DF11-8960-00237DA1680E.root',
-        #'/store/mc/Fall10/DYJetsToLL_TuneD6T_M-50_7TeV-madgraph-tauola/AODSIM/START38_V12-v2/0017/CCEE6478-EFE1-DF11-85E9-0026B94D1A94.root',
-        #'/store/relval/CMSSW_3_9_7/RelValZmumuJets_Pt_20_300_GEN/GEN-SIM-RECO/MC_39Y_V7_PU_E7TeV_AVE_2_BX2808-v1/0054/08350812-AD0F-E011-9C92-001A92810AA6.root',
-        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0048/BE734917-B50D-E011-8C78-00261894386B.root',
-        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/DE03BC23-720D-E011-8CFB-001A92811728.root',
-        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/D0D8D039-710D-E011-9242-001A92811728.root',
-        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/947253B7-720D-E011-8DF2-002354EF3BE4.root',
-        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/8AB6303D-7B0D-E011-9EFC-00261894395C.root',
-        '/store/relval/CMSSW_3_9_7/RelValWjet_Pt_80_120/GEN-SIM-RECO/MC_39Y_V7-v1/0047/28C4302A-790D-E011-AAFA-002618B27F8A.root',
-
+        '/store/relval/CMSSW_4_1_3/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0038/5694A8D8-5A52-E011-9DCB-003048678D78.root',
+        '/store/relval/CMSSW_4_1_3/RelValZMM/GEN-SIM-RECO/START311_V2-v1/0037/EEB7C520-C751-E011-94C9-0030486790BE.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )    
@@ -26,7 +18,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('START39_V6::All')
+process.GlobalTag.globaltag = cms.string('START311_V2::All')
 
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
@@ -49,10 +41,6 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracksCut    = cms.string("pt > 5"),
 )
 
-import MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi
-process.expectedHitsMu = MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi.expectedHitsComputer.clone()
-process.expectedHitsMu.inputColl  = cms.InputTag("mergedMuons")
-
 ## ==== Trigger matching
 process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
@@ -61,17 +49,13 @@ process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 changeTriggerProcessName(process, "*") # auto-guess
-process.patMuonsWithoutTrigger.userData.userInts.src += cms.VInputTag(
-    cms.InputTag('expectedHitsMu','in'),
-    cms.InputTag('expectedHitsMu','out')
-)
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && (!triggerObjectMatchesByPath('HLT_Mu9').empty())"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && (!triggerObjectMatchesByPath('HLT_Mu15_v1').empty())"),
 )
 
 process.probeMuons = cms.EDFilter("PATMuonSelector",
@@ -151,7 +135,6 @@ process.tnpSimpleSequence = cms.Sequence(
 process.tagAndProbe = cms.Path( 
     #process.fastFilter                  *
     process.mergedMuons                 *
-    process.expectedHitsMu              *
     process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
 )
