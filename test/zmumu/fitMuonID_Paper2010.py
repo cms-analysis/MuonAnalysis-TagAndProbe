@@ -42,8 +42,11 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         Glb   = cms.vstring("Global", "dummy[pass=1,fail=0]"),
         VBTF     = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
         VBTFold  = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
+        TMOSL = cms.vstring("TMOneStationLoose", "dummy[pass=1,fail=0]"),
         TMOST = cms.vstring("TMOneStationTight", "dummy[pass=1,fail=0]"),
         PF    = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
+        TM    = cms.vstring("Tracker Muon", "dummy[pass=1,fail=0]"),
+        TMA   = cms.vstring("Arbitrated Tracker Muon", "dummy[pass=1,fail=0]"),
         IsolTk3 = cms.vstring("Tk Abs Iso < 3", "dummy[pass=1,fail=0]"),
         Mu15  = cms.vstring("MC true", "dummy[true=1,false=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
@@ -119,7 +122,8 @@ CHARGE = cms.PSet(
 
 
 
-PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.17/"
+#PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.17/"
+PREFIX="/data/gpetrucc/7TeV/tnp/2011-04/"
 process.TnP_MuonID = Template.clone(
     InputFileNames = cms.vstring(PREFIX+'tnpZ_Data_Nov4B.root'),
     InputTreeName = cms.string("fitter_tree"),
@@ -136,6 +140,10 @@ if scenario.find("some_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MCDYPoweg_38X_dzIso.334pb.root" ]
 if scenario.find("39X_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_39XDY_1.root" ]
+if scenario.find("some_mc2") != -1:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMMpowhegZ2_Fall10PU.root" ]
+if scenario.find("39X_mc2") != -1:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMMpowhegZ2_Winter10PU.root" ]
 if scenario.find("realistic_mc") != -1:
     process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MCDYPoweg_38X_dzIso.334pb.root", 
                                           PREFIX+"tnpZ_MC_WJetsPU.334pb.root", 

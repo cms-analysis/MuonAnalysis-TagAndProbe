@@ -55,9 +55,9 @@ void plotMuonID_Paper2010(TString scenario="data") {
 void plotMuonIDData() {
     retitle = "Efficiency";
 
-    const int nids  = 4;
-    char *ids[nids]    = { "Glb",    "TMOST",   "VBTF",  "PF" };
-    char *titles[nids] = { "Global",  "Soft",   "Tight", "PF" };
+    const int nids  = 7;
+    char *ids[nids]    = { "Glb",    "TMOST",   "VBTF",  "PF", "TM",      "TMA",        "TMOSL" };
+    char *titles[nids] = { "Global",  "Soft",   "Tight", "PF", "Tracker", "TrackerArb", "Softer" };
 
    
     for (size_t i = 0; i < nids; ++i) {
