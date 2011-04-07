@@ -1,4 +1,30 @@
+#include <TCanvas.h>
+#include <TColor.h>
+#include <TFile.h>
+#include <TGraphAsymmErrors.h>
+#include <TH1.h>
+#include <TH2.h>
+#include <TKey.h>
+#include <TLegend.h>
+#include <TMath.h>
+#include <TPRegexp.h>
 #include <TPad.h>
+#include <TPaveText.h>
+#include <TROOT.h>
+#include <TStyle.h>
+#include <TStyle.h>
+#include <TSystem.h>
+#include <math.h>
+#include <stdlib.h>
+#include <iostream>
+
+TString prefix = "plots_dev/muonid/";
+TString basedir  = "tpTree";
+
+TFile *ref = 0;
+
+TCanvas *c1 = 0;
+
 
 /** Grab a TObject from a directory
  *  even knowing only the beginning 
@@ -53,8 +79,8 @@ TFile *fOut = 0;
 double cmsprel_xoffs = 0;
 double cmsprel_yoffs = 0;
 void cmsprelim(double xoffs=-99,double yoffs=-99) {
-    if (xoffs = -99) xoffs = cmsprel_xoffs;
-    if (yoffs = -99) yoffs = cmsprel_yoffs;
+    if (xoffs == -99) xoffs = cmsprel_xoffs;
+    if (yoffs == -99) yoffs = cmsprel_yoffs;
     TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.40 : .55),yoffs+.16,xoffs+.94,yoffs+.21,"NDC");
     cmsprel->SetTextSize(doSquare ? 0.040 : 0.05);
     cmsprel->SetFillColor(0);
@@ -134,7 +160,7 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g
 }
 
 
-void squareCanvas(TCanvas *c) {
+void squareCanvas(TVirtualPad *c) {
     c->SetCanvasSize(600,600);
     gStyle->SetPaperSize(20.,20.);
 }
@@ -174,6 +200,13 @@ double ymaxGraph(TGraphAsymmErrors *g) {
         }
     }
     return ret;
+}
+
+void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.3) {
+   ax->SetTitle(ytitle); 
+   ax->SetTitleOffset(yoffset); 
+   ax->SetDecimals(true);
+   ax->SetMoreLogLabels(true);
 }
 
 void reTitleY(TCanvas *pl, TString ytitle) {
@@ -217,8 +250,9 @@ void maybeLogX(TCanvas *c, TGraphAsymmErrors *h) {
 }
 
 void printGraph(TGraphAsymmErrors *graph, TString alias) {
-    if (graph == 0 || graph->GetN() == 0) return;
+    if (graph == 0 || graph->GetN() == 0 || !graph->InheritsFrom("TGraphAsymmErrors")) return;
     FILE *text = fopen((prefix+alias+".txt").Data(), "w");
+    if (text == 0) return;
     fprintf(text, " %7s  %7s  %7s    %6s   -%4s/ +%4s\n","  x min","  x avg","  x max","  eff ","err ","err ");
     fprintf(text, " %7s  %7s  %7s    %6s  %6s/%6s\n"," ------"," ------"," ------"," -----","------","------");
     for (int i = 0; i < graph->GetN(); ++i) {
@@ -240,7 +274,6 @@ void printGraphs(TGraphAsymmErrors *graph, TGraphAsymmErrors *graph2, TString al
         if (j == -1) {
             fprintf(text, " %7.3f  %7.3f  %7.3f    %6.2f  -%5.2f/+%5.2f    %6s  %6s/%6s\n", x-xlo,x,x+xhi,y*100,ylo*100,yhi*100,"--.--","-.--","-.--");
         } else {
-            double x2 = graph2->GetX()[i], x2lo = graph2->GetErrorXlow(i), x2hi = graph2->GetErrorXhigh(i);
             double y2 = graph2->GetY()[i], y2lo = graph2->GetErrorYlow(i), y2hi = graph2->GetErrorYhigh(i);
             fprintf(text, " %7.3f  %7.3f  %7.3f    %6.2f  -%5.2f/+%5.2f    %6.2f  -%5.2f/+%5.2f\n", x-xlo,x,x+xhi,y*100,ylo*100,yhi*100, y2*100,y2lo*100,y2hi*100);
         }
@@ -248,13 +281,6 @@ void printGraphs(TGraphAsymmErrors *graph, TGraphAsymmErrors *graph2, TString al
     fclose(text);
 }
 
-
-void reTitleTAxis(TAxis *ax, TString ytitle, double yoffset=1.3) {
-   ax->SetTitle(ytitle); 
-   ax->SetTitleOffset(yoffset); 
-   ax->SetDecimals(true);
-   ax->SetMoreLogLabels(true);
-}
 
 
 void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, const char *xtitle) {
@@ -363,21 +389,21 @@ void doDiff(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, con
     delete frame;
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
-void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) {
+void refstack(TDirectory *fit, TDirectory *refd, TString alias, TString fitname) {
     if (fit == 0) {
         std::cerr << "ERROR: refstack called with missing dirs: alias = " << alias << std::endl;
     }
-    if (ref == 0) {
+    if (refd == 0) {
         std::cerr << "REFERENCE NOT DIR FOUND FOR: " << fit->GetName() << std::endl;
         return;
     }
 
-    TCanvas *pref = getFromPrefix(ref->GetDirectory("fit_eff_plots"), fitname);
+    TCanvas *pref = (TCanvas*) getFromPrefix(refd->GetDirectory("fit_eff_plots"), fitname);
     if (pref == 0) {
-        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << ref->GetName() << std::endl;
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << refd->GetName() << std::endl;
         return;
     }
-    RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *href = (TGraphAsymmErrors *) pref->FindObject("hxy_fit_eff");
     if (doFillMC) {
         href->SetLineColor(2);
         href->SetFillColor(208);
@@ -393,12 +419,12 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
         href->SetMarkerSize(2.0);
     }
 
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    TCanvas *pfit = (TCanvas*) getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
         return;
     }
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *hfit = (TGraphAsymmErrors *) pfit->FindObject("hxy_fit_eff");
     hfit->SetLineWidth(2);
     hfit->SetLineColor(kBlack);
     hfit->SetMarkerColor(kBlack);
@@ -428,12 +454,12 @@ void refstack(TDirectory *fit, TDirectory *ref, TString alias, TString fitname) 
 }
 /** Plot FIT from file 1 plus FIT from file 2 */
 void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refname) {
-    TCanvas *pref = getFromPrefix(fit->GetDirectory("fit_eff_plots"), refname);
+    TCanvas *pref = (TCanvas*) getFromPrefix(fit->GetDirectory("fit_eff_plots"), refname);
     if (pref == 0) {
-        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+refname << " in " << ref->GetName() << std::endl;
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+refname << " in " << fit->GetName() << std::endl;
         return;
     }
-    RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *href = (TGraphAsymmErrors *) pref->FindObject("hxy_fit_eff");
     if (doFillMC) {
         href->SetLineColor(2);
         href->SetFillColor(208);
@@ -449,12 +475,12 @@ void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refn
         href->SetMarkerSize(2.0);
     }
 
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    TCanvas *pfit = (TCanvas*) getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
         return;
     }
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *hfit = (TGraphAsymmErrors *) pfit->FindObject("hxy_fit_eff");
     hfit->SetLineWidth(2);
     hfit->SetLineColor(kBlack);
     hfit->SetMarkerColor(kBlack);
@@ -480,33 +506,33 @@ void refstackNamed(TDirectory *fit, TString alias, TString fitname, TString refn
 }
 
 /** Plot FIT from file 1 plus FIT from file 2 plus CNT from file 3 */
-void refstack3(TDirectory *fit, TDirectory *ref, TDirectory *mc, TString alias, TString fitname) {
-    TCanvas *pref = getFromPrefix(ref->GetDirectory("fit_eff_plots"), fitname);
+void refstack3(TDirectory *fit, TDirectory *refd, TDirectory *mc, TString alias, TString fitname) {
+    TCanvas *pref = (TCanvas *) getFromPrefix(refd->GetDirectory("fit_eff_plots"), fitname);
     if (pref == 0) {
-        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << ref->GetName() << std::endl;
+        std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << refd->GetName() << std::endl;
         return;
     }
-    RooHist *href = (RooHist *) pref->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *href = (TGraphAsymmErrors *) pref->FindObject("hxy_fit_eff");
     href->SetLineWidth(2);
     href->SetLineColor(kRed);
     href->SetMarkerColor(kRed);
     href->SetMarkerStyle(25);
     href->SetMarkerSize(2.0);
 
-    TCanvas *pmc = getFromPrefix(mc->GetDirectory("cnt_eff_plots"), fitname);
-    RooHist *hmc = (RooHist *) pmc->FindObject("hxy_cnt_eff");
+    TCanvas *pmc = (TCanvas *) getFromPrefix(mc->GetDirectory("cnt_eff_plots"), fitname);
+    TGraphAsymmErrors *hmc = (TGraphAsymmErrors *) pmc->FindObject("hxy_cnt_eff");
     hmc->SetLineWidth(2);
     hmc->SetLineColor(209);
     hmc->SetMarkerColor(209);
     hmc->SetMarkerStyle(21);
     hmc->SetMarkerSize(1.6);
 
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    TCanvas *pfit = (TCanvas *) getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
         return;
     }
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *hfit = (TGraphAsymmErrors *) pfit->FindObject("hxy_fit_eff");
     hfit->SetLineWidth(2);
     hfit->SetLineColor(kBlack);
     hfit->SetMarkerColor(kBlack);
@@ -529,17 +555,17 @@ void refstack3(TDirectory *fit, TDirectory *ref, TDirectory *mc, TString alias, 
 }
 
 /** Plot FIT from file 1 plus CNT from file 2 */
-void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
-    TCanvas *pref = getFromPrefix(ref->GetDirectory("cnt_eff_plots"), name);
-    RooHist *href = (RooHist *) pref->FindObject("hxy_cnt_eff");
+void mcstack(TDirectory *fit, TDirectory *refd, TString alias, TString name) {
+    TCanvas *pref = (TCanvas *) getFromPrefix(refd->GetDirectory("cnt_eff_plots"), name);
+    TGraphAsymmErrors *href = (TGraphAsymmErrors *) pref->FindObject("hxy_cnt_eff");
     href->SetLineWidth(2);
     href->SetLineColor(209);
     href->SetMarkerColor(209);
     href->SetMarkerStyle(25);
     href->SetMarkerSize(2.0);
 
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), name);
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    TCanvas *pfit = (TCanvas *) getFromPrefix(fit->GetDirectory("fit_eff_plots"), name);
+    TGraphAsymmErrors *hfit = (TGraphAsymmErrors *) pfit->FindObject("hxy_fit_eff");
     hfit->SetLineWidth(2);
     hfit->SetLineColor(206);
     hfit->SetMarkerColor(206);
@@ -564,18 +590,18 @@ void mcstack(TDirectory *fit, TDirectory *ref, TString alias, TString name) {
 
 
 TGraphAsymmErrors *getFit(TDirectory *fit, TString fitname, TString algo="fit") {
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory(algo+"_eff_plots"), fitname);
+    TCanvas *pfit = (TCanvas *) getFromPrefix(fit->GetDirectory(algo+"_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << algo+"_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
-        return;
+        return 0;
     }
     if (retitle != "") reTitleY(pfit, retitle);
 
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_"+algo+"_eff");
+    TGraphAsymmErrors *hfit = (TGraphAsymmErrors *) pfit->FindObject("hxy_"+algo+"_eff");
     if (hfit == 0) {
         std::cerr << "NOT FOUND: " << algo+"_eff_plots/"+fitname << "/hxy_"+algo+"_eff in " << fit->GetName() << std::endl;
         pfit->ls();
-        return;
+        return 0;
     }
     return hfit;
 }
@@ -584,18 +610,18 @@ TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
     if (fit == 0) {
         std::cerr << "ERROR: signle called with missing dirs: alias = " << alias << std::endl;
     }
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    TCanvas *pfit = (TCanvas *) getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
-        return;
+        return 0;
     }
     if (retitle != "") reTitleY(pfit, retitle);
 
-    RooHist *hfit = (RooHist *) pfit->FindObject("hxy_fit_eff");
+    TGraphAsymmErrors *hfit = (TGraphAsymmErrors *) pfit->FindObject("hxy_fit_eff");
     if (hfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << "/hxy_fit_eff in " << fit->GetName() << std::endl;
         pfit->ls();
-        return;
+        return 0;
     }
     hfit->SetLineWidth(2);
     hfit->SetLineColor(kBlue);
@@ -620,7 +646,6 @@ void EffPalette()
    static Int_t  colors[50];
    static Bool_t initialized = kFALSE;
 
-   double mid = 0.5*(yMin+yMax);
    Double_t Red[3]    = { 1.00, 1.00, 0.00 };
    Double_t Green[3]  = { 0.00, 1.00, 1.00 };
    Double_t Blue[3]   = { 0.00, 0.00, 0.00 };
@@ -638,12 +663,12 @@ void EffPalette()
 /** Plot just one set */
 void single2D( TDirectory *fit, TString alias, TString fitname) {
     gStyle->SetPaintTextFormat(".4f");
-    TCanvas *pfit = getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
+    TCanvas *pfit = (TCanvas*) getFromPrefix(fit->GetDirectory("fit_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << "fit_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
         return;
     }
-    TH2 *hfit = pfit->FindObject(pfit->GetName());
+    TH2 *hfit = (TH2*) pfit->FindObject(pfit->GetName());
     hfit->SetTitle(retitle == "" ?  "efficiency" : retitle);
     hfit->GetZaxis()->SetTitle("");
     hfit->GetZaxis()->SetRangeUser(yMin, yMax);
@@ -664,7 +689,7 @@ void single2D( TDirectory *fit, TString alias, TString fitname) {
 
 /** Reset line styles and colors, which get messed up by tdrStyle */
 void prettyLine(TCanvas *canv, int pad, const char *cname, int color) {
-    RooCurve *c = (RooCurve *) canv->GetPad(pad)->FindObject(cname);
+    TGraph *c = (TGraph *) canv->GetPad(pad)->FindObject(cname);
     c->SetLineWidth(2);
     c->SetLineColor(color);
 }
@@ -694,11 +719,13 @@ void doCanvas(TDirectory *dir, int binsx, int binsy, const char * easyname, cons
                 sprintf(buff,easyname);
                 sprintf(baff,truename);
             }
+            std::cerr << "Trying " << baff << std::endl;
             TDirectory *subdir = (TDirectory *) getFromPrefix(dir, baff, /*prefixOnly=*/false);
             if (subdir == 0) {
                 //std::cerr << "Didn't find '" << baff << "*' in " << dir->GetName() << std::endl;
                 continue;
             }
+            subdir->ls();
             TCanvas *fitc = (TCanvas *) subdir->Get("fit_canvas");
             if (fitc == 0) {
                 std::cerr << "Didn't find " << TString(baff) << "/fit_canvas in " << dir->GetName() << std::endl;
@@ -707,12 +734,13 @@ void doCanvas(TDirectory *dir, int binsx, int binsy, const char * easyname, cons
             fitc->Draw(); 
             prettyLines(fitc);
             fitc->Print(prefix+TString("canvases/")+buff+"_fit.png");
+            fitc->Close();
         }
     }
 }
 
 enum GraphMergeAlgo { Combine, LowestUnc, Last };
-TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3=0, TGraphAsymmErrors *g4=0, GraphMergeAlgo algo=LowestUnc, double yMin = 0.001) {
+TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3=0, TGraphAsymmErrors *g4=0, GraphMergeAlgo algo=LowestUnc, double yMinCut = 0.001) {
     TGraphAsymmErrors *graphs[4];
     graphs[0] = g1;
     graphs[1] = g2;
@@ -744,7 +772,7 @@ TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGr
             if (k == -1) continue;
             double x = graphs[j]->GetX()[k];
             double y = graphs[j]->GetY()[k];
-            if (algo == Combine && ytry/ntry > yMin && y < yMin) continue;
+            if (algo == Combine && ytry/ntry > yMinCut && y < yMinCut) continue;
             double ylo = graphs[j]->GetErrorYlow(k);
             double yhi = graphs[j]->GetErrorYhigh(k);
             double w2 = 1.0/TMath::Max(ylo,yhi); w2 *= w2;
