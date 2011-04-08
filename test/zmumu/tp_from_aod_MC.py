@@ -30,7 +30,7 @@ process.GlobalTag.globaltag = cms.string('START311_V2::All')
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
 process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     mergeTracks = cms.bool(True),
-    #mergeCaloMuons = cms.bool(False), # AOD
+    mergeCaloMuons = cms.bool(False), # AOD
     muons     = cms.InputTag("muons"), 
     caloMuons = cms.InputTag("calomuons"),
     tracks    = cms.InputTag("generalTracks"),
@@ -100,7 +100,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
     ),
     tagVariables = cms.PSet(
-        nVertices = cms.InputTag("nverticesModule"),
+        nVertices   = cms.InputTag("nverticesModule"),
+        nVerticesDA = cms.InputTag("nverticesDAModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
     ),
     tagFlags = cms.PSet(),
@@ -124,6 +125,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.probeMuons * process.probeMuonsMCMatch +
     process.tpPairs    +
     process.nverticesModule +
+    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.njets15Module +
     process.njets30Module +
     process.muonsPassingPF +
@@ -200,6 +202,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.probeMuonsSta * process.probeMuonsMCMatchSta +
     process.tpPairsSta      +
     process.nverticesModule +
+    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.staToTkMatchSequenceZ +
     process.njets15ModuleSta +
     process.njets30ModuleSta +
