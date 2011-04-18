@@ -107,9 +107,11 @@ tkTracksNoZ = cms.EDProducer("CandidateResonanceInefficiencyCreator",
     outputMode = cms.string("RefToBaseVector"),
 )
 
-staToTkMatch = cms.EDProducer("MatcherUsingTracks",
+staToTkMatch = cms.EDProducer("MatcherUsingTracksWithTagAssoc",
     src     = cms.InputTag("probeMuonsSta"),
     matched = cms.InputTag("tkTracks"),  
+    tags      = cms.InputTag("tagMuons"),
+    tagDeltaZ = cms.double(1.0),
     algorithm = cms.string("byDirectComparison"), 
     srcTrack     = cms.string("muon"),    srcState = cms.string("atVertex"), 
     matchedTrack = cms.string("tracker"), matchedState = cms.string("atVertex"),

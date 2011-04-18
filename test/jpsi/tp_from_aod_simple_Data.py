@@ -8,32 +8,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/FA21CF01-3BF1-DF11-A9A1-00215E22053A.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/746FE647-2AF1-DF11-8D41-00215E21D56A.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/6AC847A6-2FF1-DF11-9D58-00215E220F78.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/665E9DFE-3AF1-DF11-8FB3-00215E22237C.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/647A53EE-39F1-DF11-9BAA-00215E21D8E2.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/46632181-31F1-DF11-AB04-00215E21DAB0.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/32EBDC2C-29F1-DF11-A0CE-00215E93EFB8.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0179/285421F0-2BF1-DF11-8688-00215E21DAB0.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0178/FADEA9B4-18F1-DF11-82CD-00215E2211AC.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0178/96DE97D2-16F1-DF11-A850-00215E21D462.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0178/8457837A-17F1-DF11-929E-00215E21D972.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0178/84454AB5-18F1-DF11-8DC1-00215E221248.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0178/68D27AC3-18F1-DF11-928D-00215E221FBC.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0178/0ADC2DCB-16F1-DF11-8C38-00215E21DAAA.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/DEE0EE56-FBF0-DF11-8E70-00215E21DA98.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/B8B651F1-F8F0-DF11-B78E-00215E221B48.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/928089F6-F9F0-DF11-9429-00215E221506.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/8E498B51-FBF0-DF11-A542-00215E21DD0E.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/28A8C477-FDF0-DF11-82B9-00215E221FF2.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/22CA2540-08F1-DF11-94D8-E41F13180DC8.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/1EA26A07-0AF1-DF11-9A8B-00215E221B48.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/12D8F056-FBF0-DF11-8595-00215E21DA98.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/0632E104-0AF1-DF11-9571-00215E21D9F6.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0177/00716ADD-0AF1-DF11-AD13-00215E22053A.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0176/BA7734F2-EDF0-DF11-84B3-00215E21DB4C.root',
-        '/store/data/Run2010B/MuOnia/RECO/Nov4ReReco_v1/0176/6A75AA1C-F0F0-DF11-A4CD-00215E22237C.root',
+	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/E89CCBE0-E957-E011-A53B-0019B9F709A4.root',
+	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/D407945E-ED57-E011-A36D-003048F0258C.root',
+	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/CEB587EC-F057-E011-B9DC-001617E30E2C.root',
+	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/BED0F55C-7959-E011-B49E-003048F1C832.root',
+	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/6E558535-F757-E011-B8C5-003048F118C2.root',
+	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/667F546C-E857-E011-A5CA-003048F024DC.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -43,7 +23,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_39X_V5::All')
+process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -60,50 +40,40 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
 process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping)
 
 process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
-process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Jet*' )
+process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu*_L2Mu*' )
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = True
 process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
-process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0' ])
-process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu0', 'HLT_Mu3_Track*_Jpsi*', 'HLT_Mu5_Track*_Jpsi*' ])
+process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu*' ])
+process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu*', 'HLT_Mu*_Track*_Jpsi*' ])
 
 ## ==== Merge CaloMuons and Tracks into the collection of reco::Muons  ====
 from RecoMuon.MuonIdentification.calomuons_cfi import calomuons;
 process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     mergeTracks = cms.bool(True),
+    mergeCaloMuons = cms.bool(False), # AOD
     muons     = cms.InputTag("muons"), 
     caloMuons = cms.InputTag("calomuons"),
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
     ## Apply some minimal pt cut
-    muonsCut     = cms.string("track.isNonnull"),
-    caloMuonsCut = cms.string(""),
-    tracksCut    = cms.string("pt > 2 || (abs(eta) > 1 && p > 2)"),
+    muonsCut     = cms.string("track.isNonnull && pt > 2"),
+    caloMuonsCut = cms.string("pt > 2"),
+    tracksCut    = cms.string("pt > 2"),
 )
-
-import MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi
-process.expectedHitsMu = MuonAnalysis.TagAndProbe.expectedHitsComputer_cfi.expectedHitsComputer.clone()
-process.expectedHitsMu.inputColl  = cms.InputTag("mergedMuons")
-
 
 ## ==== Trigger matching
 process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-#useL1MatchingWindowForSinglets(process) ## No longer used
-process.patMuonsWithoutTrigger.userData.userInts.src += cms.VInputTag(
-    cms.InputTag('expectedHitsMu','in'),
-    cms.InputTag('expectedHitsMu','out')
-)
-
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("(isGlobalMuon || numberOfMatchedStations > 1 ) && pt > 3 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
+    cut = cms.string("(isGlobalMuon || numberOfMatchedStations > 1) && pt > 3 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
@@ -114,7 +84,7 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
 )
 
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
-    cut = cms.string('2.8 < mass < 3.4'),
+    cut = cms.string('2.8 < mass < 3.4 && abs(daughter(0).vz - daughter(1).vz) < 1'),
     decay = cms.string('tagMuons@+ probeMuons@-')
 )
 process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
@@ -147,6 +117,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         pt  = cms.string('pt'),
         eta = cms.string('eta'),
         nVertices = cms.InputTag("nverticesModule"),
+        nVerticesDA = cms.InputTag("nverticesDAModule"),
     ),
     tagFlags     = cms.PSet(
         LowPtTriggerFlagsPhysics,
@@ -176,6 +147,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.onePair    +
     process.muonDxyPVdzmin +
     process.nverticesModule +
+    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.tagProbeSeparation +
     process.muonsPassingPF +
     process.tpTree
@@ -185,7 +157,6 @@ process.tagAndProbe = cms.Path(
     process.fastFilter +
     process.HLTBoth    +
     process.mergedMuons                 *
-    process.expectedHitsMu              *
     process.patMuonsWithTriggerSequence *
     process.tnpSimpleSequence
 )
@@ -232,17 +203,18 @@ process.tpTreeSta = process.tpTree.clone(
     ),
     flags = cms.PSet(
         outerValidHits = cms.string("outerTrack.numberOfValidHits > 0"),
-        MuX_L2Mu0_L2   = LowPtTriggerFlagsEfficienciesProbe.MuX_L2Mu0_L2,
+        Mu5_L2Mu0_L2      = LowPtTriggerFlagsEfficienciesProbe.Mu5_L2Mu0_L2,
+        Mu5_L2Mu2_Jpsi_L2 = LowPtTriggerFlagsEfficienciesProbe.Mu5_L2Mu2_Jpsi_L2,
         TM  = cms.string("isTrackerMuon"),
         Glb = cms.string("isGlobalMuon"),
     ),
     tagVariables = cms.PSet(
         nVertices = cms.InputTag("nverticesModule"),
+        nVerticesDA = cms.InputTag("nverticesDAModule"),
     ),
     tagFlags = cms.PSet(
-        Mu0_L2Mu0_MU = LowPtTriggerFlagsEfficienciesTag.Mu0_L2Mu0_MU,
-        Mu3_L2Mu0_MU = LowPtTriggerFlagsEfficienciesTag.Mu3_L2Mu0_MU,
-        Mu5_L2Mu0_MU = LowPtTriggerFlagsEfficienciesTag.Mu5_L2Mu0_MU,
+        Mu5_L2Mu0_MU      = LowPtTriggerFlagsEfficienciesTag.Mu5_L2Mu0_MU,
+        Mu5_L2Mu2_Jpsi_MU = LowPtTriggerFlagsEfficienciesTag.Mu5_L2Mu2_Jpsi_MU,
     ),
     pairVariables = cms.PSet(),
     pairFlags     = cms.PSet(),
@@ -255,6 +227,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.tpPairsSta      +
     process.onePairSta      +
     process.nverticesModule +
+    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.staToTkMatchSequenceJPsi +
     process.tpTreeSta
 )
