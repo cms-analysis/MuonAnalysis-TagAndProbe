@@ -33,7 +33,8 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         phi    = cms.vstring("muon #phi at vertex", "-3.1416", "3.1416", ""),
         charge = cms.vstring("muon charge", "-2.5", "2.5", ""),
         tag_pt = cms.vstring("Tag p_{T}", "0", "1000", "GeV/c"),
-        tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
+        tag_nVertices   = cms.vstring("Number of vertices", "0", "999", ""),
+        tag_nVerticesDA = cms.vstring("Number of vertices", "0", "999", ""),
         isoTrk03Abs    = cms.vstring("Probe abs trk iso", "-2", "9999999", ""),
         tag_combRelIso = cms.vstring("Tag comb rel iso", "-2", "9999999", ""),
     ),
@@ -69,6 +70,15 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
             "Exponential::backgroundFail(mass, lf[-0.1,-1,0.1])",
             "efficiency[0.9,0,1]",
             "signalFractionInPassing[0.9]"
+        ),
+        vpvPlusExpoMin70 = cms.vstring(
+            "Voigtian::signal1(mass, mean1[90,80,100], width[2.495], sigma1[2,1,3])",
+            "Voigtian::signal2(mass, mean2[90,80,100], width,        sigma2[4,3,10])",
+            "SUM::signal(vFrac[0.8,0.5,1]*signal1, signal2)",
+            "Exponential::backgroundPass(mass, lp[-0.1,-1,0.1])",
+            "Exponential::backgroundFail(mass, lf[-0.1,-1,0.1])",
+            "efficiency[0.9,0.7,1]",
+            "signalFractionInPassing[0.9]"
         )
     ),
 
@@ -95,6 +105,12 @@ VTX_BINS  = cms.PSet(
     abseta = cms.vdouble(  0.0, 2.4),
     tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5)
 )
+VTXDA_BINS  = cms.PSet(
+    pt     = cms.vdouble(  20, 120 ),
+    abseta = cms.vdouble(  0.0, 2.4),
+    tag_nVerticesDA = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5,18.5,20.5)
+)
+
 
 ETA_BINS_FINE = cms.PSet(
     pt  = cms.vdouble(20,100),
@@ -160,6 +176,7 @@ IDS = [ "TMOST", "VBTF", "PF" ]
 IDS += [ "Glb" ]
 ALLBINS = [("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
 ALLBINS += [ ("vtx",VTX_BINS)]
+ALLBINS += [ ("vtxDA",VTXDA_BINS)]
 #ALLBINS+=[("eta_fine",ETA_BINS_FINE)]
 ALLBINS += [("overall",OVERALL), ("charge",CHARGE), ("overall_abseta",OVERALL_ABSETA),("overall_endcaps21",OVERALL_ENDCAPS21)]
 ALLBINS+=[("eta_phi",ETA_PHI_BINS)]
@@ -171,7 +188,9 @@ for ID in IDS:
         if len(args) > 2 and X not in args[2:]: continue
         module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         shape = "vpvPlusExpo"
-        if X.find("eta") != -1 and X.find("abseta") == -1: shape = "voigtPlusExpo"
+        if "eta" in X and not "abseta" in X: shape = "voigtPlusExpo"
+        if X == "pt_abseta": 
+            shape = "vpvPlusExpoMin70"
         if X.find("pt_abseta") != -1: module.Variables.mass[1]="77";
         if X.find("overall") != -1: module.binsForFit = 120
         DEN = B.clone(); num = ID;

@@ -26,7 +26,7 @@ void plotMuonID(TString scenario="data") {
     doPdf = true;
     doSquare = true; yMin = 0.7; yMax = 1.048;
     datalbl = "Data, 2011";
-    reflbl  = "Sim., Spring11";
+    reflbl  = "Sim., 2011";
     preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
 
     if (scenario.Contains("any_vs_iso")) {
@@ -65,6 +65,7 @@ void plotMuonIDData() {
     for (int i = 0; i < nids; ++i) {
         TString idname(ids[i]);
         retitle = TString(titles[i])+" muon efficiency";
+        if (retitle == "Isolation muon efficiency") retitle == "Isolation efficiency";
         TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
         if (fit_pt_eta == 0) { /*if (i == 0) { gFile->GetDirectory(basedir)->ls(); } ;*/ continue; }
         yMin = 0.0; yMax = 1.1;
@@ -169,6 +170,32 @@ void plotMuonIDData() {
             }
             if (ref == 0) doCanvas(fit_vtx, 1, 27, idname+"_vtx_%d",   "tag_nVertices_bin%d_");
         }
+
+        yMin = 0.85; yMax = 1.019;
+        fit_vtx = gFile->GetDirectory(basedir+"/"+idname+"_vtxDA/");
+        if (fit_vtx) {
+            retitleX = "number of vertices (DA 100#mum)";
+            TDirectory *ref_vtx = ref ? ref->GetDirectory(basedir+"/"+idname+"_vtxDA/") : 0;
+            if (ref_vtx) {
+                refstack(fit_vtx, ref_vtx, idname+"_vtxDA",  "tag_nVerticesDA_PLOT_");
+                TDirectory *mc_vtx  = ref->GetDirectory(basedir+"/"+idname+"_vtxDA_mcTrue/");
+                if (mc_vtx) {
+                    refstack3(fit_vtx, ref_vtx, mc_vtx, idname+"_vtxDA_3",  "tag_nVerticesDA_PLOT_");
+                }
+            } else {
+                TDirectory *mc_vtx  = gFile->GetDirectory(basedir+"/"+idname+"_vtxDA_mcTrue/");
+                if (mc_vtx) {
+                    TString databk = datalbl, refbk = reflbl;
+                    datalbl = "T&P fit"; reflbl = "Sim. truth";
+                    mcstack(fit_vtx, mc_vtx, idname+"_vtxDA",  "tag_nVerticesDA_PLOT_");
+                    reflbl = refbk; datalbl = databk;
+                } else {
+                    single(fit_vtx, idname+"_vtxDA",  "tag_nVerticesDA_PLOT_");
+                }
+            }
+            if (ref == 0) doCanvas(fit_vtx, 1, 27, idname+"_vtxDA_%d",   "tag_nVerticesDA_bin%d_");
+        }
+
 
         yMin = 0.85; yMax = 1.019;
         TDirectory *fit_charge = gFile->GetDirectory(basedir+"/"+idname+"_charge/");
