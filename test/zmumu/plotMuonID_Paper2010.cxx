@@ -45,6 +45,13 @@ void plotMuonID_Paper2010(TString scenario="data") {
     } else if (scenario.Contains("38X_vs_39X")) {
         datalbl = "3.9.X";
         reflbl  = "3.8.X";
+        if (scenario.Contains("data")) {
+            datalbl += " Data";
+            reflbl += " Data";
+        } else {
+            datalbl += " Sim.";
+            reflbl += " Sim.";
+        }
         yMinD = -0.2; yMaxD = 0.2;
         yMinR =  0.8; yMaxR = 1.2;
     }
