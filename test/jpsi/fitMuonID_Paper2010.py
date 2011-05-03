@@ -34,7 +34,8 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tag_pt = cms.vstring("Tag p_{T}",    "0", "1000", "GeV/c"),
         pair_Nvertices = cms.vstring("Number of vertices", "0", "999", ""),
         pair_dphiVtxTimesQ = cms.vstring("q1 * (#phi1-#phi2)", "-6", "6", ""),
-        pair_distM1  = cms.vstring("q1 * (#phi1-#phi2)", "-99999", "999999", ""),
+        pair_drM1   = cms.vstring("#Delta R(Station 1)", "-99999", "999999", "rad"),
+        pair_distM1 = cms.vstring("q", "-99999", "999999", ""),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
     ),
 
@@ -72,61 +73,69 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 )
 
 # pick muons that bend apart from each other
-SEAGULL   = cms.PSet(pair_dphiVtxTimesQ = cms.vdouble(-2,0))
-SEPARATED = cms.PSet(pair_distM1 = cms.vdouble(200,1000))
+SEPARATED = cms.PSet(pair_drM1 = cms.vdouble(0.5,10))
 
-PT_ETA_BINS = cms.PSet(SEAGULL, SEPARATED,
+PT_ETA_BINS = cms.PSet(SEPARATED,
     pt     = cms.vdouble(  0.5, 1.0, 1.5, 2, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 9.0, 11.0, 14.0, 17.0, 20.0),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
-P_ETA_BINS = cms.PSet(SEAGULL, SEPARATED,
+P_ETA_BINS = cms.PSet(SEPARATED,
     p      = cms.vdouble(  2, 2.5, 3, 3.5, 4, 4.5, 5, 5, 6, 8, 10, 14, 20 ),
     abseta = cms.vdouble(  1.2, 2.4)
 )
-ETA_BINS = cms.PSet(SEAGULL, SEPARATED,
+ETA_BINS = cms.PSet(SEPARATED,
     pt  = cms.vdouble(6,100),
     eta = cms.vdouble(-2.4, -2.1, -1.6, -1.1, -0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4),
 )
-PT_BARREL = cms.PSet(SEAGULL, SEPARATED,
-    pt     = cms.vdouble(  0.5, 1.0, 1.5, 2, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 9.0, 11.0, 14.0, 17.0, 20.0),
+PT_BARREL = cms.PSet(SEPARATED,
+    pt     = cms.vdouble( 0.5, 1.0, 1.5, 2, 2.5, 2.75, 3.0, 3.25, 3.5, 3.75, 4.0, 4.5, 5.0, 5.5, 6.0, 7.0, 9.0, 11.0, 14.0, 17.0, 20.0),
     abseta = cms.vdouble( 0.0, 0.8 )
 )
 
 
 VTX_BINS_BARREL = cms.PSet(
-    SEAGULL, SEPARATED,
+    SEPARATED,
     abseta = cms.vdouble(0.0, 1.2),
     pt     = cms.vdouble(6.0, 20.0),
     tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
 )
 VTX_BINS_ENDCAPS = cms.PSet(
-    SEAGULL, SEPARATED,
+    SEPARATED,
     abseta = cms.vdouble(1.2, 2.4),
     pt     = cms.vdouble(4.0, 20.0),
     tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
 )
 PLATEAU_BARREL = cms.PSet(
-    SEAGULL, SEPARATED,
+    SEPARATED,
     abseta = cms.vdouble(0.0,  1.2),
     pt     = cms.vdouble(6.0, 20.0),
 )
 PLATEAU_ENDCAPS = cms.PSet(
-    SEAGULL, SEPARATED,
+    SEPARATED,
     abseta = cms.vdouble(1.2, 2.4),
     pt     = cms.vdouble(4.0, 20.0),
 )
 PLATEAU_ENDCAPS21 = cms.PSet(
-    SEAGULL, SEPARATED,
+    SEPARATED,
     abseta = cms.vdouble(1.2, 2.1),
     pt     = cms.vdouble(4.0, 20.0),
 )
 
-SEPARATION = cms.PSet(
+SEPARATION_BARREL = cms.PSet(
     pair_dphiVtxTimesQ = cms.vdouble(-2,0,2),
-    pt = cms.vdouble(5.0, 20.0),
-    abseta = cms.vdouble(  0.0, 1.2, 2.4),
+    pt = cms.vdouble(6.0, 20.0),
+    abseta = cms.vdouble(  0.0, 1.2),
     pair_distM1 = cms.vdouble(50,100,150,200,250,300,350,400,500,600,800,1000)
 )
+SEPARATION_ENDCAPS = SEPARATION_BARREL.clone(abseta = cms.vdouble(1.2,2.4), pt = cms.vdouble(4.0, 20.0))
+ANGSEPARATION_BARREL = cms.PSet(
+    pair_dphiVtxTimesQ = cms.vdouble(-2,0,2),
+    pt = cms.vdouble(6.0, 20.0),
+    abseta = cms.vdouble(  0.0, 1.2),
+    pair_drM1 = cms.vdouble(0.125,0.25,0.375,0.5,0.75,1.0,1.5,2.0,3.0)
+)
+ANGSEPARATION_ENDCAPS = ANGSEPARATION_BARREL.clone(abseta = cms.vdouble(1.2,2.4), pt = cms.vdouble(4.0, 20.0))
+
 
 
 PREFIX="root://lxcms06//data2/b/botta/TnP_Paper2010_Tree/"
@@ -155,17 +164,19 @@ if scenario.find("beauty_mc") != -1:
 
 IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
 TRIGS = [ (0,'Mu3_Track0'), (0,'Mu5_Track0'), (3,'Mu3_Track3'), (5,'Mu3_Track5') ]
-if scenario.find("calomu") != -1:
-    TRIGS = [ (0,'Mu3_Track0'), (0,'Mu5_Track0') ]
-
-ALLBINS=[("pt_abseta",PT_ETA_BINS), ("vtx_barrel",VTX_BINS_BARREL), ("vtx_endcaps",VTX_BINS_ENDCAPS)]
-ALLBINS += [ ("p_abseta",P_ETA_BINS), ("pt6_eta",ETA_BINS) ]
+ALLBINS =  [("pt_abseta",PT_ETA_BINS), ("vtx_barrel",VTX_BINS_BARREL), ("vtx_endcaps",VTX_BINS_ENDCAPS)]
+#ALLBINS += [ ("p_abseta",P_ETA_BINS), ("pt6_eta",ETA_BINS) ]
 ALLBINS += [("plateau_barrel",PLATEAU_BARREL),("plateau_endcaps",PLATEAU_ENDCAPS),("plateau_endcaps21",PLATEAU_ENDCAPS21)]
-ALLBINS += [("pt_barrel",PT_BARREL)]
+#ALLBINS += [("pt_barrel",PT_BARREL)]
 
-if scenario.find("gaussExpo") != -1:
-    IDS = [ "TMOST", "VBTF" ]
-    ALLBINS=[("pt_abseta",PT_ETA_BINS), ("plateau_barrel",PLATEAU_BARREL),("plateau_endcaps",PLATEAU_ENDCAPS)]
+if "calomu" in scenario:
+    ALLBINS = [("pt_abseta",PT_ETA_BINS), ("pt_barrel",PT_BARREL)]
+    TRIGS = [ (0,'Mu3_Track0'), (0,'Mu5_Track0') ]
+else:
+    TRIGS = [ (3,'Mu3_Track3'), (5,'Mu3_Track5') ]
+    
+if "gaussExpo" in scenario:
+    ALLBINS=[("pt_abseta",PT_ETA_BINS), ("plateau_barrel",PLATEAU_BARREL), ("plateau_endcaps",PLATEAU_ENDCAPS)]
     process.TnP_MuonID.PDFs.cbPlusPoly = cms.vstring(
         "Gaussian::signal(mass, mean[3.1,3.0,3.2], sigma[0.05,0.02,0.1])",
         "Exponential::backgroundPass(mass, lp[0,-5,5])",
@@ -174,47 +185,43 @@ if scenario.find("gaussExpo") != -1:
         "signalFractionInPassing[0.9]"
     )
 
-if scenario.find("separation") != -1:
-    IDS = [ "TMOST", "VBTF" ]
-    ALLBINS = [ ("separation", SEPARATION) ]
-    if scenario.find("mc") != -1:
-        TRIGS = [ (3,'Mu3_Track3') ]
-    else: 
-        TRIGS = [ (5,'Mu3_Track5') ]
+if "separation" in scenario:
+    ALLBINS = [ ("separation_barrel",    SEPARATION_BARREL),    ("separation_endcaps",    SEPARATION_ENDCAPS), 
+                ("angseparation_barrel", ANGSEPARATION_BARREL), ("angseparation_endcaps", ANGSEPARATION_ENDCAPS)  ]
 
 for ID in IDS:
     if len(args) > 1 and args[1] in IDS and ID != args[1]: continue
     for X,B in ALLBINS:
-        if len(args) > 2 and args[2] != X: continue
+        if len(args) > 2 and X not in args[2:]: continue
         module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         for PTMIN, TRIG in TRIGS: 
-            if X.find("vtx") != -1 and TRIG != "Mu3_Track3": continue # use only one trigger for pileup studies
-            if (TRIG == "Mu3_Track5" or TRIG == "Mu3_Track0") and scenario.find("mc") != -1: continue # skip trigger not in MC
-            if X.find("plateau") != -1:
-                if scenario.find("mc") != -1: 
-                    if TRIG != "Mu3_Track3": continue
-                else:
-                    if TRIG != "Mu3_Track5": continue
-            if X.find("p_abseta") != -1 or X.find("p_2d") != -1:
-                DEN=B.clone()
+            TRIGLABEL=""
+            if "pt_" in X:
+                if (TRIG == "Mu3_Track5" or TRIG == "Mu3_Track0") and "mc" in scenario: continue # skip trigger not in MC
+                TRIGLABEL="_"+TRIG
             else:
-                DEN=B.clone(pt = cms.vdouble(*[i for i in B.pt if i >= PTMIN]))
+                if TRIG != "Mu3_Track3": continue # use only one trigger except for turn-on
+            DEN = B.clone()
+            if hasattr(DEN, "pt"):
+                DEN.pt = cms.vdouble(*[i for i in B.pt if i >= PTMIN])
                 if len(DEN.pt) == 1: DEN.pt = cms.vdouble(PTMIN, DEN.pt[0])
-            if (X.find("plateau") != -1) and ID == "VBTF": DEN.pt[0] = 10.0
+                if "plateaux" in X and ID == "VBTF": DEN.pt[0] = 7.0
+                if "separation" in X and ID == "VBTF": DEN.pt[0] = 7.0
+                if ("mc" not in scenario) and (DEN.pt[0] > 5): TRIG = "Mu3_Track5"
             setattr(DEN, "tag_%s_Jpsi_MU" % TRIG, cms.vstring("pass"))
             setattr(DEN,     "%s_Jpsi_TK" % TRIG, cms.vstring("pass"))
-            if scenario.find("calomu") != -1: DEN.Calo = cms.vstring("pass")
-            ## fit efficiency, unless scenario vetoes it
-            if scenario.find("nofit") == -1:
-                setattr(module.Efficiencies, ID+"_"+X+"_"+TRIG, cms.PSet(
-                    EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
-                    UnbinnedVariables = cms.vstring("mass"),
-                    BinnedVariables = DEN,
-                    BinToPDFmap = cms.vstring("cbPlusPoly")
-                ))
+            if "calomu" in scenario: DEN.Calo = cms.vstring("pass")
+            setattr(module.Efficiencies, ID+"_"+X+TRIGLABEL, cms.PSet(
+                EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
+                UnbinnedVariables = cms.vstring("mass"),
+                BinnedVariables = DEN,
+                BinToPDFmap = cms.vstring("cbPlusPoly")
+            ))
+            if "plateau" in X:
+                module.SaveWorkspace = True
             ## mc efficiency, if scenario is mc 
-            if scenario.find("mc") != -1:
-                setattr(module.Efficiencies, ID+"_"+X+"_"+TRIG+"_mcTrue", cms.PSet(
+            if "mc" in scenario:
+                setattr(module.Efficiencies, ID+"_"+X+TRIGLABEL+"_mcTrue", cms.PSet(
                     EfficiencyCategoryAndState = cms.vstring(ID,"pass"),
                     UnbinnedVariables = cms.vstring("mass"),
                     BinnedVariables = DEN.clone(mcTrue = cms.vstring("true"))
