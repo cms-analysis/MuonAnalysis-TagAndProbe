@@ -55,7 +55,7 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && (!triggerObjectMatchesByPath('HLT_Mu15_v1').empty())"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
 process.probeMuons = cms.EDFilter("PATMuonSelector",
@@ -96,7 +96,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        ## ParticleFlow
        PF = cms.InputTag("muonsPassingPF"),
        ## A few other flags
-       Track_QTF  = cms.string("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithMeasurement > 1 && track.normalizedChi2 < 4 && abs(dB) < 3 && abs(track.dz) < 30"),
        Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
     ),
     tagVariables = cms.PSet(
@@ -104,18 +103,19 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVerticesDA = cms.InputTag("nverticesDAModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
     ),
-    tagFlags = cms.PSet(),
+    tagFlags = cms.PSet(HighPtTriggerFlags),
     pairVariables = cms.PSet(
         nJets15 = cms.InputTag("njets15Module"),
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
+        pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
     probeMatches     = cms.InputTag("probeMuonsMCMatch"),
     motherPdgId      = cms.vint32(22, 23),
-    makeMCUnbiasTree       = cms.bool(True), 
+    makeMCUnbiasTree       = cms.bool(False), 
     checkMotherInUnbiasEff = cms.bool(True),
     allProbes              = cms.InputTag("probeMuons"),
 )

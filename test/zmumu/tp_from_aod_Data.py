@@ -8,9 +8,9 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/161/103/FE4260FF-8556-E011-8184-003048F1BF68.root',
-        '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/161/103/7654B872-8B56-E011-A7EB-001617C3B77C.root',
-        '/store/data/Run2011A/SingleMu/RECO/PromptReco-v1/000/161/103/506BD24F-E956-E011-9681-000423D9890C.root',
+	'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/F4E034EB-2170-E011-B8A2-001617E30D52.root',
+	'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/AE8F9B2C-7F70-E011-8A4A-0030487A1884.root',
+        '/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/8693F25C-2670-E011-A5E7-003048F110BE.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -19,7 +19,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
+process.GlobalTag.globaltag = cms.string('GR_R_311_V3::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -70,7 +70,7 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByPath('HLT_Mu15_v*').empty()"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
@@ -101,13 +101,14 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
+       # Extra triggers
+       Mu8_forEMu  = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenEG5L3Filtered8').empty"),
+       Mu17_forEMu = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenEG5L3Filtered17').empty"),
        ## Isolation
        Isol    = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt < 0.15"), 
        IsolTk3 = cms.string("isolationR03.sumPt < 3"), 
        ## ParticleFlow
        PF = cms.InputTag("muonsPassingPF"),
-       ## A few other flags
-       Track_QTF  = cms.string("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithMeasurement > 1 && track.normalizedChi2 < 4 && abs(dB) < 3 && abs(track.dz) < 30"),
        Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
     ),
     tagVariables = cms.PSet(
@@ -115,11 +116,13 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVerticesDA = cms.InputTag("nverticesDAModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
     ),
-    tagFlags = cms.PSet(),
+    tagFlags = cms.PSet(HighPtTriggerFlags),
     pairVariables = cms.PSet(
         nJets15 = cms.InputTag("njets15Module"),
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
+        nL1EG5  = cms.InputTag("nL1EG5Module"), # to unlock EMu triggers
+        pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(False),
@@ -136,6 +139,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.njets15Module +
     process.njets30Module +
+    process.mergedL1EG + process.nL1EG5Module +
     process.muonsPassingPF +
     process.probeMuonsIsoSequence +
     process.tpTree
@@ -200,6 +204,7 @@ process.tpTreeSta = process.tpTree.clone(
 )
 process.tpTreeSta.pairVariables.nJets15 = "njets15ModuleSta"
 process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
+del process.tpTreeSta.pairVariables.nL1EG5
 process.njets15ModuleSta = process.njets15Module.clone(pairs = "tpPairsSta")
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
