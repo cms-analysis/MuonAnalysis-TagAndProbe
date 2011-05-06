@@ -28,6 +28,17 @@ njets30Module = cms.EDProducer("CandCleanedMultiplicityCounter",
     minProbeObjDR = cms.double(0.3),
 )
 
+mergedL1EG = cms.EDProducer("CandViewMerger",
+    src = cms.VInputTag(cms.InputTag("l1extraParticles","Isolated"), cms.InputTag("l1extraParticles","NonIsolated")),
+)
+nL1EG5Module = cms.EDProducer("CandCleanedMultiplicityCounter", 
+    pairs   = cms.InputTag("tpPairs"),
+    objects = cms.InputTag("mergedL1EG"),
+    objectSelection = cms.string("bx == 0 && pt >= 5"), 
+    minTagObjDR   = cms.double(0.5),
+    minProbeObjDR = cms.double(0.5),
+)
+
 #########################################################################################
 ##        Deterministic Annealing vertices (100um distance; 4.2.X config)              ##
 #########################################################################################
