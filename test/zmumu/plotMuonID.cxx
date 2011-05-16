@@ -29,27 +29,20 @@ void plotMuonID(TString scenario="data") {
     reflbl  = "Sim., 2011";
     preliminary = "CMS Preliminary,   #sqrt{s} = 7 TeV";
 
-    if (scenario.Contains("any_vs_iso")) {
-        datalbl = "All tracks";
-        reflbl  = "Iso. tracks";
-        yMinD = -0.2; yMaxD = 0.2;
-        yMinR =  0.8; yMaxR = 1.2;
-    } else if (scenario.Contains("signal_mc_vs_realistic_mc")) {
-        datalbl = "Sim. signal only";
-        reflbl  = "Sim. w/ backgrounds";
-        yMinD = -0.2; yMaxD = 0.2;
-        yMinR =  0.8; yMaxR = 1.2;
-    } else if (scenario.Contains("38X_vs_39X")) {
-        datalbl = "3.9.X";
-        reflbl  = "3.8.X";
-        yMinD = -0.2; yMaxD = 0.2;
-        yMinR =  0.8; yMaxR = 1.2;
-    } else if (scenario.Contains("_vs_2010")) {
+    if (scenario.Contains("_vs_2010")) {
         datalbl = "Data, 2011A";
         reflbl  = "Data, 2010B";
         yMinD = -0.2; yMaxD = 0.2;
         yMinR =  0.8; yMaxR = 1.2;
     }
+    if (scenario.Contains("v2_vs_v1")) {
+        datalbl = "2011A v2";
+        reflbl  = "2011A v1";
+        yMinD = -0.2; yMaxD = 0.2;
+        yMinR =  0.8; yMaxR = 1.2;
+    }
+
+
 
     plotMuonIDData();
 }
@@ -57,15 +50,16 @@ void plotMuonID(TString scenario="data") {
 void plotMuonIDData() {
     retitle = "Efficiency";
 
-    const int nids  = 8;
-    const char *ids[nids]    = { "Glb",    "TMOST",   "VBTF",  "PF", "TM",      "TMA",        "TMOSL",  "Isol_from_VBTF" };
-    const char *titles[nids] = { "Global",  "Soft",   "Tight", "PF", "Tracker", "TrackerArb", "Softer", "Isolation" };
+    const int nids  = 12;
+    const char *ids[nids]    = { "Glb",    "TMOST",   "VBTF",  "PF", "TM",      "TMA",        "TMOSL",  "Isol_from_VBTF", "Mu24_from_VBTF", "DoubleMu7_from_VBTF", "Mu8_forEMu_from_VBTF", "Mu17_forEMu_from_VBTF" };
+    const char *titles[nids] = { "Global",  "Soft",   "Tight", "PF", "Tracker", "TrackerArb", "Softer", "Isolation",      "HLT Mu24",       "HLT DoubleMu7 leg",   "HLT Mu8 leg", "HLT Mu17 leg" };
 
    
     for (int i = 0; i < nids; ++i) {
         TString idname(ids[i]);
         retitle = TString(titles[i])+" muon efficiency";
-        if (retitle == "Isolation muon efficiency") retitle == "Isolation efficiency";
+        if (retitle == "Isolation muon efficiency") retitle = "Isolation efficiency";
+        if (retitle.Contains("HLT")) retitle = TString(titles[i])+" efficiency";
         TDirectory *fit_pt_eta = gFile->GetDirectory(basedir+"/"+idname+"_pt_abseta/");
         if (fit_pt_eta == 0) { /*if (i == 0) { gFile->GetDirectory(basedir)->ls(); } ;*/ continue; }
         yMin = 0.0; yMax = 1.1;
@@ -96,6 +90,7 @@ void plotMuonIDData() {
 
         yMin = 0.7; yMax = 1.049;
         TDirectory *fit_eta = gFile->GetDirectory(basedir+"/"+idname+"_eta/");
+        if (idname.Contains("Mu24")) { yMin = 0.0; yMax = 1.1; }
         if (fit_eta) {
             if (ref != 0) {
                 extraSpam = "    p_{T} > 20 GeV"; retitleX = "muon #eta";
@@ -149,6 +144,7 @@ void plotMuonIDData() {
 
         yMin = 0.85; yMax = 1.019;
         TDirectory *fit_vtx = gFile->GetDirectory(basedir+"/"+idname+"_vtx/");
+        if (idname.Contains("Mu24")) { yMin = 0.0; yMax = 1.1; }
         if (fit_vtx) {
             TDirectory *ref_vtx = ref ? ref->GetDirectory(basedir+"/"+idname+"_vtx/") : 0;
             if (ref_vtx) {
