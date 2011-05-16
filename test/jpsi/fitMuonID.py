@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
 ### USAGE:
-###    cmsRun fitMuonID_Paper2010.py <scenario>
+###    cmsRun fitMuonID.py <scenario>
 ### scenarios:
 ###   - data_all (default)  
 ###   - signal_mc
@@ -49,6 +49,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tag_Mu5_Track2_Jpsi_MU = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
         tag_Mu7_Track7_Jpsi_MU = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
+        Mu5_Track0_Jpsi_TK = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
+        Mu3_Track3_Jpsi_TK = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
+        Mu5_Track5_Jpsi_TK = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
+        tag_Mu5_Track0_Jpsi_MU = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
+        tag_Mu3_Track3_Jpsi_MU = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
+        tag_Mu5_Track5_Jpsi_MU = cms.vstring("ProbeTrigger_Track0", "dummy[pass=1,fail=0]"),
     ),
 
     PDFs = cms.PSet(
@@ -88,8 +94,12 @@ PLATEAU_ABSETA = cms.PSet(SEPARATED,
     pt     = cms.vdouble(7.0, 30.0),
 )
 
+PT_ABSETA_WIDE = cms.PSet(SEPARATED,
+    abseta = cms.vdouble(0.0, 1.2, 2.4),
+    pt     = cms.vdouble(5.0, 7.0, 20.0),
+)
 
-PREFIX="root://lxcms06//data2/b/botta/TnP_Paper2010_Tree/"
+OLDPREFIX="/data/gpetrucc/7TeV/tnp/2011.02.17/"
 PREFIX="/data/gpetrucc/7TeV/tnp/2011-04/"
 process.TnP_MuonID = Template.clone(
     InputFileNames = cms.vstring(
@@ -98,19 +108,25 @@ process.TnP_MuonID = Template.clone(
     ),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
-    OutputFileName = cms.string("TnP_Paper2010_MuonID_%s.root" % scenario),
+    OutputFileName = cms.string("TnP_MuonID_%s.root" % scenario),
     Efficiencies = cms.PSet(),
 )
 
 IDS = [ "Glb", "TMOST", "VBTF", "PF" ]
 TRIGS = [ (2,'Mu5_Track2'), (7,'Mu7_Track7') ]
+
+if "mc_39X" in scenario:
+     TRIGS = [ (0,'Mu5_Track0'), (3,'Mu3_Track3'), (5,'Mu3_Track5') ]
+     process.TnP_MuonID.InputFileNames = [ OLDPREFIX+"tnpJPsi_MC_Prompt_39X.crop.root" ]
+
 ALLBINS =  [("pt_abseta",PT_ETA_BINS), ("vtx",VTX_BINS), ("plateau",PLATEAU_ABSETA)]
+ALLBINS += [("pt_abseta_wide",PT_ABSETA_WIDE)]
 
 for ID in IDS:
     if len(args) > 1 and args[1] in IDS and ID != args[1]: continue
     for X,B in ALLBINS:
         if len(args) > 2 and X not in args[2:]: continue
-        module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_Paper2010_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
+        module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         for PTMIN, TRIG in TRIGS: 
             TRIGLABEL=""
             if "pt_" in X:

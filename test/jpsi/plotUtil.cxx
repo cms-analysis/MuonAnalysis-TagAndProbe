@@ -31,6 +31,7 @@ TCanvas *c1 = 0;
  *  of it's name.
  */
 TObject *getFromPrefix(TDirectory *dir, TString prefixName, bool prefixOnly=true) {
+    if (dir == 0) { std::cerr << "ERROR: trying to get " << prefixName << " from null dir." << std::endl; return 0; }
     TIter next(dir->GetListOfKeys());
     TKey *key;
     if (prefixName.MaybeRegexp()) {
@@ -590,6 +591,7 @@ void mcstack(TDirectory *fit, TDirectory *refd, TString alias, TString name) {
 
 
 TGraphAsymmErrors *getFit(TDirectory *fit, TString fitname, TString algo="fit") {
+    if (fit == 0) { std::cerr << "getFit called with " << fitname << " and fit = 0" << std::endl; return 0; }
     TCanvas *pfit = (TCanvas *) getFromPrefix(fit->GetDirectory(algo+"_eff_plots"), fitname);
     if (pfit == 0) {
         std::cerr << "NOT FOUND: " << algo+"_eff_plots/"+fitname << " in " << fit->GetName() << std::endl;
@@ -804,7 +806,7 @@ TGraphAsymmErrors *mergeGraphs(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGr
             }
         }
         ret->SetPoint(i, sxw2/sw2, syw2/sw2);
-        ret->SetPointError(i, sxw2/sw2 - xmin, xmax - sxw2/sw2, sqrt(shi)/sw2, sqrt(slo)/sw2);
+        ret->SetPointError(i, sxw2/sw2 - xmin, xmax - sxw2/sw2, sqrt(slo)/sw2, sqrt(shi)/sw2);
     }
     return ret;
 }    
