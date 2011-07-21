@@ -86,6 +86,7 @@ process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
 )
 process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
 
+from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -94,6 +95,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # probe variables: all useful ones
     variables = cms.PSet(
         AllVariables,
+        ExtraIsolationVariables,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
     ),
@@ -129,6 +131,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     addRunLumiInfo = cms.bool(True),
 )
 
+process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
+
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
@@ -142,6 +146,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.mergedL1EG + process.nL1EG5Module +
     process.muonsPassingPF +
     process.probeMuonsIsoSequence +
+    process.computeCorrectedIso + 
     process.tpTree
 )
 

@@ -76,6 +76,8 @@ process.tagMuonsMCMatch = cms.EDProducer("MCTruthDeltaRMatcherNew",
 )
 process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons")
 
+from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -83,6 +85,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # probe variables: all useful ones
     variables = cms.PSet(
         AllVariables,
+        ExtraIsolationVariables,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
     ),
@@ -120,6 +123,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     allProbes              = cms.InputTag("probeMuons"),
 )
 
+process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
+
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.probeMuons * process.probeMuonsMCMatch +
@@ -130,6 +135,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.muonsPassingPF +
     process.probeMuonsIsoSequence +
+    process.computeCorrectedIso + 
     process.tpTree
 )
 
