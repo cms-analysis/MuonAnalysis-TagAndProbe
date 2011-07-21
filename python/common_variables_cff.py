@@ -70,6 +70,7 @@ MuonIDFlags = cms.PSet(
 )
 
 HighPtTriggerFlags = cms.PSet(
+
    # legacy
    Mu9       = cms.string("!triggerObjectMatchesByPath('HLT_Mu9').empty()"),
    DoubleMu3 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu3_v*').empty()"),
@@ -82,8 +83,14 @@ HighPtTriggerFlags = cms.PSet(
    IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*').empty()"),
    IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*').empty()"),
    IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*').empty()"),
+   DoubleMu5 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty()"),
    DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty()"),
-)
+   DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').empty() &&" +
+                                   "!triggerObjectMatchesByFilter('hltSingleMu13L3Filtered13').empty()"),
+   DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').empty() &&" +
+                                  "!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty()"),
+    
+   )
 
 LowPtTriggerFlagsPhysics = cms.PSet(
    DoubleMu0_Quarkonium  = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu0').empty() || "+
