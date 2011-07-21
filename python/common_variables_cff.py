@@ -10,7 +10,12 @@ KinematicVariables = cms.PSet(
 )
 IsolationVariables = cms.PSet(
     tkIso  = cms.string("isolationR03.sumPt"),
+    ecalIso = cms.string("isolationR03.emEt"),
+    hcalIso = cms.string("isolationR03.hadEt"),
     combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+    neutralHadIso = cms.string("neutralHadronIso"),
+    chargedHadIso = cms.string("chargedHadronIso"),
+    photonIso = cms.string("photonIso")
 )
 MuonIDVariables = cms.PSet(
     caloCompatibility = cms.string("? isCaloCompatibilityValid ? caloCompatibility : -1"),
