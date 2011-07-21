@@ -1,5 +1,5 @@
 //
-// $Id: NearbyMuonsInfo.cc,v 1.4 2011/01/30 12:08:25 gpetrucc Exp $
+// $Id: NearbyMuonsInfo.cc,v 1.5 2011/02/10 01:07:56 gpetrucc Exp $
 //
 
 /**
@@ -7,7 +7,7 @@
   \brief    Matcher of reconstructed objects to L1 Muons 
             
   \author   Giovanni Petrucciani
-  \version  $Id: NearbyMuonsInfo.cc,v 1.4 2011/01/30 12:08:25 gpetrucc Exp $
+  \version  $Id: NearbyMuonsInfo.cc,v 1.5 2011/02/10 01:07:56 gpetrucc Exp $
 */
 
 
@@ -25,6 +25,12 @@
 #include <DataFormats/Math/interface/deltaR.h>
 #include <MuonAnalysis/MuonAssociators/interface/PropagateToMuon.h>
 #include <functional>
+
+//// Includes for DCA: /////
+#include "MagneticField/Records/interface/IdealMagneticFieldRecord.h"
+#include "MagneticField/Engine/interface/MagneticField.h"
+#include "TrackingTools/TransientTrack/interface/TransientTrack.h"
+#include "TrackingTools/PatternTools/interface/ClosestApproachInRPhi.h"
 
 class NearbyMuonsInfo : public edm::EDProducer {
     public:
@@ -50,6 +56,7 @@ NearbyMuonsInfo::NearbyMuonsInfo(const edm::ParameterSet & iConfig) :
     prop1_(iConfig.getParameter<edm::ParameterSet>("propM1")),
     prop2_(iConfig.getParameter<edm::ParameterSet>("propM2"))
 {
+    produces<edm::ValueMap<float> >("DCA");
     produces<edm::ValueMap<float> >("dphiVtxTimesQ");
     produces<edm::ValueMap<float> >("drVtx");
     produces<edm::ValueMap<float> >("drM1");
@@ -75,9 +82,11 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
 
     Handle<View<reco::Candidate> > src;
     iEvent.getByLabel(src_, src);
+    edm::ESHandle<MagneticField> theMF;
+    iSetup.get<IdealMagneticFieldRecord>().get(theMF);
 
     size_t n = src->size();
-    std::vector<float> dphiVtxTimesQ(n), drVtx(n);
+    std::vector<float> dphiVtxTimesQ(n), drVtx(n), DCA(n, -999);
     std::vector<float> drStaIn(n, -999), dphiStaIn(n, -999);
     std::vector<float> drM1(n,    -999),    dphiM1(n, -999), distM1(n, -999);
     std::vector<float> drM2(n,    -999),    dphiM2(n, -999), distM2(n, -999);
@@ -92,6 +101,21 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
         const reco::RecoCandidate *mu2 = dynamic_cast<const reco::RecoCandidate *>(&*d2.masterClone());
         if (mu1 == 0) throw cms::Exception("CorruptData") << "First daughter of candidate is not a ShallowClone of a reco::RecoCandidate\n";
         if (mu2 == 0) throw cms::Exception("CorruptData") << "Second daughter of candidate is not a ShallowClone of a reco::RecoCandidate\n";
+
+	//// Start DCA Calculation //////
+	reco::TrackRef tk = mu1->get<reco::TrackRef>();
+	reco::TrackRef tk2nd = mu2->get<reco::TrackRef>();
+	reco::TransientTrack transMu1(*tk, &(*theMF) );
+	reco::TransientTrack transMu2(*tk2nd, &(*theMF) );
+	TrajectoryStateClosestToPoint mu1TS = transMu1.impactPointTSCP();
+	TrajectoryStateClosestToPoint mu2TS = transMu2.impactPointTSCP();
+	if (mu1TS.isValid() && mu2TS.isValid()) {
+	  ClosestApproachInRPhi cApp;
+	  cApp.calculate(mu1TS.theState(), mu2TS.theState());
+	  if (cApp.status()) DCA[i] = cApp.distance();
+	}
+	//// End DCA Calculation //////
+
         if (mu1->standAloneMuon().isNonnull()            && mu2->standAloneMuon().isNonnull() &&
             mu1->standAloneMuon().isAvailable()          && mu2->standAloneMuon().isAvailable() &&
             mu1->standAloneMuon()->extra().isAvailable() && mu2->standAloneMuon()->extra().isAvailable()  ) {
@@ -116,6 +140,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
         }
     }
 
+    writeValueMap(iEvent, src, DCA,            "DCA");
     writeValueMap(iEvent, src, dphiVtxTimesQ,  "dphiVtxTimesQ");
     writeValueMap(iEvent, src, drVtx,          "drVtx");
     writeValueMap(iEvent, src, drStaIn,        "drStaIn");
