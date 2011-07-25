@@ -61,6 +61,7 @@ probes_(iConfig.getParameter<edm::InputTag>("probes"))
 
 {
   produces<edm::ValueMap<float> >("dxyPVdzmin");
+  produces<edm::ValueMap<float> >("dzPV");
 }
 
 
@@ -98,6 +99,7 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // prepare vector for output    
   std::vector<double> muon_dxy;
+  std::vector<double> muon_dz;
 
   // fill
   View<reco::Muon>::const_iterator probe, endprobes = probes->end();
@@ -106,7 +108,8 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (probe = probes->begin(); probe != endprobes; ++probe) {
     
     Double_t dxy_ivtx_dzmin=65535;
-    
+    Double_t dzPV=-99999.;
+
     if(probe->innerTrack().isNonnull()){
       
       edm::ESHandle<TransientTrackBuilder> ttBuilder;
@@ -118,7 +121,12 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       Double_t dzmin = 1e6;
       Int_t ivtx_dzmin = -1;
       
+
       for(unsigned int iVtx=0; iVtx<primaryVerticesHandle->size(); iVtx++){
+
+	dzPV = muonTrack->dz(primaryVerticesHandle->at(0).position());
+	muon_dxy.push_back(dzPV);
+
         Double_t pvx,pvy,pvz,bsx,bsy,bsz;
         pvx=primaryVerticesHandle->at(iVtx).x();
         pvy=primaryVerticesHandle->at(iVtx).y();
@@ -156,10 +164,16 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // convert into ValueMap and store
   std::auto_ptr<ValueMap<float> > dxyPVdzmin(new ValueMap<float>());
+  std::auto_ptr<ValueMap<float> > dzPV(new ValueMap<float>());
   ValueMap<float>::Filler filler1(*dxyPVdzmin);
+  ValueMap<float>::Filler filler2(*dzPV);
   filler1.insert(probes, muon_dxy.begin(), muon_dxy.end());
+  filler2.insert(probes, muon_dz.begin(), muon_dz.end());
   filler1.fill();
+  filler2.fill();
+
   iEvent.put(dxyPVdzmin, "dxyPVdzmin");
+  iEvent.put(dzPV, "dzPV");
 
 }
 
