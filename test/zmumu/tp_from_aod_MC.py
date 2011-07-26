@@ -88,6 +88,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         ExtraIsolationVariables,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
+        dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
+        dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,

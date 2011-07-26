@@ -102,6 +102,7 @@ process.tagMuonsMCMatch = cms.EDProducer("MCTruthDeltaRMatcherNew",
 )
 process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons")
 
+from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -110,8 +111,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # probe variables: all useful ones
     variables = cms.PSet(
         AllVariables,
+        ExtraIsolationVariables,
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
-    ),
+        dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
+        ),
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
