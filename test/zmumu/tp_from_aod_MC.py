@@ -123,6 +123,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     allProbes              = cms.InputTag("probeMuons"),
 )
 
+from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets;
+kt6PFJets = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
+kt6PFJets.Rho_EtaMax = cms.double(2.5)
+
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
 process.tnpSimpleSequence = cms.Sequence(
@@ -135,7 +139,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.muonsPassingPF +
     process.probeMuonsIsoSequence +
-    process.computeCorrectedIso + 
+    process.kt6PFJets * process.computeCorrectedIso + 
     process.tpTree
 )
 
