@@ -73,6 +73,7 @@ offlinePrimaryVerticesDA100um = cms.EDProducer("PrimaryVertexProducer",
         )
     )
 )
+
 nverticesDAModule = cms.EDProducer("VertexMultiplicityCounter",
     probes = cms.InputTag("tagMuons"),
     objects = cms.InputTag("offlinePrimaryVerticesDA100um"),

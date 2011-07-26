@@ -104,7 +104,7 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   
   // Rho value
   edm::Handle<double> rhoH;
-  iEvent.getByLabel(InputTag("kt6PFJets", "rho"), rhoH);
+  iEvent.getByLabel(InputTag("kt6PFJetsForIso", "rho"), rhoH);
 
   // Prepare vector for output 
   std::vector<double> ecalIsoRhoCorr;
