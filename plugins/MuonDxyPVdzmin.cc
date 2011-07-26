@@ -125,7 +125,7 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       for(unsigned int iVtx=0; iVtx<primaryVerticesHandle->size(); iVtx++){
 
 	dzPV = muonTrack->dz(primaryVerticesHandle->at(0).position());
-	muon_dxy.push_back(dzPV);
+	muon_dz.push_back(dzPV);
 
         Double_t pvx,pvy,pvz,bsx,bsy,bsz;
         pvx=primaryVerticesHandle->at(iVtx).x();

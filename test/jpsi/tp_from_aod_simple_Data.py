@@ -139,6 +139,17 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     isMC           = cms.bool(False),
     addRunLumiInfo = cms.bool(True),
 )
+
+
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+##-------------------- Turn-on the FastJet density calculation -----------------------
+process.kt6PFJets.doRhoFastjet = True
+##-------------------- FastJet density calculation for Iso -----------------------
+process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
+
+
+process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
+
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
@@ -150,6 +161,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.tagProbeSeparation +
     process.muonsPassingPF +
+    process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.tpTree
 )
 
