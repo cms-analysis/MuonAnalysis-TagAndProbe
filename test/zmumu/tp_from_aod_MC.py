@@ -44,7 +44,7 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
 ## ==== Trigger matching
 process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
-process.muonMatchHLTL2.maxDeltaR = 0.5
+process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
@@ -123,9 +123,13 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     allProbes              = cms.InputTag("probeMuons"),
 )
 
-from RecoJets.JetProducers.kt4PFJets_cfi import kt4PFJets;
-kt6PFJets = kt4PFJets.clone( rParam = 0.6, doRhoFastjet = True )
-kt6PFJets.Rho_EtaMax = cms.double(2.5)
+
+process.load('RecoJets.Configuration.RecoPFJets_cff')
+##-------------------- Turn-on the FastJet density calculation -----------------------
+process.kt6PFJets.doRhoFastjet = True
+##-------------------- FastJet density calculation for Iso -----------------------
+process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
+
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
@@ -139,7 +143,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.muonsPassingPF +
     process.probeMuonsIsoSequence +
-    process.kt6PFJets * process.computeCorrectedIso + 
+    process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.tpTree
 )
 
