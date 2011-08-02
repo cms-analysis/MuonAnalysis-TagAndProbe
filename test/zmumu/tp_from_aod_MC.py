@@ -140,6 +140,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.probeMuons * process.probeMuonsMCMatch +
     process.tpPairs    +
     process.nverticesModule +
+    process.muonDxyPVdzmin +
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.njets15Module +
     process.njets30Module +
