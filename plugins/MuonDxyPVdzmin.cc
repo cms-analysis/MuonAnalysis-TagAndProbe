@@ -108,7 +108,7 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (probe = probes->begin(); probe != endprobes; ++probe) {
     
     Double_t dxy_ivtx_dzmin=65535;
-    Double_t dzPV=-99999.;
+    Double_t dzPV = -99999.;
 
     if(probe->innerTrack().isNonnull()){
       
@@ -123,7 +123,6 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       
       dzPV = muonTrack->dz(primaryVerticesHandle->at(0).position());
       muon_dz.push_back(dzPV);
-
 
       for(unsigned int iVtx=0; iVtx<primaryVerticesHandle->size(); iVtx++){
 

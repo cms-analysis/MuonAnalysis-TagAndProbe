@@ -189,6 +189,10 @@ muonDxyPVdzmin = cms.EDProducer("MuonDxyPVdzmin",
     probes = cms.InputTag("probeMuons"),
 )
 
+muonSIP = cms.EDProducer("MuonSIP",
+    probes = cms.InputTag("probeMuons"),
+)
+
 muonsPassingPF = cms.EDProducer("MuonsPassingPF",
     muons = cms.InputTag("probeMuons"),
     pf    = cms.InputTag("particleFlow"),
