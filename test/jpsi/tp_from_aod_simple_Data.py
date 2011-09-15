@@ -101,7 +101,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         ExtraIsolationVariables,
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        IP = cms.InputTag("MuonSIP","IP"),
+        IP = cms.InputTag("muonSIP","IP"),
         IPError = cms.InputTag("muonSIP","IPError"),
         SIP = cms.InputTag("muonSIP","SIP"),
     ),
@@ -163,6 +163,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.tpPairs    +
     process.onePair    +
     process.muonDxyPVdzmin +
+    process.muonSIP +
     process.nverticesModule +
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.tagProbeSeparation +
