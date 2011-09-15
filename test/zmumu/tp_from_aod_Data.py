@@ -8,9 +8,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/F4E034EB-2170-E011-B8A2-001617E30D52.root',
-	'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/AE8F9B2C-7F70-E011-8A4A-0030487A1884.root',
-        '/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/8693F25C-2670-E011-A5E7-003048F110BE.root',
+    'file:/data3/HZZ_AOD/L1Yves.root',
+	#'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/F4E034EB-2170-E011-B8A2-001617E30D52.root',
+	#'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/AE8F9B2C-7F70-E011-8A4A-0030487A1884.root',
+        #'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/8693F25C-2670-E011-A5E7-003048F110BE.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -100,7 +101,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        IP = cms.InputTag("MuonSIP","IP"),
+        IP = cms.InputTag("muonSIP","IP"),
         IPError = cms.InputTag("muonSIP","IPError"),
         SIP = cms.InputTag("muonSIP","SIP"),
         
@@ -156,6 +157,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.onePair    +
     process.nverticesModule +
     process.muonDxyPVdzmin +
+    process.muonSIP +
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.njets15Module +
     process.njets30Module +

@@ -144,6 +144,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.tpPairs    +
     process.nverticesModule +
     process.muonDxyPVdzmin +
+    process.muonSIP +
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.njets15Module +
     process.njets30Module +
