@@ -60,6 +60,7 @@ MuonDxyPVdzmin::MuonDxyPVdzmin(const edm::ParameterSet& iConfig):
 probes_(iConfig.getParameter<edm::InputTag>("probes"))
 
 {
+  produces<edm::ValueMap<float> >("dxyBS");
   produces<edm::ValueMap<float> >("dxyPVdzmin");
   produces<edm::ValueMap<float> >("dzPV");
 }
@@ -98,6 +99,7 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   BSPosition = bs.position();
 
   // prepare vector for output    
+  std::vector<double> muon_dxyBS;
   std::vector<double> muon_dxy;
   std::vector<double> muon_dz;
 
@@ -107,6 +109,7 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   // loop on PROBES
   for (probe = probes->begin(); probe != endprobes; ++probe) {
     
+    Double_t dxyBS = -99999.;
     Double_t dxy_ivtx_dzmin=65535;
     Double_t dzPV = -99999.;
 
@@ -120,7 +123,9 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       
       Double_t dzmin = 1e6;
       Int_t ivtx_dzmin = -1;
-      
+
+      dxyBS = muonTrack->dxy(BSPosition);
+      muon_dxyBS.push_back(dxyBS);
       dzPV = muonTrack->dz(primaryVerticesHandle->at(0).position());
       muon_dz.push_back(dzPV);
 
@@ -162,15 +167,20 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }// end loop on probes
 
   // convert into ValueMap and store
+  std::auto_ptr<ValueMap<float> > dxyBS(new ValueMap<float>());
   std::auto_ptr<ValueMap<float> > dxyPVdzmin(new ValueMap<float>());
   std::auto_ptr<ValueMap<float> > dzPV(new ValueMap<float>());
+  ValueMap<float>::Filler filler0(*dxyBS);
   ValueMap<float>::Filler filler1(*dxyPVdzmin);
   ValueMap<float>::Filler filler2(*dzPV);
+  filler0.insert(probes, muon_dxyBS.begin(), muon_dxyBS.end());
   filler1.insert(probes, muon_dxy.begin(), muon_dxy.end());
   filler2.insert(probes, muon_dz.begin(), muon_dz.end());
+  filler0.fill();
   filler1.fill();
   filler2.fill();
 
+  iEvent.put(dxyBS, "dxyBS");
   iEvent.put(dxyPVdzmin, "dxyPVdzmin");
   iEvent.put(dzPV, "dzPV");
 
