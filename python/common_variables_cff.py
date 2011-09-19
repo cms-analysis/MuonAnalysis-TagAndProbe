@@ -31,10 +31,14 @@ TrackQualityVariables = cms.PSet(
     tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner.numberOfLostHits"),
     tkExpHitOut = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsOuter.numberOfLostHits"),
     tkHitFract  = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidHits/(track.hitPattern.numberOfValidHits+track.hitPattern.numberOfLostHits+track.trackerExpectedHitsInner.numberOfLostHits+track.trackerExpectedHitsOuter.numberOfLostHits)"),
-    trkChi2 = cms.string("? track.isNonnull ? track.normalizedChi2 : -1"),
+    tkChi2 = cms.string("? track.isNull ? -1 : track.normalizedChi2"),
+    tkPtError = cms.string("? track.isNull ? -1 : track.ptError"),
+    tkSigmaPtOverPt = cms.string("? track.isNull ? -1 : track.ptError/track.pt"),
 )
 GlobalTrackQualityVariables = cms.PSet(
-    glbChi2 = cms.string("? globalTrack.isNonnull ? globalTrack.normalizedChi2 : -1"),
+    glbChi2 = cms.string("? globalTrack.isNull ? -1 : globalTrack.normalizedChi2"),
+    glbPtError = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError"),
+    glbSigmaPtOverPt = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError/globalTrack.pt"),
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
