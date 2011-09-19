@@ -15,7 +15,8 @@ IsolationVariables = cms.PSet(
     combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
     neutralHadIso = cms.string("neutralHadronIso"),
     chargedHadIso = cms.string("chargedHadronIso"),
-    photonIso = cms.string("photonIso")
+    photonIso = cms.string("photonIso"),
+    combRelIsoP = cms.string("(neutralHadronIso + chargedHadronIso + photonIso)/pt"),
 )
 MuonIDVariables = cms.PSet(
     caloCompatibility = cms.string("? isCaloCompatibilityValid ? caloCompatibility : -1"),
@@ -23,13 +24,17 @@ MuonIDVariables = cms.PSet(
     numberOfMatchedStations = cms.string("? isMatchesValid ? numberOfMatchedStations : -1"),
 )
 TrackQualityVariables = cms.PSet(
-    
     dB          = cms.string("dB"),
     tkValidHits = cms.string("? track.isNull ? 0 : track.numberOfValidHits"),
+    tkValidPixelHits = cms.string("? track.isNull ? 0 : track.numberOfValidPixelHits"),
     tkPixelLay  = cms.string("? track.isNull ? 0 : track.hitPattern.pixelLayersWithMeasurement"),
     tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner.numberOfLostHits"),
     tkExpHitOut = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsOuter.numberOfLostHits"),
     tkHitFract  = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidHits/(track.hitPattern.numberOfValidHits+track.hitPattern.numberOfLostHits+track.trackerExpectedHitsInner.numberOfLostHits+track.trackerExpectedHitsOuter.numberOfLostHits)"),
+    trkChi2 = cms.string("? track.isNonnull ? track.normalizedChi2 : -1"),
+)
+GlobalTrackQualityVariables = cms.PSet(
+    glbChi2 = cms.string("? globalTrack.isNonnull ? globalTrack.normalizedChi2 : -1"),
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
@@ -52,7 +57,7 @@ L3Variables = cms.PSet(
                       "         triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).phi ) ")
 )
 TriggerVariables = cms.PSet(L1Variables, L2Variables, L3Variables)
-AllVariables = cms.PSet(KinematicVariables, IsolationVariables, MuonIDVariables, TrackQualityVariables, L1Variables, L2Variables, L3Variables)
+AllVariables = cms.PSet(KinematicVariables, IsolationVariables, MuonIDVariables, TrackQualityVariables, GlobalTrackQualityVariables, L1Variables, L2Variables, L3Variables)
 
 TrackQualityFlags = cms.PSet(
     Track_HP  = cms.string("? track.isNonnull ? track.quality('highPurity') : 0"),
