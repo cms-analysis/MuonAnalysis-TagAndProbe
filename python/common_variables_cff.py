@@ -79,36 +79,65 @@ MuonIDFlags = cms.PSet(
                         "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
 )
 
+# HighPtTriggerFlags = cms.PSet(
+
+#    # legacy
+#    Mu9  = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_Mu9_v*',1,0)"),     
+#    DoubleMu3 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_DoubleMu3_v*',1,0)"),
+#    # current or new
+#    Mu15 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_Mu15_v*',1,0)"),     
+#    Mu20 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_Mu20_v*',1,0)"),     
+#    Mu24 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_Mu24_v*',1,0)"),     
+#    Mu30 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_Mu30_v*',1,0)"),     
+#    IsoMu15 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_IsoMu15_v*',1,0)"),  
+   
+#    IsoMu17 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_IsoMu17_v*',1,0)"),
+   
+#    IsoMu24 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_IsoMu24_v*',1,0)"),
+   
+#    IsoMu30 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_IsoMu30_v*',1,0)"),
+#    IsoMu24_Eta2p1 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_IsoMu24_eta2p1_v*',1,0)"),
+#    IsoMu30_Eta2p1 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_IsoMu30_eta2p1_v*',1,0)"),
+   
+#    DoubleMu5 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_DoubleMu5_v*',1,0)"),
+#    DoubleMu7 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_DoubleMu7_v*',1,0)"),
+#    DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).path('HLT_Mu13_Mu8_v*',1,0)"),
+#    DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
+#    )
+
+
+
 HighPtTriggerFlags = cms.PSet(
 
    # legacy
    Mu9       = cms.string("!triggerObjectMatchesByPath('HLT_Mu9').empty()"),
    DoubleMu3 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu3_v*').empty()"),
-   # current or new
-   Mu15      = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*').empty()"),
-   Mu20      = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*').empty()"),
-   Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*').empty()"),
-   Mu30      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_v*').empty()"),
-   IsoMu15   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_v*').empty()"),
-   IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*').empty()"),
-   IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*').empty()"),
-   IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*').empty()"),
-   DoubleMu5 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu5_v*').empty()"),
-   DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*').empty()"),
-   DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').empty() &&" +
-                                   "!triggerObjectMatchesByFilter('hltSingleMu13L3Filtered13').empty()"),
-   DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*').empty() &&" +
-                                  "!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty()"),
+   # current or new up to 3E33 menu
+   Mu15      = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*',1,0).empty()"),
+   Mu20      = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty()"),
+   Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*',1,0).empty()"),
+   Mu30      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty()"),
+   IsoMu15   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_v*',1,0).empty()"),
+   IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty()"),
+   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
+   IsoMu30_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty()"),
+   IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
+   IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*',1,0).empty()"),
+   DoubleMu5 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu5_v*',1,0).empty()"),
+   DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*',1,0).empty()"),
+   DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
+   DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
     
    )
 
+
 LowPtTriggerFlagsPhysics = cms.PSet(
-   DoubleMu0_Quarkonium  = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu0').empty() || "+
-                                      "!triggerObjectMatchesByPath('HLT_DoubleMu0_Quarkonium').empty() || "+
-                                      "!triggerObjectMatchesByPath('HLT_DoubleMu0_Quarkonium_v1').empty()"),
+   DoubleMu0_Quarkonium  = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu0',1,0).empty() || "+
+                                      "!triggerObjectMatchesByPath('HLT_DoubleMu0_Quarkonium',1,0).empty() || "+
+                                      "!triggerObjectMatchesByPath('HLT_DoubleMu0_Quarkonium_v1',1,0).empty()"),
    DoubleMu3_Jpsi_A      = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered3Jpsi').empty()"),
    DoubleMu3_Jpsi_B      = cms.string("!triggerObjectMatchesByFilter('hltDoubleMu3JpsiL3Filtered').empty()"),
-   DoubleMu3_Jpsi        = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu3_Jpsi_v*').empty()"),
+   DoubleMu3_Jpsi        = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu3_Jpsi_v*',1,0).empty()"),
 
 )
 
