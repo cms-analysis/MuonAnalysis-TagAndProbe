@@ -13,11 +13,35 @@ IsolationVariables = cms.PSet(
     ecalIso = cms.string("isolationR03.emEt"),
     hcalIso = cms.string("isolationR03.hadEt"),
     combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+    
+    chargedHadIso03 = cms.string("pfIsolationR03().sumChargedHadronPt"),
+    puIso03 = cms.string("pfIsolationR03().sumPUPt"),
+    neutralHadIso03 = cms.string("pfIsolationR03().sumNeutralHadronEt"),
+    neutralHadIso03HT = cms.string("pfIsolationR03().sumNeutralHadronEtHighThreshold"),
+    photonIso03 = cms.string("pfIsolationR03().sumPhotonEt"),
+    photonIso03HT = cms.string("pfIsolationR03().sumPhotonEtHighThreshold"),
+    chargedParticleIso03 = cms.string("pfIsolationR03().sumChargedParticlePt"),
+    combRelIsoPF03 = cms.string("(pfIsolationR03().sumChargedHadronPt + pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt)/pt"),
+    combRelIsoPF03dBeta = cms.string("(pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - pfIsolationR03().sumPUPt/2,0.0))/pt"),
+    combRelIsoPF03HT = cms.string("(pfIsolationR03().sumChargedHadronPt + pfIsolationR03().sumNeutralHadronEtHighThreshold + pfIsolationR03().sumPhotonEtHighThreshold)/pt"),
+
+    chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+    puIso04 = cms.string("pfIsolationR04().sumPUPt"),
+    neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+    neutralHadIso04HT = cms.string("pfIsolationR04().sumNeutralHadronEtHighThreshold"),
+    photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+    photonIso04HT = cms.string("pfIsolationR04().sumPhotonEtHighThreshold"),
+    chargedParticleIso04 = cms.string("pfIsolationR04().sumChargedParticlePt"),
+    combRelIsoPF04 = cms.string("(pfIsolationR04().sumChargedHadronPt + pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt)/pt"),
+    combRelIsoPF04dBeta = cms.string("(pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - pfIsolationR04().sumPUPt/2,0.0))/pt"),
+    combRelIsoPF04HT = cms.string("(pfIsolationR04().sumChargedHadronPt + pfIsolationR04().sumNeutralHadronEtHighThreshold + pfIsolationR04().sumPhotonEtHighThreshold)/pt"),
+
     neutralHadIso = cms.string("neutralHadronIso"),
     chargedHadIso = cms.string("chargedHadronIso"),
     photonIso = cms.string("photonIso"),
     combRelIsoP = cms.string("(neutralHadronIso + chargedHadronIso + photonIso)/pt"),
 )
+
 MuonIDVariables = cms.PSet(
     caloCompatibility = cms.string("? isCaloCompatibilityValid ? caloCompatibility : -1"),
     numberOfMatches   = cms.string("? isMatchesValid ? numberOfMatches : -1"),
@@ -26,6 +50,7 @@ MuonIDVariables = cms.PSet(
 TrackQualityVariables = cms.PSet(
     dB          = cms.string("dB"),
     tkValidHits = cms.string("? track.isNull ? 0 : track.numberOfValidHits"),
+    tkTrackerLay = cms.string("? track.isNull ? 0 : track.hitPattern.trackerLayersWithMeasurement"),
     tkValidPixelHits = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidPixelHits"),
     tkPixelLay  = cms.string("? track.isNull ? 0 : track.hitPattern.pixelLayersWithMeasurement"),
     tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner.numberOfLostHits"),
@@ -75,8 +100,14 @@ MuonIDFlags = cms.PSet(
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
     TMOSL  = cms.string("muonID('TMOneStationLoose')"),
     TMOST  = cms.string("muonID('TMOneStationTight')"),
+    TMOSTQual  = cms.string("muonID('TMOneStationTight') && track.numberOfValidHits > 10 && track.normalizedChi2()<1.8 && track.hitPattern.pixelLayersWithMeasurement>1"),
     VBTF   = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
+    VBTF_nL8    = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
+                        "track.hitPattern.trackerLayersWithMeasurement > 8 && track.hitPattern.numberOfValidPixelHits > 0"),
+    
+    VBTF_nL9    = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
+                        "track.hitPattern.trackerLayersWithMeasurement > 9 && track.hitPattern.numberOfValidPixelHits > 0"),
 )
 
 
@@ -90,14 +121,19 @@ HighPtTriggerFlags = cms.PSet(
    Mu15      = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*',1,0).empty()"),
    Mu20      = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty()"),
    Mu24      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_v*',1,0).empty()"),
+   Mu24_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_eta2p1_v*',1,0).empty()"),
    Mu30      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty()"),
+   Mu30_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_eta2p1_v*',1,0).empty()"),
    Mu40      = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty()"),
+   Mu40_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
    IsoMu15   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_v*',1,0).empty()"),
+   IsoMu15_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_eta2p1_v*',1,0).empty()"),
    IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty()"),
-   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
-   IsoMu30_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty()"),
    IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
+   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
    IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*',1,0).empty()"),
+   IsoMu30_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty()"),
+   Mu15orMu17orMu20orMu24orMu30orMu40   = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu24_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu24_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
    DoubleMu5 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu5_v*',1,0).empty()"),
    DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*',1,0).empty()"),
    DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
@@ -105,7 +141,7 @@ HighPtTriggerFlags = cms.PSet(
    DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty()"),
    DoubleMu17Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
    DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty()"),
-   DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3Mu17FromDiMuonFiltered17').empty()")
+   DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3Mu17FromDiMuonFiltered17').empty()")  
    )
 
 
