@@ -129,15 +129,12 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     tagVariables = cms.PSet(
         nVertices   = cms.InputTag("nverticesModule"),
-        nVerticesDA = cms.InputTag("nverticesDAModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags),
     pairVariables = cms.PSet(
-        nJets15 = cms.InputTag("njets15Module"),
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
-        nL1EG5  = cms.InputTag("nL1EG5Module"), # to unlock EMu triggers
         pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
     ),
     pairFlags = cms.PSet(),
@@ -156,6 +153,14 @@ process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5),
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
+process.extraProbeVariablesSeq = cms.Sequence(
+    process.muonsPassingPF +
+    process.probeMuonsIsoSequence +
+    process.kt6PFJetsForIso * process.computeCorrectedIso + 
+    process.mvaIsoVariablesSeq +
+    process.muonDxyPVdzmin +
+    process.muonSIP 
+)
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
@@ -163,16 +168,8 @@ process.tnpSimpleSequence = cms.Sequence(
     process.tpPairs    +
     process.onePair    +
     process.nverticesModule +
-    process.muonDxyPVdzmin +
-    process.muonSIP +
-    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
-    process.njets15Module +
     process.njets30Module +
-    process.mergedL1EG + process.nL1EG5Module +
-    process.muonsPassingPF +
-    process.probeMuonsIsoSequence +
-    process.kt6PFJetsForIso * process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq +
+    process.extraProbeVariablesSeq +
     process.tpTree
 )
 
@@ -233,10 +230,7 @@ process.tpTreeSta = process.tpTree.clone(
         Glb = cms.string("isGlobalMuon"),
     ),
 )
-process.tpTreeSta.pairVariables.nJets15 = "njets15ModuleSta"
 process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
-del process.tpTreeSta.pairVariables.nL1EG5
-process.njets15ModuleSta = process.njets15Module.clone(pairs = "tpPairsSta")
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
@@ -246,9 +240,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.tpPairsSta      +
     process.onePairSta      +
     process.nverticesModule +
-    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.staToTkMatchSequenceZ +
-    process.njets15ModuleSta +
     process.njets30ModuleSta +
     process.tpTreeSta
 )
@@ -258,6 +250,72 @@ process.tagAndProbeSta = cms.Path(
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
+)
+
+##    _____     _          ____       _            
+##   |  ___|_ _| | _____  |  _ \ __ _| |_ ___  ___ 
+##   | |_ / _` | |/ / _ \ | |_) / _` | __/ _ \/ __|
+##   |  _| (_| |   <  __/ |  _ < (_| | ||  __/\__ \
+##   |_|  \__,_|_|\_\___| |_| \_\__,_|\__\___||___/
+##                                                 
+##   
+process.load("MuonAnalysis.TagAndProbe.fakerate_all_cff")
+
+process.fakeRateJetPlusProbeTree = process.tpTree.clone(
+    tagProbePairs = 'jetPlusProbe',
+    arbitration   = 'None', 
+    tagVariables = process.JetPlusProbeTagVariables,
+    tagFlags = cms.PSet(),
+    pairVariables = cms.PSet(deltaPhi = cms.string("deltaPhi(daughter(0).phi, daughter(1).phi)")), 
+    pairFlags     = cms.PSet(), 
+)
+process.fakeRateWPlusProbeTree = process.tpTree.clone(
+    tagProbePairs = 'wPlusProbe',
+    arbitration   = 'None', 
+    tagVariables = process.WPlusProbeTagVariables,
+    tagFlags = cms.PSet(),
+    pairVariables = cms.PSet(), 
+    pairFlags     = cms.PSet(SameSign = cms.string('daughter(0).daughter(0).charge == daughter(1).charge')), 
+)
+process.fakeRateZPlusProbeTree = process.tpTree.clone(
+    tagProbePairs = 'zPlusProbe',
+    arbitration   = 'None', 
+    tagVariables  = process.ZPlusProbeTagVariables,
+    tagFlags      = cms.PSet(),
+    pairVariables = cms.PSet(), 
+    pairFlags     = cms.PSet(), 
+)
+
+process.fakeRateJetPlusProbe = cms.Path(
+    process.fastFilter +
+    process.mergedMuons * process.patMuonsWithTriggerSequence +
+    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.jetPlusProbeSequence +
+    process.fakeRateJetPlusProbeTree
+)
+process.fakeRateWPlusProbe = cms.Path(
+    process.fastFilter +
+    process.mergedMuons * process.patMuonsWithTriggerSequence +
+    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.wPlusProbeSequence +
+    process.fakeRateWPlusProbeTree
+)
+process.fakeRateZPlusProbe = cms.Path(
+    process.fastFilter +
+    process.mergedMuons * process.patMuonsWithTriggerSequence +
+    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.zPlusProbeSequence +
+    process.fakeRateZPlusProbeTree
+)
+
+
+
+process.schedule = cms.Schedule(
+   process.tagAndProbe, 
+   process.tagAndProbeSta, 
+   process.fakeRateJetPlusProbe,
+   process.fakeRateWPlusProbe,
+   process.fakeRateZPlusProbe,
 )
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.root"))

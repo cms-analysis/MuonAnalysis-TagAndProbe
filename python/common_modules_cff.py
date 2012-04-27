@@ -12,14 +12,6 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
     objectSelection = cms.string("!isFake && ndof > 4 && abs(z) <= 25 && position.Rho <= 2"),
 )
 
-njets15Module = cms.EDProducer("CandCleanedMultiplicityCounter", 
-    pairs   = cms.InputTag("tpPairs"),
-    objects = cms.InputTag("ak5PFJets"),
-    objectSelection = cms.string("abs(eta) < 5 && pt > 15"), 
-    minTagObjDR   = cms.double(0.3),
-    minProbeObjDR = cms.double(0.3),
-)
-
 njets30Module = cms.EDProducer("CandCleanedMultiplicityCounter", 
     pairs   = cms.InputTag("tpPairs"),
     objects = cms.InputTag("ak5PFJets"),
@@ -27,59 +19,6 @@ njets30Module = cms.EDProducer("CandCleanedMultiplicityCounter",
     minTagObjDR   = cms.double(0.3),
     minProbeObjDR = cms.double(0.3),
 )
-
-mergedL1EG = cms.EDProducer("CandViewMerger",
-    src = cms.VInputTag(cms.InputTag("l1extraParticles","Isolated"), cms.InputTag("l1extraParticles","NonIsolated")),
-)
-nL1EG5Module = cms.EDProducer("CandCleanedMultiplicityCounter", 
-    pairs   = cms.InputTag("tpPairs"),
-    objects = cms.InputTag("mergedL1EG"),
-    objectSelection = cms.string("bx == 0 && pt >= 5"), 
-    minTagObjDR   = cms.double(0.5),
-    minProbeObjDR = cms.double(0.5),
-)
-
-#########################################################################################
-##        Deterministic Annealing vertices (100um distance; 4.2.X config)              ##
-#########################################################################################
-offlinePrimaryVerticesDA100um = cms.EDProducer("PrimaryVertexProducer",
-    verbose = cms.untracked.bool(False),
-    algorithm = cms.string('AdaptiveVertexFitter'),
-    TrackLabel = cms.InputTag("generalTracks"),
-    useBeamConstraint = cms.bool(False),
-    beamSpotLabel = cms.InputTag("offlineBeamSpot"),
-    minNdof  = cms.double(0.0),
-    PVSelParameters = cms.PSet(
-        maxDistanceToBeam = cms.double(1.0)
-    ),
-    TkFilterParameters = cms.PSet(
-        algorithm=cms.string('filter'),
-        maxNormalizedChi2 = cms.double(20.0),
-        minPixelLayersWithHits=cms.int32(2),
-        minSiliconLayersWithHits = cms.int32(5),
-        maxD0Significance = cms.double(5.0), 
-        minPt = cms.double(0.0),
-        trackQuality = cms.string("any")
-    ),
-
-    TkClusParameters = cms.PSet(
-        algorithm   = cms.string("DA"),
-        TkDAClusParameters = cms.PSet(
-            coolingFactor = cms.double(0.6),  #  moderate annealing speed
-            Tmin = cms.double(4.),            #  end of annealing
-            vertexSize = cms.double(0.01),    #  ~ resolution / sqrt(Tmin)
-            d0CutOff = cms.double(3.),        # downweight high IP tracks 
-            dzCutOff = cms.double(4.)         # outlier rejection after freeze-out (T<Tmin)
-        )
-    )
-)
-
-nverticesDAModule = cms.EDProducer("VertexMultiplicityCounter",
-    probes = cms.InputTag("tagMuons"),
-    objects = cms.InputTag("offlinePrimaryVerticesDA100um"),
-    objectSelection = cms.string("!isFake && ndof > 4 && abs(z) <= 25 && position.Rho <= 2"),
-)   
-
 
 #########################################################################################
 ##        Tracking-related modules                                                     ##
