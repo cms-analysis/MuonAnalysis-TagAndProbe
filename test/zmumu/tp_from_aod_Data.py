@@ -8,10 +8,12 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-    'file:/data3/HZZ_AOD/L1Yves.root',
-	#'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/F4E034EB-2170-E011-B8A2-001617E30D52.root',
-	#'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/AE8F9B2C-7F70-E011-8A4A-0030487A1884.root',
-        #'/store/data/Run2011A/SingleMu/AOD/PromptReco-v2/000/163/339/8693F25C-2670-E011-A5E7-003048F110BE.root',
+	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/4C1F04C2-D687-E111-AF80-485B39897227.root',
+	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/48B34CE2-1488-E111-93A8-001D09F2A465.root',
+	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/469EE257-1B88-E111-B46A-0025B320384C.root',
+	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3CB662F6-DF87-E111-9FCD-5404A63886EE.root',
+	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3CA86B2C-0488-E111-B1CA-001D09F252DA.root',
+	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3C402D34-DA87-E111-8FCC-003048D37694.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -20,7 +22,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_311_V3::All')
+process.GlobalTag.globaltag = cms.string('GR_R_52_V7::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -89,6 +91,9 @@ process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPair
 
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
+process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
+from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -97,6 +102,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
+        MVAIsoVariablesPlain, MVAIsoVariablesMix,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
@@ -166,6 +172,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.muonsPassingPF +
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
+    process.mvaIsoVariablesSeq +
     process.tpTree
 )
 

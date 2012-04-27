@@ -46,9 +46,17 @@ MuonIDVariables = cms.PSet(
     caloCompatibility = cms.string("? isCaloCompatibilityValid ? caloCompatibility : -1"),
     numberOfMatches   = cms.string("? isMatchesValid ? numberOfMatches : -1"),
     numberOfMatchedStations = cms.string("? isMatchesValid ? numberOfMatchedStations : -1"),
+    segmentCompatibility = cms.string("segmentCompatibility"),
+)
+MuonCaloVariables = cms.PSet(
+    hadEnergy   = cms.string("calEnergy.had"),
+    emEnergy    = cms.string("calEnergy.em"),
+    hadS9Energy = cms.string("calEnergy.hadS9"),
+    emS9Energy  = cms.string("calEnergy.emS9"),
 )
 TrackQualityVariables = cms.PSet(
     dB          = cms.string("dB"),
+    edB         = cms.string("edB"),
     tkValidHits = cms.string("? track.isNull ? 0 : track.numberOfValidHits"),
     tkTrackerLay = cms.string("? track.isNull ? 0 : track.hitPattern.trackerLayersWithMeasurement"),
     tkValidPixelHits = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidPixelHits"),
@@ -59,9 +67,11 @@ TrackQualityVariables = cms.PSet(
     tkChi2 = cms.string("? track.isNull ? -1 : track.normalizedChi2"),
     tkPtError = cms.string("? track.isNull ? -1 : track.ptError"),
     tkSigmaPtOverPt = cms.string("? track.isNull ? -1 : track.ptError/track.pt"),
+    tkKink = cms.string("combinedQuality.trkKink"),
 )
 GlobalTrackQualityVariables = cms.PSet(
     glbChi2 = cms.string("? globalTrack.isNull ? -1 : globalTrack.normalizedChi2"),
+    glbValidMuHits = cms.string("? globalTrack.isNull ? 0 : globalTrack.hitPattern.numberOfValidMuonHits"),
     glbPtError = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError"),
     glbSigmaPtOverPt = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError/globalTrack.pt"),
 )
@@ -86,7 +96,7 @@ L3Variables = cms.PSet(
                       "         triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).phi ) ")
 )
 TriggerVariables = cms.PSet(L1Variables, L2Variables, L3Variables)
-AllVariables = cms.PSet(KinematicVariables, IsolationVariables, MuonIDVariables, TrackQualityVariables, GlobalTrackQualityVariables, L1Variables, L2Variables, L3Variables)
+AllVariables = cms.PSet(KinematicVariables, IsolationVariables, MuonIDVariables, MuonCaloVariables, TrackQualityVariables, GlobalTrackQualityVariables, L1Variables, L2Variables, L3Variables)
 
 TrackQualityFlags = cms.PSet(
     Track_HP  = cms.string("? track.isNonnull ? track.quality('highPurity') : 0"),
@@ -98,6 +108,7 @@ MuonIDFlags = cms.PSet(
     TM     = cms.string("isTrackerMuon"),
     TMA    = cms.string("muonID('TrackerMuonArbitrated')"),
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
+    TMLST  = cms.string("muonID('TMLastStationTight')"),
     TMOSL  = cms.string("muonID('TMOneStationLoose')"),
     TMOST  = cms.string("muonID('TMOneStationTight')"),
     TMOSTQual  = cms.string("muonID('TMOneStationTight') && track.numberOfValidHits > 10 && track.normalizedChi2()<1.8 && track.hitPattern.pixelLayersWithMeasurement>1"),
