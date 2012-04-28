@@ -93,6 +93,7 @@ from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsola
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
+#process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -111,21 +112,12 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         IP = cms.InputTag("muonSIP","IP"),
         IPError = cms.InputTag("muonSIP","IPError"),
         SIP = cms.InputTag("muonSIP","SIP"),
-        
+        #radialIso = cms.InputTag("radialIso"), 
     ),
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
-       # Extra triggers
-       Mu8_forEMu  = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenEG5L3Filtered8').empty"),
-       Mu17_forEMu = cms.string("!triggerObjectMatchesByFilter('hltL1MuOpenEG5L3Filtered17').empty"),
-       ## Isolation
-       Isol    = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt < 0.15"), 
-       IsolTk3 = cms.string("isolationR03.sumPt < 3"), 
-       ## ParticleFlow
-       PF = cms.InputTag("muonsPassingPF"),
-       Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
     ),
     tagVariables = cms.PSet(
         nVertices   = cms.InputTag("nverticesModule"),
@@ -143,7 +135,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
 )
 
 
-
 process.load('RecoJets.Configuration.RecoPFJets_cff')
 ##-------------------- Turn-on the FastJet density calculation -----------------------
 process.kt6PFJets.doRhoFastjet = True
@@ -154,10 +145,9 @@ process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5),
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
 process.extraProbeVariablesSeq = cms.Sequence(
-    process.muonsPassingPF +
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq +
+    process.mvaIsoVariablesSeq + #* process.radialIso +
     process.muonDxyPVdzmin +
     process.muonSIP 
 )

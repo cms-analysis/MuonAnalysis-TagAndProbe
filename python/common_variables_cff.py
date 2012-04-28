@@ -107,6 +107,7 @@ MuonIDFlags = cms.PSet(
     GlbPT  = cms.string("muonID('GlobalMuonPromptTight')"),
     TM     = cms.string("isTrackerMuon"),
     TMA    = cms.string("muonID('TrackerMuonArbitrated')"),
+    PF     = cms.string("isPFMuon()"),
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
     TMLST  = cms.string("muonID('TMLastStationTight')"),
     TMOSL  = cms.string("muonID('TMOneStationLoose')"),
