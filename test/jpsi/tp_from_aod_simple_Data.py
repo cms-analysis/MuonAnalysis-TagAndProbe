@@ -8,12 +8,13 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/E89CCBE0-E957-E011-A53B-0019B9F709A4.root',
-	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/D407945E-ED57-E011-A36D-003048F0258C.root',
-	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/CEB587EC-F057-E011-B9DC-001617E30E2C.root',
-	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/BED0F55C-7959-E011-B49E-003048F1C832.root',
-	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/6E558535-F757-E011-B8C5-003048F118C2.root',
-	'/store/data/Run2011A/MuOnia/AOD/PromptReco-v1/000/161/312/667F546C-E857-E011-A5CA-003048F024DC.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/645E9BE9-FC87-E111-9D30-5404A63886C5.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/60C36C17-0188-E111-8B3D-5404A638868F.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5E384785-F087-E111-A8CB-BCAEC518FF80.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5C605E9F-F887-E111-A540-00237DDC5CB0.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5C0DCA92-CE87-E111-A539-5404A63886C6.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5A856F46-1888-E111-A3A5-BCAEC5329700.root',
+	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5271187F-DF87-E111-ADDB-BCAEC518FF7C.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -23,7 +24,7 @@ process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_311_V2::All')
+process.GlobalTag.globaltag = cms.string('GR_R_52_V7::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -73,14 +74,14 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("(isGlobalMuon || numberOfMatchedStations > 1) && pt > 3 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
+    cut = cms.string("(isGlobalMuon || numberOfMatchedStations > 1) && pt > 5 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
 
 process.probeMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("track.isNonnull && (!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() || !triggerObjectMatchesByCollection('hltL2MuonCandidates').empty())"),
+    cut = cms.string("track.isNonnull && (!triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').empty() || !triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() || !triggerObjectMatchesByCollection('hltL2MuonCandidates').empty())"),
 )
 
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
@@ -109,17 +110,12 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlags,
        LowPtTriggerFlagsPhysics,
        LowPtTriggerFlagsEfficienciesProbe,
-       ## A few other flags
-       Track_QTF  = cms.string("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithMeasurement > 1 && track.normalizedChi2 < 4 && abs(dB) < 3 && abs(track.dz) < 30"),
-       Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
-       ## Acceptance definition
        Acc_JPsi = cms.string("(abs(eta) <= 1.3 && pt > 3.3) || (1.3 < abs(eta) <= 2.2 && p > 2.9) || (2.2 < abs(eta) <= 2.4  && pt > 0.8)"),
     ),
     tagVariables = cms.PSet(
         pt  = cms.string('pt'),
         eta = cms.string('eta'),
         nVertices = cms.InputTag("nverticesModule"),
-        nVerticesDA = cms.InputTag("nverticesDAModule"),
     ),
     tagFlags     = cms.PSet(
         LowPtTriggerFlagsPhysics,
@@ -160,7 +156,6 @@ process.tnpSimpleSequence = cms.Sequence(
     process.onePair    +
     process.muonDxyPVdzmin +
     process.nverticesModule +
-    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.tagProbeSeparation +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.tpTree
@@ -223,7 +218,6 @@ process.tpTreeSta = process.tpTree.clone(
     ),
     tagVariables = cms.PSet(
         nVertices = cms.InputTag("nverticesModule"),
-        nVerticesDA = cms.InputTag("nverticesDAModule"),
     ),
     tagFlags = cms.PSet(
         Mu5_L2Mu0_MU      = LowPtTriggerFlagsEfficienciesTag.Mu5_L2Mu0_MU,
@@ -240,7 +234,6 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.tpPairsSta      +
     process.onePairSta      +
     process.nverticesModule +
-    process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.staToTkMatchSequenceJPsi +
     process.tpTreeSta
 )
