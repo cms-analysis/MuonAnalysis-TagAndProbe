@@ -128,13 +128,3 @@ muonDxyPVdzmin = cms.EDProducer("MuonDxyPVdzmin",
     probes = cms.InputTag("probeMuons"),
 )
 
-muonSIP = cms.EDProducer("MuonSIP",
-    probes = cms.InputTag("probeMuons"),
-)
-
-muonsPassingPF = cms.EDProducer("MuonsPassingPF",
-    muons = cms.InputTag("probeMuons"),
-    pf    = cms.InputTag("particleFlow"),
-    pfCut = cms.string("abs(pdgId) == 13"),
-    matchByReference = cms.bool(False), # set to true only if your probeMuons are a subset by reference of the "muons" collection
-)

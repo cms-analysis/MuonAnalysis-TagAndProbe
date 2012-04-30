@@ -102,9 +102,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        IP = cms.InputTag("muonSIP","IP"),
-        IPError = cms.InputTag("muonSIP","IPError"),
-        SIP = cms.InputTag("muonSIP","SIP"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -112,8 +109,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlags,
        LowPtTriggerFlagsPhysics,
        LowPtTriggerFlagsEfficienciesProbe,
-       ## ParticleFlow
-       PF = cms.InputTag("muonsPassingPF"),
        ## A few other flags
        Track_QTF  = cms.string("track.numberOfValidHits > 11 && track.hitPattern.pixelLayersWithMeasurement > 1 && track.normalizedChi2 < 4 && abs(dB) < 3 && abs(track.dz) < 30"),
        Track_VBTF = cms.string("track.numberOfValidHits > 10 && track.hitPattern.pixelLayersWithMeasurement > 0 && abs(dB) < 0.2"),
@@ -164,11 +159,9 @@ process.tnpSimpleSequence = cms.Sequence(
     process.tpPairs    +
     process.onePair    +
     process.muonDxyPVdzmin +
-    process.muonSIP +
     process.nverticesModule +
     process.offlinePrimaryVerticesDA100um * process.nverticesDAModule +
     process.tagProbeSeparation +
-    process.muonsPassingPF +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.tpTree
 )

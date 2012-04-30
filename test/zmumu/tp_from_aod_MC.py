@@ -98,9 +98,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        IP = cms.InputTag("muonSIP","IP"),
-        IPError = cms.InputTag("muonSIP","IPError"),
-        SIP = cms.InputTag("muonSIP","SIP"),
         #radialIso = cms.InputTag("radialIso"), 
     ),
     flags = cms.PSet(
@@ -142,8 +139,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq + #* process.radialIso +
-    process.muonDxyPVdzmin +
-    process.muonSIP 
+    process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +

@@ -55,8 +55,14 @@ MuonCaloVariables = cms.PSet(
     emS9Energy  = cms.string("calEnergy.emS9"),
 )
 TrackQualityVariables = cms.PSet(
+    # 2D variables
     dB          = cms.string("dB"),
     edB         = cms.string("edB"),
+    # 3D variables
+    IP = cms.string('abs(dB("PV3D"))'),
+    IPError = cms.string('edB("PV3D")'),
+    SIP = cms.string('abs(dB("PV3D")/edB("PV3D"))'),
+    # Hits and such
     tkValidHits = cms.string("? track.isNull ? 0 : track.numberOfValidHits"),
     tkTrackerLay = cms.string("? track.isNull ? 0 : track.hitPattern.trackerLayersWithMeasurement"),
     tkValidPixelHits = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidPixelHits"),
