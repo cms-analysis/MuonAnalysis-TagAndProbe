@@ -36,10 +36,10 @@ IsolationVariables = cms.PSet(
     combRelIsoPF04dBeta = cms.string("(pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - pfIsolationR04().sumPUPt/2,0.0))/pt"),
 #    combRelIsoPF04HT = cms.string("(pfIsolationR04().sumChargedHadronPt + pfIsolationR04().sumNeutralHadronEtHighThreshold + pfIsolationR04().sumPhotonEtHighThreshold)/pt"),
 
-    neutralHadIso = cms.string("neutralHadronIso"),
-    chargedHadIso = cms.string("chargedHadronIso"),
-    photonIso = cms.string("photonIso"),
-    combRelIsoP = cms.string("(neutralHadronIso + chargedHadronIso + photonIso)/pt"),
+#     neutralHadIso = cms.string("neutralHadronIso"),
+#     chargedHadIso = cms.string("chargedHadronIso"),
+#     photonIso = cms.string("photonIso"),
+#     combRelIsoP = cms.string("(neutralHadronIso + chargedHadronIso + photonIso)/pt"),
 )
 
 MuonIDVariables = cms.PSet(
