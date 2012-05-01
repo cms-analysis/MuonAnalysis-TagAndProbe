@@ -81,7 +81,12 @@ ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
   effAreaHcalBar(iConfig.getParameter<double>("EffAreaHcalBar")),
   effAreaHcalEnd(iConfig.getParameter<double>("EffAreaHcalEnd"))
 {
-  produces<edm::ValueMap<float> >("Rho");
+
+  produces<edm::ValueMap<float> >("RhoAllCalo");
+  produces<edm::ValueMap<float> >("RhoAll");
+  produces<edm::ValueMap<float> >("RhoPU");
+  produces<edm::ValueMap<float> >("RhoNeu05");
+  produces<edm::ValueMap<float> >("RhoNeu1");
   produces<edm::ValueMap<float> >("ecalIsoRhoCorrected");
   produces<edm::ValueMap<float> >("hcalIsoRhoCorrected");
   produces<edm::ValueMap<float> >("combRelIsoRhoCorrected");
@@ -102,9 +107,22 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   Handle<View<pat::Muon> > probes;
   iEvent.getByLabel(probesLabel, probes);
   
-  // Rho value
-  edm::Handle<double> rhoH;
-  iEvent.getByLabel(InputTag("kt6PFJetsForIso", "rho"), rhoH);
+  // Rho values
+  edm::Handle<double> rhoAllH;
+  iEvent.getByLabel(InputTag("kt6PFJetsForIso", "rho"), rhoAllH);
+
+  edm::Handle<double> rhoAllCaloH;
+  iEvent.getByLabel(InputTag("kt6CaloJetsCentral", "rho"), rhoAllCaloH);
+
+  edm::Handle<double> rhoPUH;
+  iEvent.getByLabel(InputTag("kt6PFJetsCentralChargedPileUp", "rho"), rhoPUH);
+  
+  edm::Handle<double> rhoNeu05H;
+  iEvent.getByLabel(InputTag("kt6PFJetsCentralNeutral", "rho"), rhoNeu05H);
+  
+  edm::Handle<double> rhoNeu1H;
+  iEvent.getByLabel(InputTag("kt6PFJetsCentralNeutralTight", "rho"), rhoNeu1H);
+
 
   // Prepare vector for output 
   std::vector<double> ecalIsoRhoCorr;
@@ -122,12 +140,12 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
     double hcalIso  = probe->hcalIso();
 
     if( fabs(probe->eta())<1.479 ) {
-      ecalIso=std::max(0., ecalIso-effAreaEcalBar*(*rhoH));
-      hcalIso=std::max(0., hcalIso-effAreaHcalBar*(*rhoH));
+      ecalIso=std::max(0., ecalIso-effAreaEcalBar*(*rhoAllH));
+      hcalIso=std::max(0., hcalIso-effAreaHcalBar*(*rhoAllH));
     }
     else {
-      ecalIso=std::max(0., ecalIso-effAreaEcalEnd*(*rhoH));
-      hcalIso=std::max(0., hcalIso-effAreaHcalEnd*(*rhoH));
+      ecalIso=std::max(0., ecalIso-effAreaEcalEnd*(*rhoAllH));
+      hcalIso=std::max(0., hcalIso-effAreaHcalEnd*(*rhoAllH));
     }
     double probeRhoRelativeIsolation=(trackIso+ecalIso+hcalIso)/std::max(0.5, probe->pt());
 
@@ -139,12 +157,44 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
 
   
   // Store rho
-  std::auto_ptr<ValueMap<float> > Rho(new ValueMap<float>());
-  ValueMap<float>::Filler filler1(*Rho);
-  std::vector<float> myRhos(probes->size(), *rhoH);
-  filler1.insert(probes, myRhos.begin(), myRhos.end());
+  std::auto_ptr<ValueMap<float> > RhoAll(new ValueMap<float>());
+  ValueMap<float>::Filler filler1(*RhoAll);
+  std::vector<float> myRhosAll(probes->size(), *rhoAllH);
+  filler1.insert(probes, myRhosAll.begin(), myRhosAll.end());
   filler1.fill();
-  iEvent.put(Rho, "Rho");
+  iEvent.put(RhoAll, "RhoAll");
+
+  // Store rho
+  std::auto_ptr<ValueMap<float> > RhoAllCalo(new ValueMap<float>());
+  ValueMap<float>::Filler filler11(*RhoAllCalo);
+  std::vector<float> myRhosAllCalo(probes->size(), *rhoAllCaloH);
+  filler11.insert(probes, myRhosAllCalo.begin(), myRhosAllCalo.end());
+  filler11.fill();
+  iEvent.put(RhoAllCalo, "RhoAllCalo");
+
+  // Store rho
+  std::auto_ptr<ValueMap<float> > RhoPU(new ValueMap<float>());
+  ValueMap<float>::Filler filler12(*RhoPU);
+  std::vector<float> myRhosPU(probes->size(), *rhoPUH);
+  filler12.insert(probes, myRhosPU.begin(), myRhosPU.end());
+  filler12.fill();
+  iEvent.put(RhoPU, "RhoPU");
+
+  // Store rho
+  std::auto_ptr<ValueMap<float> > RhoNeu05(new ValueMap<float>());
+  ValueMap<float>::Filler filler13(*RhoNeu05);
+  std::vector<float> myRhosNeu05(probes->size(), *rhoNeu05H);
+  filler13.insert(probes, myRhosNeu05.begin(), myRhosNeu05.end());
+  filler13.fill();
+  iEvent.put(RhoNeu05, "RhoNeu05");
+
+  // Store rho
+  std::auto_ptr<ValueMap<float> > RhoNeu1(new ValueMap<float>());
+  ValueMap<float>::Filler filler14(*RhoNeu1);
+  std::vector<float> myRhosNeu1(probes->size(), *rhoNeu1H);
+  filler14.insert(probes, myRhosNeu1.begin(), myRhosNeu1.end());
+  filler14.fill();
+  iEvent.put(RhoNeu1, "RhoNeu1");
 
   // Store corrected EcalIso 
   std::auto_ptr<ValueMap<float> > EcalIsoRhoCorrected(new ValueMap<float>());
