@@ -16,7 +16,7 @@ process.source = cms.Source("PoolSource",
 	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3C402D34-DA87-E111-8FCC-003048D37694.root',
     ),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )    
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
@@ -93,7 +93,7 @@ from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsola
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
-#process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
+process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -109,7 +109,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        #radialIso = cms.InputTag("radialIso"), 
+        radialIso = cms.InputTag("radialIso"), 
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -135,16 +135,16 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
 process.load('RecoJets.Configuration.RecoPFJets_cff')
 ##-------------------- Turn-on the FastJet density calculation -----------------------
 process.kt6PFJets.doRhoFastjet = True
-##-------------------- FastJet density calculation for Iso -----------------------
+##-------------------- FastJet density calculation for Iso ---------------------------
 process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
-
+##-------------------- All the other rhos are taken from the events ------------------
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq + #* process.radialIso +
+    process.mvaIsoVariablesSeq * process.radialIso +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
