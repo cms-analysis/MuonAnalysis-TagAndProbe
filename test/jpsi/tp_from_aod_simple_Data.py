@@ -8,23 +8,17 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/645E9BE9-FC87-E111-9D30-5404A63886C5.root',
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/60C36C17-0188-E111-8B3D-5404A638868F.root',
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5E384785-F087-E111-A8CB-BCAEC518FF80.root',
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5C605E9F-F887-E111-A540-00237DDC5CB0.root',
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5C0DCA92-CE87-E111-A539-5404A63886C6.root',
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5A856F46-1888-E111-A3A5-BCAEC5329700.root',
-	'/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5271187F-DF87-E111-ADDB-BCAEC518FF7C.root',
+        'file:/tmp/gpetrucc/MuOnia_2011B_180093_E0CB4E55365C.root',
+        'file:/tmp/gpetrucc/MuOnia_2011B_180093_002481E0D958.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
-
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_52_V7::All')
+process.GlobalTag.globaltag = cms.string('GR_R_42_V22::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -111,6 +105,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        LowPtTriggerFlagsPhysics,
        LowPtTriggerFlagsEfficienciesProbe,
        Acc_JPsi = cms.string("(abs(eta) <= 1.3 && pt > 3.3) || (1.3 < abs(eta) <= 2.2 && p > 2.9) || (2.2 < abs(eta) <= 2.4  && pt > 0.8)"),
+       ## ParticleFlow 	 
+       PF = cms.InputTag("muonsPassingPF"),
     ),
     tagVariables = cms.PSet(
         pt  = cms.string('pt'),
@@ -158,6 +154,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.tagProbeSeparation +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
+    process.muonsPassingPF +
     process.tpTree
 )
 

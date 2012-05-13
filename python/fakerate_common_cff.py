@@ -5,7 +5,7 @@ nverticesModuleProbes = nverticesModule.clone(probes = 'probeMuons')
 
 probeRecoMuons = cms.EDFilter("PATMuonRefSelector",
     src = cms.InputTag("probeMuons"),
-    cut = cms.string("isGlobalMuon || isPFMuon || isTrackerMuon"),
+    cut = cms.string("isGlobalMuon || isTrackerMuon"),
 )
 
 diMuPairs = cms.EDProducer("CandViewShallowCloneCombiner",

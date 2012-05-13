@@ -8,19 +8,20 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/A29B9025-0E7A-E111-97E7-001A928116DE.root',
-	'/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/5CAA0235-0F7A-E111-BA3E-0018F3D09690.root',
-	'/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/1011EE9E-2B7A-E111-9349-0018F3D0970C.root',
-	'/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/0E187509-0D7A-E111-8FA3-001A928116C2.root',
+        'file:/tmp/gpetrucc/DYJetsToLL_Fall11_485B39800B95.root' # lxplus311.cern.ch
+	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0026/40B00842-9ABB-E011-A9D5-003048679000.root',
+	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0024/FA374077-D3BA-E011-B079-003048678D78.root',
+	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0024/AE0B00F7-D4BA-E011-9AA4-001A928116C6.root',
+	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0024/8276ABDD-D6BA-E011-8066-00304867C136.root',
     ),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('START52_V5::All')
+process.GlobalTag.globaltag = cms.string('START42_V12::All')
 
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
@@ -82,7 +83,9 @@ from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsola
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
-#process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
+process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
+process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff")
+from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import MuonPFIsoVariables
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -92,18 +95,21 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
+        MuonPFIsoVariables,
         MVAIsoVariablesPlain, MVAIsoVariablesMix,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        #radialIso = cms.InputTag("radialIso"), 
+        radialIso = cms.InputTag("radialIso"), 
     ),
     flags = cms.PSet(
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
+       ## ParticleFlow 	 
+       PF = cms.InputTag("muonsPassingPF"),
     ),
     tagVariables = cms.PSet(
         nVertices   = cms.InputTag("nverticesModule"),
@@ -129,16 +135,17 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
 process.load('RecoJets.Configuration.RecoPFJets_cff')
 ##-------------------- Turn-on the FastJet density calculation -----------------------
 process.kt6PFJets.doRhoFastjet = True
-##-------------------- FastJet density calculation for Iso -----------------------
+##-------------------- FastJet density calculation for Iso ---------------------------
 process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
-
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq + #* process.radialIso +
+    process.mvaIsoVariablesSeq * process.radialIso +
+    process.muonsPassingPF +
+    process.muonPFIsoSequence +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
@@ -151,7 +158,6 @@ process.tnpSimpleSequence = cms.Sequence(
     process.tpTree
 )
 
-#process.fastFilter = cms.EDFilter("MuonSelector", src = cms.InputTag("muons"), cut = cms.string("pt > 15"), filter = cms.bool(True))
 process.tagAndProbe = cms.Path( 
     #process.fastFilter                  *
     process.mergedMuons                 *

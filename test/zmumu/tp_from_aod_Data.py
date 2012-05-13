@@ -8,21 +8,31 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/4C1F04C2-D687-E111-AF80-485B39897227.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/48B34CE2-1488-E111-93A8-001D09F2A465.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/469EE257-1B88-E111-B46A-0025B320384C.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3CB662F6-DF87-E111-9FCD-5404A63886EE.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3CA86B2C-0488-E111-B1CA-001D09F252DA.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3C402D34-DA87-E111-8FCC-003048D37694.root',
+        'file:/tmp/gpetrucc/SingleMu_Run2011B_R180093_0025901D624E.root', # lxplus311.cern.ch
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/FEE539CB-E002-E111-9313-0025901D624E.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/F65A014A-E202-E111-BDD4-003048D3C982.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/B8080E2D-EC02-E111-8921-003048F1BF66.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/A0278599-E802-E111-A82A-BCAEC532971C.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/98B686C3-D602-E111-B1E0-BCAEC518FF8A.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/9891C10F-D902-E111-A50C-001D09F23A34.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/88D05CBD-E302-E111-82CF-003048D2BF1C.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/529F7E9B-DC02-E111-B3C0-BCAEC5329718.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/4A5C54AB-D802-E111-8EE6-E0CB4E55367F.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/3E342B04-CE02-E111-B8D1-002481E0CC00.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/30E00D00-E302-E111-8C71-003048F11942.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/2EE751D3-0703-E111-AC3C-BCAEC5364C6C.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/2842F675-E402-E111-BFF4-0025901D5DEE.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/2682A64D-E702-E111-9E46-003048D2C16E.root',
+	#'/store/data/Run2011B/SingleMu/AOD/PromptReco-v1/000/180/093/10FC73D8-D502-E111-AE21-BCAEC5329705.root',
     ),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load("Configuration.StandardSequences.MagneticField_cff")
 process.load("Configuration.StandardSequences.Geometry_cff")
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_52_V7::All')
+process.GlobalTag.globaltag = cms.string('GR_R_42_V22::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -94,6 +104,8 @@ from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsola
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
+process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff")
+from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import MuonPFIsoVariables
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
@@ -103,6 +115,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
+        MuonPFIsoVariables,
         MVAIsoVariablesPlain, MVAIsoVariablesMix,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
@@ -115,6 +128,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
+       ## ParticleFlow 	 
+       PF = cms.InputTag("muonsPassingPF"),
     ),
     tagVariables = cms.PSet(
         nVertices   = cms.InputTag("nverticesModule"),
@@ -137,7 +152,6 @@ process.load('RecoJets.Configuration.RecoPFJets_cff')
 process.kt6PFJets.doRhoFastjet = True
 ##-------------------- FastJet density calculation for Iso ---------------------------
 process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
-##-------------------- All the other rhos are taken from the events ------------------
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
@@ -145,6 +159,8 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.radialIso +
+    process.muonsPassingPF +
+    process.muonPFIsoSequence +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(

@@ -25,7 +25,7 @@ zVetoForW = cms.EDFilter("CandViewSelector",
     filter = cms.bool(True),
 )
 
-jetsForVeto = cms.EDFilter("PFJetSelector",
+jetsForVeto = cms.EDFilter("CandViewSelector",
     src = cms.InputTag("ak5PFJets"),
     cut = cms.string("pt > 30"),
 )

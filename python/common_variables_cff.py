@@ -13,33 +13,6 @@ IsolationVariables = cms.PSet(
     ecalIso = cms.string("isolationR03.emEt"),
     hcalIso = cms.string("isolationR03.hadEt"),
     combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
-    
-    chargedHadIso03 = cms.string("pfIsolationR03().sumChargedHadronPt"),
-    puIso03 = cms.string("pfIsolationR03().sumPUPt"),
-    neutralHadIso03 = cms.string("pfIsolationR03().sumNeutralHadronEt"),
-#    neutralHadIso03HT = cms.string("pfIsolationR03().sumNeutralHadronEtHighThreshold"),
-    photonIso03 = cms.string("pfIsolationR03().sumPhotonEt"),
-#    photonIso03HT = cms.string("pfIsolationR03().sumPhotonEtHighThreshold"),
-    chargedParticleIso03 = cms.string("pfIsolationR03().sumChargedParticlePt"),
-    combRelIsoPF03 = cms.string("(pfIsolationR03().sumChargedHadronPt + pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt)/pt"),
-    combRelIsoPF03dBeta = cms.string("(pfIsolationR03().sumChargedHadronPt + max(pfIsolationR03().sumNeutralHadronEt + pfIsolationR03().sumPhotonEt - pfIsolationR03().sumPUPt/2,0.0))/pt"),
-#    combRelIsoPF03HT = cms.string("(pfIsolationR03().sumChargedHadronPt + pfIsolationR03().sumNeutralHadronEtHighThreshold + pfIsolationR03().sumPhotonEtHighThreshold)/pt"),
-
-    chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
-    puIso04 = cms.string("pfIsolationR04().sumPUPt"),
-    neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
-#    neutralHadIso04HT = cms.string("pfIsolationR04().sumNeutralHadronEtHighThreshold"),
-    photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-#    photonIso04HT = cms.string("pfIsolationR04().sumPhotonEtHighThreshold"),
-    chargedParticleIso04 = cms.string("pfIsolationR04().sumChargedParticlePt"),
-    combRelIsoPF04 = cms.string("(pfIsolationR04().sumChargedHadronPt + pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt)/pt"),
-    combRelIsoPF04dBeta = cms.string("(pfIsolationR04().sumChargedHadronPt + max(pfIsolationR04().sumNeutralHadronEt + pfIsolationR04().sumPhotonEt - pfIsolationR04().sumPUPt/2,0.0))/pt"),
-#    combRelIsoPF04HT = cms.string("(pfIsolationR04().sumChargedHadronPt + pfIsolationR04().sumNeutralHadronEtHighThreshold + pfIsolationR04().sumPhotonEtHighThreshold)/pt"),
-
-#     neutralHadIso = cms.string("neutralHadronIso"),
-#     chargedHadIso = cms.string("chargedHadronIso"),
-#     photonIso = cms.string("photonIso"),
-#     combRelIsoP = cms.string("(neutralHadronIso + chargedHadronIso + photonIso)/pt"),
 )
 
 MuonIDVariables = cms.PSet(
@@ -113,7 +86,6 @@ MuonIDFlags = cms.PSet(
     GlbPT  = cms.string("muonID('GlobalMuonPromptTight')"),
     TM     = cms.string("isTrackerMuon"),
     TMA    = cms.string("muonID('TrackerMuonArbitrated')"),
-    PF     = cms.string("isPFMuon()"),
     TMLSAT = cms.string("muonID('TMLastStationAngTight')"),
     TMLST  = cms.string("muonID('TMLastStationTight')"),
     TMOSL  = cms.string("muonID('TMOneStationLoose')"),
@@ -201,10 +173,10 @@ LowPtTriggerFlagsEfficienciesTag = cms.PSet(
 
 LowPtTriggerFlagsEfficienciesProbe = cms.PSet(
    ## Mu + Track
-   Mu5_Track2_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').empty() && "+
-                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').at(0).hasFilterLabel('hltMu5Track2JpsiTrackMassFiltered')"),
-   Mu5_Track3p5_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').empty() && "+
-                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').at(0).hasFilterLabel('hltMu5Track3p5JpsiTrackMassFiltered')"),
+   Mu5_Track2_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu5Track2JpsiTrackMassFiltered')"),
+   Mu5_Track3p5_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
+                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu5Track3p5JpsiTrackMassFiltered')"),
    Mu7_Track7_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
                                    " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu7Track7JpsiTrackMassFiltered')"),
    ## Mu + L2Mu
