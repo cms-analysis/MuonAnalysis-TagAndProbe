@@ -46,7 +46,14 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
     numtrack = cms.untracked.uint32(10),
     thresh = cms.untracked.double(0.25)
 )
-process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping)
+
+process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
+process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_IsoMu24_v*', 'HLT_Mu40_eta2p1_v*' )
+process.triggerResultsFilter.l1tResults = ''
+process.triggerResultsFilter.throw = False
+process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
+
+process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilter)
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
 ##   | |\/| | | | |/ _ \| '_ \/ __|
