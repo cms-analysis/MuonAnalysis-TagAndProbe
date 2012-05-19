@@ -27,11 +27,11 @@ void addMVAIso() {
 
     TTree *tIn  = (TTree *) ((TFile*)gROOT->GetListOfFiles()->At(0))->Get("tpTree/fitter_tree");
     Float_t pt, eta, rho; Int_t global, tracker;
-    Float_t ChargedIso_DR0p0To0p1, NeutralHadronIso_DR0p0To0p1, PhotonIso_DR0p0To0p1;
-    Float_t ChargedIso_DR0p1To0p2, NeutralHadronIso_DR0p1To0p2, PhotonIso_DR0p1To0p2;
-    Float_t ChargedIso_DR0p2To0p3, NeutralHadronIso_DR0p2To0p3, PhotonIso_DR0p2To0p3;
-    Float_t ChargedIso_DR0p3To0p4, NeutralHadronIso_DR0p3To0p4, PhotonIso_DR0p3To0p4;
-    Float_t ChargedIso_DR0p4To0p5, NeutralHadronIso_DR0p4To0p5, PhotonIso_DR0p4To0p5;
+    Float_t ChargedIso_DR0p0To0p1, NeutralHadronIso_DR0p0To0p1, GammaIso_DR0p0To0p1;
+    Float_t ChargedIso_DR0p1To0p2, NeutralHadronIso_DR0p1To0p2, GammaIso_DR0p1To0p2;
+    Float_t ChargedIso_DR0p2To0p3, NeutralHadronIso_DR0p2To0p3, GammaIso_DR0p2To0p3;
+    Float_t ChargedIso_DR0p3To0p4, NeutralHadronIso_DR0p3To0p4, GammaIso_DR0p3To0p4;
+    Float_t ChargedIso_DR0p4To0p5, NeutralHadronIso_DR0p4To0p5, GammaIso_DR0p4To0p5;
     tIn->SetBranchAddress("pt",  &pt);
     tIn->SetBranchAddress("eta", &eta);
     tIn->SetBranchAddress("Glb", &global);
@@ -47,11 +47,11 @@ void addMVAIso() {
     tIn->SetBranchAddress("NeutralHadronIso_DR0p2To0p3", &NeutralHadronIso_DR0p2To0p3);
     tIn->SetBranchAddress("NeutralHadronIso_DR0p3To0p4", &NeutralHadronIso_DR0p3To0p4);
     tIn->SetBranchAddress("NeutralHadronIso_DR0p4To0p5", &NeutralHadronIso_DR0p4To0p5);
-    tIn->SetBranchAddress("PhotonIso_DR0p0To0p1", &PhotonIso_DR0p0To0p1);
-    tIn->SetBranchAddress("PhotonIso_DR0p1To0p2", &PhotonIso_DR0p1To0p2);
-    tIn->SetBranchAddress("PhotonIso_DR0p2To0p3", &PhotonIso_DR0p2To0p3);
-    tIn->SetBranchAddress("PhotonIso_DR0p3To0p4", &PhotonIso_DR0p3To0p4);
-    tIn->SetBranchAddress("PhotonIso_DR0p4To0p5", &PhotonIso_DR0p4To0p5);
+    tIn->SetBranchAddress("GammaIso_DR0p0To0p1", &GammaIso_DR0p0To0p1);
+    tIn->SetBranchAddress("GammaIso_DR0p1To0p2", &GammaIso_DR0p1To0p2);
+    tIn->SetBranchAddress("GammaIso_DR0p2To0p3", &GammaIso_DR0p2To0p3);
+    tIn->SetBranchAddress("GammaIso_DR0p3To0p4", &GammaIso_DR0p3To0p4);
+    tIn->SetBranchAddress("GammaIso_DR0p4To0p5", &GammaIso_DR0p4To0p5);
 
     TFile *fOut = new TFile("tnpZ_withMVAIso.root", "RECREATE");
     fOut->mkdir("tpTree")->cd();
@@ -73,11 +73,11 @@ void addMVAIso() {
                                                 ChargedIso_DR0p2To0p3,
                                                 ChargedIso_DR0p3To0p4,
                                                 ChargedIso_DR0p4To0p5,
-                                                PhotonIso_DR0p0To0p1,
-                                                PhotonIso_DR0p1To0p2,
-                                                PhotonIso_DR0p2To0p3,
-                                                PhotonIso_DR0p3To0p4,
-                                                PhotonIso_DR0p4To0p5,
+                                                GammaIso_DR0p0To0p1,
+                                                GammaIso_DR0p1To0p2,
+                                                GammaIso_DR0p2To0p3,
+                                                GammaIso_DR0p3To0p4,
+                                                GammaIso_DR0p4To0p5,
                                                 NeutralHadronIso_DR0p0To0p1,
                                                 NeutralHadronIso_DR0p1To0p2,
                                                 NeutralHadronIso_DR0p2To0p3,
