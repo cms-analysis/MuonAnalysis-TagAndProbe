@@ -27,7 +27,7 @@ void addEAIso() {
     TStopwatch timer; timer.Start();
     for (int i = 0, n = tIn->GetEntries(); i < n; ++i) {
         tIn->GetEntry(i);
-        Float_t ea_tot = MuonEffectiveArea::GetMuonEffectiveArea(effAreaType, abs(eta), effAreaTarget);
+        Float_t ea_tot = MuonEffectiveArea::GetMuonEffectiveArea(effAreaType, fabs(eta), effAreaTarget);
         pfCombRelIso04EACorr = (chHad + max(0.f, nHad + phot - ea_tot*rho))/pt;
         if (i < 20) {
             printf("muon with pt = %.2f, eta = %+5.2f:", pt, eta);
