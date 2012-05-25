@@ -18,13 +18,14 @@ muonPFIsoChHad04 = cms.EDProducer("MuonPFIsoSingleTypeMapProd",
     pfLabel     = cms.InputTag("pfNoPileUpPFIso"),
     pfSelection = cms.string("charge != 0 && abs(pdgId) == 211"), # charged hadrons
     deltaR      = cms.double(0.4),
+    deltaRveto  = cms.double(0.0001),
 )
-muonPFIsoNHad04pt0  = muonPFIsoChHad04.clone(pfSelection = "charge == 0 && abs(pdgId) == 130") # neutral hadrons
-muonPFIsoNHad04pt05 = muonPFIsoChHad04.clone(pfSelection = "charge == 0 && abs(pdgId) == 130 && pt > 0.5") # 
-muonPFIsoNHad04pt1  = muonPFIsoChHad04.clone(pfSelection = "charge == 0 && abs(pdgId) == 130 && pt > 1")   # 
-muonPFIsoPhot04pt0  = muonPFIsoChHad04.clone(pfSelection = "charge == 0 && abs(pdgId) == 22") # neutral hadrons
-muonPFIsoPhot04pt05 = muonPFIsoChHad04.clone(pfSelection = "charge == 0 && abs(pdgId) == 22 && pt > 0.5") # 
-muonPFIsoPhot04pt1  = muonPFIsoChHad04.clone(pfSelection = "charge == 0 && abs(pdgId) == 22 && pt > 1")   # 
+muonPFIsoNHad04pt0  = muonPFIsoChHad04.clone(deltaRveto = 0.01, pfSelection = "charge == 0 && abs(pdgId) == 130") # neutral hadrons
+muonPFIsoNHad04pt05 = muonPFIsoChHad04.clone(deltaRveto = 0.01, pfSelection = "charge == 0 && abs(pdgId) == 130 && pt > 0.5") # 
+muonPFIsoNHad04pt1  = muonPFIsoChHad04.clone(deltaRveto = 0.01, pfSelection = "charge == 0 && abs(pdgId) == 130 && pt > 1")   # 
+muonPFIsoPhot04pt0  = muonPFIsoChHad04.clone(deltaRveto = 0.01, pfSelection = "charge == 0 && abs(pdgId) == 22") # neutral hadrons
+muonPFIsoPhot04pt05 = muonPFIsoChHad04.clone(deltaRveto = 0.01, pfSelection = "charge == 0 && abs(pdgId) == 22 && pt > 0.5") # 
+muonPFIsoPhot04pt1  = muonPFIsoChHad04.clone(deltaRveto = 0.01, pfSelection = "charge == 0 && abs(pdgId) == 22 && pt > 1")   # 
 
 muonPFIsoChHad03    = muonPFIsoChHad04.clone(deltaR = 0.3)
 muonPFIsoNHad03pt0  = muonPFIsoNHad04pt0.clone(deltaR = 0.3)
@@ -36,6 +37,8 @@ muonPFIsoPhot03pt1  = muonPFIsoPhot04pt1.clone(deltaR = 0.3)
 
 muonPFIsoChHad04PU = muonPFIsoChHad04.clone(pfLabel = "pfPileUpPFIso")
 muonPFIsoChHad03PU = muonPFIsoChHad03.clone(pfLabel = "pfPileUpPFIso")
+
+tagMuonPFIsoChHad04 = muonPFIsoChHad04.clone(muonLabel = 'tagMuons')
 
 muonPFIsoSequence = cms.Sequence(
     pfPileUpPFIso * pfNoPileUpPFIso * (

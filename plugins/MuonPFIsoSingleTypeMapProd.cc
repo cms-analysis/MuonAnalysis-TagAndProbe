@@ -30,6 +30,7 @@ private:
   edm::InputTag pfLabel_;
   StringCutObjectSelector<reco::PFCandidate> pfSelection_;
   double deltaR_;
+  double deltaRveto_;
 
 };
 
@@ -39,7 +40,8 @@ MuonPFIsoSingleTypeMapProd::MuonPFIsoSingleTypeMapProd(const edm::ParameterSet& 
   muonLabel_(iConfig.getParameter<edm::InputTag>("muonLabel")),
   pfLabel_(iConfig.getParameter<edm::InputTag>("pfLabel")),
   pfSelection_(iConfig.getParameter<std::string>("pfSelection")),
-  deltaR_(iConfig.getParameter<double>("deltaR"))
+  deltaR_(iConfig.getParameter<double>("deltaR")),
+  deltaRveto_(iConfig.getParameter<double>("deltaRveto"))
 {
   produces<edm::ValueMap<float> >();
 }
@@ -65,7 +67,7 @@ void MuonPFIsoSingleTypeMapProd::produce(edm::Event& iEvent, const edm::EventSet
           double dr = deltaR(mu, pf);
 
           // In cone
-          if (dr >= deltaR_) continue;            
+          if (dr < deltaRveto_ || dr >= deltaR_) continue;            
 
           // Passes selection
           if (!pfSelection_(pf)) continue;
