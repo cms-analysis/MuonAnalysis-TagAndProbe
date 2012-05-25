@@ -8,11 +8,8 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-        'file:/tmp/gpetrucc/DYJetsToLL_Fall11_485B39800B95.root' # lxplus311.cern.ch
-	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0026/40B00842-9ABB-E011-A9D5-003048679000.root',
-	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0024/FA374077-D3BA-E011-B079-003048678D78.root',
-	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0024/AE0B00F7-D4BA-E011-9AA4-001A928116C6.root',
-	#'/store/relval/CMSSW_4_2_8/RelValZMM/GEN-SIM-RECO/START42_V12-v1/0024/8276ABDD-D6BA-E011-8066-00304867C136.root',
+        #'/store/mc/Fall11/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/AODSIM/PU_S6_START42_V14B-v1/0000/08C03A6E-06F1-E011-8D4F-90E6BA442F0C.root'
+        'root://pcmssd12//data/gpetrucc/7TeV/tnp/AODSIM/Fall11/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola/PU_S6_START42_V14B-v1/08C03A6E-06F1-E011-8D4F-90E6BA442F0C.root'
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
@@ -23,6 +20,26 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 process.GlobalTag.globaltag = cms.string('START42_V12::All')
 
+## ==== Fast Filters ====
+process.goodVertexFilter = cms.EDFilter("VertexSelector",
+    src = cms.InputTag("offlinePrimaryVertices"),
+    cut = cms.string("!isFake && ndof > 4 && abs(z) <= 25 && position.Rho <= 2"),
+    filter = cms.bool(True),
+)
+process.noScraping = cms.EDFilter("FilterOutScraping",
+    applyfilter = cms.untracked.bool(True),
+    debugOn = cms.untracked.bool(False), ## Or 'True' to get some per-event info
+    numtrack = cms.untracked.uint32(10),
+    thresh = cms.untracked.double(0.25)
+)
+
+process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
+process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_IsoMu24_v*', 'HLT_Mu40_eta2p1_v*' )
+process.triggerResultsFilter.l1tResults = ''
+process.triggerResultsFilter.throw = False
+process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
+
+process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilter)
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
 ##   | |\/| | | | |/ _ \| '_ \/ __|
@@ -39,9 +56,9 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
     ## Apply some minimal pt cut
-    muonsCut     = cms.string("pt > 5 && track.isNonnull"),
-    caloMuonsCut = cms.string("pt > 5"),
-    tracksCut    = cms.string("pt > 5"),
+    muonsCut     = cms.string("pt > 3 && track.isNonnull"),
+    caloMuonsCut = cms.string("pt > 3"),
+    tracksCut    = cms.string("pt > 3"),
 )
 
 ## ==== Trigger matching
@@ -61,6 +78,8 @@ process.tagMuons = cms.EDFilter("PATMuonSelector",
     cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
+process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
+
 process.probeMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
     cut = cms.string("track.isNonnull"),  # no real cut now
@@ -70,6 +89,7 @@ process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
     cut = cms.string('60 < mass < 140'),
     decay = cms.string('tagMuons@+ probeMuons@-')
 )
+process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
 
 process.tagMuonsMCMatch = cms.EDProducer("MCTruthDeltaRMatcherNew",
     src = cms.InputTag("tagMuons"),
@@ -82,7 +102,7 @@ process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons")
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
-from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
+from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff")
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import MuonPFIsoVariables
@@ -96,7 +116,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         AllVariables,
         ExtraIsolationVariables,
         MuonPFIsoVariables,
-        MVAIsoVariablesPlain, MVAIsoVariablesMix,
+        MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
@@ -112,8 +132,11 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        PF = cms.InputTag("muonsPassingPF"),
     ),
     tagVariables = cms.PSet(
+        pt = cms.string("pt"),
+        eta = cms.string("eta"),
         nVertices   = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+        chargedHadIso04 = cms.InputTag("tagMuonPFIsoChHad04"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags),
     pairVariables = cms.PSet(
@@ -143,15 +166,17 @@ process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
+    process.muonPFIsoSequence +
     process.mvaIsoVariablesSeq * process.radialIso +
     process.muonsPassingPF +
-    process.muonPFIsoSequence +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
+    process.oneTag     +
     process.probeMuons * process.probeMuonsMCMatch +
     process.tpPairs    +
+    process.onePair    +
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
@@ -159,7 +184,7 @@ process.tnpSimpleSequence = cms.Sequence(
 )
 
 process.tagAndProbe = cms.Path( 
-    #process.fastFilter                  *
+    process.fastFilter                  *
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence +
     process.tnpSimpleSequence
@@ -193,6 +218,8 @@ process.probeMuonsMCMatchSta = process.tagMuonsMCMatch.clone(src = "probeMuonsSt
 
 process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-", cut = '40 < mass < 150')
 
+process.onePairSta = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairsSta"), minNumber = cms.uint32(1))
+
 process.staToTkMatch.maxDeltaR     = 0.3
 process.staToTkMatch.maxDeltaPtRel = 2.
 process.staToTkMatchNoZ.maxDeltaR     = 0.3
@@ -221,8 +248,10 @@ process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
+    process.oneTag     +
     process.probeMuonsSta * process.probeMuonsMCMatchSta +
     process.tpPairsSta      +
+    process.onePairSta      +
     process.nverticesModule +
     process.staToTkMatchSequenceZ +
     process.njets30ModuleSta +
@@ -230,6 +259,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
 )
 
 process.tagAndProbeSta = cms.Path( 
+    process.fastFilter +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta

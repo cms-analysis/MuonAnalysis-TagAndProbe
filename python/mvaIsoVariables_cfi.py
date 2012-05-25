@@ -1,6 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-# Si Xie's tune (but no overlap removal)
 mvaIsoVariables = cms.EDProducer("MuonMVAIsoVariables",
     probes = cms.InputTag("probeMuons"),
     doOverlapRemoval = cms.bool(False), # remove electrons and muon taken from this lists from the sums
@@ -12,3 +11,4 @@ mvaIsoVariables = cms.EDProducer("MuonMVAIsoVariables",
     photonPtMin = cms.double(-1),
     neutralHadPtMin = cms.double(-1),
 )
+
