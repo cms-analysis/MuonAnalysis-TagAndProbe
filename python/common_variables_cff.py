@@ -123,9 +123,10 @@ MuonIDFlags = cms.PSet(
                         "track.numberOfValidHits > 10 && track.hitPattern.numberOfValidPixelHits > 0"),
     VBTF_nL8    = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 8 && track.hitPattern.numberOfValidPixelHits > 0"),
-    
     VBTF_nL9    = cms.string("numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 9 && track.hitPattern.numberOfValidPixelHits > 0"),
+    Tight2012   = cms.string("isPFMuon && numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
+                        "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
 )
 
 

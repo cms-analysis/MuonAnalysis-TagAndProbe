@@ -53,9 +53,9 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
     ## Apply some minimal pt cut
-    muonsCut     = cms.string("pt > 5 && track.isNonnull"),
-    caloMuonsCut = cms.string("pt > 5"),
-    tracksCut    = cms.string("pt > 5"),
+    muonsCut     = cms.string("pt > 3 && track.isNonnull"),
+    caloMuonsCut = cms.string("pt > 3"),
+    tracksCut    = cms.string("pt > 3"),
 )
 
 ## ==== Trigger matching
@@ -67,13 +67,12 @@ from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 
 
-
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.VBTF.value()+" && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.Tight2012.value()+" && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
@@ -92,7 +91,7 @@ process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPair
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
-from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesMix
+from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain 
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
@@ -103,7 +102,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
-        MVAIsoVariablesPlain, MVAIsoVariablesMix,
+        MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
@@ -117,8 +116,11 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlags,
     ),
     tagVariables = cms.PSet(
+        pt = cms.string("pt"),
+        eta = cms.string("eta"),
         nVertices   = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+        chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags),
     pairVariables = cms.PSet(
