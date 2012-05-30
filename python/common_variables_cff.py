@@ -164,10 +164,10 @@ HighPtTriggerFlags = cms.PSet(
    # DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty()"),
    # DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3Mu17FromDiMuonFiltered17').empty()")
 
-   DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty()"),
+   DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17').empty()"),
    DoubleMu17Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8').empty()"),
-   DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty()"),
-   DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty()")
+   DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty()"),
+   DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()")
    
    
    )
