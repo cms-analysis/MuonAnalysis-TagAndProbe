@@ -1,30 +1,16 @@
 import FWCore.ParameterSet.Config as cms
-### USAGE:
-###    cmsRun fitMuonID.py <scenario> [ <id> [ <binning1> ... <binningN> ] ]
-###
-### scenarios:
-###   - data_all (default)  
-###   - signal_mc
-
-import sys
-args = sys.argv[1:]
-if (sys.argv[0] == "cmsRun"): args =sys.argv[2:]
-scenario = "data_all"
-if len(args) > 0: scenario = args[0]
-print "Will run scenario ", scenario 
 
 process = cms.Process("TagProbe")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
-
 process.source = cms.Source("EmptySource")
-
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1) )
 
 process.TnP_Muon_ID = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     ## Input, output 
-    #### xrdcp root://eoscms//eos/cms/store/cmst3/user/botta/TnPtrees/tnpZ_Data.190456-193557.root /tmp/gpetrucc/tnpZ_Data.190456-193557.root
-    InputFileNames = cms.vstring("/tmp/gpetrucc/tnpZ_Data.190456-193557.root"),
+    InputFileNames = cms.vstring("root://eoscms//eos/cms/store/cmst3/user/botta/TnPtrees/tnpZ_Data.190456-193557.root"), ## can put more than one
+    ## copy locally to be faster: xrdcp root://eoscms//eos/cms/store/cmst3/user/botta/TnPtrees/tnpZ_Data.190456-193557.root $PWD/tnpZ_Data.190456-193557.root
+    ## and then set InputFileNames = cms.vstring("tnpZ_Data.190456-193557.root"), 
     OutputFileName = cms.string("TnP_Muon_ID_Simple.root"),
     InputTreeName = cms.string("fitter_tree"), 
     InputDirectoryName = cms.string("tpTree"),  
