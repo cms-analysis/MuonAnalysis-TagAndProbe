@@ -11,23 +11,22 @@ doVtx = True
 
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
+    tag_IsoMu24_eta2p1 = cms.vstring("pass"),
+    tag_combRelIso = cms.vdouble(-1,0.15),
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
     pt = cms.vdouble( 10, 120 ),
     eta = cms.vdouble(-2.4, 2.4),
 )
-ETA_BINS = ONE_BIN.clone(
-   eta = cms.vdouble(-2.4, -2.0, -1.6, -1.2, -0.8, -0.4, 0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4)
+ETA_BINS = cms.PSet(CONSTRAINTS,
+    pt = cms.vdouble( 10, 120 ),
+    #eta = cms.vdouble(-2.4,-2.1,-1.6,-1.1,-0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4)
+    eta = cms.vdouble(*[-2.4+0.1*x for x in range(0,49)])
 )
-
-ETA_PHI_BINS =  ONE_BIN.clone(
-   eta = cms.vdouble(*[0.4*i for i in range(-6,7)]),
-   phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,3)]), 
-)
-
 VTX_BINS = ONE_BIN.clone(
-    tag_nVertices = cms.vdouble(0.5,1.5,2.5,3.5,4.5,5.5,6.5)
+    tag_nVertices = cms.vdouble(*[2*i+0.5 for i in xrange(21)])
 )
+
 
 process = cms.Process("TagProbe")
 
@@ -54,10 +53,12 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tk_deltaR_NoZ   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
         tk_deltaEta_NoZ = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
+        tag_combRelIso = cms.vstring("Number of vertices", "-1", "999", ""),
         run    = cms.vstring("Run Number", "132440", "999999", ""),
     ),
 
     Categories = cms.PSet(
+        tag_IsoMu24_eta2p1 = cms.vstring("hasValidHits",  "dummy[pass=1,fail=0]"),
         outerValidHits = cms.vstring("hasValidHits",  "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
@@ -77,6 +78,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     binnedFit = cms.bool(True),
     binsForFit = cms.uint32(20),
+    saveDistributionsPlot = cms.bool(False),
 )
 
 matches = [ (0.3, 0.3) ]
@@ -90,18 +92,16 @@ process.TnP_Tracking = Template.clone(
     Efficiencies = cms.PSet()
 )
 
-PREFIX="root://pcmssd12.cern.ch//data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
-PREFIX="/data/gpetrucc/7TeV/tnp/JPsi-2010.01.25/"
-PREFIX="root://castorpublic.cern.ch//castor/cern.ch/user/g/gpetrucc/TnP/JPsiMuMu/"
-PREFIX="/afs/cern.ch/user/g/gpetrucc/scratch0/tnp/CMSSW_3_9_7/src/MuonAnalysis/TagAndProbe/test/zmumu/"
-PREFIX=""
-if scenario == "data_all":
+PREFIX="root://pcmssd12//data/gpetrucc/8TeV/tnp/All/"
+if "data_all" in scenario:
     process.TnP_Tracking.InputFileNames = cms.vstring(
-        PREFIX+'tnpZ_Data2010B_Nov4.root',
+        PREFIX+'tnpZ_Data_Run2011A.root',
+        PREFIX+'tnpZ_Data_Run2011B_upTo194479.root',
+        PREFIX+'tnpZ_Data_Run2011B_194480-195016.root',
     )
-elif scenario == "signal_mc":
+if "signal_mc" in scenario:
     process.TnP_Tracking.InputFileNames = [
-        PREFIX+"tnpZ_DYToMMpowhegZ2_Fall10PU.root",
+        PREFIX+"tnpZ_MC_DYJetsToLL_madgraph_Summer12_PU_S7_START52_V9_v2.root",
     ]
 
 sampleToPdfMap = { "": "voigtPlusExpo", "NoZ":"voigtPlusExpo"}
@@ -110,19 +110,16 @@ for (dr,de) in matches:
         label = "dr%03de%03d%s" % (100*dr, 100*de, X.replace("_",""))
         module = process.TnP_Tracking.clone(OutputFileName = cms.string("TnP_Tracking_%s_%s.root" % (label,scenario)))
         setattr(module.Cuts, "dr_cut",   cms.vstring("tk_deltaR"  +X, "tk_deltaR"  +X, str(dr)))
-        setattr(module.Cuts, "deta_cut", cms.vstring("tk_deltaEta"+X, "tk_deltaEta"+X, str(de)))
         common = cms.PSet(
-            EfficiencyCategoryAndState = cms.vstring("dr_cut","below", "deta_cut","below"),
+            EfficiencyCategoryAndState = cms.vstring("dr_cut","below"),
             UnbinnedVariables = cms.vstring("mass"),
             BinToPDFmap = cms.vstring(sampleToPdfMap[X.replace("_","")])
         )
-        #setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
-        if doEta:
-            setattr(module.Efficiencies, "eff_abseta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
-            #setattr(module.Efficiencies, "eff_etaphi_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
-        if False and scenario == "data_all":
-            setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS))
-        if doVtx:
-            setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
+        if de < dr:
+            setattr(module.Cuts, "deta_cut", cms.vstring("tk_deltaEta"+X, "tk_deltaEta"+X, str(de)))
+            common.EfficiencyCategoryAndState += [ "deta_cut","below" ]
+        if "avg" in scenario: setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
+        if "eta" in scenario: setattr(module.Efficiencies, "eff_eta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
+        if "vtx" in scenario: setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
         setattr(process,"TnP_Tracking_"+label, module)
         setattr(process,"p_TnP_Tracking_"+label, cms.Path(module))

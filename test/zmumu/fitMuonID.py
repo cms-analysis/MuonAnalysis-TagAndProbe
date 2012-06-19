@@ -26,44 +26,26 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     SaveWorkspace = cms.bool(False),
 
     Variables = cms.PSet(
-        mass = cms.vstring("Tag-muon Mass", "70", "130", "GeV/c^{2}"),
+        mass = cms.vstring("Tag-muon Mass", "76", "125", "GeV/c^{2}"),
         pt = cms.vstring("muon p_{T}", "0", "1000", "GeV/c"),
         eta    = cms.vstring("muon #eta", "-2.5", "2.5", ""),
         abseta = cms.vstring("muon |#eta|", "0", "2.5", ""),
-        phi    = cms.vstring("muon #phi at vertex", "-3.1416", "3.1416", ""),
-        charge = cms.vstring("muon charge", "-2.5", "2.5", ""),
-        tag_pt = cms.vstring("Tag p_{T}", "0", "1000", "GeV/c"),
-        tag_nVertices   = cms.vstring("Number of vertices", "0", "999", ""),
-        tag_nVerticesDA = cms.vstring("Number of vertices", "0", "999", ""),
-        isoTrk03Abs    = cms.vstring("Probe abs trk iso", "-2", "9999999", ""),
-        tag_combRelIso = cms.vstring("Tag comb rel iso", "-2", "9999999", ""),
-        l3pt = cms.vstring("L3 p_{T}", "-99999999", "999999999", ""),
-        pair_nL1EG5 = cms.vstring("Number of L1 EG5", "-1", "9999", ""),
+        tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
+        pfCombRelIso04EACorr = cms.vstring("Number of vertices", "0", "999", ""),
+        SIP = cms.vstring("Number of vertices", "0", "999", ""),
+        run = cms.vstring("Number of vertices", "-999", "999999", ""),
+        HLT_Mu8  = cms.vstring("Mu8 leg",  "-1", "2", ""),
+        HLT_Mu17 = cms.vstring("Mu17 leg", "-1", "2", ""),
     ),
 
     Categories = cms.PSet(
         Glb   = cms.vstring("Global", "dummy[pass=1,fail=0]"),
-        VBTF     = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
-        VBTFold  = cms.vstring("VBTFLike", "dummy[pass=1,fail=0]"),
-        TMOSL = cms.vstring("TMOneStationLoose", "dummy[pass=1,fail=0]"),
-        TMOST = cms.vstring("TMOneStationTight", "dummy[pass=1,fail=0]"),
         PF    = cms.vstring("PF Muon", "dummy[pass=1,fail=0]"),
         TM    = cms.vstring("Tracker Muon", "dummy[pass=1,fail=0]"),
-        TMA   = cms.vstring("Arbitrated Tracker Muon", "dummy[pass=1,fail=0]"),
-        Isol  = cms.vstring("Comb rel iso", "dummy[pass=1,fail=0]"),
-        IsolTk3 = cms.vstring("Tk Abs Iso < 3", "dummy[pass=1,fail=0]"),
-        Mu15  = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        Mu24  = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        IsoMu15   = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        IsoMu17   = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        DoubleMu7 = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        DoubleMu3 = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        Mu8_forEMu  = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        Mu17_forEMu = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        tag_Mu15 = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
-        tag_Mu24 = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
+        mvaIsoCut = cms.vstring("MC true", "dummy[pass=1,fail=0]"),
         mcTrue = cms.vstring("MC true", "dummy[true=1,false=0]"),
     ),
+    Cuts = cms.PSet(),
     PDFs = cms.PSet(
         voigtPlusExpo = cms.vstring(
             "Voigtian::signal(mass, mean[90,80,100], width[2.495], sigma[3,1,20])",
@@ -94,6 +76,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
 
     binnedFit = cms.bool(True),
     binsForFit = cms.uint32(40),
+    saveDistributionsPlot = cms.bool(False),
 
     Efficiencies = cms.PSet(), # will be filled later
 )
@@ -102,110 +85,85 @@ TRIGGER = cms.PSet(tag_Mu24 = cms.vstring("pass"))
 if "mc" in scenario or "39X" in scenario or "38X" in scenario:
     TRIGGER = cms.PSet(tag_Mu15 = cms.vstring("pass"), tag_pt = cms.vdouble(24.,9999.))
 
+# PT_ETA_BINS = cms.PSet(
+#     pt     = cms.vdouble(  3, 5, 7, 10, 15, 20, 30, 40, 100 ),
+#     abseta = cms.vdouble(  0.0, 1.2, 2.4)
+# )
+
+# Cris' bins
 PT_ETA_BINS = cms.PSet(
     pt     = cms.vdouble(  10, 20, 30, 40, 60, 100 ),
     abseta = cms.vdouble(  0.0, 1.2, 2.4)
 )
+
+
+PT_ETA_BINS_MU17 = cms.PSet(
+    pt     = cms.vdouble(  10, 15, 16, 16.5, 17, 17.5, 18.0, 19, 20, 30, 40, 100 ),
+    abseta = cms.vdouble(  0.0, 1.2, 2.4)
+)
+PT_ETA_BINS_MU8  = cms.PSet(
+    pt     = cms.vdouble(  3, 5, 6, 7, 7.5, 8, 8.5, 9, 10, 12, 15, 20, 30, 40, 100 ),
+    abseta = cms.vdouble(  0.0, 1.2, 2.4)
+)
+
+# ETA_BINS = cms.PSet(
+#     pt  = cms.vdouble(20,100),
+#     eta = cms.vdouble(*[x/10. for x in xrange(-24,25,1)]),    
+# )
+
+
+# Cris' bins
 ETA_BINS = cms.PSet(
     pt  = cms.vdouble(20,100),
-    eta = cms.vdouble(-2.4, -2.1, -1.6, -1.1, -0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4),
+    eta = cms.vdouble(-2.4, -2.1, -1.6, -1.2, -0.9, -0.4, 0., 0.4, 0.9, 1.2, 1.6, 2.1, 2.4),
+    #eta = cms.vdouble(-2.4, -2.1, -1.6, -1.1, -0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4),
 )
-ETA_PHI_BINS = ETA_BINS.clone(
-   eta = cms.vdouble(-2.4, -1.6, -8.0, 0, 0.8, 1.6, 2.4),
-   phi = cms.vdouble(*[3.1416*i/3.0 for i in range(-3,4)]), 
-)
+
+
+
+# VTX_BINS  = cms.PSet(
+#     pt     = cms.vdouble(  20, 120 ),
+#     abseta = cms.vdouble(  0.0, 2.4),
+#     tag_nVertices = cms.vdouble(*[x-0.5 for x in range(21)])
+# )
+
+
+# Cris' bins
 VTX_BINS  = cms.PSet(
     pt     = cms.vdouble(  20, 120 ),
     abseta = cms.vdouble(  0.0, 2.4),
-    tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5)
-)
-VTXDA_BINS  = cms.PSet(
-    pt     = cms.vdouble(  20, 120 ),
-    abseta = cms.vdouble(  0.0, 2.4),
-    tag_nVerticesDA = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5,18.5,20.5)
+    #tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,14.5,16.5,18.5,20.5)
+    tag_nVertices = cms.vdouble(0.5,2.5,4.5,6.5,8.5,10.5,12.5,16.5,20.5,25,30,40)
 )
 
 
-ETA_BINS_FINE = cms.PSet(
-    pt  = cms.vdouble(20,100),
-    eta = cms.vdouble(*[x/10. for x in xrange(-24,25,1)]),
-)
-OVERALL = cms.PSet(
-    pt  = cms.vdouble(20,100),
-    abseta = cms.vdouble(0.0, 2.4),
-)
-OVERALL_ABSETA = cms.PSet(
-    pt  = cms.vdouble(20,100),
-    abseta = cms.vdouble(0.0, 1.2, 2.4),
-)
+PREFIX="/afs/cern.ch/work/g/gpetrucc/CMSSW_5_2_4_patch4/src/MuonAnalysis/TagAndProbe/test/zmumu/"
 
-OVERALL_ENDCAPS21 = cms.PSet(
-    pt  = cms.vdouble(20,100),
-    abseta = cms.vdouble(1.2, 2.1),
-)
-
-
-CHARGE = cms.PSet(
-    pt     = cms.vdouble(20,100),
-    abseta = cms.vdouble(0.0, 2.4),
-    charge = cms.vdouble(-2,0,2),
-)
-
-
-
-#PREFIX="/data/gpetrucc/7TeV/tnp/2011.02.17/"
-PREFIX="/data/gpetrucc/7TeV/tnp/2011-04/"
 process.TnP_MuonID = Template.clone(
-    InputFileNames = cms.vstring(PREFIX+"tnpZ_2011A_v1_GOLDEN.root",    PREFIX+"tnpZ_2011A_v2_GOLDEN.root",
-                                 PREFIX+"tnpZ_2011A_v1_NotGolden.root", PREFIX+"tnpZ_2011A_v2_NotGolden.root"),
+    InputFileNames = cms.vstring(),
     InputTreeName = cms.string("fitter_tree"),
     InputDirectoryName = cms.string("tpTree"),
     OutputFileName = cms.string("TnP_MuonID_%s.root" % scenario),
     Efficiencies = cms.PSet(),
 )
+if "_weight" in scenario:
+    process.TnP_MuonID.WeightVariable = cms.string("weight")
+    process.TnP_MuonID.Variables.weight = cms.vstring("weight","0","10","")
 
 
-if "data" in scenario:
-    if   "v1" in scenario: process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_2011A_v1_GOLDEN.root" ]
-    elif "v2" in scenario: process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_2011A_v2_GOLDEN.root" ]
-    else:                  process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_2011A_v1_GOLDEN.root", PREFIX+"tnpZ_2011A_v2_GOLDEN.root" ]
-if "JSON" not in scenario:
-    if   "v1" in scenario: process.TnP_MuonID.InputFileNames += [ PREFIX+"tnpZ_2011A_v1_NotGolden.root" ]
-    elif "v2" in scenario: process.TnP_MuonID.InputFileNames += [ PREFIX+"tnpZ_2011A_v2_NotGolden.root" ]
-    else:                  process.TnP_MuonID.InputFileNames += [ PREFIX+"tnpZ_2011A_v1_NotGolden.root", PREFIX+"tnpZ_2011A_v2_NotGolden.root" ]
+if "data2011" in scenario:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_Run2011_forID.root" ]
+if "mc2011" in scenario:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DY50Fall11_forID_withNVtxWeights2011.root" ]
+if "data2012" in scenario:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_Data.190456-193557_forID.root" ]
+if "mc2012" in scenario:
+    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_DYJetsToLL_S7_START52_V9_forID_withNVtxWeights190456-193557.root" ]
 
-if "38X" in scenario and "data" in scenario:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_Data_Nov4B.root" ]
-if "39X" in scenario and "data" in scenario:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_Data_Dec22B.root" ]
-if scenario.find("signal_mc") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMMpowhegZ2_Spring11PU.root" ]
-if scenario.find("some_mc") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MCDYPoweg_38X_dzIso.334pb.root" ]
-if scenario.find("39X_mc") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_MC_39XDY_1.root" ]
-if scenario.find("some_mc2") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMMpowhegZ2_Fall10PU.root" ]
-if scenario.find("39X_mc2") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMMpowhegZ2_Winter10PU.root" ]
-if scenario.find("realistic_mc") != -1:
-    process.TnP_MuonID.InputFileNames = [ PREFIX+"tnpZ_DYToMuMu_Spring11.347pb.root", 
-                                          PREFIX+"tnpZ_DYToTauTau_Spring11.347pb.root", 
-                                          PREFIX+"tnpZ_WJets_Spring11.347pb.root", 
-                                          PREFIX+"tnpZ_QCDMu15_Spring11.347pb.root", 
-                                          PREFIX+"tnpZ_TTbar_Spring11.347pb.root", ]
-if "tag35" in scenario:
-    process.TnP_MuonID.Variables.tag_pt[1]='35'
-
-IDS = [ "TMOST", "VBTF", "PF", "Glb" ]
-#IDS += [ "Glb" ]
+#IDS = [ "PF", "SIP4_from_PF", "PFIso25_from_PF_and_SIP4", "PFIso40_from_PF_and_SIP4", "mvaIsoCut_from_PF_and_SIP4" ]
+IDS = [ "PF", "SIP4_from_PF", "PFIso40_from_PF_and_SIP4"]
 ALLBINS = [("pt_abseta",PT_ETA_BINS),("eta", ETA_BINS)]
-#ALLBINS += [ ("vtx",VTX_BINS)]
-ALLBINS += [ ("vtxDA",VTXDA_BINS)]
-#ALLBINS+=[("eta_fine",ETA_BINS_FINE)]
-#ALLBINS += [("overall",OVERALL), ("charge",CHARGE), ("overall_abseta",OVERALL_ABSETA),("overall_endcaps21",OVERALL_ENDCAPS21)]
-ALLBINS += [("overall_abseta",OVERALL_ABSETA)]
-#ALLBINS+=[("eta_phi",ETA_PHI_BINS)]
+ALLBINS += [ ("vtx",VTX_BINS)]
 
 if len(args) > 1 and args[1] not in IDS: IDS += [ args[1] ]
 for ID in IDS:
@@ -214,42 +172,50 @@ for ID in IDS:
         if len(args) > 2 and X not in args[2:]: continue
         module = process.TnP_MuonID.clone(OutputFileName = cms.string("TnP_MuonID_%s_%s_%s.root" % (scenario, ID, X)))
         shape = "vpvPlusExpo"
-        if "eta" in X and not "abseta" in X: shape = "voigtPlusExpo"
-        if "pt_abseta" in X: shape = "voigtPlusExpo"
-        if X.find("pt_abseta") != -1: module.Variables.mass[1]="77";
-        if X.find("overall") != -1: module.binsForFit = 120
-        DEN = B.clone(); num = ID;
-        if "24" in ID and hasattr(DEN,'pt') and "pt" not in X: DEN.pt[0] = 25
+        #if "eta" in X and not "abseta" in X: shape = "voigtPlusExpo"
+        #if "pt_abseta" in X: shape = "voigtPlusExpo"
+        if "Mu17" in ID and "pt_abseta" in X: B = PT_ETA_BINS_MU17
+        if "Mu8" in ID and "pt_abseta" in X: B = PT_ETA_BINS_MU8
+        DEN = B.clone(); num = ID; numstate = "pass"
         if "_from_" in ID:
             parts = ID.split("_from_")
             num = parts[0]
-            setattr(DEN, parts[1], cms.vstring("pass"))
-        if scenario.find("tagiso") != -1:  
-            DEN.tag_combRelIso = cms.vdouble(-1, 0.1)
-        if scenario.find("loosetagiso") != -1:  
-            DEN.tag_combRelIso = cms.vdouble(-1, 0.2)
-        if scenario.find("probeiso") != -1:
-            DEN.isoTrk03Abs = cms.vdouble(-1, 3)
-        #if scenario.find("calo") != -1: DEN.caloCompatibility = cms.vdouble(0.9,1.1)  # same as above, I think.
-        if "mc" in scenario:
-            if num == "Mu24": num = "Mu15"
-            if num == "IsoMu17": num = "IsoMu15"
-            if num == "DoubleMu7": num = "DoubleMu3"
-            if num == "Mu8_forEMu": num = "DoubleMu3"
-            if num == "Mu17_forEMu": num = "DoubleMu3"
-        if "EG5" in scenario: DEN.pair_nL1EG5 = cms.vdouble(0.5,999)
+            for D in parts[1].split("_and_"):
+                if D == "SIP4":      DEN.SIP = cms.vdouble(0,4.0)
+                elif D == "PFIso25": DEN.pfCombRelIso04EACorr  = cms.vdouble(0,0.25)
+                elif D == "PFIso40": DEN.pfCombRelIso04EACorr  = cms.vdouble(0,0.40)
+                else: setattr(DEN, D, cms.vstring("pass"))
+        numString = cms.vstring()
+        for N in num.split("_and_"):
+            if N == "SIP4":
+                module.Cuts.SIP4 = cms.vstring("SIP4","SIP", "4.0") 
+                numString += [N, "below"]
+            elif N == "PFIso25":
+                module.Cuts.PFIso25 = cms.vstring("PFIso","pfCombRelIso04EACorr", "0.25") 
+                numString += [N, "below"]
+            elif N == "PFIso40":
+                module.Cuts.PFIso40 = cms.vstring("PFIso","pfCombRelIso04EACorr", "0.40") 
+                numString += [N, "below"]
+            elif N in [ "HLT_Mu17", "HLT_Mu8" ]:
+                setattr(module.Cuts, N+"_Pass", cms.vstring(N+"_Pass", N, "0.5")) 
+                numString += [N+"_Pass", "above"]
+            else:
+                numString += [N, "pass"]
         setattr(module.Efficiencies, ID+"_"+X, cms.PSet(
-            EfficiencyCategoryAndState = cms.vstring(num,"pass"),
+            EfficiencyCategoryAndState = numString,
             UnbinnedVariables = cms.vstring("mass"),
             BinnedVariables = DEN,
             BinToPDFmap = cms.vstring(shape)
         ))
         if scenario.find("mc") != -1:
             setattr(module.Efficiencies, ID+"_"+X+"_mcTrue", cms.PSet(
-                EfficiencyCategoryAndState = cms.vstring(num,"pass"),
+                EfficiencyCategoryAndState = numString,
                 UnbinnedVariables = cms.vstring("mass"),
                 BinnedVariables = DEN.clone(mcTrue = cms.vstring("true"))
             ))
+            if "_weight" in scenario:
+                getattr(module.Efficiencies, ID+"_"+X          ).UnbinnedVariables.append("weight")
+                getattr(module.Efficiencies, ID+"_"+X+"_mcTrue").UnbinnedVariables.append("weight")
         setattr(process, "TnP_MuonID_"+ID+"_"+X, module)        
         setattr(process, "run_"+ID+"_"+X, cms.Path(module))
 

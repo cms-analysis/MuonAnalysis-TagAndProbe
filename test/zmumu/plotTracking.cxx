@@ -2,12 +2,12 @@
 */
 #include <TCanvas.h>
 #include <TPad.h>
-#include "../jpsi/plotUtil.cxx"
-TString prefix = "plots_dev/tracking/";
+#include "ZZ4L/plotUtil.cxx"
+TString prefix = "ZZ4L/plots/tracking/";
 TString basedir  = "tpTreeSta";
 
 TFile *ref = 0;
-
+TFile *files[4];
 TCanvas *c1 = 0;
 void plotTracking(TString scenario="data",TString match="dr030e030") {
     prefix = prefix+scenario+"/";
@@ -21,43 +21,57 @@ void plotTracking(TString scenario="data",TString match="dr030e030") {
         ref = (TFile *) gROOT->GetListOfFiles()->At(1);
         ((TFile*) gROOT->GetListOfFiles()->At(0))->cd();
     }
+    if (gROOT->GetListOfFiles()->GetEntries() == 4) {
+        files[0] = (TFile*) gROOT->GetListOfFiles()->At(0);
+        files[1] = (TFile*) gROOT->GetListOfFiles()->At(1);
+        files[2] = (TFile*) gROOT->GetListOfFiles()->At(2);
+        files[3] = (TFile*) gROOT->GetListOfFiles()->At(3);
+    }
 
     doRatioPlot = false;
     doDiffPlot  = false;
-    doPdf = false;
-    doSquare = true; yMin = 0.8; yMax = 1.1;
-    datalbl = "Data";
-    reflbl  = "Sim.";
-    preliminary = ""; //CMS Preliminary, #sqrt{s} = 7 TeV";
+    doPdf = true;
+    doSquare = true; yMin = 0.949; yMax = 1.009;
+    doFillMC = true;
+    datalbl = "Data, 2012";
+    reflbl  = "Simulation";
+    preliminary = "CMS Preliminary,  #sqrt{s} = 8 TeV";
     plotTracking_(match);
 }
 
 void plotTracking_(TString match) {
     const int nplots = 2;
-    const char *plots[nplots] = { "eff_abseta",  "eff_vtx"       };
-    const char * vars[nplots] = { "eta",         "tag_nVertices" };
+    const char *plots[nplots] = { "eff_eta",  "eff_vtx"       };
+    const char * vars[nplots] = { "eta",      "tag_nVertices" };
+    const char *xvars[nplots] = { "muon #eta", "N(primary vertices)" };
+    bool  has4files = (gROOT->GetListOfFiles()->GetEntries() == 4);
     for (size_t i = 0; i < nplots; ++i) {
+        retitleX = TString(xvars[i]);
         TString plotname(plots[i]); plotname += "_"+match;
         TString varname(vars[i]);
+        if (has4files) files[0]->cd();
         TDirectory *fit_0 = gFile->GetDirectory(basedir+"/"+plotname+"/");
         if (fit_0 == 0) { std::cerr << "Didn't find " << basedir+"/"+plotname+"/" << " in " << gFile->GetName() << std::endl; continue; }
+        if (has4files) files[1]->cd();
         TDirectory *fit_1 = gFile->GetDirectory(basedir+"/"+plotname+"NoZ/");
-        if (ref != 0) {
+        if (ref != 0 || has4files) {
+            if (has4files) ref = files[2];
             TDirectory *ref_0 = ref->GetDirectory(basedir+"/"+plotname+"/");
+            if (has4files) ref = files[3];
             TDirectory *ref_1 = ref->GetDirectory(basedir+"/"+plotname+"NoZ/");
-            yMin = 0.9; yMax = 1.019;
+            yMin = 0.949; yMax = 1.009;
             retitle = "Raw efficiency";
             if (fit_0 && ref_0) refstack(fit_0, ref_0, plotname, varname+"_PLOT_");
             retitle = "Fake rate";
             yMin = 0.0; yMax = 1.1;
             if (fit_1 && ref_1) refstack(fit_1, ref_1, plotname+"_fake", varname+"_PLOT_");
             if (fit_0 && fit_1 && ref_0 && ref_1) {
-                yMin = 0.9; yMax = 1.019; retitle = "Corrected efficiency";
+                yMin = 0.949; yMax = 1.003; retitle = "Efficiency";
                 TGraphAsymmErrors *corr = corrsingle(fit_0, fit_1, plotname+"_corr",     varname+"_PLOT_", false);
                 TGraphAsymmErrors *cref = corrsingle(ref_0, ref_1, plotname+"_corr_ref", varname+"_PLOT_", false);
                 if (doFillMC) {
-                    cref->SetLineColor(2);
-                    cref->SetFillColor(208);
+                    cref->SetLineColor(62);
+                    cref->SetFillColor(65);
                     cref->SetLineStyle(0);
                     cref->SetMarkerColor(2);
                     cref->SetMarkerStyle(21);
@@ -74,13 +88,20 @@ void plotTracking_(TString match) {
                 corr->SetMarkerColor(kBlack);
                 corr->SetMarkerStyle(20);
                 corr->SetMarkerSize(1.6);
-                cref->Draw("AP");
+                cref->GetXaxis()->SetTitle(retitleX);
+                cref->GetYaxis()->SetTitleOffset(1.6);
+                gStyle->SetErrorX(0.5);
+                gPad->SetLeftMargin(0.2);
+                cref->Draw(doFillMC ? "AE2" : "AP");
                 corr->Draw("P SAME");
                 if (datalbl) doLegend(corr,cref,datalbl,reflbl);
                 c1->Print(prefix+plotname+"_corr"+".png");
                 if (doPdf) c1->Print(prefix+plotname+"_corr"+".pdf");
-                autoScale = false; yMinR = 0.971; yMaxR = 1.029;
-                doRatio(corr,cref,plotname+"_corr",corr->GetXaxis()->GetTitle()); 
+                autoScale = false; yMinR = 0.964; yMaxR = 1.007;
+                TString bk_datalbl = datalbl, bk_reflbl = reflbl;
+                datalbl = "Data"; reflbl = "Sim.";
+                doRatio(corr,cref,plotname+"_corr",retitleX); 
+                reflbl = bk_reflbl; datalbl = bk_datalbl;
             }
         } else {
             TDirectory *mc_pt_eta = 0;
@@ -93,12 +114,12 @@ void plotTracking_(TString match) {
                 if (fit_0) single(fit_0, plotname, varname+"_PLOT_");
                 yMin = 0.0; yMax = 1.1;  retitle = "Fake rate";
                 if (fit_1) single(fit_1, plotname+"_fake1", varname+"_PLOT_");
-                yMin = 0.9; yMax = 1.019; retitle = "Corrected efficiency";
+                yMin = 0.9; yMax = 1.019; retitle = "Efficiency";
                 if (fit_0 && fit_1) corrsingle(fit_0, fit_1, plotname+"_corr", varname+"_PLOT_");
             }
         }
 
-        if (ref == 0) {
+        if (0 && ref == 0) {
             if (fit_0) doCanvas(fit_0, 1, 50, plotname+"_"+varname+"_%d", varname+"_bin%d__");
             if (fit_1) doCanvas(fit_1, 1, 50, plotname+"_fake_"+varname+"_%d", varname+"_bin%d__");
         }
