@@ -14,7 +14,7 @@
 // Original Author:  Tommaso Boccali
 // Modified for muons: Jonathan Hollar
 //         Created:  Tue Nov 25 15:50:50 CET 2008
-// $Id: MuTestPerformanceFW_ES.cc,v 1.7 2010/07/30 07:43:39 jjhollar Exp $
+// $Id: MuTestPerformanceFW_ES.cc,v 1.8 2011/01/30 10:54:00 gpetrucc Exp $
 //
 //
 
@@ -106,7 +106,6 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
 
   double eta, pt, phi;
   int pdgid = 0;
-  int status = 0;
   int chg = 0;
   std::string algoname;
 
@@ -117,7 +116,6 @@ MuTestPerformanceFW_ES::analyze(const edm::Event& iEvent, const edm::EventSetup&
     { 
       const Candidate & p = (*genParticles)[ i ]; 
 
-      status = p.status(); 
       if(p.status() == 3) 
 	continue; 
 

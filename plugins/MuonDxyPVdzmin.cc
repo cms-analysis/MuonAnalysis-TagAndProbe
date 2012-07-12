@@ -122,7 +122,6 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       reco::TransientTrack tTrack = ttBuilder->build(*muonTrack);
       
       Double_t dzmin = 1e6;
-      Int_t ivtx_dzmin = -1;
 
       dxyBS = muonTrack->dxy(BSPosition);
       muon_dxyBS.push_back(dxyBS);
@@ -151,7 +150,6 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
            && dzmin_loop < dzmin
           ){
           dzmin = dzmin_loop;
-          ivtx_dzmin = iVtx;
           dxy_ivtx_dzmin = dxy_fromIP.second.value();
         }
       }
