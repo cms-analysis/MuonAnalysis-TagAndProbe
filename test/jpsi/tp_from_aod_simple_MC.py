@@ -8,20 +8,18 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/E8286D9A-077A-E111-813F-0018F3D095EA.root',
-	'/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/C033D80B-077A-E111-8951-003048678B08.root',
-	'/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/B837A248-2C7A-E111-BA34-003048678FB8.root',
-	'/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/304746CC-097A-E111-A71F-003048FFD76E.root',
+	'/store/relval/CMSSW_5_3_2-START53_V6/RelValJpsiMM/GEN-SIM-RECO/v1/0000/A029BBE1-7EB9-E111-A645-00261894386B.root',
+	'/store/relval/CMSSW_5_3_2-START53_V6/RelValJpsiMM/GEN-SIM-RECO/v1/0000/3A335E73-79B9-E111-8E4D-003048679166.root',
     ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 
-process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('START52_V5::All')
+process.GlobalTag.globaltag = cms.string('START53_V6::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",

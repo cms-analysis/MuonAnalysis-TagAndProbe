@@ -8,21 +8,22 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/4C1F04C2-D687-E111-AF80-485B39897227.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/48B34CE2-1488-E111-93A8-001D09F2A465.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/469EE257-1B88-E111-B46A-0025B320384C.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3CB662F6-DF87-E111-9FCD-5404A63886EE.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3CA86B2C-0488-E111-B1CA-001D09F252DA.root',
-	'/store/data/Run2012A/SingleMu/AOD/PromptReco-v1/000/191/226/3C402D34-DA87-E111-8FCC-003048D37694.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/6C0F28D7-2FC7-E111-BF3C-00237DDBE0E2.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/48876EBC-2DC7-E111-B8B3-001D09F25041.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/3007CDAF-32C7-E111-83B6-003048D2BC62.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/06A4396B-2EC7-E111-82EA-003048F1183E.root',
     ),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(100) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
-process.load("Configuration.StandardSequences.MagneticField_cff")
-process.load("Configuration.StandardSequences.Geometry_cff")
+process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
+process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_52_V7::All')
+process.GlobalTag.globaltag = cms.string('GR_R_53_V7::All')
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
