@@ -128,3 +128,9 @@ muonDxyPVdzmin = cms.EDProducer("MuonDxyPVdzmin",
     probes = cms.InputTag("probeMuons"),
 )
 
+probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
+    pairs = cms.InputTag("tpPairs"),
+   #pairCut  = cms.string(""),  # count only probes whose pairs satisfy this cut
+   #probeCut = cms.string(""),  # count only probes satisfying this cut
+)
+

@@ -68,7 +68,9 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
-    cut = cms.string("pt > 15 && "+MuonIDFlags.Tight2012.value()+" && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
+    cut = cms.string("pt > 15 && "+MuonIDFlags.Tight2012.value()+
+                     " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
+                     " && pfIsolationR04().sumChargedHadronPt/pt < 0.2"),
 )
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
@@ -79,7 +81,8 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
 )
 
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
-    cut = cms.string('60 < mass < 140'),
+    #cut = cms.string('60 < mass < 140 && abs(daughter(0).vz - daughter(1).vz) < 4'),
+    cut = cms.string('60 < mass && abs(daughter(0).vz - daughter(1).vz) < 4'),
     decay = cms.string('tagMuons@+ probeMuons@-')
 )
 process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
@@ -101,7 +104,7 @@ process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
-    arbitration   = cms.string("OneProbe"),
+    arbitration   = cms.string("None"),
     # probe variables: all useful ones
     variables = cms.PSet(
         AllVariables,
@@ -125,12 +128,14 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVertices   = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+        combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
         pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
+        probeMultiplicity = cms.InputTag("probeMultiplicity"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
@@ -156,6 +161,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.kt6PFJetsForIso * process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.radialIso +
+    process.probeMultiplicity +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
@@ -214,6 +220,7 @@ process.staToTkMatchNoZ.maxDeltaPtRel = 2.
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
+    arbitration   = "OneProbe",
     variables = cms.PSet(
         KinematicVariables, 
         ## track matching variables
@@ -231,6 +238,7 @@ process.tpTreeSta = process.tpTree.clone(
     probeMatches  = "probeMuonsMCMatchSta",
 )
 process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
+del process.tpTreeSta.pairVariables.probeMultiplicity
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
