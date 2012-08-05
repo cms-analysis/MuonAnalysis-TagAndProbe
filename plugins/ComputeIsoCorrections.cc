@@ -55,10 +55,6 @@ private:
 
   // ----------member data ---------------------------
   const edm::InputTag probesLabel;
-  const double effAreaEcalBar;
-  const double effAreaEcalEnd;
-  const double effAreaHcalBar;
-  const double effAreaHcalEnd;
 
 };
 
@@ -75,11 +71,7 @@ private:
 // constructors and destructor
 //
 ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
-  probesLabel(iConfig.getParameter<edm::InputTag>("probes")),
-  effAreaEcalBar(iConfig.getParameter<double>("EffAreaEcalBar")),
-  effAreaEcalEnd(iConfig.getParameter<double>("EffAreaEcalEnd")),
-  effAreaHcalBar(iConfig.getParameter<double>("EffAreaHcalBar")),
-  effAreaHcalEnd(iConfig.getParameter<double>("EffAreaHcalEnd"))
+  probesLabel(iConfig.getParameter<edm::InputTag>("probes"))
 {
 
   produces<edm::ValueMap<float> >("RhoAllCalo");
@@ -87,9 +79,6 @@ ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
   produces<edm::ValueMap<float> >("RhoPU");
   produces<edm::ValueMap<float> >("RhoNeu05");
   produces<edm::ValueMap<float> >("RhoNeu1");
-  produces<edm::ValueMap<float> >("ecalIsoRhoCorrected");
-  produces<edm::ValueMap<float> >("hcalIsoRhoCorrected");
-  produces<edm::ValueMap<float> >("combRelIsoRhoCorrected");
 }
 
 
@@ -109,7 +98,7 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   
   // Rho values
   edm::Handle<double> rhoAllH;
-  iEvent.getByLabel(InputTag("kt6PFJetsForIso", "rho"), rhoAllH);
+  iEvent.getByLabel(InputTag("kt6PFJets", "rho"), rhoAllH);
 
   edm::Handle<double> rhoAllCaloH;
   iEvent.getByLabel(InputTag("kt6CaloJetsCentral", "rho"), rhoAllCaloH);
@@ -129,33 +118,8 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   std::vector<double> hcalIsoRhoCorr;
   std::vector<double> combRelIsoRhoCorr;
 
-  View<pat::Muon>::const_iterator probe, endprobes=probes->end();
+  View<pat::Muon>::const_iterator probe;
 
-  // Loop on probes
-  for(probe=probes->begin(); probe!=endprobes; ++probe) {
-
-    // Isolation variables
-    double trackIso = probe->trackIso();
-    double ecalIso  = probe->ecalIso();
-    double hcalIso  = probe->hcalIso();
-
-    if( fabs(probe->eta())<1.479 ) {
-      ecalIso=std::max(0., ecalIso-effAreaEcalBar*(*rhoAllH));
-      hcalIso=std::max(0., hcalIso-effAreaHcalBar*(*rhoAllH));
-    }
-    else {
-      ecalIso=std::max(0., ecalIso-effAreaEcalEnd*(*rhoAllH));
-      hcalIso=std::max(0., hcalIso-effAreaHcalEnd*(*rhoAllH));
-    }
-    double probeRhoRelativeIsolation=(trackIso+ecalIso+hcalIso)/std::max(0.5, probe->pt());
-
-    ecalIsoRhoCorr.push_back(ecalIso);
-    hcalIsoRhoCorr.push_back(hcalIso);
-    combRelIsoRhoCorr.push_back(probeRhoRelativeIsolation);
-
-  } // end loop on probes
-
-  
   // Store rho
   std::auto_ptr<ValueMap<float> > RhoAll(new ValueMap<float>());
   ValueMap<float>::Filler filler1(*RhoAll);
@@ -195,28 +159,6 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   filler14.insert(probes, myRhosNeu1.begin(), myRhosNeu1.end());
   filler14.fill();
   iEvent.put(RhoNeu1, "RhoNeu1");
-
-  // Store corrected EcalIso 
-  std::auto_ptr<ValueMap<float> > EcalIsoRhoCorrected(new ValueMap<float>());
-  ValueMap<float>::Filler filler2(*EcalIsoRhoCorrected);
-  filler2.insert(probes, ecalIsoRhoCorr.begin(), ecalIsoRhoCorr.end());
-  filler2.fill();
-  iEvent.put(EcalIsoRhoCorrected, "ecalIsoRhoCorrected");
-  
-  // Store corrected HcalIso 
-  std::auto_ptr<ValueMap<float> > HcalIsoRhoCorrected(new ValueMap<float>());
-  ValueMap<float>::Filler filler3(*HcalIsoRhoCorrected);
-  filler3.insert(probes, hcalIsoRhoCorr.begin(), hcalIsoRhoCorr.end());
-  filler3.fill();
-  iEvent.put(HcalIsoRhoCorrected, "hcalIsoRhoCorrected");
-  
-  // Store corrected CombRelIso 
-  std::auto_ptr<ValueMap<float> > RelIsoRhoCorrected(new ValueMap<float>());
-  ValueMap<float>::Filler filler4(*RelIsoRhoCorrected);
-  filler4.insert(probes, combRelIsoRhoCorr.begin(), combRelIsoRhoCorr.end());
-  filler4.fill();
-  iEvent.put(RelIsoRhoCorrected, "combRelIsoRhoCorrected");
-  
 }
 
 void 

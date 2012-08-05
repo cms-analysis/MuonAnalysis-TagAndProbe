@@ -116,6 +116,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
+        nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -159,9 +160,9 @@ process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
-    process.kt6PFJetsForIso * process.computeCorrectedIso + 
+    process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.radialIso +
-    process.probeMultiplicity +
+    process.splitTrackTagger +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
@@ -173,6 +174,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
+    process.probeMultiplicity +
     process.tpTree
 )
 

@@ -134,3 +134,13 @@ probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
    #probeCut = cms.string(""),  # count only probes satisfying this cut
 )
 
+splitTrackTagger = cms.EDProducer("NearbyCandCountComputer",
+    probes = cms.InputTag("probeMuons"),
+    objects = cms.InputTag("probeMuons"),
+    deltaR  = cms.double(0.03),
+    pairSelection = cms.string("mu1.charge == mu2.charge && "+ 
+                               "abs(mu1.vz - mu2.vz) - 3*hypot(mu1.track.dzError,mu2.track.dzError) < 1 && "+
+                               "abs(mu1.track.hitPattern.numberOfValidPixelHits - mu2.track.hitPattern.numberOfValidPixelHits) >= 2 && "+
+                               "abs(mu1.track.trackerExpectedHitsOuter.numberOfLostHits - mu2.track.trackerExpectedHitsOuter.numberOfLostHits) >= 2 && "+
+                               "( abs(mu1.pt - mu2.pt) - 10*hypot(mu1.track.ptError,mu2.track.ptError) )/min(mu1.pt, mu2.pt) < 0"),
+)

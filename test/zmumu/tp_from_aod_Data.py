@@ -44,7 +44,12 @@ process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = False
 process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
 
-process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilter)
+process.triggerResultsFilterFake = process.triggerResultsFilter.clone(
+    triggerConditions = cms.vstring( 'HLT_Mu40_v*', 'HLT_Mu5_v*', 'HLT_Mu12_v*', 'HLT_Mu24_v*')
+)
+
+process.fastFilter     = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilter)
+process.fastFilterFake = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilterFake)
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
 ##   | |\/| | | | |/ _ \| '_ \/ __|
@@ -120,6 +125,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
+        nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -158,9 +164,9 @@ process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
-    process.kt6PFJetsForIso * process.computeCorrectedIso + 
+    process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.radialIso +
-    process.probeMultiplicity +
+    process.splitTrackTagger +
     process.muonDxyPVdzmin 
 )
 process.tnpSimpleSequence = cms.Sequence(
@@ -172,6 +178,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
+    process.probeMultiplicity + 
     process.tpTree
 )
 
@@ -291,7 +298,7 @@ process.fakeRateZPlusProbeTree = process.tpTree.clone(
 )
 
 process.fakeRateJetPlusProbe = cms.Path(
-    process.fastFilter +
+    process.fastFilterFake +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
     process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
     process.jetPlusProbeSequence +
@@ -317,9 +324,9 @@ process.fakeRateZPlusProbe = cms.Path(
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
-   #process.fakeRateJetPlusProbe,
-   #process.fakeRateWPlusProbe,
-   #process.fakeRateZPlusProbe,
+   process.fakeRateJetPlusProbe,
+   process.fakeRateWPlusProbe,
+   process.fakeRateZPlusProbe,
 )
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.root"))
