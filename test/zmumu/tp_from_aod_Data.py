@@ -78,6 +78,7 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
+useExtendedL1Match(process)
 
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
@@ -152,13 +153,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     addRunLumiInfo = cms.bool(True),
 )
 
-
-process.load('RecoJets.Configuration.RecoPFJets_cff')
-##-------------------- Turn-on the FastJet density calculation -----------------------
-process.kt6PFJets.doRhoFastjet = True
-##-------------------- FastJet density calculation for Iso ---------------------------
-process.kt6PFJetsForIso = process.kt6PFJets.clone( Rho_EtaMax = cms.double(2.5), Ghost_EtaMax = cms.double(2.5) )
-##-------------------- All the other rhos are taken from the events ------------------
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 
