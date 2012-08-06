@@ -7,15 +7,7 @@ process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
 process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring(
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/6C0F28D7-2FC7-E111-BF3C-00237DDBE0E2.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/48876EBC-2DC7-E111-B8B3-001D09F25041.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/3007CDAF-32C7-E111-83B6-003048D2BC62.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/06A4396B-2EC7-E111-82EA-003048F1183E.root',
-    ),
+    fileNames = cms.untracked.vstring( ),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )    
 
@@ -23,7 +15,23 @@ process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
 process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
-process.GlobalTag.globaltag = cms.string('GR_R_53_V7::All')
+
+import os
+if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('GR_R_53_V7::All')
+    process.source.fileNames = [
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
+        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
+    ]
+elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('GR_P_V39_AN1::All')
+    process.source.fileNames = [
+        '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/C64F808D-10BB-E111-AD32-0030486780B4.root',
+        '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/B6EC67C6-0DBB-E111-BEC9-5404A6388697.root',
+        '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/AEF38851-2BBB-E111-AE15-001D09F2447F.root',
+    ]
+else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -323,4 +331,4 @@ process.schedule = cms.Schedule(
    process.fakeRateZPlusProbe,
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.old.root"))
