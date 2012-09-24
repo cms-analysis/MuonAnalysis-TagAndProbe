@@ -81,6 +81,11 @@ GlobalTrackQualityVariables = cms.PSet(
     glbPtError = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError"),
     glbSigmaPtOverPt = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError/globalTrack.pt"),
 )
+StaOnlyVariables = cms.PSet(
+    staQoverP      = cms.string("? outerTrack.isNull() ? 0 : outerTrack.qoverp"),
+    staQoverPerror = cms.string("? outerTrack.isNull() ? 0 : outerTrack.qoverpError"),
+    staValidStations = cms.string("? outerTrack.isNull() ? -1 : outerTrack.hitPattern.muonStationsWithValidHits()"),
+)
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
     l1q  = cms.string("userInt('muonL1Info:quality')"),
@@ -132,8 +137,6 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
 )
 
-
-
 HighPtTriggerFlags = cms.PSet(
    # legacy
    #Mu9       = cms.string("!triggerObjectMatchesByPath('HLT_Mu9').empty()"),
@@ -177,9 +180,9 @@ HighPtTriggerFlags = cms.PSet(
 
 
    DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty())"),
-   DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()")
+   DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
    DoubleMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
-   DoubleMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()")
+   DoubleMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
    
    
    )

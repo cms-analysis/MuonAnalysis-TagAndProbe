@@ -141,6 +141,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagVariables = cms.PSet(
         pt = cms.string("pt"),
         eta = cms.string("eta"),
+        phi = cms.string("phi"),
         nVertices   = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
@@ -152,6 +153,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
         pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        rapidity = cms.string("rapidity"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
@@ -233,6 +235,7 @@ process.tpTreeSta = process.tpTree.clone(
     arbitration   = "OneProbe",
     variables = cms.PSet(
         KinematicVariables, 
+        StaOnlyVariables,
         ## track matching variables
         tk_deltaR     = cms.InputTag("staToTkMatch","deltaR"),
         tk_deltaEta   = cms.InputTag("staToTkMatch","deltaEta"),
@@ -243,6 +246,8 @@ process.tpTreeSta = process.tpTree.clone(
         outerValidHits = cms.string("outerTrack.numberOfValidHits > 0"),
         TM  = cms.string("isTrackerMuon"),
         Glb = cms.string("isGlobalMuon"),
+        Tk  = cms.string("track.isNonnull"),
+        StaTkSameCharge = cms.string("outerTrack.isNonnull && innerTrack.isNonnull && (outerTrack.charge == innerTrack.charge)"),
     ),
     allProbes     = "probeMuonsSta",
     probeMatches  = "probeMuonsMCMatchSta",
