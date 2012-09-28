@@ -33,7 +33,6 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
-
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
     src = cms.InputTag("offlinePrimaryVertices"),
@@ -76,6 +75,7 @@ process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 useExtendedL1Match(process)
+addHLTL1Passthrough(process)
 changeTriggerProcessName(process, "*") # auto-guess
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
