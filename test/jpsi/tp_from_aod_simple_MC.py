@@ -80,6 +80,7 @@ process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 useExtendedL1Match(process)
+addHLTL1Passthrough(process)
 changeTriggerProcessName(process, "*")
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
@@ -130,6 +131,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
+       HighPtTriggerFlagsDebug,
        LowPtTriggerFlagsPhysics,
        LowPtTriggerFlagsEfficienciesProbe,
        Acc_JPsi = cms.string("(abs(eta) <= 1.3 && pt > 3.3) || (1.3 < abs(eta) <= 2.2 && p > 2.9) || (2.2 < abs(eta) <= 2.4  && pt > 0.8)"),
@@ -137,9 +139,14 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     tagVariables = cms.PSet(
         pt  = cms.string('pt'),
         eta = cms.string('eta'),
+        phi = cms.string('phi'),
         nVertices = cms.InputTag("nverticesModule"),
+        l1rate = cms.InputTag("l1rate"),
+        bx     = cms.InputTag("l1rate","bx"),
     ),
     tagFlags     = cms.PSet(
+        HighPtTriggerFlags,
+        HighPtTriggerFlagsDebug,
         LowPtTriggerFlagsPhysics,
         LowPtTriggerFlagsEfficienciesTag,
     ),
@@ -181,6 +188,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.computeCorrectedIso + 
     process.probeMultiplicity + 
     process.splitTrackTagger +
+    process.l1rate +
     process.tpTree
 )
 
@@ -259,6 +267,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.onePairSta      +
     process.nverticesModule +
     process.staToTkMatchSequenceJPsi +
+    process.l1rate +
     process.tpTreeSta
 )
 
