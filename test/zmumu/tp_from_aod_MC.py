@@ -137,6 +137,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
+       HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
         pt = cms.string("pt"),
@@ -147,7 +148,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
     ),
-    tagFlags = cms.PSet(HighPtTriggerFlags),
+    tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
@@ -230,6 +231,8 @@ process.staToTkMatch.maxDeltaPtRel = 2.
 process.staToTkMatchNoZ.maxDeltaR     = 0.3
 process.staToTkMatchNoZ.maxDeltaPtRel = 2.
 
+process.load("MuonAnalysis.TagAndProbe.tracking_reco_info_cff")
+
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
     arbitration   = "OneProbe",
@@ -267,6 +270,18 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.njets30ModuleSta +
     process.tpTreeSta
 )
+
+## Add extra RECO-level info
+if False:
+    process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkClusterInfo+process.tpTreeSta)
+    process.tpTreeSta.tagVariables.nClustersStrip = cms.InputTag("tkClusterInfo","siStripClusterCount")
+    process.tpTreeSta.tagVariables.nClustersPixel = cms.InputTag("tkClusterInfo","siPixelClusterCount")
+    process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkLogErrors+process.tpTreeSta)
+    process.tpTreeSta.tagVariables.nLogErrFirst = cms.InputTag("tkLogErrors","firstStep")
+    process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
+    process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
+
+
 
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +

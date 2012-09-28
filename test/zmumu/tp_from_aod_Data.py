@@ -9,7 +9,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 100
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring( ),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10000) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
@@ -24,6 +24,15 @@ if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
     ]
+#    process.source.fileNames = [
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/E24492CF-60F1-E111-B1A3-0025901D624A.root',
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/CC6F5333-5EF1-E111-BB26-BCAEC5364C62.root',
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/A0C46F23-6AF1-E111-8E4D-001D09F34488.root',
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/78F208A3-6EF1-E111-BC73-001D09F23D1D.root',
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/52FE8A6E-77F1-E111-A026-00215AEDFCCC.root',
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/3A358B5D-69F1-E111-9FB3-001D09F2441B.root',
+#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/166B73E0-64F1-E111-A723-5404A63886D2.root',
+#    ]
 elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('GR_P_V39_AN1::All')
     process.source.fileNames = [
@@ -87,6 +96,7 @@ process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 useExtendedL1Match(process)
+addHLTL1Passthrough(process)
 
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
@@ -140,6 +150,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        TrackQualityFlags,
        MuonIDFlags,
        HighPtTriggerFlags,
+       HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
         pt = cms.string("pt"),
@@ -149,8 +160,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+        l1rate = cms.InputTag("l1rate"),
+        bx     = cms.InputTag("l1rate","bx"),
     ),
-    tagFlags = cms.PSet(HighPtTriggerFlags),
+    tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
@@ -182,6 +195,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
+    process.l1rate +
     process.probeMultiplicity + 
     process.tpTree
 )
@@ -227,6 +241,8 @@ process.staToTkMatch.maxDeltaPtRel = 2.
 process.staToTkMatchNoZ.maxDeltaR     = 0.3
 process.staToTkMatchNoZ.maxDeltaPtRel = 2.
 
+process.load("MuonAnalysis.TagAndProbe.tracking_reco_info_cff")
+
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
     arbitration   = "OneProbe",
@@ -260,8 +276,19 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.nverticesModule +
     process.staToTkMatchSequenceZ +
     process.njets30ModuleSta +
+    process.l1rate +
     process.tpTreeSta
 )
+
+## Add extra RECO-level info
+if False:
+    process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkClusterInfo+process.tpTreeSta)
+    process.tpTreeSta.tagVariables.nClustersStrip = cms.InputTag("tkClusterInfo","siStripClusterCount")
+    process.tpTreeSta.tagVariables.nClustersPixel = cms.InputTag("tkClusterInfo","siPixelClusterCount")
+    process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkLogErrors+process.tpTreeSta)
+    process.tpTreeSta.tagVariables.nLogErrFirst = cms.InputTag("tkLogErrors","firstStep")
+    process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
+    process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
 
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +

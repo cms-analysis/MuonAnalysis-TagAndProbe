@@ -144,3 +144,8 @@ splitTrackTagger = cms.EDProducer("NearbyCandCountComputer",
                                "abs(mu1.track.trackerExpectedHitsOuter.numberOfLostHits - mu2.track.trackerExpectedHitsOuter.numberOfLostHits) >= 2 && "+
                                "( abs(mu1.pt - mu2.pt) - 10*hypot(mu1.track.ptError,mu2.track.ptError) )/min(mu1.pt, mu2.pt) < 0"),
 )
+
+l1rate = cms.EDProducer("ComputeL1TriggerRate",
+    probes = cms.InputTag("tagMuons"),
+    scalers = cms.InputTag("scalersRawToDigi"),
+)
