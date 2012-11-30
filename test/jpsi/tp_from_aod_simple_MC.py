@@ -19,10 +19,10 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START53_V6::All')
+    process.GlobalTag.globaltag = cms.string('START53_V14::All')
     process.source.fileNames = [
-	'/store/relval/CMSSW_5_3_2-START53_V6/RelValJpsiMM/GEN-SIM-RECO/v1/0000/A029BBE1-7EB9-E111-A645-00261894386B.root',
-	'/store/relval/CMSSW_5_3_2-START53_V6/RelValJpsiMM/GEN-SIM-RECO/v1/0000/3A335E73-79B9-E111-8E4D-003048679166.root',
+        '/store/relval/CMSSW_5_3_6-START53_V14/RelValJpsiMM/GEN-SIM-RECO/v2/00000/C475A7F8-352A-E211-91A9-001A92971B68.root',
+        '/store/relval/CMSSW_5_3_6-START53_V14/RelValJpsiMM/GEN-SIM-RECO/v2/00000/C2D08A6A-322A-E211-AC25-0030486792AC.root',
     ]
 elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('START52_V5::All')

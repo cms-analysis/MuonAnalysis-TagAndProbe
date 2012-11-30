@@ -162,7 +162,11 @@ HighPtTriggerFlags = cms.PSet(
    #DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*',1,0).empty()"),
    DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
    DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
-   
+
+   ## Heavily prescaled but still useful   
+   Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu8_v*',1,0).empty()"),
+   Mu8  = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_v*',1,0).empty()"),
+
    # 2011 version
    # DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty()"),
    # DoubleMu17Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),

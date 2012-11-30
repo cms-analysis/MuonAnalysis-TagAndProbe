@@ -127,6 +127,7 @@ probeMuonsIsoSequence = cms.Sequence(
 muonDxyPVdzmin = cms.EDProducer("MuonDxyPVdzmin",
     probes = cms.InputTag("probeMuons"),
 )
+muonDxyPVdzminTags = muonDxyPVdzmin.clone(probes = "tagMuons")
 
 probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
     pairs = cms.InputTag("tpPairs"),
@@ -149,3 +150,8 @@ l1rate = cms.EDProducer("ComputeL1TriggerRate",
     probes = cms.InputTag("tagMuons"),
     scalers = cms.InputTag("scalersRawToDigi"),
 )
+
+newTunePVals = cms.EDProducer("HighPtMuonsInfo",
+    src = cms.InputTag("tpPairs"),
+)
+

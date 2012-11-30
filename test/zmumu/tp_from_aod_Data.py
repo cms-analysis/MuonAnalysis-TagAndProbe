@@ -18,7 +18,7 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_R_53_V7::All')
+    process.GlobalTag.globaltag = cms.string('GR_P_V42_AN2::All')
     process.source.fileNames = [
         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
@@ -56,7 +56,7 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
 )
 
 process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
-process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*' )
+process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*', 'HLT_Mu8_v*', 'HLT_Mu17_v*' )
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = False
 process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
@@ -162,14 +162,21 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
+        dzPV = cms.InputTag("muonDxyPVdzminTag","dzPV"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
-        pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
-        probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        pt      = cms.string("pt"), 
         rapidity = cms.string("rapidity"),
+        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+        probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        ## New TuneP variables
+        newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
+        newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelErr"),
+        newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
+        newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(False),
@@ -186,6 +193,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.splitTrackTagger +
     process.muonDxyPVdzmin 
 )
+
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons +
     process.oneTag     +
@@ -197,6 +205,8 @@ process.tnpSimpleSequence = cms.Sequence(
     process.extraProbeVariablesSeq +
     process.l1rate +
     process.probeMultiplicity + 
+    process.newTunePVals +
+    process.muonDxyPVdzminTags +
     process.tpTree
 )
 

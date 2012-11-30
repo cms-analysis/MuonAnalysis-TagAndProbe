@@ -18,10 +18,10 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START53_V6::All')
+    process.GlobalTag.globaltag = cms.string('START53_V14::All')
     process.source.fileNames = [
-        '/store/relval/CMSSW_5_3_2-START53_V6/RelValZMM/GEN-SIM-RECO/v1/0000/5AAE8FC2-76B9-E111-B0BD-00261894382D.root',
-        '/store/relval/CMSSW_5_3_2-START53_V6/RelValZMM/GEN-SIM-RECO/v1/0000/160A5D5D-74B9-E111-A2B3-002618943810.root',
+        '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/76156813-F529-E211-917B-003048678FA6.root',
+        '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/08C1D822-F629-E211-A6B1-003048679188.root',
     ]
 elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('START52_V5::All')
@@ -147,14 +147,21 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+        dzPV = cms.InputTag("muonDxyPVdzminTag","dzPV"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30Module"),
         dz      = cms.string("daughter(0).vz - daughter(1).vz"),
-        pt      = cms.string("pt"), # let's do some bump hunt in the T&P too
-        probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        pt      = cms.string("pt"), 
         rapidity = cms.string("rapidity"),
+        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+        probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        ## New TuneP variables
+        newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
+        newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelErr"),
+        newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
+        newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
@@ -176,6 +183,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.splitTrackTagger +
     process.muonDxyPVdzmin 
 )
+
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.oneTag     +
@@ -185,7 +193,9 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
-    process.probeMultiplicity +
+    process.probeMultiplicity + 
+    process.newTunePVals +
+    process.muonDxyPVdzminTags +
     process.tpTree
 )
 
@@ -280,8 +290,6 @@ if False:
     process.tpTreeSta.tagVariables.nLogErrFirst = cms.InputTag("tkLogErrors","firstStep")
     process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
     process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
-
-
 
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
