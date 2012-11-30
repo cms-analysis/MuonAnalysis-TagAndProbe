@@ -155,3 +155,8 @@ newTunePVals = cms.EDProducer("HighPtMuonsInfo",
     src = cms.InputTag("tpPairs"),
 )
 
+l1hltprescale = cms.EDProducer("ComputeL1HLTPrescales",
+    probes = cms.InputTag("tagMuons"),
+    hltConfig = cms.string("HLT"),
+    hltPaths = cms.vstring("HLT_Mu17_v", "HLT_Mu8_v"),
+)

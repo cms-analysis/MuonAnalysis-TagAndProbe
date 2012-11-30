@@ -20,10 +20,20 @@ import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('GR_P_V42_AN2::All')
     process.source.fileNames = [
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
-        '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/0A79B825-B339-E211-869D-BCAEC5364C93.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/3AB8635A-C339-E211-AD34-003048D2BC30.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/74791AB5-B639-E211-A2B4-0030486780B8.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/883C07A5-9E39-E211-A669-001D09F248F8.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/92B75860-B739-E211-80AC-001D09F242EF.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E03B2BD3-B339-E211-9CC5-001D09F29114.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E439CDE0-DE39-E211-8727-0025901D631E.root',
+        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E4C70744-A439-E211-89FC-003048678098.root',
     ]
+#     process.source.fileNames = [
+#         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
+#         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
+#         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
+#     ]
 #    process.source.fileNames = [
 #        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/E24492CF-60F1-E111-B1A3-0025901D624A.root',
 #        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/CC6F5333-5EF1-E111-BB26-BCAEC5364C62.root',
@@ -165,6 +175,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
+        mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
+        mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
         dzPV = cms.InputTag("muonDxyPVdzminTag","dzPV"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
@@ -207,6 +219,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.extraProbeVariablesSeq +
     process.l1rate +
+    process.l1hltprescale + 
     process.probeMultiplicity + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
