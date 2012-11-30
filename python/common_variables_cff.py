@@ -187,6 +187,10 @@ HighPtTriggerFlags = cms.PSet(
    DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
    DoubleMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
    DoubleMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
+
+   DoubleMu17TkMu8NoDZ_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_NoDZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
+   DoubleMu13Mu8NoDZ_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_NoDZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered13').empty()"),
+   DoubleMu13Mu8NoDZ_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"),
 )
 HighPtTriggerFlagsDebug = cms.PSet(
    # --- the ones commented out don't save tags ---
