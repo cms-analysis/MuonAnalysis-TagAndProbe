@@ -135,6 +135,11 @@ probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
    #probeCut = cms.string(""),  # count only probes satisfying this cut
 )
 
+bestPairByZMass = cms.EDProducer("BestPairByMass",
+    pairs = cms.InputTag("tpPairs"),
+    mass  = cms.double(91.2),
+)
+
 splitTrackTagger = cms.EDProducer("NearbyCandCountComputer",
     probes = cms.InputTag("probeMuons"),
     objects = cms.InputTag("probeMuons"),
@@ -160,3 +165,4 @@ l1hltprescale = cms.EDProducer("ComputeL1HLTPrescales",
     hltConfig = cms.string("HLT"),
     hltPaths = cms.vstring("HLT_Mu17_v", "HLT_Mu8_v"),
 )
+

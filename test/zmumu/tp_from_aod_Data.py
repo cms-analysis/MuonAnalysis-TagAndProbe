@@ -177,7 +177,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         bx     = cms.InputTag("l1rate","bx"),
         mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
-        dzPV = cms.InputTag("muonDxyPVdzminTag","dzPV"),
+        dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -189,11 +189,13 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
         ## New TuneP variables
         newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
-        newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelErr"),
+        newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
         newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
         newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
     ),
-    pairFlags = cms.PSet(),
+    pairFlags = cms.PSet(
+        BestZ = cms.InputTag("bestPairByZMass"),
+    ),
     isMC           = cms.bool(False),
     addRunLumiInfo = cms.bool(True),
 )
@@ -221,6 +223,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.l1rate +
     process.l1hltprescale + 
     process.probeMultiplicity + 
+    process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
     process.tpTree
@@ -291,6 +294,7 @@ process.tpTreeSta = process.tpTree.clone(
 )
 process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
 del process.tpTreeSta.pairVariables.probeMultiplicity
+del process.tpTreeSta.pairFlags.BestZ
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(

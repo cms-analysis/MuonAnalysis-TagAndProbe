@@ -147,7 +147,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
-        dzPV = cms.InputTag("muonDxyPVdzminTag","dzPV"),
+        dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -159,11 +159,13 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
         ## New TuneP variables
         newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
-        newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelErr"),
+        newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
         newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
         newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
     ),
-    pairFlags = cms.PSet(),
+    pairFlags = cms.PSet(
+        BestZ = cms.InputTag("bestPairByZMass"),
+    ),
     isMC           = cms.bool(True),
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
     probeMatches     = cms.InputTag("probeMuonsMCMatch"),
@@ -194,6 +196,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.extraProbeVariablesSeq +
     process.probeMultiplicity + 
+    process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
     process.tpTree
@@ -267,6 +270,7 @@ process.tpTreeSta = process.tpTree.clone(
 )
 process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
 del process.tpTreeSta.pairVariables.probeMultiplicity
+del process.tpTreeSta.pairFlags.BestZ
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(

@@ -1,5 +1,5 @@
 //
-// $Id: HighPtMuonsInfo.cc,v 1.6 2011/07/21 01:07:49 botta Exp $
+// $Id: HighPtMuonsInfo.cc,v 1.1 2012/11/30 13:49:16 gpetrucc Exp $
 //
 
 /**
@@ -8,7 +8,7 @@
             https://twiki.cern.ch/twiki/bin/view/CMSPublic/SWGuideMuonId#New_Version_recommended
             
   \author   Giovanni Petrucciani
-  \version  $Id: HighPtMuonsInfo.cc,v 1.6 2011/07/21 01:07:49 botta Exp $
+  \version  $Id: HighPtMuonsInfo.cc,v 1.1 2012/11/30 13:49:16 gpetrucc Exp $
 */
 
 
@@ -80,7 +80,7 @@ HighPtMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
         ptRelError[i] = tuneP2.first->ptError()/pt[i];
 
         // Invariant mass
-        mass[i] = ( reco::Particle::PolarLorentzVector(tuneP2.first->pt(), tuneP2.first->eta(), tuneP2.first->phi(), d2.mass()) +
+        mass[i] = ( reco::Particle::PolarLorentzVector(tuneP1.first->pt(), tuneP1.first->eta(), tuneP1.first->phi(), d1.mass()) +
                     reco::Particle::PolarLorentzVector(tuneP2.first->pt(), tuneP2.first->eta(), tuneP2.first->phi(), d2.mass())  ).M();
  
         // convert the enumerator into int by hand: numbers are not given explicitly in the header file, and might change */
