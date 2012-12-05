@@ -15,7 +15,7 @@ jsondir = os.environ['CMSSW_BASE']+"/src/MuonAnalysis/TagAndProbe/test/zmumu/pro
 
 def cfgsub(cfg, dict):
     for key, value in dict.iteritems():
-        cfg = sub(compile("^\\s*%s\\s*=\\s*\\S+" % key, MULTILINE), "%s = %s" % (key,value), cfg)
+        cfg = sub(compile("^(\\s*)%s\\s*=\\s*\\S+" % key, MULTILINE), "\\1%s = %s" % (key,value), cfg)
     return cfg
 
 for row in datasets:
