@@ -1,0 +1,6 @@
+### NICK   DATASET                               GLOBAL_TAG      JSON                                                               JOBS
+JPsi        /JPsiToMuMu_2MuPtEtaFilter_tuneD6T_8TeV-pythia6-evtgen/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM   START53_V14 - 200
+Bs_NoPtCut  /BsToJPsiPhi_2K2MuFilter_8TeV-pythia6-evtgen/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM       START53_V14 - 20
+Bs_PtCut    /BsToJPsiPhi_2K2MuPtEtaFilter_8TeV-pythia6-evtgen/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM  START53_V14 - 40
+Bu_PtCut    /BuToJPsiK_K2MuPtEtaEtaFilter_8TeV-pythia6-evtgen/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM  START53_V14 - 60
+Bu_NoPtCut  /BuToJPsiK_K2MuFilter_8TeV-pythia6-evtgen/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM          START53_V14 - 40
