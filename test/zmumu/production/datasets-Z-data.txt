@@ -1,0 +1,6 @@
+### NICK              DATASET                               GLOBAL_TAG      JSON                                                               JOBS
+run2012A_13Jul2012    /SingleMu/Run2012A-13Jul2012-v1/AOD   FT_53_V6_AN2    Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_v2.txt   25
+run2012B_13Jul2012    /SingleMu/Run2012B-13Jul2012-v1/AOD   FT_53_V6_AN2    Cert_190456-196531_8TeV_13Jul2012ReReco_Collisions12_JSON_v2.txt   100
+run2012Cv1_24Aug2012  /SingleMu/Run2012C-24Aug2012-v1/AOD   FT_53_V10_AN2   Cert_198022-198523_8TeV_24Aug2012ReReco_Collisions12_JSON.txt      15
+run2012Cv2_Prompt     /SingleMu/Run2012C-PromptReco-v2/AOD  GR_P_V42_AN2    Cert_190456-207898_8TeV_PromptReco_Collisions12_JSON.txt           250
+run2012Dv2_upTo207898 /SingleMu/Run2012D-PromptReco-v1/AOD  GR_P_V42_AN2    Cert_190456-207898_8TeV_PromptReco_Collisions12_JSON.txt           100
