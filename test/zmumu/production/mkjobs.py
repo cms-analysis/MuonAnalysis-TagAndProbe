@@ -31,7 +31,7 @@ for row in datasets:
     print "Will prepare crab cfg %s to run %s on dataset %s (%s jobs, json %s)" % (cfgout, pyout, dataset, jobs, json)
     mycfg = cfgsub(cfg, {'number_of_jobs':jobs, 'datasetpath':dataset, 'lumi_mask':jsondir+json, 'pset':pyout} )
     if json in ["-","none","MC"]:
-        mycfg = sub(r"^lumi_mask\s*=\s*\S+", "", mycfg.replace("total_number_of_lumis","total_number_of_events"))
+        mycfg = sub(compile("^lumi_mask\s*=\s*\S+",MULTILINE), "", mycfg.replace("total_number_of_lumis","total_number_of_events"))
     cfghandle = open(cfgout, "w")
     cfghandle.write(mycfg)
     cfghandle.close()    
