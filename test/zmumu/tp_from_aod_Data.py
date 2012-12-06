@@ -52,6 +52,9 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
+## SELECT WHAT DATASET YOU'RE RUNNING ON
+TRIGGER="SingleMu"
+
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
     src = cms.InputTag("offlinePrimaryVertices"),
@@ -66,10 +69,14 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
 )
 
 process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
-## For SingleMu PD
-process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*' )
-## For DoubleMu PD
-## process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*', 'HLT_Mu17_TkMu8_NoDZ_v*', 'HLT_Mu13_Mu8_NoDZ_v*' )
+
+if TRIGGER == "SingleMu":
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*' )
+elif TRIGGER == "DoubleMu":
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*', 'HLT_Mu17_TkMu8_NoDZ_v*', 'HLT_Mu13_Mu8_NoDZ_v*' )
+else:
+    raise RuntimeError, "TRIGGER must be 'SingleMu' or 'DoubleMu'"
+
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = False
 process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
@@ -121,6 +128,10 @@ process.tagMuons = cms.EDFilter("PATMuonSelector",
                      " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
                      " && pfIsolationR04().sumChargedHadronPt/pt < 0.2"),
 )
+if TRIGGER == "DoubleMu":
+    process.tagMuons.cut = ("pt > 15 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
+                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
+                            " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
 
@@ -199,6 +210,9 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     isMC           = cms.bool(False),
     addRunLumiInfo = cms.bool(True),
 )
+if TRIGGER == "DoubleMu":
+    for K,F in MuonIDFlags.parameters_().iteritems():
+        setattr(process.tpTree.tagFlags, K, F)
 
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
@@ -388,9 +402,13 @@ process.fakeRateZPlusProbe = cms.Path(
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
-   process.fakeRateJetPlusProbe,
-   process.fakeRateWPlusProbe,
-   process.fakeRateZPlusProbe,
 )
+
+if TRIGGER == "SingleMu": 
+    process.schedule.extend([
+       process.fakeRateJetPlusProbe,
+       process.fakeRateWPlusProbe,
+       process.fakeRateZPlusProbe,
+    ])
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.root"))
