@@ -80,6 +80,9 @@ GlobalTrackQualityVariables = cms.PSet(
     glbValidMuHits = cms.string("? globalTrack.isNull ? 0 : globalTrack.hitPattern.numberOfValidMuonHits"),
     glbPtError = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError"),
     glbSigmaPtOverPt = cms.string("? globalTrack.isNull ? -1 : globalTrack.ptError/globalTrack.pt"),
+    chi2LocMom = cms.string("combinedQuality.chi2LocalMomentum"),
+    chi2LocPos = cms.string("combinedQuality.chi2LocalPosition"),
+    glbTrackProb = cms.string("combinedQuality.glbTrackProbability"),
 )
 StaOnlyVariables = cms.PSet(
     staQoverP      = cms.string("? outerTrack.isNull() ? 0 : outerTrack.qoverp"),
