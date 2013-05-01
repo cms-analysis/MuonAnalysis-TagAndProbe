@@ -71,7 +71,7 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
 process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 
 if TRIGGER == "SingleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_v*', 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*' )
 elif TRIGGER == "DoubleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*', 'HLT_Mu17_TkMu8_NoDZ_v*', 'HLT_Mu13_Mu8_NoDZ_v*' )
 else:
@@ -129,7 +129,7 @@ process.tagMuons = cms.EDFilter("PATMuonSelector",
                      " && pfIsolationR04().sumChargedHadronPt/pt < 0.2"),
 )
 if TRIGGER == "DoubleMu":
-    process.tagMuons.cut = ("pt > 15 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
+    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
                             " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
                             " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 
@@ -177,12 +177,16 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
+        TriggerVariables, 
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
         nVertices   = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+        neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+        photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+        kt6RhoNeu05 = cms.InputTag("computeCorrectedIso", "RhoNeu05"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
