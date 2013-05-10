@@ -13,7 +13,7 @@
 //
 // Original Author:  Nov 16 16:12 (lxplus231.cern.ch)
 //         Created:  Sun Nov 16 16:14:09 CET 2008
-// $Id: BestPairByMass.cc,v 1.1 2010/05/27 08:30:39 gpetrucc Exp $
+// $Id: BestPairByMass.cc,v 1.1 2012/12/03 09:25:32 gpetrucc Exp $
 //
 //
 
@@ -77,8 +77,6 @@ BestPairByMass::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     edm::Handle<edm::View<reco::Candidate> > pairs; 
     iEvent.getByLabel(pairs_, pairs);
 
-    std::auto_ptr<edm::RefToBaseVector<reco::Candidate> > out(new edm::RefToBaseVector<reco::Candidate>());
-
     // Filter and fill
     size_t i, n = pairs->size(); 
     std::vector<int8_t> marked(n, 0); // 0 = unprocessed; 1 = processed, good; -1 = processed, bad
@@ -112,9 +110,13 @@ BestPairByMass::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
             }
         }
 
-        out->push_back(pairs->refAt(i));
     }
 
+    std::auto_ptr<edm::RefToBaseVector<reco::Candidate> > out(new edm::RefToBaseVector<reco::Candidate>());
+    for (it = pairs->begin(), i = 0; it != ed; ++it, ++i) {
+        if (marked[i] == 1) out->push_back(pairs->refAt(i));
+    }
+ 
     iEvent.put(out);
 }
 
