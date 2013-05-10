@@ -138,6 +138,16 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 9 && track.hitPattern.numberOfValidPixelHits > 0"),
     Tight2012   = cms.string("isPFMuon && numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
+    HWWID =  cms.string("( ((isGlobalMuon() && "
+                        "    globalTrack.normalizedChi2 <10 &&" +
+                        "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
+                        "    numberOfMatches > 1 ) || " + 
+                        "   (isTrackerMuon() && muonID('TMLastStationTight')) ) && " +
+                        " isPFMuon && "+
+                        " combinedQuality.trkKink < 20 &&" +
+                        " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 &&" +
+                        " innerTrack.hitPattern.numberOfValidPixelHits > 0 && " + 
+                        " abs(track.ptError / pt) < 0.10 )"),
 )
 
 HighPtTriggerFlags = cms.PSet(
