@@ -150,7 +150,7 @@ process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPair
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
-from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain 
+from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
@@ -178,6 +178,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     tagVariables = cms.PSet(
         TriggerVariables, 
+        MVAIsoVariablesPlainTag, 
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
@@ -186,7 +187,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
         photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-        kt6RhoNeu05 = cms.InputTag("computeCorrectedIso", "RhoNeu05"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
@@ -406,6 +406,9 @@ process.fakeRateZPlusProbe = cms.Path(
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
+   process.fakeRateJetPlusProbe,
+   process.fakeRateWPlusProbe,
+   process.fakeRateZPlusProbe,
 )
 
 if TRIGGER == "SingleMu": 
