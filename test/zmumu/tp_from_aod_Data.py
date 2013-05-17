@@ -54,6 +54,7 @@ else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
 TRIGGER="SingleMu"
+#TRIGGER="DoubleMu"
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -224,7 +225,7 @@ process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq * process.radialIso +
+    process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin 
 )
@@ -309,10 +310,28 @@ process.tpTreeSta = process.tpTree.clone(
         Tk  = cms.string("track.isNonnull"),
         StaTkSameCharge = cms.string("outerTrack.isNonnull && innerTrack.isNonnull && (outerTrack.charge == innerTrack.charge)"),
     ),
+    tagVariables = cms.PSet(
+        pt = cms.string("pt"),
+        eta = cms.string("eta"),
+        phi = cms.string("phi"),
+        nVertices   = cms.InputTag("nverticesModule"),
+        combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+        chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+        neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+        photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+        combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+        l1rate = cms.InputTag("l1rate"),
+        bx     = cms.InputTag("l1rate","bx"),
+    ),
+    pairVariables = cms.PSet(
+        nJets30 = cms.InputTag("njets30ModuleSta"),
+        dz      = cms.string("daughter(0).vz - daughter(1).vz"),
+        pt      = cms.string("pt"), 
+        rapidity = cms.string("rapidity"),
+        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+    ),
+    pairFlags = cms.PSet(),
 )
-process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
-del process.tpTreeSta.pairVariables.probeMultiplicity
-del process.tpTreeSta.pairFlags.BestZ
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
