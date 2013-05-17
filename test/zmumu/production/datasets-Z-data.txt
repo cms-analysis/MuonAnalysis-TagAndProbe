@@ -1,5 +1,5 @@
 ### NICK              DATASET                               GLOBAL_TAG      JSON                                                               JOBS
-run2012A_22Jan2013    /SingleMu/Run2012A-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      50
-run2012B_22Jan2013    /SingleMu/Run2012B-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      200
-run2012C_22Jan2013    /SingleMu/Run2012C-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      250
-run2012D_22Jan2013    /SingleMu/Run2012D-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      200
+run2012A_22Jan2013    /SingleMu/Run2012A-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      100
+run2012B_22Jan2013    /SingleMu/Run2012B-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      400
+run2012C_22Jan2013    /SingleMu/Run2012C-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      600
+run2012D_22Jan2013    /SingleMu/Run2012D-22Jan2013-v1/AOD   FT_53_V21_AN3   Cert_190456-208686_8TeV_22Jan2013ReReco_Collisions12_JSON.txt      400
