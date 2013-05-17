@@ -129,7 +129,7 @@ MuonMVAIsoVariables::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<reco::VertexCollection  > vertices;
   iEvent.getByLabel(pfCandidates_, pfCandidates);
   iEvent.getByLabel(vertices_, vertices);
-  const reco::Vertex &vtx = vertices->at(0);
+  const reco::Vertex &vtx = !vertices->empty() ? vertices->at(0) : reco::Vertex();
 
   View<reco::Muon>::const_iterator probe, endprobes=probes->end();
   View<reco::PFCandidate>::const_iterator iP, beginpf = pfCandidates->begin(), endpf=pfCandidates->end();
@@ -155,7 +155,7 @@ MuonMVAIsoVariables::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     for (iP = beginpf; iP != endpf; ++iP) {
         double dr = deltaR(*iP, mu);
         int idr = floor(dr/0.1);
-        if (idr >= 5) continue; 
+        if (idr >= 5 || idr < 0) continue;  // idr<0 can occur for bizarre reasons if dr is nan
 
         bool hastk = iP->trackRef().isNonnull();
         if (hastk && mu.track() == iP->trackRef()) continue;
