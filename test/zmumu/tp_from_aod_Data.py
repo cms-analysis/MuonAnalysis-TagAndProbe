@@ -4,7 +4,7 @@ process = cms.Process("TagProbe")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring( ),
@@ -425,9 +425,6 @@ process.fakeRateZPlusProbe = cms.Path(
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
-   process.fakeRateJetPlusProbe,
-   process.fakeRateWPlusProbe,
-   process.fakeRateZPlusProbe,
 )
 
 if TRIGGER == "SingleMu": 
