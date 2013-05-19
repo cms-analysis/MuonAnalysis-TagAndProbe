@@ -4,7 +4,7 @@ process = cms.Process("TagProbe")
 
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
@@ -32,6 +32,10 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
         '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/0E187509-0D7A-E111-8FA3-001A928116C2.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
+
+## SELECT WHAT DATASET YOU'RE RUNNING ON
+#TRIGGER="SingleMu"
+TRIGGER="Any"
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -87,6 +91,10 @@ process.tagMuons = cms.EDFilter("PATMuonSelector",
                      " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
                      " && pfIsolationR04().sumChargedHadronPt/pt < 0.2"),
 )
+if TRIGGER != "SingleMu":
+    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
+                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
+                            " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
 
@@ -113,7 +121,7 @@ process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons")
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
 process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
-from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain 
+from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
@@ -141,6 +149,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     ),
     tagVariables = cms.PSet(
         TriggerVariables, 
+        MVAIsoVariablesPlainTag, 
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
@@ -149,7 +158,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
         photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-        kt6RhoNeu05 = cms.InputTag("computeCorrectedIso", "RhoNeu05"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
     ),
@@ -179,6 +187,9 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     checkMotherInUnbiasEff = cms.bool(True),
     allProbes              = cms.InputTag("probeMuons"),
 )
+if TRIGGER != "SingleMu":
+    for K,F in MuonIDFlags.parameters_().iteritems():
+        setattr(process.tpTree.tagFlags, K, F)
 
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
@@ -186,7 +197,7 @@ process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq * process.radialIso +
+    process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin 
 )
@@ -270,12 +281,28 @@ process.tpTreeSta = process.tpTree.clone(
         Tk  = cms.string("track.isNonnull"),
         StaTkSameCharge = cms.string("outerTrack.isNonnull && innerTrack.isNonnull && (outerTrack.charge == innerTrack.charge)"),
     ),
+    tagVariables = cms.PSet(
+        pt = cms.string("pt"),
+        eta = cms.string("eta"),
+        phi = cms.string("phi"),
+        nVertices   = cms.InputTag("nverticesModule"),
+        combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+        chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+        neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+        photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+        combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+    ),
+    pairVariables = cms.PSet(
+        nJets30 = cms.InputTag("njets30ModuleSta"),
+        dz      = cms.string("daughter(0).vz - daughter(1).vz"),
+        pt      = cms.string("pt"), 
+        rapidity = cms.string("rapidity"),
+        deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+    ),
+    pairFlags = cms.PSet(),
     allProbes     = "probeMuonsSta",
     probeMatches  = "probeMuonsMCMatchSta",
 )
-process.tpTreeSta.pairVariables.nJets30 = "njets30ModuleSta"
-del process.tpTreeSta.pairVariables.probeMultiplicity
-del process.tpTreeSta.pairFlags.BestZ
 process.njets30ModuleSta = process.njets30Module.clone(pairs = "tpPairsSta")
 
 process.tnpSimpleSequenceSta = cms.Sequence(
