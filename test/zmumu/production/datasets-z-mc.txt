@@ -1,0 +1,4 @@
+### NICK             DATASET                                                                                             GLOBAL_TAG  JSON   JOBS
+MC53X_DYJets_powheg /DYToMuMu_M-20_CT10_TuneZ2star_v2_8TeV-powheg-pythia6/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM    START53_V20   -    800
+MC53X_DYJets        /DYJetsToLL_M-50_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v1/AODSIM        START53_V20   -    400
+MC53X_WJets         /WJetsToLNu_TuneZ2Star_8TeV-madgraph-tarball/Summer12_DR53X-PU_S10_START53_V7A-v2/AODSIM             START53_V20   -    400
