@@ -20,8 +20,9 @@ import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('START53_V14::All')
     process.source.fileNames = [
-        '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/76156813-F529-E211-917B-003048678FA6.root',
-        '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/08C1D822-F629-E211-A6B1-003048679188.root',
+        '/store/relval/CMSSW_5_3_14/RelValZMM/GEN-SIM-RECO/START53_LV6-v1/00000/84DA43EB-7F62-E311-B9CE-0025905A612E.root',
+        '/store/relval/CMSSW_5_3_14/RelValZMM/GEN-SIM-RECO/START53_LV6-v1/00000/9294101E-4C60-E311-B1D2-0025905A4964.root',
+        '/store/relval/CMSSW_5_3_14/RelValZMM/GEN-SIM-RECO/START53_LV6-v1/00000/D03765C8-1561-E311-BE7A-0025905A6060.root',
     ]
 elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('START52_V5::All')

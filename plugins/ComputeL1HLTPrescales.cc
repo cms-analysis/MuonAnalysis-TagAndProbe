@@ -80,6 +80,17 @@ void ComputeL1HLTPrescales::produce(edm::Event& iEvent, const edm::EventSetup& i
 	break;
       }
     } // end for(iHltPath)
+    if (trigName == "") {
+        static unsigned int lastRun = 0;
+        if (lastRun != iEvent.id().run()) {
+            std::cout << "ERROR: didn't find trigger " << hltPaths_[j] << " in table for run " << iEvent.id().run() << std::endl;
+            lastRun = iEvent.id().run();
+        }
+        std::string tmpStr = hltPaths_[j].substr(0, hltPaths_[j].find("_v"));
+        while(tmpStr.find("_")!=std::string::npos) {tmpStr.replace(tmpStr.find("_"),1,"");}
+        writeGlobalFloat(iEvent, probes, -2., tmpStr+"TotalPrescale");
+        continue;
+    }
 
     float totPs = -1.;
     if(trigName.length()>0) {

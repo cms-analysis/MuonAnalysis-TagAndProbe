@@ -18,16 +18,15 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V42_AN2::All')
+    #process.GlobalTag.globaltag = cms.string('GR_P_V42_AN2::All')
+    process.GlobalTag.globaltag = cms.string('FT_R_53_LV5::All')
     process.source.fileNames = [
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/0A79B825-B339-E211-869D-BCAEC5364C93.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/3AB8635A-C339-E211-AD34-003048D2BC30.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/74791AB5-B639-E211-A2B4-0030486780B8.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/883C07A5-9E39-E211-A669-001D09F248F8.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/92B75860-B739-E211-80AC-001D09F242EF.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E03B2BD3-B339-E211-9CC5-001D09F29114.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E439CDE0-DE39-E211-8727-0025901D631E.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E4C70744-A439-E211-89FC-003048678098.root',
+        '/store/data/Run2011A/SingleMu/AOD/12Oct2013-v1/10000/00082EAF-C03D-E311-8E53-003048F00B1C.root',
+        #'/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/0A79B825-B339-E211-869D-BCAEC5364C93.root',
+        #'/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/3AB8635A-C339-E211-AD34-003048D2BC30.root',
+        #'/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/74791AB5-B639-E211-A2B4-0030486780B8.root',
+        #'/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/883C07A5-9E39-E211-A669-001D09F248F8.root',
+        #'/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/92B75860-B739-E211-80AC-001D09F242EF.root',
     ]
 #     process.source.fileNames = [
 #         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
