@@ -9,7 +9,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10000
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -31,6 +31,13 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
         '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/1011EE9E-2B7A-E111-9349-0018F3D0970C.root',
         '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/0E187509-0D7A-E111-8FA3-001A928116C2.root',
     ]
+elif "CMSSW_7_2_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('START72_V1::All')
+    process.source.fileNames = [
+        '/store/relval/CMSSW_7_2_1/RelValZMM_13/GEN-SIM-RECO/PU50ns_PHYS14_25_V1_Phys14-v1/00000/287B9489-B85E-E411-95DF-02163E00EB3F.root'
+        ]
+
+
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
@@ -78,9 +85,9 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-useExtendedL1Match(process)
-addHLTL1Passthrough(process)
-changeTriggerProcessName(process, "*") # auto-guess
+#useExtendedL1Match(process) #MM no idea what the sequence did, not available since git migration
+#addHLTL1Passthrough(process)
+#changeTriggerProcessName(process, "*") # auto-guess
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
@@ -148,18 +155,29 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
-        TriggerVariables, 
-        MVAIsoVariablesPlainTag, 
-        pt = cms.string("pt"),
-        eta = cms.string("eta"),
-        phi = cms.string("phi"),
-        nVertices   = cms.InputTag("nverticesModule"),
-        combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
-        chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
-        neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
-        photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-        combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+     #   TriggerVariables, 
+     #   MVAIsoVariablesPlainTag, 
+     #   pt = cms.string("pt"),
+     #   eta = cms.string("eta"),
+     #   phi = cms.string("phi"),
+     #   nVertices   = cms.InputTag("nverticesModule"),
+     #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+     #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+     #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+     #   photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+     #   combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+     #   combRelIsoPF03dBeta = IsolationVariables.combRelIsoPF03dBeta,
+     #   dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        AllVariables,
+        ExtraIsolationVariables,
+        MVAIsoVariablesPlain, 
+        isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
+        isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
+        dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
+        dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        radialIso = cms.InputTag("radialIso"), 
+        nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -393,8 +411,6 @@ process.fakeRateZPlusProbe = cms.Path(
     process.fakeRateZPlusProbeTree
 )
 
-
-
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
@@ -402,5 +418,18 @@ process.schedule = cms.Schedule(
    process.fakeRateWPlusProbe,
    process.fakeRateZPlusProbe,
 )
+
+
+process.RandomNumberGeneratorService = cms.Service("RandomNumberGeneratorService",
+
+    # Include a PSet for each module label that needs a
+    # random engine.  The name is the module label.
+    # You must supply a seed or seeds.
+    # Optionally an engine type can be specified
+    tkTracksNoZ = cms.PSet(
+        initialSeed = cms.untracked.uint32(81)
+    )
+)
+
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_MC.root"))

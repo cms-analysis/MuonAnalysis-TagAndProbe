@@ -70,34 +70,24 @@ class InefficiencyCreator : public edm::EDProducer {
         typedef StringObjectFunction<T> Function;
         /// The Probability
         Function probability_;
-
-        /// The Random number generator
-        std::auto_ptr<CLHEP::RandFlat> flatDistribution_;
-
+  
         enum OutputMode { Values, Refs, RefBases };
         OutputMode outputMode_;
+
+  edm::Service<edm::RandomNumberGenerator> rng_;
 };
 
 template<typename T>
 InefficiencyCreator<T>::InefficiencyCreator(const edm::ParameterSet &iConfig) :
     src_(iConfig.getParameter<edm::InputTag>("src")),
-    probability_(iConfig.getParameter<std::string>("probability")),
-    flatDistribution_(0)
+    probability_(iConfig.getParameter<std::string>("probability"))
 {
-    edm::Service<edm::RandomNumberGenerator> rng;
-    if ( ! rng.isAvailable()) {
+  if ( ! rng_.isAvailable()) {
         throw cms::Exception("Configuration")
             << "XXXXXXX requires the RandomNumberGeneratorService\n"
             "which is not present in the configuration file.  You must add the service\n"
             "in the configuration file or remove the modules that require it.";
     }
-
-    CLHEP::HepRandomEngine& engine = rng->getEngine();
-
-    // engine MUST be a reference here, if a pointer is used the
-    // distribution will destroy the engine in its destructor, a major
-    // problem because the service owns the engine and will destroy it 
-    flatDistribution_.reset(new CLHEP::RandFlat(engine, 0, 1));
 
     std::string outputMode = iConfig.getParameter<std::string>("outputMode");
     if (outputMode == "vector") {
@@ -126,6 +116,8 @@ InefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     edm::Handle<edm::View<T> > src; 
     iEvent.getByLabel(src_, src);
 
+    CLHEP::HepRandomEngine& engine = rng_->getEngine( iEvent.streamID() );
+
     // Prepare output
     std::auto_ptr<PlainVecT>   vec;
     std::auto_ptr<RefVecT>     refvec;
@@ -141,7 +133,7 @@ InefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     typename edm::View<T>::const_iterator it;
     for (i = 0, it = src->begin(); i < n; ++i, ++it) {
         const T &t = *it;
-        if (flatDistribution_->fire() <= probability_(t)) {
+        if ( engine.flat() <= probability_(t)) {
             switch (outputMode_) {
                 case Values:   vec->push_back(t); break;
                 case Refs:     refvec->push_back(src->refAt(i).template castTo<RefT>()); break;

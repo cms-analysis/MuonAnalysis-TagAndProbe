@@ -28,6 +28,7 @@
 #include <TrackingTools/KalmanUpdators/interface/Chi2MeasurementEstimator.h>
 #include <TrackingTools/DetLayers/interface/GeometricSearchDet.h> 
 #include <RecoTracker/MeasurementDet/interface/MeasurementTracker.h>
+#include "RecoTracker/MeasurementDet/interface/MeasurementTrackerEvent.h"
 #include <TrackingTools/MeasurementDet/interface/MeasurementDet.h>
 #include "RecoTracker/Record/interface/CkfComponentsRecord.h"
 
@@ -37,7 +38,7 @@
 #include "DataFormats/DetId/interface/DetId.h"
 #include <DataFormats/TrackingRecHit/interface/InvalidTrackingRecHit.h>
 
-#include "TrackingTools/DetLayers/interface/NavigationSetter.h"
+//#include "TrackingTools/DetLayers/interface/NavigationSetter.h"
 #include <DataFormats/SiPixelDetId/interface/PXBDetId.h>
 
 class ExpectedHitsComputer : public edm::EDProducer {
@@ -84,19 +85,21 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   edm::ESHandle<NavigationSchool> theNavSchool;
   edm::ESHandle<MeasurementTracker> theMeasTk;
   edm::ESHandle<GlobalTrackingGeometry> theGeo;
-
+  
   iSetup.get<IdealMagneticFieldRecord>().get(theMF);
   iSetup.get<TrackingComponentsRecord>().get(thePropName,theProp);
   iSetup.get<NavigationSchoolRecord>().get(theNavSchoolName, theNavSchool); 
-  NavigationSetter setter( *theNavSchool );
+  //NavigationSetter setter( *theNavSchool );
 
   iSetup.get<CkfComponentsRecord>().get(theMeasTkName,theMeasTk); 
+ 
   iSetup.get<GlobalTrackingGeometryRecord>().get(theGeo); 
-
+  
   Chi2MeasurementEstimator estimator(30.,-3.0);
   //Chi2MeasurementEstimator estimator(30.,3.0);
     
-
+  edm::Handle<MeasurementTrackerEvent> theMeasTkEvent;
+  iEvent.getByLabel("MeasurementTrackerEvent", theMeasTkEvent);
 
   // read input
   Handle<View<reco::RecoCandidate> > inputCands;
@@ -164,11 +167,17 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 
 
 
-    std::vector< const DetLayer * > innerCompLayers = 
-      innerLayer->compatibleLayers(*tsosInner.freeState(),dirForInnerLayers);
+    // std::vector< const DetLayer * > innerCompLayers = 
+    //   innerLayer->compatibleLayers(*tsosInner.freeState(),dirForInnerLayers);
+
+    // std::vector< const DetLayer * > outerCompLayers = 
+    //   outerLayer->compatibleLayers(*tsosOuter.freeState(),dirForOuterLayers);
+
+    std::vector< const DetLayer * > innerCompLayers =
+      theNavSchool->compatibleLayers( *innerLayer, *tsosInner.freeState(),dirForInnerLayers);
 
     std::vector< const DetLayer * > outerCompLayers = 
-      outerLayer->compatibleLayers(*tsosOuter.freeState(),dirForOuterLayers);
+      theNavSchool->compatibleLayers( *outerLayer, *tsosOuter.freeState(),dirForOuterLayers);
 
     //cout << "innerCompLayers size: " << innerCompLayers.size() << endl; 
 
@@ -180,8 +189,8 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 										      estimator);
       if(!detWithState.size()) continue;
       DetId id = detWithState.front().first->geographicalId();
-      const MeasurementDet* measDet = theMeasTk->idToDet(id);	
-      if(measDet->isActive()){	
+      const MeasurementDetWithData measDet = theMeasTkEvent->idToDet(id);	
+      if(measDet.isActive()){	
       //if(1){
 	counter++;
 	//InvalidTrackingRecHit  tmpHit(id,TrackingRecHit::missing);
@@ -201,8 +210,8 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 										      estimator);
       if(!detWithState.size()) continue;
       DetId id = detWithState.front().first->geographicalId();
-      const MeasurementDet* measDet = theMeasTk->idToDet(id);	
-      if(measDet->isActive()){	
+      const MeasurementDetWithData measDet = theMeasTkEvent->idToDet(id);	
+      if(measDet.isActive()){	
       //if(1){
 	counter++;
 	//InvalidTrackingRecHit  tmpHit(id,TrackingRecHit::missing);

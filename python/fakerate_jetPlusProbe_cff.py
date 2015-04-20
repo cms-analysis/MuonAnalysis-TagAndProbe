@@ -15,7 +15,8 @@ leadingJet = cms.EDFilter("LargestPtCandViewSelector",
 jetPlusProbe = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("leadingJet probeRecoMuons"),
     cut   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi) > 1.0 && daughter(1).pt > 10"),
-    checkCharge = cms.bool(False)
+    checkCharge = cms.bool(False),
+    checkOverlap = cms.bool(False)
 )
 
 jetPlusProbeFilter = cms.EDFilter("CandViewCountFilter",

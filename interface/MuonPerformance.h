@@ -10,13 +10,15 @@
 
 class MuonPerformance {
 public:
-  MuonPerformance(const PerformancePayload& p, const PerformanceWorkingPoint& w) : pl(p), wp(w) {}
+ MuonPerformance(const PerformancePayload& p, const PerformanceWorkingPoint& w) : pl(p), wp(w) {};
+
+  virtual ~MuonPerformance() {};
 
   virtual float getResult(PerformanceResult::ResultType, BinningPointByMap) const ;
 
   virtual bool isResultOk(PerformanceResult::ResultType, BinningPointByMap) const ;
   
-  virtual const PerformanceWorkingPoint& workingPoint() const {return wp;}
+  virtual const PerformanceWorkingPoint& workingPoint() const {return wp;};
 
   private:
   const PerformancePayload& pl;
