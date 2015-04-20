@@ -14,7 +14,7 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
 
 njets30Module = cms.EDProducer("CandCleanedMultiplicityCounter", 
     pairs   = cms.InputTag("tpPairs"),
-    objects = cms.InputTag("ak5PFJets"),
+    objects = cms.InputTag("ak4PFJetsCHS"),
     objectSelection = cms.string("abs(eta) < 5 && pt > 30"), 
     minTagObjDR   = cms.double(0.3),
     minProbeObjDR = cms.double(0.3),
