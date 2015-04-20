@@ -2,18 +2,19 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TagProbe")
 
+process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
-    fileNames = cms.untracked.vstring( ),
+    fileNames = cms.untracked.vstring(),
 )
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
@@ -49,6 +50,16 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
         '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/C64F808D-10BB-E111-AD32-0030486780B4.root',
         '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/B6EC67C6-0DBB-E111-BEC9-5404A6388697.root',
         '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/AEF38851-2BBB-E111-AE15-001D09F2447F.root',
+    ]
+elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('GR_R_74_V8')
+    process.source.fileNames = [
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/00158E58-7ADF-E411-986C-002618943882.root',
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/00528257-7CDF-E411-857C-0026189438E0.root',
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/006297ED-F7DF-E411-8858-00261894385D.root',
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/00685EF4-88DF-E411-866D-0025905A613C.root',
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/02307D89-88DF-E411-9F53-0025905A6122.root',
+        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/027697F6-88DF-E411-84DC-0025905A609A.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -116,8 +127,8 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-useExtendedL1Match(process)
-addHLTL1Passthrough(process)
+#useExtendedL1Match(process)
+#addHLTL1Passthrough(process)
 
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
@@ -426,6 +437,9 @@ process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
 )
+
+process.RandomNumberGeneratorService.tkTracksNoZ = cms.PSet( initialSeed = cms.untracked.uint32(81) )
+
 
 if TRIGGER == "SingleMu": 
     process.schedule.extend([
