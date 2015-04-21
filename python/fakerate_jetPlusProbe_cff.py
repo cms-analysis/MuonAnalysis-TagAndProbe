@@ -3,7 +3,7 @@ import FWCore.ParameterSet.Config as cms
 from MuonAnalysis.TagAndProbe.fakerate_common_cff import *
 
 realJets = cms.EDFilter("CandViewSelector",
-        src = cms.InputTag("ak5PFJets"),
+        src = cms.InputTag("ak4PFJetsCHS"),
         cut = cms.string("pt > 15 && (chargedMultiplicity+neutralMultiplicity) > 1 && chargedMuEnergyFraction < 0.25"),
         filter = cms.bool(True),
 )
@@ -15,7 +15,8 @@ leadingJet = cms.EDFilter("LargestPtCandViewSelector",
 jetPlusProbe = cms.EDProducer("CandViewShallowCloneCombiner",
     decay = cms.string("leadingJet probeRecoMuons"),
     cut   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi) > 1.0 && daughter(1).pt > 10"),
-    checkCharge = cms.bool(False)
+    checkCharge = cms.bool(False),
+    checkOverlap = cms.bool(False)
 )
 
 jetPlusProbeFilter = cms.EDFilter("CandViewCountFilter",

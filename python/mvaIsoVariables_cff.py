@@ -5,7 +5,7 @@ from MuonAnalysis.TagAndProbe.mvaIsoVariables_cfi import mvaIsoVariables
 from CommonTools.ParticleFlow.pfNoPileUp_cff import *
 # default pfNoPU reads from somewhere else. don't want to mess up with it, so make copy
 pfPileUpMVAIso = pfPileUp.clone(PFCandidates = 'particleFlow')
-pfNoPileUpMVAIso = pfNoPileUp.clone(topCollection = 'pfPileUpMVAIso', bottomCollection = 'particleFlow')
+pfNoPileUpMVAIso = pfNoPileUp.clone(topCollection = 'pfPileUpMVAIso', bottomCollection = 'particleFlowPtrs')
 
 ## We keep PfNoPU for use with radialIso
 mvaIsoVariablesSeq = cms.Sequence(

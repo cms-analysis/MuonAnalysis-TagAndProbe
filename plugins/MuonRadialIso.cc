@@ -27,6 +27,9 @@
 
 class MuonRadialIso : public edm::EDProducer {
 public:
+
+  typedef std::vector< edm::FwdPtr<reco::PFCandidate> > PFCollection;
+
   explicit MuonRadialIso(const edm::ParameterSet&);
   ~MuonRadialIso();
 
@@ -36,6 +39,9 @@ private:
   // ----------member data ---------------------------
   const edm::InputTag probes_;    
   const edm::InputTag pfCandidates_;
+
+  //edm::EDGetTokenT<PFCollection> tokenPFCandidates_;
+
   const double photonPtMin_, neutralHadPtMin_;
 
 
@@ -88,11 +94,12 @@ MuonRadialIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   Handle<View<reco::Muon> > probes;
   iEvent.getByLabel(probes_, probes);
 
-  Handle<View<reco::PFCandidate> > pfCandidates;
+  //Handle<View<reco::PFCandidate> > pfCandidates;
+  Handle<PFCollection> pfCandidates;
   iEvent.getByLabel(pfCandidates_, pfCandidates);
 
   View<reco::Muon>::const_iterator probe, endprobes=probes->end();
-  View<reco::PFCandidate>::const_iterator iP, beginpf = pfCandidates->begin(), endpf=pfCandidates->end();
+  PFCollection::const_iterator iP, beginpf = pfCandidates->begin(), endpf=pfCandidates->end();
   unsigned int n = probes->size();
 
   std::vector<float> iso(n,0);
@@ -103,21 +110,21 @@ MuonRadialIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     const reco::Muon &mu = *probe;
 
     for (iP = beginpf; iP != endpf; ++iP) {
-        double dr = deltaR(*iP, mu);
+      double dr = deltaR( *(iP->get() ) , mu );
 
-        bool hastk = iP->trackRef().isNonnull();
-        if (hastk && mu.track() == iP->trackRef()) continue;
+      bool hastk = iP->get()->trackRef().isNonnull();
+        if (hastk && mu.track() == iP->get()->trackRef()) continue;
 
         if (dr < 0.01 || dr > 0.3) continue;
         
         if (hastk) {
-            if (iP->particleId() == reco::PFCandidate::e || iP->particleId() == reco::PFCandidate::mu) continue;
-        } else if (iP->particleId() == reco::PFCandidate::gamma) {
-            if (iP->pt() <= photonPtMin_) continue;
+	  if (iP->get()->particleId() == reco::PFCandidate::e || iP->get()->particleId() == reco::PFCandidate::mu) continue;
+        } else if (iP->get()->particleId() == reco::PFCandidate::gamma) {
+	  if (iP->get()->pt() <= photonPtMin_) continue;
         } else {
-            if (iP->pt() <= neutralHadPtMin_) continue;
+	  if (iP->get()->pt() <= neutralHadPtMin_) continue;
         }
-        iso[imu] += iP->pt() * ( 1 - 3*dr) / mu.pt();
+        iso[imu] += iP->get()->pt() * ( 1 - 3*dr) / mu.pt();
     }
   }// end loop on probes
 

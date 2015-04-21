@@ -85,10 +85,14 @@ class ResonanceInefficiencyCreator : public edm::EDProducer {
         Function probability_;
 
         /// The Random number generator
-        std::auto_ptr<CLHEP::RandFlat> flatDistribution_;
+  //std::auto_ptr<CLHEP::RandFlat> flatDistribution_;
 
         enum OutputMode { Values, Refs, RefBases };
         OutputMode outputMode_;
+
+  edm::Service<edm::RandomNumberGenerator> rng_;
+  bool useProb_;
+  
 };
 
 template<typename T>
@@ -99,24 +103,24 @@ ResonanceInefficiencyCreator<T>::ResonanceInefficiencyCreator(const edm::Paramet
     massMin_(iConfig.getParameter<double>("massMin")),
     massMax_(iConfig.getParameter<double>("massMax")),
     onlyBestMatch_(iConfig.getParameter<bool>("onlyBestMatch")),
-    probability_(iConfig.existsAs<std::string>("probability") ? iConfig.getParameter<std::string>("probability") : "1"),
-    flatDistribution_(0)
+    probability_(iConfig.existsAs<std::string>("probability") ? iConfig.getParameter<std::string>("probability") : "1")
 {
+  useProb_ =false;
     if (iConfig.existsAs<std::string>("probability")) {
-        edm::Service<edm::RandomNumberGenerator> rng;
-        if ( ! rng.isAvailable()) {
-            throw cms::Exception("Configuration")
-                << "XXXXXXX requires the RandomNumberGeneratorService\n"
-                "which is not present in the configuration file.  You must add the service\n"
-                "in the configuration file or remove the modules that require it.";
-        }
+      useProb_ =true;
+      if ( ! rng_.isAvailable()) {
+	throw cms::Exception("Configuration")
+	  << "XXXXXXX requires the RandomNumberGeneratorService\n"
+	  "which is not present in the configuration file.  You must add the service\n"
+	  "in the configuration file or remove the modules that require it.";
+      }
 
-        CLHEP::HepRandomEngine& engine = rng->getEngine();
+        //CLHEP::HepRandomEngine& engine = rng->getEngine();
 
         // engine MUST be a reference here, if a pointer is used the
         // distribution will destroy the engine in its destructor, a major
         // problem because the service owns the engine and will destroy it 
-        flatDistribution_.reset(new CLHEP::RandFlat(engine, 0, 1));
+	//        flatDistribution_.reset(new CLHEP::RandFlat(engine, 0, 1));
     }
 
     std::string outputMode = iConfig.getParameter<std::string>("outputMode");
@@ -146,6 +150,8 @@ ResonanceInefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSet
 
     edm::Handle<edm::View<reco::Candidate> > tags; 
     iEvent.getByLabel(tags_, tags);
+
+    CLHEP::HepRandomEngine& engine = rng_->getEngine( iEvent.streamID() );
 
     // Prepare output
     std::auto_ptr<PlainVecT>   vec;
@@ -189,10 +195,10 @@ ResonanceInefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSet
         const T &t = (*src)[i];
         bool  ok = true;
         if (marked[i]) { // it's targeted
-            if (flatDistribution_.get()) {
-                // random chance
-                ok = flatDistribution_->fire() <= probability_(t);
-            } else {
+	  if (useProb_) { //flatDistribution_.get()
+	   // random chance
+	    ok = engine.flat() <= probability_(t);
+	  } else {
                 // kill all
                 ok = false;
             }

@@ -2,18 +2,19 @@ import FWCore.ParameterSet.Config as cms
 
 process = cms.Process("TagProbe")
 
+process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 10000
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20000) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
@@ -23,13 +24,19 @@ if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
         '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/76156813-F529-E211-917B-003048678FA6.root',
         '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/08C1D822-F629-E211-A6B1-003048679188.root',
     ]
-elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START52_V5::All')
+elif "CMSSW_7_2_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('START72_V1::All')
     process.source.fileNames = [
-        '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/A29B9025-0E7A-E111-97E7-001A928116DE.root',
-        '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/5CAA0235-0F7A-E111-BA3E-0018F3D09690.root',
-        '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/1011EE9E-2B7A-E111-9349-0018F3D0970C.root',
-        '/store/relval/CMSSW_5_2_3/RelValZMM/GEN-SIM-RECO/START52_V5-v1/0043/0E187509-0D7A-E111-8FA3-001A928116C2.root',
+        '/store/relval/CMSSW_7_2_1/RelValZMM_13/GEN-SIM-RECO/PU50ns_PHYS14_25_V1_Phys14-v1/00000/287B9489-B85E-E411-95DF-02163E00EB3F.root'
+        ]
+elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V7')
+    process.source.fileNames = [
+        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/0005AAE5-49E0-E411-BC50-0025905A6060.root',
+        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/32776650-51E0-E411-8B6E-0025905A60B6.root',
+        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/44DE1ADA-49E0-E411-9877-0026189437FD.root',
+        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/58E0B454-51E0-E411-A51F-0025905A60B6.root',
+        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/BAF703DF-49E0-E411-A3FE-0025905A48D8.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -78,9 +85,9 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-useExtendedL1Match(process)
-addHLTL1Passthrough(process)
-changeTriggerProcessName(process, "*") # auto-guess
+#useExtendedL1Match(process) #MM no idea what the sequence did, not available since git migration
+#addHLTL1Passthrough(process)
+#changeTriggerProcessName(process, "*") # auto-guess
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
@@ -148,18 +155,29 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
-        TriggerVariables, 
-        MVAIsoVariablesPlainTag, 
-        pt = cms.string("pt"),
-        eta = cms.string("eta"),
-        phi = cms.string("phi"),
-        nVertices   = cms.InputTag("nverticesModule"),
-        combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
-        chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
-        neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
-        photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-        combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+     #   TriggerVariables, 
+     #   MVAIsoVariablesPlainTag, 
+     #   pt = cms.string("pt"),
+     #   eta = cms.string("eta"),
+     #   phi = cms.string("phi"),
+     #   nVertices   = cms.InputTag("nverticesModule"),
+     #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+     #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+     #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+     #   photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+     #   combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+     #   combRelIsoPF03dBeta = IsolationVariables.combRelIsoPF03dBeta,
+     #   dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        AllVariables,
+        ExtraIsolationVariables,
+        MVAIsoVariablesPlain, 
+        isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
+        isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
+        dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
+        dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        radialIso = cms.InputTag("radialIso"), 
+        nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -393,8 +411,6 @@ process.fakeRateZPlusProbe = cms.Path(
     process.fakeRateZPlusProbeTree
 )
 
-
-
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
@@ -402,5 +418,8 @@ process.schedule = cms.Schedule(
    process.fakeRateWPlusProbe,
    process.fakeRateZPlusProbe,
 )
+
+process.RandomNumberGeneratorService.tkTracksNoZ = cms.PSet( initialSeed = cms.untracked.uint32(81) )
+
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_MC.root"))

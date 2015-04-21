@@ -98,19 +98,19 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   
   // Rho values
   edm::Handle<double> rhoAllH;
-  iEvent.getByLabel(InputTag("kt6PFJets", "rho"), rhoAllH);
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAll", ""), rhoAllH);
 
   edm::Handle<double> rhoAllCaloH;
-  iEvent.getByLabel(InputTag("kt6CaloJetsCentral", "rho"), rhoAllCaloH);
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAllCalo", ""), rhoAllCaloH);
 
   edm::Handle<double> rhoPUH;
-  iEvent.getByLabel(InputTag("kt6PFJetsCentralChargedPileUp", "rho"), rhoPUH);
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralChargedPileUp", ""), rhoPUH);
   
   edm::Handle<double> rhoNeu05H;
-  iEvent.getByLabel(InputTag("kt6PFJetsCentralNeutral", "rho"), rhoNeu05H);
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralNeutral", ""), rhoNeu05H);
   
   edm::Handle<double> rhoNeu1H;
-  iEvent.getByLabel(InputTag("kt6PFJetsCentralNeutralTight", "rho"), rhoNeu1H);
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAll", ""), rhoNeu1H); //MM FIXME, was tight in 53X
 
 
   // Prepare vector for output 

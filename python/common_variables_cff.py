@@ -67,9 +67,12 @@ TrackQualityVariables = cms.PSet(
     tkTrackerLay = cms.string("? track.isNull ? 0 : track.hitPattern.trackerLayersWithMeasurement"),
     tkValidPixelHits = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidPixelHits"),
     tkPixelLay  = cms.string("? track.isNull ? 0 : track.hitPattern.pixelLayersWithMeasurement"),
-    tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner.numberOfLostHits"),
-    tkExpHitOut = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsOuter.numberOfLostHits"),
-    tkHitFract  = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidHits/(track.hitPattern.numberOfValidHits+track.hitPattern.numberOfLostHits+track.trackerExpectedHitsInner.numberOfLostHits+track.trackerExpectedHitsOuter.numberOfLostHits)"),
+   # tkExpHitIn  = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsInner().numberOfLostHits"),
+  #  tkExpHitOut = cms.string("? track.isNull ? 0 : track.trackerExpectedHitsOuter().numberOfLostHits"),
+    tkExpHitIn = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfLostHits('MISSING_INNER_HITS')"), #reco::HitPattern::
+    tkExpHitOut = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfLostHits('MISSING_OUTER_HITS')"), #reco::HitPattern::
+    #  tkHitFract  = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidHits/(track.hitPattern.numberOfValidHits+track.hitPattern.numberOfLostHits+track.trackerExpectedHitsInner().numberOfLostHits+track.trackerExpectedHitsOuter().numberOfLostHits)"),
+    tkHitFract  = cms.string("? track.isNull ? 0 : track.hitPattern.numberOfValidHits/(track.hitPattern.numberOfValidHits+track.hitPattern.numberOfLostHits('TRACK_HITS')+track.hitPattern.numberOfLostHits('MISSING_INNER_HITS')+ track.hitPattern.numberOfLostHits('MISSING_OUTER_HITS') )"),
     tkChi2 = cms.string("? track.isNull ? -1 : track.normalizedChi2"),
     tkPtError = cms.string("? track.isNull ? -1 : track.ptError"),
     tkSigmaPtOverPt = cms.string("? track.isNull ? -1 : track.ptError/track.pt"),
@@ -138,6 +141,7 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 9 && track.hitPattern.numberOfValidPixelHits > 0"),
     Tight2012   = cms.string("isPFMuon && numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
+    Medium      = cms.string("isPFMuon && innerTrack.validFraction >= 0.8 && segmentCompatibility >= ( ? isGlobalMuon && globalTrack.normalizedChi2 < 3 && combinedQuality.chi2LocalPosition < 12 && combinedQuality.trkKink < 20 ? 0.303 : 0.451 )"),
     HWWID =  cms.string("( ((isGlobalMuon() && "
                         "    globalTrack.normalizedChi2 <10 &&" +
                         "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 

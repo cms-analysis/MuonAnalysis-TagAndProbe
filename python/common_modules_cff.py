@@ -14,7 +14,7 @@ nverticesModule = cms.EDProducer("VertexMultiplicityCounter",
 
 njets30Module = cms.EDProducer("CandCleanedMultiplicityCounter", 
     pairs   = cms.InputTag("tpPairs"),
-    objects = cms.InputTag("ak5PFJets"),
+    objects = cms.InputTag("ak4PFJetsCHS"),
     objectSelection = cms.string("abs(eta) < 5 && pt > 30"), 
     minTagObjDR   = cms.double(0.3),
     minProbeObjDR = cms.double(0.3),
@@ -147,9 +147,10 @@ splitTrackTagger = cms.EDProducer("NearbyCandCountComputer",
     pairSelection = cms.string("mu1.charge == mu2.charge && "+ 
                                "abs(mu1.vz - mu2.vz) - 3*hypot(mu1.track.dzError,mu2.track.dzError) < 1 && "+
                                "abs(mu1.track.hitPattern.numberOfValidPixelHits - mu2.track.hitPattern.numberOfValidPixelHits) >= 2 && "+
-                               "abs(mu1.track.trackerExpectedHitsOuter.numberOfLostHits - mu2.track.trackerExpectedHitsOuter.numberOfLostHits) >= 2 && "+
+                               "abs(mu1.track.hitPattern.numberOfLostHits('MISSING_OUTER_HITS') - mu2.track.hitPattern.numberOfLostHits('MISSING_OUTER_HITS')) >= 2 && "+
                                "( abs(mu1.pt - mu2.pt) - 10*hypot(mu1.track.ptError,mu2.track.ptError) )/min(mu1.pt, mu2.pt) < 0"),
 )
+#numberOfLostHits('MISSING_INNER_HITS')
 
 l1rate = cms.EDProducer("ComputeL1TriggerRate",
     probes = cms.InputTag("tagMuons"),
