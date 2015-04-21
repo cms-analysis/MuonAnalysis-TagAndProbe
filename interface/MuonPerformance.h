@@ -11,6 +11,7 @@
 class MuonPerformance {
 public:
   MuonPerformance(const PerformancePayload& p, const PerformanceWorkingPoint& w) : pl(p), wp(w) {}
+  virtual ~MuonPerformance() {} 
 
   virtual float getResult(PerformanceResult::ResultType, BinningPointByMap) const ;
 
