@@ -69,11 +69,15 @@ HighPtMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
 
         const reco::Muon *mu1 = dynamic_cast<const reco::Muon *>(&*d1.masterClone());
         if (mu1 == 0) throw cms::Exception("CorruptData") << "First daughter of candidate is not a ShallowClone of a reco::Muon\n";
-        reco::Muon::MuonTrackTypePair tuneP1 = muon::tevOptimized(*mu1, 200, 40., 17., 0.25);
+        reco::Muon::MuonTrackTypePair tuneP1 = (mu1->isTrackerMuon() || mu1->isGlobalMuon() || mu1->isStandAloneMuon()) ?
+                                                    muon::tevOptimized(*mu1, 200, 40., 17., 0.25) :
+                                                    reco::Muon::MuonTrackTypePair(mu1->track(), reco::Muon::InnerTrack);
 
         const reco::Muon *mu2 = dynamic_cast<const reco::Muon *>(&*d2.masterClone());
         if (mu2 == 0) throw cms::Exception("CorruptData") << "Second daughter of candidate is not a ShallowClone of a reco::Muon\n";
-        reco::Muon::MuonTrackTypePair tuneP2 = muon::tevOptimized(*mu2, 200, 40., 17., 0.25);
+        reco::Muon::MuonTrackTypePair tuneP2 = (mu2->isTrackerMuon() || mu2->isGlobalMuon() || mu2->isStandAloneMuon()) ?
+                                                    muon::tevOptimized(*mu2, 200, 40., 17., 0.25) :
+                                                    reco::Muon::MuonTrackTypePair(mu2->track(), reco::Muon::InnerTrack);
 
         // Momentum and relative uncertainty
         pt[i] = tuneP2.first->pt();
