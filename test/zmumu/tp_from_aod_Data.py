@@ -18,16 +18,17 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V42_AN2::All')
+    process.GlobalTag.globaltag = cms.string('FT53_V21A_AN6::All')
     process.source.fileNames = [
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/0A79B825-B339-E211-869D-BCAEC5364C93.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/3AB8635A-C339-E211-AD34-003048D2BC30.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/74791AB5-B639-E211-A2B4-0030486780B8.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/883C07A5-9E39-E211-A669-001D09F248F8.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/92B75860-B739-E211-80AC-001D09F242EF.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E03B2BD3-B339-E211-9CC5-001D09F29114.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E439CDE0-DE39-E211-8727-0025901D631E.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E4C70744-A439-E211-89FC-003048678098.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/069F899F-E085-E211-9CFC-20CF305B0535.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/08F772D0-D585-E211-A687-E0CB4E29C4E5.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/0E43604A-DB85-E211-B997-001EC9D825C1.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/10756D6F-ED85-E211-858D-20CF3019DF03.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/1260603C-E185-E211-ADE1-00259073E3AC.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/148030C8-D685-E211-AFBC-E0CB4E1A118C.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/1A465BFE-0386-E211-8B42-E0CB4E1A1150.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/1A869675-E985-E211-A21A-485B39800B62.root',
+        '/store/data/Run2012D/SingleMu/AOD/22Jan2013-v1/20001/1CC19FB4-DC85-E211-918C-00248CB3209E.root',
     ]
 #     process.source.fileNames = [
 #         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
