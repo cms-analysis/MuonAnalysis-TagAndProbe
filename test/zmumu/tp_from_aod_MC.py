@@ -33,10 +33,10 @@ elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('MCRUN2_74_V7')
     process.source.fileNames = [
         '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/0005AAE5-49E0-E411-BC50-0025905A6060.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/32776650-51E0-E411-8B6E-0025905A60B6.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/44DE1ADA-49E0-E411-9877-0026189437FD.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/58E0B454-51E0-E411-A51F-0025905A60B6.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/BAF703DF-49E0-E411-A3FE-0025905A48D8.root',
+        #'/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/32776650-51E0-E411-8B6E-0025905A60B6.root',
+        #'/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/44DE1ADA-49E0-E411-9877-0026189437FD.root',
+        #'/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/58E0B454-51E0-E411-A51F-0025905A60B6.root',
+        #'/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/BAF703DF-49E0-E411-A3FE-0025905A48D8.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -145,6 +145,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
+        PtRatio= cms.InputTag("AddPtRatio","PtRatio"),
         radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
@@ -176,6 +177,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        PtRatio = cms.InputTag("AddPtRatio","PtRatio"),
         radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
@@ -217,8 +219,10 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
-    process.muonDxyPVdzmin 
-)
+    process.muonDxyPVdzmin + 
+    process.AddPtRatio
+
+    )
 
 process.tnpSimpleSequence = cms.Sequence(
     process.tagMuons   * process.tagMuonsMCMatch   +
@@ -233,6 +237,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
+    process.AddPtRatio +
     process.tpTree
 )
 
