@@ -55,6 +55,8 @@ MuonCaloVariables = cms.PSet(
     emS9Energy  = cms.string("calEnergy.emS9"),
 )
 TrackQualityVariables = cms.PSet(
+
+    #dz	 	= cms.string("abs(bestTrackRef.dz(bestTrackRef.referencePoint))"),
     # 2D variables
     dB          = cms.string("dB"),
     edB         = cms.string("edB"),
@@ -141,6 +143,7 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 9 && track.hitPattern.numberOfValidPixelHits > 0"),
     Tight2012   = cms.string("isPFMuon && numberOfMatchedStations > 1 && muonID('GlobalMuonPromptTight') && abs(dB) < 0.2 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
+    Loose       = cms.string("isLooseMuon()"),
     Medium      = cms.string("isPFMuon && innerTrack.validFraction >= 0.8 && ( isGlobalMuon && globalTrack.normalizedChi2 < 3 && combinedQuality.chi2LocalPosition < 12 && combinedQuality.trkKink < 20 && segmentCompatibility >= 0.303 || segmentCompatibility >= 0.451 )"),
     HWWID =  cms.string("( ((isGlobalMuon() && "
                         "    globalTrack.normalizedChi2 <10 &&" +
