@@ -131,7 +131,8 @@ muonDxyPVdzminTags = muonDxyPVdzmin.clone(probes = "tagMuons")
 
 AddPtRatio = cms.EDProducer("AddPtRatio",
     probes = cms.InputTag("probeMuons"),
-    jets = cms.InputTag("ak4PFJetsCHS")
+    jets = cms.InputTag("ak4PFJetsCHS"),
+    dRmax = cms.double(0.4)
 )
 
 
