@@ -55,8 +55,6 @@ MuonCaloVariables = cms.PSet(
     emS9Energy  = cms.string("calEnergy.emS9"),
 )
 TrackQualityVariables = cms.PSet(
-
-    #dz	 	= cms.string("abs(bestTrackRef.dz(bestTrackRef.referencePoint))"),
     # 2D variables
     dB          = cms.string("dB"),
     edB         = cms.string("edB"),
