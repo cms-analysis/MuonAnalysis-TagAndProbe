@@ -18,7 +18,7 @@
 #include <DataFormats/MuonReco/interface/Muon.h>
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
-#include "TVector3.h"
+#include "DataFormats/Math/interface/deltaR.h"
 
 
 using namespace std;
@@ -41,6 +41,7 @@ class AddPtRatio : public edm::EDProducer{
 		// ----------member data ---------------------------
 		const edm::InputTag probes_;    
 		const edm::InputTag jets_;    
+		const double dRmax_;
 };
 
 //
@@ -57,7 +58,8 @@ class AddPtRatio : public edm::EDProducer{
 //
 AddPtRatio::AddPtRatio(const edm::ParameterSet& iConfig):
 	probes_(iConfig.getParameter<edm::InputTag>("probes")),
-	jets_(iConfig.getParameter<edm::InputTag>("jets"))
+	jets_(iConfig.getParameter<edm::InputTag>("jets")),
+	dRmax_(iConfig.getParameter<double>("dRmax"))
 {
 
 	//now do what ever initialization is needed
@@ -103,19 +105,13 @@ AddPtRatio::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		//Initialise loop variables
 		double mupt_loop = 9999;
 		double jetpt_loop = -9999;
-		TVector3 pmu(0,0,0);
-		TVector3 pjet(0,0,0);
 		float dR = 9999;
-
-		pmu.SetPtEtaPhi( k->pt(), k->eta(), k->phi());
 
 		for( std::vector<reco::PFJet>::const_iterator l = Jets->begin(); l != Jets->end(); ++ l){
 
-			pjet.SetPtEtaPhi( l->pt(), l->eta(), l->phi());
+			if(dR > deltaR(*l, *k)){
 
-			if(dR > pmu.DrEtaPhi(pjet)){
-
-				dR = pmu.DrEtaPhi(pjet); 
+				dR = deltaR(*l, *k);
 				mupt_loop = k->pt();
 				jetpt_loop = l->pt();
 
@@ -128,7 +124,7 @@ AddPtRatio::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 		//
 		
 		//No jets found
-		if(dR == 9999){
+		if(dR > dRmax_){
 
 			ptratio.push_back(1);
 
