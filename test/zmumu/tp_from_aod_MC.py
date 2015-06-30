@@ -575,3 +575,20 @@ process.RandomNumberGeneratorService.tkTracksNoZ0 = cms.PSet( initialSeed = cms.
 
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_MC.root"))
+
+if False: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
+    import sys
+    args = sys.argv[1:]
+    if (sys.argv[0] == "cmsRun"): args = sys.argv[2:]
+    scenario = args[0] if len(args) > 0 else ""
+    if scenario:
+        if scenario.startswith("/"):
+            import subprocess
+            files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", scenario ])
+            process.source.fileNames = [ scenario+"/"+f for f in files.split() ]
+            import os.path
+            process.TFileService.fileName = "tnpZ_MC_%s.root" % os.path.basename(scenario)
+        else:
+            process.TFileService.fileName = "tnpZ_MC_%s.root" % scenario
+    if len(args) > 1:
+        process.TFileService.fileName = process.TFileService.fileName.value().replace(".root", ".%s.root" % args[1])
