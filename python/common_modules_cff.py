@@ -133,6 +133,18 @@ probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
    #pairCut  = cms.string(""),  # count only probes whose pairs satisfy this cut
    #probeCut = cms.string(""),  # count only probes satisfying this cut
 )
+probeMultiplicityTMGM = cms.EDProducer("ProbeMulteplicityProducer",
+   pairs = cms.InputTag("tpPairs"),
+   #pairCut  = cms.string(""),  # count only probes whose pairs satisfy this cut
+   probeCut = cms.string("isTrackerMuon || isGlobalMuon"),  # count only probes satisfying this cut
+)
+probeMultiplicityPt10M60140 = cms.EDProducer("ProbeMulteplicityProducer",
+   pairs = cms.InputTag("tpPairs"),
+   pairCut  = cms.string("mass > 60 && mass < 140"),  # count only probes whose pairs satisfy this cut
+   probeCut = cms.string("pt > 10"),  # count only probes satisfying this cut
+)
+probeMultiplicities = cms.Sequence(probeMultiplicity  + probeMultiplicityTMGM + probeMultiplicityPt10M60140)
+
 
 bestPairByZMass = cms.EDProducer("BestPairByMass",
     pairs = cms.InputTag("tpPairs"),

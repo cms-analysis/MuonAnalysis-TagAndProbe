@@ -192,6 +192,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         rapidity = cms.string("rapidity"),
         deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        probeMultiplicity_TMGM = cms.InputTag("probeMultiplicityTMGM"),
+        probeMultiplicity_Pt10_M60140 = cms.InputTag("probeMultiplicityPt10M60140"),
         ## New TuneP variables
         newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
@@ -235,7 +237,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
-    process.probeMultiplicity + 
+    process.probeMultiplicities + 
     process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
