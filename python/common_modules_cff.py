@@ -83,10 +83,9 @@ staToTkMatchSequenceJPsi = cms.Sequence(
     tkTracksNoJPsi     * staToTkMatchNoJPsi     +
     tkTracksNoBestJPsi * staToTkMatchNoBestJPsi 
 )
+preTkMatchSequenceZ = cms.Sequence( pCutTracks + tkTracks + tkTracksNoZ )
 staToTkMatchSequenceZ = cms.Sequence(
-    pCutTracks +
-    tkTracks    * staToTkMatch    +
-    tkTracksNoZ * staToTkMatchNoZ     
+    preTkMatchSequenceZ * staToTkMatch * staToTkMatchNoZ     
 )
 
 #########################################################################################
@@ -165,5 +164,10 @@ l1hltprescale = cms.EDProducer("ComputeL1HLTPrescales",
     probes = cms.InputTag("tagMuons"),
     hltConfig = cms.string("HLT"),
     hltPaths = cms.vstring("HLT_Mu17_v", "HLT_Mu8_v"),
+)
+
+goodGenMuons = cms.EDFilter("GenParticleSelector",
+    src = cms.InputTag("genParticles"),
+    cut = cms.string("abs(pdgId) == 13 && pt > 3 && abs(eta) < 2.4 && status == 1 && isPromptFinalState")
 )
 

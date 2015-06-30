@@ -116,7 +116,7 @@ L3Variables = cms.PSet(
                       "         triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).phi ) ")
 )
 TriggerVariables = cms.PSet(L1Variables, L2Variables, L3Variables)
-AllVariables = cms.PSet(KinematicVariables, IsolationVariables, MuonIDVariables, MuonCaloVariables, TrackQualityVariables, GlobalTrackQualityVariables, L1Variables, L2Variables, L3Variables)
+AllVariables = cms.PSet(KinematicVariables, IsolationVariables, MuonIDVariables, MuonCaloVariables, TrackQualityVariables, GlobalTrackQualityVariables, StaOnlyVariables, L1Variables, L2Variables, L3Variables)
 
 TrackQualityFlags = cms.PSet(
     Track_HP  = cms.string("? track.isNonnull ? track.quality('highPurity') : 0"),
@@ -152,6 +152,7 @@ MuonIDFlags = cms.PSet(
                         " innerTrack.hitPattern.trackerLayersWithMeasurement > 5 &&" +
                         " innerTrack.hitPattern.numberOfValidPixelHits > 0 && " + 
                         " abs(track.ptError / pt) < 0.10 )"),
+    MuIDForOutsideInTk = cms.string("isStandAloneMuon && outerTrack.pt > 10 && outerTrack.hitPattern.muonStationsWithValidHits() >= 2"),
 )
 
 HighPtTriggerFlags = cms.PSet(

@@ -117,13 +117,18 @@ process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
 )
 process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
 
-process.tagMuonsMCMatch = cms.EDProducer("MCTruthDeltaRMatcherNew",
-    src = cms.InputTag("tagMuons"),
-    matched = cms.InputTag("genParticles"),
-    pdgId = cms.vint32(13),
-    distMin = cms.double(0.3),
+process.tagMuonsMCMatch = cms.EDProducer("MCMatcher", # cut on deltaR, deltaPt/Pt; pick best by deltaR
+    src     = cms.InputTag("tagMuons"), # RECO objects to match
+    matched = cms.InputTag("goodGenMuons"),   # mc-truth particle collection
+    mcPdgId     = cms.vint32(13),  # one or more PDG ID (13 = muon); absolute values (see below)
+    checkCharge = cms.bool(False), # True = require RECO and MC objects to have the same charge
+    mcStatus = cms.vint32(1),      # PYTHIA status code (1 = stable, 2 = shower, 3 = hard scattering)
+    maxDeltaR = cms.double(0.3),   # Minimum deltaR for the match
+    maxDPtRel = cms.double(0.5),   # Minimum deltaPt/Pt for the match
+    resolveAmbiguities = cms.bool(True),    # Forbid two RECO objects to match to the same GEN object
+    resolveByMatchQuality = cms.bool(True), # False = just match input in order; True = pick lowest deltaR pair first
 )
-process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons")
+process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons", maxDeltaR = 0.3, maxDPtRel = 1.0, resolveAmbiguities = False,  resolveByMatchQuality = False)
 
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
@@ -221,6 +226,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
 )
 
 process.tnpSimpleSequence = cms.Sequence(
+    process.goodGenMuons +
     process.tagMuons   * process.tagMuonsMCMatch   +
     process.oneTag     +
     process.probeMuons * process.probeMuonsMCMatch +
