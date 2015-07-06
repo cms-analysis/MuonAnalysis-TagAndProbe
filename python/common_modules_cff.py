@@ -83,10 +83,9 @@ staToTkMatchSequenceJPsi = cms.Sequence(
     tkTracksNoJPsi     * staToTkMatchNoJPsi     +
     tkTracksNoBestJPsi * staToTkMatchNoBestJPsi 
 )
+preTkMatchSequenceZ = cms.Sequence( pCutTracks + tkTracks + tkTracksNoZ )
 staToTkMatchSequenceZ = cms.Sequence(
-    pCutTracks +
-    tkTracks    * staToTkMatch    +
-    tkTracksNoZ * staToTkMatchNoZ     
+    preTkMatchSequenceZ * staToTkMatch * staToTkMatchNoZ     
 )
 
 #########################################################################################
@@ -134,6 +133,18 @@ probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
    #pairCut  = cms.string(""),  # count only probes whose pairs satisfy this cut
    #probeCut = cms.string(""),  # count only probes satisfying this cut
 )
+probeMultiplicityTMGM = cms.EDProducer("ProbeMulteplicityProducer",
+   pairs = cms.InputTag("tpPairs"),
+   #pairCut  = cms.string(""),  # count only probes whose pairs satisfy this cut
+   probeCut = cms.string("isTrackerMuon || isGlobalMuon"),  # count only probes satisfying this cut
+)
+probeMultiplicityPt10M60140 = cms.EDProducer("ProbeMulteplicityProducer",
+   pairs = cms.InputTag("tpPairs"),
+   pairCut  = cms.string("mass > 60 && mass < 140"),  # count only probes whose pairs satisfy this cut
+   probeCut = cms.string("pt > 10"),  # count only probes satisfying this cut
+)
+probeMultiplicities = cms.Sequence(probeMultiplicity  + probeMultiplicityTMGM + probeMultiplicityPt10M60140)
+
 
 bestPairByZMass = cms.EDProducer("BestPairByMass",
     pairs = cms.InputTag("tpPairs"),
@@ -165,5 +176,10 @@ l1hltprescale = cms.EDProducer("ComputeL1HLTPrescales",
     probes = cms.InputTag("tagMuons"),
     hltConfig = cms.string("HLT"),
     hltPaths = cms.vstring("HLT_Mu17_v", "HLT_Mu8_v"),
+)
+
+goodGenMuons = cms.EDFilter("GenParticleSelector",
+    src = cms.InputTag("genParticles"),
+    cut = cms.string("abs(pdgId) == 13 && pt > 3 && abs(eta) < 2.4 && status == 1 && isPromptFinalState")
 )
 
