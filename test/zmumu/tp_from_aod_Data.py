@@ -13,7 +13,7 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load('Configuration.StandardSequences.MagneticField_AutoFromDBCurrent_cff')
+process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
@@ -54,12 +54,26 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
 elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('GR_R_74_V8')
     process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/00158E58-7ADF-E411-986C-002618943882.root',
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/00528257-7CDF-E411-857C-0026189438E0.root',
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/006297ED-F7DF-E411-8858-00261894385D.root',
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/00685EF4-88DF-E411-866D-0025905A613C.root',
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/02307D89-88DF-E411-9F53-0025905A6122.root',
-        '/store/relval/CMSSW_7_4_0_pre9_ROOT6/SingleMu/RECO/GR_R_74_V8_1Apr_RelVal_sm2012D-v10/00000/027697F6-88DF-E411-84DC-0025905A609A.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/00977639-2F25-E511-9236-02163E012852.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/00D1B530-2D25-E511-AD9D-02163E0133BB.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/024A5DDB-3225-E511-8B77-02163E011AB3.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/02FF07DB-3225-E511-B26B-02163E0137C6.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0418BBAA-2B25-E511-9FF5-02163E013414.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/04C6B28D-2525-E511-BFAE-02163E01192D.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/04C914D5-3225-E511-933E-02163E01414A.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/04DC1BE3-3225-E511-AEC5-02163E011D35.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0805EB93-2B25-E511-B25C-02163E01340A.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/08784BF0-3225-E511-9CA3-02163E01284E.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0A26FADC-3225-E511-BA11-02163E013844.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C01D0C2-2B25-E511-842D-02163E013971.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C028577-2525-E511-8314-02163E0140E1.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C192140-2225-E511-B818-02163E013728.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C392269-2825-E511-A535-02163E014527.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E1AFEDB-3225-E511-8798-02163E0134A3.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E63F4D8-3225-E511-BA5D-02163E0134E8.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E666176-2525-E511-B17F-02163E014289.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0EB4CCBF-3625-E511-ACCE-02163E0136A9.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/10D5B7FF-3825-E511-BDA4-02163E012B2A.root'
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -82,23 +96,26 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
 
 process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 
+
 if TRIGGER == "SingleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_v*', 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu40_v*', 'HLT_Mu40_eta2p1_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*' )
 elif TRIGGER == "DoubleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*', 'HLT_Mu17_TkMu8_NoDZ_v*', 'HLT_Mu13_Mu8_NoDZ_v*' )
 else:
     raise RuntimeError, "TRIGGER must be 'SingleMu' or 'DoubleMu'"
 
-process.triggerResultsFilter.l1tResults = ''
+process.triggerResultsFilter.l1tResults = "gtDigis"
 process.triggerResultsFilter.throw = False
-process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
+process.triggerResultsFilter.hltResults = cms.InputTag("TriggerResults","","HLT")
 
-process.triggerResultsFilterFake = process.triggerResultsFilter.clone(
-    triggerConditions = cms.vstring( 'HLT_Mu40_v*', 'HLT_Mu5_v*', 'HLT_Mu12_v*', 'HLT_Mu24_v*')
-)
+#decomment when you have it
+#process.triggerResultsFilterFake = process.triggerResultsFilter.clone(
+#    triggerConditions = cms.vstring( 'HLT_Mu40_v*', 'HLT_Mu5_v*', 'HLT_Mu12_v*', 'HLT_Mu24_v*')
+#)
 
 process.fastFilter     = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilter)
-process.fastFilterFake = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilterFake)
+#process.fastFilterFake = cms.Sequence(process.goodVertexFilter + process.noScraping + process.triggerResultsFilterFake)
+
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
 ##   | |\/| | | | |/ _ \| '_ \/ __|
@@ -189,22 +206,32 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
-        TriggerVariables, 
-        MVAIsoVariablesPlainTag, 
-        pt = cms.string("pt"),
-        eta = cms.string("eta"),
-        phi = cms.string("phi"),
-        nVertices   = cms.InputTag("nverticesModule"),
-        combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
-        chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
-        neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
-        photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-        combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
-        l1rate = cms.InputTag("l1rate"),
-        bx     = cms.InputTag("l1rate","bx"),
-        mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
-        mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
+     #   TriggerVariables, 
+     #   MVAIsoVariablesPlainTag, 
+     #   pt = cms.string("pt"),
+     #   eta = cms.string("eta"),
+     #   phi = cms.string("phi"),
+     #   nVertices   = cms.InputTag("nverticesModule"),
+     #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+     #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+     #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+     #   photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+     #   combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+     #   combRelIsoPF03dBeta = IsolationVariables.combRelIsoPF03dBeta,
+     #   dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        AllVariables,
+        ExtraIsolationVariables,
+        MVAIsoVariablesPlain, 
+        isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
+        isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
+        dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
+        dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        radialIso = cms.InputTag("radialIso"), 
+        #l1rate = cms.InputTag("l1rate"),
+        #bx     = cms.InputTag("l1rate","bx"),
+        #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
+        #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -250,8 +277,8 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
-    process.l1rate +
-    process.l1hltprescale + 
+    #process.l1rate +
+    #process.l1hltprescale + 
     process.probeMultiplicity + 
     process.bestPairByZMass + 
     process.newTunePVals +
@@ -325,14 +352,14 @@ process.tpTreeSta = process.tpTree.clone(
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
-        nVertices   = cms.InputTag("nverticesModule"),
+        nVertices = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
         photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
-        l1rate = cms.InputTag("l1rate"),
-        bx     = cms.InputTag("l1rate","bx"),
+        #l1rate = cms.InputTag("l1rate"),
+        #bx     = cms.InputTag("l1rate","bx"),
     ),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30ModuleSta"),
@@ -354,7 +381,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.nverticesModule +
     process.staToTkMatchSequenceZ +
     process.njets30ModuleSta +
-    process.l1rate +
+    #process.l1rate +
     process.tpTreeSta
 )
 
@@ -368,12 +395,96 @@ if False:
     process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
     process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
 
+if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
+    process.tracksNoMuonSeeded = cms.EDFilter("TrackSelector",
+      src = cms.InputTag("generalTracks"),
+      cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
+                    'initialStep', 'lowPtTripletStep', 'pixelPairStep', 'detachedTripletStep',
+                    'mixedTripletStep', 'pixelLessStep', 'tobTecStep', 'jetCoreRegionalStep' ] ) )
+    )
+    process.pCutTracks0 = process.pCutTracks.clone(src = 'tracksNoMuonSeeded')
+    process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
+    process.tkTracksNoZ0 = process.tkTracksNoZ.clone(src = 'tkTracks0')
+    process.preTkMatchSequenceZ.replace(
+            process.tkTracksNoZ, process.tkTracksNoZ +
+            process.tracksNoMuonSeeded + process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoZ0)
+    process.staToTkMatch0 = process.staToTkMatch.clone(matched = 'tkTracks0')
+    process.staToTkMatchNoZ0 = process.staToTkMatchNoZ.clone(matched = 'tkTracksNoZ0')
+    process.staToTkMatchSequenceZ.replace( process.staToTkMatch, process.staToTkMatch + process.staToTkMatch0 )
+    process.staToTkMatchSequenceZ.replace( process.staToTkMatchNoZ, process.staToTkMatchNoZ + process.staToTkMatchNoZ0 )
+    process.tpTreeSta.variables.tk0_deltaR     = cms.InputTag("staToTkMatch0","deltaR")
+    process.tpTreeSta.variables.tk0_deltaEta   = cms.InputTag("staToTkMatch0","deltaEta")
+    process.tpTreeSta.variables.tk0_deltaR_NoZ   = cms.InputTag("staToTkMatchNoZ0","deltaR")
+    process.tpTreeSta.variables.tk0_deltaEta_NoZ = cms.InputTag("staToTkMatchNoZ0","deltaEta")
+
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
 )
+
+
+if True: # turn on for tracking efficiency using L1 seeds
+    process.probeL1 = cms.EDFilter("CandViewSelector",
+        src = cms.InputTag("l1extraParticles"),
+        cut = cms.string("pt >= 5 && abs(eta) < 2.4"),
+    )
+    process.tpPairsTkL1 = process.tpPairs.clone(decay = "tagMuons@+ probeL1@-", cut = 'mass > 30')
+    process.l1ToTkMatch    = process.staToTkMatch.clone(src = "probeL1", srcTrack="none")
+    process.l1ToTkMatchNoZ = process.staToTkMatchNoZ.clone(src = "probeL1", srcTrack="none")
+    process.l1ToTkMatch0    = process.staToTkMatch0.clone(src = "probeL1", srcTrack="none")
+    process.l1ToTkMatchNoZ0 = process.staToTkMatchNoZ0.clone(src = "probeL1", srcTrack="none")
+    process.tpTreeL1 = process.tpTreeSta.clone(
+        tagProbePairs = "tpPairsTkL1",
+        arbitration   = "OneProbe",
+        variables = cms.PSet(
+            KinematicVariables, 
+            bx = cms.string("bx"),
+            quality = cms.string("gmtMuonCand.quality"),
+            ## track matching variables
+            tk_deltaR     = cms.InputTag("l1ToTkMatch","deltaR"),
+            tk_deltaEta   = cms.InputTag("l1ToTkMatch","deltaEta"),
+            tk_deltaR_NoZ   = cms.InputTag("l1ToTkMatchNoZ","deltaR"),
+            tk_deltaEta_NoZ = cms.InputTag("l1ToTkMatchNoZ","deltaEta"),
+            ## track matching variables (early general tracks)
+            tk0_deltaR     = cms.InputTag("l1ToTkMatch0","deltaR"),
+            tk0_deltaEta   = cms.InputTag("l1ToTkMatch0","deltaEta"),
+            tk0_deltaR_NoZ   = cms.InputTag("l1ToTkMatchNoZ0","deltaR"),
+            tk0_deltaEta_NoZ = cms.InputTag("l1ToTkMatchNoZ0","deltaEta"),
+        ),
+        flags = cms.PSet(
+        ),
+        tagVariables = cms.PSet(
+            pt = cms.string("pt"),
+            eta = cms.string("eta"),
+            phi = cms.string("phi"),
+            nVertices   = cms.InputTag("nverticesModule"),
+            combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
+            chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
+            neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
+            photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
+            combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
+        ),
+        pairVariables = cms.PSet(
+            #nJets30 = cms.InputTag("njets30ModuleSta"),
+            pt      = cms.string("pt"),
+            rapidity = cms.string("rapidity"),
+            deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
+        ),
+        pairFlags = cms.PSet(),
+        allProbes     = cms.InputTag("probeL1"),
+    )
+    process.tagAndProbeTkL1 = cms.Path(
+        process.fastFilter +
+        process.probeL1 +
+        process.tpPairsTkL1 +
+        process.preTkMatchSequenceZ +
+        process.l1ToTkMatch + process.l1ToTkMatchNoZ +
+        process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
+        process.tpTreeL1
+    )
+
 
 ##    _____     _          ____       _            
 ##   |  ___|_ _| | _____  |  _ \ __ _| |_ ___  ___ 
@@ -410,7 +521,7 @@ process.fakeRateZPlusProbeTree = process.tpTree.clone(
 )
 
 process.fakeRateJetPlusProbe = cms.Path(
-    process.fastFilterFake +
+    #process.fastFilterFake +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
     process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
     process.jetPlusProbeSequence +
@@ -431,14 +542,14 @@ process.fakeRateZPlusProbe = cms.Path(
     process.fakeRateZPlusProbeTree
 )
 
-
-
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
+   process.tagAndProbeTkL1
 )
 
 process.RandomNumberGeneratorService.tkTracksNoZ = cms.PSet( initialSeed = cms.untracked.uint32(81) )
+process.RandomNumberGeneratorService.tkTracksNoZ0 = cms.PSet( initialSeed = cms.untracked.uint32(81) )
 
 
 if TRIGGER == "SingleMu": 

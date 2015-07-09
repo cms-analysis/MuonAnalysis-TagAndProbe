@@ -77,12 +77,11 @@ staToTkMatchNoJPsi = staToTkMatch.clone(matched = 'tkTracksNoJPsi')
 staToTkMatchNoBestJPsi = staToTkMatch.clone(matched = 'tkTracksNoBestJPsi')
 staToTkMatchNoZ = staToTkMatch.clone(matched = 'tkTracksNoZ')
 
+preTkMatchSequenceJPsi = cms.Sequence( pCutTracks + tkTracks + tkTracksNoJPsi + tkTracksNoBestJPsi )
 staToTkMatchSequenceJPsi = cms.Sequence(
-    pCutTracks + 
-    tkTracks           * staToTkMatch           +
-    tkTracksNoJPsi     * staToTkMatchNoJPsi     +
-    tkTracksNoBestJPsi * staToTkMatchNoBestJPsi 
+    preTkMatchSequenceJPsi * staToTkMatch * staToTkMatchNoJPsi * staToTkMatchNoBestJPsi     
 )
+
 preTkMatchSequenceZ = cms.Sequence( pCutTracks + tkTracks + tkTracksNoZ )
 staToTkMatchSequenceZ = cms.Sequence(
     preTkMatchSequenceZ * staToTkMatch * staToTkMatchNoZ     

@@ -10,7 +10,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(2000) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -57,6 +57,7 @@ process.noScraping = cms.EDFilter("FilterOutScraping",
     thresh = cms.untracked.double(0.25)
 )
 process.fastFilter = cms.Sequence(process.goodVertexFilter + process.noScraping)
+
 ##    __  __                       
 ##   |  \/  |_   _  ___  _ __  ___ 
 ##   | |\/| | | | |/ _ \| '_ \/ __|
@@ -203,6 +204,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     pairFlags = cms.PSet(
         BestZ = cms.InputTag("bestPairByZMass"),
     ),
+    pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
     addRunLumiInfo = cms.bool(True),
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
@@ -311,7 +313,7 @@ process.tpTreeSta = process.tpTree.clone(
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
-        nVertices   = cms.InputTag("nverticesModule"),
+        nVertices = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
         neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
@@ -344,7 +346,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
 )
 
 ## Add extra RECO-level info
-if False:
+if True:
     process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkClusterInfo+process.tpTreeSta)
     process.tpTreeSta.tagVariables.nClustersStrip = cms.InputTag("tkClusterInfo","siStripClusterCount")
     process.tpTreeSta.tagVariables.nClustersPixel = cms.InputTag("tkClusterInfo","siPixelClusterCount")
@@ -353,7 +355,7 @@ if False:
     process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
     process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
 
-if False: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
+if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.pCutTracks0 = process.pCutTracks.clone(src = 'earlyGeneralTracks')
     process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
     process.tkTracksNoZ0 = process.tkTracksNoZ.clone(src = 'tkTracks0')
@@ -368,7 +370,7 @@ if False: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.tpTreeSta.variables.tk0_deltaEta   = cms.InputTag("staToTkMatch0","deltaEta")
     process.tpTreeSta.variables.tk0_deltaR_NoZ   = cms.InputTag("staToTkMatchNoZ0","deltaR")
     process.tpTreeSta.variables.tk0_deltaEta_NoZ = cms.InputTag("staToTkMatchNoZ0","deltaEta")
-    
+
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
     process.muonsSta                       +
@@ -377,7 +379,7 @@ process.tagAndProbeSta = cms.Path(
 )
 
 
-if False: # turn on for tracking efficiency using gen particles as probe
+if True: # turn on for tracking efficiency using gen particles as probe
     process.probeGen = cms.EDFilter("GenParticleSelector",
         src = cms.InputTag("genParticles"),
         cut = cms.string("abs(pdgId) == 13 && pt > 3 && abs(eta) < 2.4 && isPromptFinalState"),
@@ -439,7 +441,7 @@ if False: # turn on for tracking efficiency using gen particles as probe
         process.tpTreeGen
     )
 
-if False: # turn on for tracking efficiency using L1 seeds
+if True: # turn on for tracking efficiency using L1 seeds
     process.probeL1 = cms.EDFilter("CandViewSelector",
         src = cms.InputTag("l1extraParticles"),
         cut = cms.string("pt >= 5 && abs(eta) < 2.4"),
@@ -483,7 +485,7 @@ if False: # turn on for tracking efficiency using L1 seeds
         ),
         pairVariables = cms.PSet(
             #nJets30 = cms.InputTag("njets30ModuleSta"),
-            pt      = cms.string("pt"), 
+            pt      = cms.string("pt"),
             rapidity = cms.string("rapidity"),
             deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
         ),
@@ -491,11 +493,11 @@ if False: # turn on for tracking efficiency using L1 seeds
         allProbes     = cms.InputTag("probeL1"),
         probeMatches  = cms.InputTag("probeMuonsMCMatchL1"),
     )
-    process.tagAndProbeTkL1 = cms.Path( 
+    process.tagAndProbeTkL1 = cms.Path(
         process.fastFilter +
         process.probeL1 +
-        process.tpPairsTkL1 + 
-        process.preTkMatchSequenceZ + 
+        process.tpPairsTkL1 +
+        process.preTkMatchSequenceZ +
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
         process.probeMuonsMCMatchL1 +
@@ -565,8 +567,8 @@ process.fakeRateZPlusProbe = cms.Path(
 process.schedule = cms.Schedule(
    process.tagAndProbe, 
    process.tagAndProbeSta, 
-   #process.tagAndProbeTkGen, 
-   #process.tagAndProbeTkL1, 
+   process.tagAndProbeTkGen, 
+   process.tagAndProbeTkL1, 
    process.fakeRateJetPlusProbe,
    process.fakeRateWPlusProbe,
    process.fakeRateZPlusProbe,
@@ -578,7 +580,7 @@ process.RandomNumberGeneratorService.tkTracksNoZ0 = cms.PSet( initialSeed = cms.
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_MC.root"))
 
-if False: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
+if True: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
     import sys
     args = sys.argv[1:]
     if (sys.argv[0] == "cmsRun"): args = sys.argv[2:]

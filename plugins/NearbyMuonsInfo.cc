@@ -38,7 +38,7 @@ class NearbyMuonsInfo : public edm::EDProducer {
       virtual ~NearbyMuonsInfo() { }
 
       virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
-      virtual void beginRun(edm::Run & iRun, const edm::EventSetup & iSetup);
+      virtual void beginRun(const edm::Run & iRun, const edm::EventSetup & iSetup);
     private:
         edm::InputTag src_;
         PropagateToMuon prop1_, prop2_;
@@ -70,7 +70,7 @@ NearbyMuonsInfo::NearbyMuonsInfo(const edm::ParameterSet & iConfig) :
 }
 
 void 
-NearbyMuonsInfo::beginRun(edm::Run & iRun, const edm::EventSetup & iSetup) {
+NearbyMuonsInfo::beginRun(const edm::Run & iRun, const edm::EventSetup & iSetup) {
     prop1_.init(iSetup);
     prop2_.init(iSetup);
 }
