@@ -18,31 +18,26 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
-if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START53_V14::All')
+if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9')
     process.source.fileNames = [
-        '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/76156813-F529-E211-917B-003048678FA6.root',
-        '/store/relval/CMSSW_5_3_6-START53_V14/RelValZMM/GEN-SIM-RECO/v2/00000/08C1D822-F629-E211-A6B1-003048679188.root',
-    ]
-elif "CMSSW_7_2_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START72_V1::All')
-    process.source.fileNames = [
-        '/store/relval/CMSSW_7_2_1/RelValZMM_13/GEN-SIM-RECO/PU50ns_PHYS14_25_V1_Phys14-v1/00000/287B9489-B85E-E411-95DF-02163E00EB3F.root'
-        ]
-elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V7')
-    process.source.fileNames = [
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/0005AAE5-49E0-E411-BC50-0025905A6060.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/32776650-51E0-E411-8B6E-0025905A60B6.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/44DE1ADA-49E0-E411-9877-0026189437FD.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/58E0B454-51E0-E411-A51F-0025905A60B6.root',
-        '/store/relval/CMSSW_7_4_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_MCRUN2_74_V7_gs7115_puProd-v1/00000/BAF703DF-49E0-E411-A3FE-0025905A48D8.root',
+        #'/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/MCRUN2_74_V9_unsch_noCCC-v1/00000/18452F6E-A325-E511-A801-0026189438BC.root',
+        #'/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/MCRUN2_74_V9_unsch_noCCC-v1/00000/4803316F-A325-E511-AF82-00261894387A.root',
+        #'/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/MCRUN2_74_V9_unsch_noCCC-v1/00000/CA696B76-9C25-E511-9862-002618943976.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/48B3DF41-F31C-E511-B9D1-0025905A48F0.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/4ABA4010-ED1C-E511-A4D1-00261894389C.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/6A41A762-F11C-E511-BE70-0025905B8610.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/8C2EBE13-ED1C-E511-9D3D-0025905A60A8.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/C8D0EF5A-F51C-E511-B053-0025905B85D6.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/D458615E-F11C-E511-B496-0025905964A6.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/E2718D57-F51C-E511-8006-003048FFD770.root',
+        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/FCE234F5-ED1C-E511-B7F8-003048FFCC1E.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
-#TRIGGER="SingleMu"
-TRIGGER="Any"
+TRIGGER="SingleMu"
+#TRIGGER="Any"
 
 ## ==== Fast Filters ====
 process.goodVertexFilter = cms.EDFilter("VertexSelector",
@@ -204,7 +199,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     pairFlags = cms.PSet(
         BestZ = cms.InputTag("bestPairByZMass"),
     ),
-    pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
     addRunLumiInfo = cms.bool(True),
     tagMatches       = cms.InputTag("tagMuonsMCMatch"),
@@ -346,7 +340,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
 )
 
 ## Add extra RECO-level info
-if True:
+if False:
     process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkClusterInfo+process.tpTreeSta)
     process.tpTreeSta.tagVariables.nClustersStrip = cms.InputTag("tkClusterInfo","siStripClusterCount")
     process.tpTreeSta.tagVariables.nClustersPixel = cms.InputTag("tkClusterInfo","siPixelClusterCount")
@@ -355,13 +349,19 @@ if True:
     process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
     process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
 
-if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
-    process.pCutTracks0 = process.pCutTracks.clone(src = 'earlyGeneralTracks')
+if True: 
+    process.tracksNoMuonSeeded = cms.EDFilter("TrackSelector",
+      src = cms.InputTag("generalTracks"),
+      cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
+                    'initialStep', 'lowPtTripletStep', 'pixelPairStep', 'detachedTripletStep',
+                    'mixedTripletStep', 'pixelLessStep', 'tobTecStep', 'jetCoreRegionalStep' ] ) )
+    )
+    process.pCutTracks0 = process.pCutTracks.clone(src = 'tracksNoMuonSeeded')
     process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
     process.tkTracksNoZ0 = process.tkTracksNoZ.clone(src = 'tkTracks0')
     process.preTkMatchSequenceZ.replace(
             process.tkTracksNoZ, process.tkTracksNoZ +
-            process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoZ0)
+            process.tracksNoMuonSeeded + process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoZ0)
     process.staToTkMatch0 = process.staToTkMatch.clone(matched = 'tkTracks0')
     process.staToTkMatchNoZ0 = process.staToTkMatchNoZ.clone(matched = 'tkTracksNoZ0')
     process.staToTkMatchSequenceZ.replace( process.staToTkMatch, process.staToTkMatch + process.staToTkMatch0 )

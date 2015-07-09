@@ -18,41 +18,8 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
-if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V42_AN2::All')
-    process.source.fileNames = [
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/0A79B825-B339-E211-869D-BCAEC5364C93.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/3AB8635A-C339-E211-AD34-003048D2BC30.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/74791AB5-B639-E211-A2B4-0030486780B8.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/883C07A5-9E39-E211-A669-001D09F248F8.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/92B75860-B739-E211-80AC-001D09F242EF.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E03B2BD3-B339-E211-9CC5-001D09F29114.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E439CDE0-DE39-E211-8727-0025901D631E.root',
-        '/store/data/Run2012D/DoubleMu/AOD/PromptReco-v1/000/207/924/E4C70744-A439-E211-89FC-003048678098.root',
-    ]
-#     process.source.fileNames = [
-#         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/EA6F61C2-4AC7-E111-9190-001D09F27003.root',
-#         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/E8AF1970-2EC7-E111-A30E-001D09F29146.root',
-#         '/store/data/Run2012C/SingleMu/AOD/PromptReco-v1/000/198/208/7421AA75-27C7-E111-9FFA-5404A63886AF.root',
-#     ]
-#    process.source.fileNames = [
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/E24492CF-60F1-E111-B1A3-0025901D624A.root',
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/CC6F5333-5EF1-E111-BB26-BCAEC5364C62.root',
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/A0C46F23-6AF1-E111-8E4D-001D09F34488.root',
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/78F208A3-6EF1-E111-BC73-001D09F23D1D.root',
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/52FE8A6E-77F1-E111-A026-00215AEDFCCC.root',
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/3A358B5D-69F1-E111-9FB3-001D09F2441B.root',
-#        '/store/data/Run2012C/SingleMu/RECO/PromptReco-v2/000/201/678/166B73E0-64F1-E111-A723-5404A63886D2.root',
-#    ]
-elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V39_AN1::All')
-    process.source.fileNames = [
-        '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/C64F808D-10BB-E111-AD32-0030486780B4.root',
-        '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/B6EC67C6-0DBB-E111-BEC9-5404A6388697.root',
-        '/store/data/Run2012B/SingleMu/AOD/PromptReco-v1/000/196/531/AEF38851-2BBB-E111-AE15-001D09F2447F.root',
-    ]
-elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_R_74_V8')
+if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('GR_P_V56')
     process.source.fileNames = [
       '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/00977639-2F25-E511-9236-02163E012852.root',
       '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/00D1B530-2D25-E511-AD9D-02163E0133BB.root',
@@ -228,6 +195,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
+        nSplitTk  = cms.InputTag("splitTrackTagger"),
         #l1rate = cms.InputTag("l1rate"),
         #bx     = cms.InputTag("l1rate","bx"),
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
@@ -241,6 +209,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         rapidity = cms.string("rapidity"),
         deltaR   = cms.string("deltaR(daughter(0).eta, daughter(0).phi, daughter(1).eta, daughter(1).phi)"), 
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        probeMultiplicity_TMGM = cms.InputTag("probeMultiplicityTMGM"),
+        probeMultiplicity_Pt10_M60140 = cms.InputTag("probeMultiplicityPt10M60140"),
         ## New TuneP variables
         newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
@@ -277,9 +247,9 @@ process.tnpSimpleSequence = cms.Sequence(
     process.nverticesModule +
     process.njets30Module +
     process.extraProbeVariablesSeq +
+    process.probeMultiplicities + 
     #process.l1rate +
     #process.l1hltprescale + 
-    process.probeMultiplicity + 
     process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
@@ -395,7 +365,7 @@ if False:
     process.tpTreeSta.tagVariables.nLogErrPix   = cms.InputTag("tkLogErrors","pixelSteps")
     process.tpTreeSta.tagVariables.nLogErrAny   = cms.InputTag("tkLogErrors","anyStep")
 
-if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
+if True: 
     process.tracksNoMuonSeeded = cms.EDFilter("TrackSelector",
       src = cms.InputTag("generalTracks"),
       cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
