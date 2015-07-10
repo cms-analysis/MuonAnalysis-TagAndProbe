@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -19,19 +19,16 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9')
+    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V7')
     process.source.fileNames = [
-        #'/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/MCRUN2_74_V9_unsch_noCCC-v1/00000/18452F6E-A325-E511-A801-0026189438BC.root',
-        #'/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/MCRUN2_74_V9_unsch_noCCC-v1/00000/4803316F-A325-E511-AF82-00261894387A.root',
-        #'/store/relval/CMSSW_7_4_6_patch6/RelValZMM_13/GEN-SIM-RECO/MCRUN2_74_V9_unsch_noCCC-v1/00000/CA696B76-9C25-E511-9862-002618943976.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/48B3DF41-F31C-E511-B9D1-0025905A48F0.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/4ABA4010-ED1C-E511-A4D1-00261894389C.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/6A41A762-F11C-E511-BE70-0025905B8610.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/8C2EBE13-ED1C-E511-9D3D-0025905A60A8.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/C8D0EF5A-F51C-E511-B053-0025905B85D6.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/D458615E-F11C-E511-B496-0025905964A6.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/E2718D57-F51C-E511-8006-003048FFD770.root',
-        '/store/relval/CMSSW_7_4_6_patch1/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8_unsch-v1/00000/FCE234F5-ED1C-E511-B7F8-003048FFCC1E.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0CE0AB97-2E1A-E511-A324-0025905A607E.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0E3FF274-2C1A-E511-9FC5-0025905A60D2.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/68042E12-471B-E511-B16E-0025905A60B4.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/860D8B15-251A-E511-B97A-0025905A612C.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/8A3792A9-141B-E511-8931-0025905A6084.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/A2D65BC4-141B-E511-8A1A-002618943875.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B4DFF255-4A1A-E511-81FA-0025905A48E4.root',
+        '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B6B36157-4A1A-E511-9FFA-003048FF86CA.root'
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 

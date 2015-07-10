@@ -10,10 +10,10 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load('Configuration.StandardSequences.MagneticField_38T_cff')
+process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
@@ -339,7 +339,7 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.tpTreeSta.variables.tk0_deltaEta_NoJPsi = cms.InputTag("staToTkMatchNoJPsi0","deltaEta")
     process.tpTreeSta.variables.tk0_deltaR_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi0","deltaR")
     process.tpTreeSta.variables.tk0_deltaEta_NoBestJPsi = cms.InputTag("staToTkMatchNoBestJPsi0","deltaEta")
-    
+
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
 #    process.HLTMu      +
@@ -458,12 +458,6 @@ if True: # turn on for tracking efficiency using L1 seeds
             eta = cms.string("eta"),
             phi = cms.string("phi"),
             nVertices   = cms.InputTag("nverticesModule"),
-	    #ERICA:to check if for the JPsi is valid
-            #combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
-            #chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
-            #neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
-            #photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-            #combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         ),
         pairVariables = cms.PSet(
             #nJets30 = cms.InputTag("njets30ModuleSta"),
@@ -557,7 +551,7 @@ process.schedule = cms.Schedule(
    #process.fakeRateZPlusProbe,
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC_prova.root"))
 
 # use this if you want to compute also 'unbiased' efficiencies, 
 # - you have to remove all filters

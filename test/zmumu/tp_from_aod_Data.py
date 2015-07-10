@@ -14,7 +14,7 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
+process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
@@ -40,7 +40,37 @@ if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
       '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E63F4D8-3225-E511-BA5D-02163E0134E8.root',
       '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E666176-2525-E511-B17F-02163E014289.root',
       '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0EB4CCBF-3625-E511-ACCE-02163E0136A9.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/10D5B7FF-3825-E511-BDA4-02163E012B2A.root'
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/10D5B7FF-3825-E511-BDA4-02163E012B2A.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/002904BE-BC25-E511-A490-02163E01463E.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/006DFED2-AA25-E511-8B18-02163E011AB3.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/00ABFFC5-AA25-E511-A3BB-02163E0133FF.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/00FF92AB-AB25-E511-B377-02163E0140E1.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/0439B3B4-BC25-E511-9DBB-02163E011BFC.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/045B3EE1-B525-E511-BB37-02163E013960.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/04C15D9C-B625-E511-AA76-02163E011CF1.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/067693E7-B525-E511-8510-02163E0141F4.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/08019EE5-9325-E511-834E-02163E0127B5.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/082CC1B4-BC25-E511-811B-02163E014186.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/00064C91-C925-E511-97E3-02163E01207C.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/048305E6-D025-E511-806C-02163E01358B.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0487545F-D225-E511-9600-02163E01361A.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/06685796-C925-E511-8D89-02163E013503.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0877D899-CF25-E511-B4F1-02163E013619.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/08FF3B8A-D025-E511-AB82-02163E0129A3.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0A35F2E4-CD25-E511-93C3-02163E012426.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0A7FF789-CF25-E511-85BA-02163E01252E.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0C83355C-D225-E511-999D-02163E0118F6.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0E042CE9-D025-E511-8CFB-02163E01354D.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/0001AA16-E625-E511-8AC1-02163E011BDA.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/002BD2EF-D325-E511-975D-02163E013737.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00661D5D-DB25-E511-B268-02163E0141F4.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00A00228-DD25-E511-AA04-02163E01192D.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00B8C2EF-D325-E511-9338-02163E013430.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00F4ACC0-DC25-E511-A1B6-02163E0137CC.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/0224BCA5-E325-E511-BC75-02163E0136A9.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/026F5DE5-DF25-E511-9E69-02163E012661.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/027AEE2D-DD25-E511-A603-02163E01208E.root',
+      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/02A95EFC-D325-E511-8101-02163E011AA5.root'
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
