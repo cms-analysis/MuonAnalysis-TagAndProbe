@@ -165,30 +165,37 @@ HighPtTriggerFlags = cms.PSet(
    #Mu24_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_eta2p1_v*',1,0).empty()"),
    #Mu30      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty()"),
    #Mu30_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_eta2p1_v*',1,0).empty()"),
-   Mu40      = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty()"),
-   Mu40_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
+   #Mu40      = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty()"),
+   #Mu40_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
    #IsoMu15   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_v*',1,0).empty()"),
    #IsoMu15_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_eta2p1_v*',1,0).empty()"),
    #IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty()"),
-   IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
-   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
-   IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*',1,0).empty()"),
+   #IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
+   #IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
+   #IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*',1,0).empty()"),
    #IsoMu30_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty()"),
    #Mu15orMu17orMu20orMu24orMu30orMu40   = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu24_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu24_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
    #DoubleMu5 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu5_v*',1,0).empty()"),
    #DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*',1,0).empty()"),
-   DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
-   DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
+   #DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
+   #DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
 
    ## Heavily prescaled but still useful   
-   Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_v*',1,0).empty()"),
-   Mu8  = cms.string("!triggerObjectMatchesByPath('HLT_Mu8_v*',1,0).empty()"),
+   #Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_v*',1,0).empty()"),
+   #Mu8  = cms.string("!triggerObjectMatchesByPath('HLT_Mu8_v*',1,0).empty()"),
 
    # 2011 version
    # DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty()"),
    # DoubleMu17Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
    # DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty()"),
    # DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3Mu17FromDiMuonFiltered17').empty()")
+
+   # 2015 version
+   Mu20      = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty()"),
+   IsoMu17_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_eta2p1_v*',1,0).empty()"),
+   IsoMu20   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty()"),
+   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
+   IsoTkMu20 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_v**',1,0).empty()"),
 
 
    # To take care of the presence or not of the dz filter, we are requiring three flags for each of the main un-prescaled DoubleMuon Triggers
