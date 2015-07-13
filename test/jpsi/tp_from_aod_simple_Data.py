@@ -5,7 +5,7 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
@@ -44,12 +44,20 @@ elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
         '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5271187F-DF87-E111-ADDB-BCAEC518FF7C.root',
     ]
 elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V56')
+    process.GlobalTag.globaltag = cms.string('GR_P_V56::All')
     process.source.fileNames = [
         '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/164/00000/56BA3AC3-A226-E511-98BB-02163E0133B5.root',
 	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/167/00000/FED37D13-A826-E511-8641-02163E01386E.root',
 	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/168/00000/1602316B-CF26-E511-BCBA-02163E011BF3.root',
-	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/168/00000/86456DCF-D026-E511-A8E2-02163E011D37.root'
+	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/168/00000/86456DCF-D026-E511-A8E2-02163E011D37.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/162/00000/E855BF93-4227-E511-8207-02163E011976.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/244/00000/4ADDEB99-6727-E511-BEF2-02163E011955.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/244/00000/C6DB3E01-8327-E511-B696-02163E0139CF.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/244/00000/FC4B5FE2-8A27-E511-A0DD-02163E014729.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/251/00000/7097B2BC-8E27-E511-80E1-02163E0138B3.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/0067F5A4-9A27-E511-B904-02163E01267F.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/642ACBD2-A127-E511-A59E-02163E0123F1.root',
+        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/F24C3492-9627-E511-AEC5-02163E011C7F.root'
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -87,7 +95,7 @@ process.mergedMuons = cms.EDProducer("CaloMuonMerger",
     tracks    = cms.InputTag("generalTracks"),
     minCaloCompatibility = calomuons.minCaloCompatibility,
     ## Apply some minimal pt cut
-    muonsCut     = cms.string("track.isNonnull && pt > 2"),
+    muonsCut     = cms.string("pt > 2 && track.isNonnull"),
     caloMuonsCut = cms.string("pt > 2"),
     tracksCut    = cms.string("pt > 2"),
 )
@@ -99,6 +107,7 @@ from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 #useExtendedL1Match(process)
 #addHLTL1Passthrough(process)
+
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
@@ -228,9 +237,12 @@ process.probeMuonsSta = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTriggerSta"),
     cut = cms.string("outerTrack.isNonnull && !triggerObjectMatchesByCollection('hltL2MuonCandidates').empty()"), 
 )
+
 process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-", cut = "2 < mass < 5")
 
 process.onePairSta = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairsSta"), minNumber = cms.uint32(1))
+
+process.load("MuonAnalysis.TagAndProbe.tracking_reco_info_cff")
 
 process.tpTreeSta = process.tpTree.clone(
     tagProbePairs = "tpPairsSta",
@@ -280,9 +292,6 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.tpTreeSta
 )
 
-process.RandomNumberGeneratorService.tkTracksNoJPsi      = cms.PSet( initialSeed = cms.untracked.uint32(81) )
-process.RandomNumberGeneratorService.tkTracksNoBestJPsi  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
-
 ## Add extra RECO-level info
 if False:
     process.tnpSimpleSequenceSta.replace(process.tpTreeSta, process.tkClusterInfo+process.tpTreeSta)
@@ -304,11 +313,9 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
     process.tkTracksNoJPsi0 = process.tkTracksNoJPsi.clone(src = 'tkTracks0')
     process.tkTracksNoBestJPsi0 = process.tkTracksNoBestJPsi.clone(src = 'tkTracks0')
-    process.RandomNumberGeneratorService.tkTracksNoJPsi0      = cms.PSet( initialSeed = cms.untracked.uint32(81) )
-    process.RandomNumberGeneratorService.tkTracksNoBestJPsi0  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
     process.preTkMatchSequenceJPsi.replace(
             process.tkTracksNoJPsi, process.tkTracksNoJPsi +
-            process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoJPsi0 +process.tkTracksNoBestJPsi0
+            process.tracksNoMuonSeeded + process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoJPsi0 +process.tkTracksNoBestJPsi0
     )
     process.staToTkMatch0 = process.staToTkMatch.clone(matched = 'tkTracks0')
     process.staToTkMatchNoJPsi0 = process.staToTkMatchNoJPsi.clone(matched = 'tkTracksNoJPsi0')
@@ -333,7 +340,7 @@ process.tagAndProbeSta = cms.Path(
 
 
 
-if True: # turn on for tracking efficiency using L1 seeds
+if False: # turn on for tracking efficiency using L1 seeds
     process.probeL1 = cms.EDFilter("CandViewSelector",
         src = cms.InputTag("l1extraParticles"),
         cut = cms.string("pt >= 2 && abs(eta) < 2.4"),
@@ -395,5 +402,16 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.l1ToTkMatchNoJPsi0 + process.l1ToTkMatchNoBestJPsi0 +
         process.tpTreeL1
     )
+
+process.schedule = cms.Schedule(
+   process.tagAndProbe,
+   process.tagAndProbeSta,
+   #process.tagAndProbeTkL1
+)
+
+process.RandomNumberGeneratorService.tkTracksNoJPsi      = cms.PSet( initialSeed = cms.untracked.uint32(81) )
+process.RandomNumberGeneratorService.tkTracksNoJPsi0      = cms.PSet( initialSeed = cms.untracked.uint32(81) )
+process.RandomNumberGeneratorService.tkTracksNoBestJPsi  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
+process.RandomNumberGeneratorService.tkTracksNoBestJPsi0  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_Data.root"))

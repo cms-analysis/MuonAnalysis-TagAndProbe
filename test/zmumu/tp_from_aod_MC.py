@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(10) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -351,14 +351,16 @@ if True:
       src = cms.InputTag("generalTracks"),
       cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
                     'initialStep', 'lowPtTripletStep', 'pixelPairStep', 'detachedTripletStep',
-                    'mixedTripletStep', 'pixelLessStep', 'tobTecStep', 'jetCoreRegionalStep' ] ) )
+                    'mixedTripletStep', 'pixelLessStep', 'tobTecStep', 'jetCoreRegionalStep'] ) )
     )
     process.pCutTracks0 = process.pCutTracks.clone(src = 'tracksNoMuonSeeded')
+    #process.pCutTracks0 = process.pCutTracks.clone(src = 'earlyGeneralTracks')
     process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
     process.tkTracksNoZ0 = process.tkTracksNoZ.clone(src = 'tkTracks0')
     process.preTkMatchSequenceZ.replace(
             process.tkTracksNoZ, process.tkTracksNoZ +
             process.tracksNoMuonSeeded + process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoZ0)
+    #        process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoZ0)
     process.staToTkMatch0 = process.staToTkMatch.clone(matched = 'tkTracks0')
     process.staToTkMatchNoZ0 = process.staToTkMatchNoZ.clone(matched = 'tkTracksNoZ0')
     process.staToTkMatchSequenceZ.replace( process.staToTkMatch, process.staToTkMatch + process.staToTkMatch0 )

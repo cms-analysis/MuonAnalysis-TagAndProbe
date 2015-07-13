@@ -1,5 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
+import subprocess
+#dataSummary = open('dataSummary.txt', 'w')
+
 process = cms.Process("TagProbe")
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -19,59 +22,32 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V56')
-    process.source.fileNames = [
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/00977639-2F25-E511-9236-02163E012852.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/00D1B530-2D25-E511-AD9D-02163E0133BB.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/024A5DDB-3225-E511-8B77-02163E011AB3.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/02FF07DB-3225-E511-B26B-02163E0137C6.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0418BBAA-2B25-E511-9FF5-02163E013414.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/04C6B28D-2525-E511-BFAE-02163E01192D.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/04C914D5-3225-E511-933E-02163E01414A.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/04DC1BE3-3225-E511-AEC5-02163E011D35.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0805EB93-2B25-E511-B25C-02163E01340A.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/08784BF0-3225-E511-9CA3-02163E01284E.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0A26FADC-3225-E511-BA11-02163E013844.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C01D0C2-2B25-E511-842D-02163E013971.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C028577-2525-E511-8314-02163E0140E1.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C192140-2225-E511-B818-02163E013728.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0C392269-2825-E511-A535-02163E014527.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E1AFEDB-3225-E511-8798-02163E0134A3.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E63F4D8-3225-E511-BA5D-02163E0134E8.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0E666176-2525-E511-B17F-02163E014289.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/0EB4CCBF-3625-E511-ACCE-02163E0136A9.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/168/00000/10D5B7FF-3825-E511-BDA4-02163E012B2A.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/002904BE-BC25-E511-A490-02163E01463E.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/006DFED2-AA25-E511-8B18-02163E011AB3.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/00ABFFC5-AA25-E511-A3BB-02163E0133FF.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/00FF92AB-AB25-E511-B377-02163E0140E1.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/0439B3B4-BC25-E511-9DBB-02163E011BFC.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/045B3EE1-B525-E511-BB37-02163E013960.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/04C15D9C-B625-E511-AA76-02163E011CF1.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/067693E7-B525-E511-8510-02163E0141F4.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/08019EE5-9325-E511-834E-02163E0127B5.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/244/00000/082CC1B4-BC25-E511-811B-02163E014186.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/00064C91-C925-E511-97E3-02163E01207C.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/048305E6-D025-E511-806C-02163E01358B.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0487545F-D225-E511-9600-02163E01361A.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/06685796-C925-E511-8D89-02163E013503.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0877D899-CF25-E511-B4F1-02163E013619.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/08FF3B8A-D025-E511-AB82-02163E0129A3.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0A35F2E4-CD25-E511-93C3-02163E012426.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0A7FF789-CF25-E511-85BA-02163E01252E.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0C83355C-D225-E511-999D-02163E0118F6.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/251/00000/0E042CE9-D025-E511-8CFB-02163E01354D.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/0001AA16-E625-E511-8AC1-02163E011BDA.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/002BD2EF-D325-E511-975D-02163E013737.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00661D5D-DB25-E511-B268-02163E0141F4.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00A00228-DD25-E511-AA04-02163E01192D.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00B8C2EF-D325-E511-9338-02163E013430.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/00F4ACC0-DC25-E511-A1B6-02163E0137CC.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/0224BCA5-E325-E511-BC75-02163E0136A9.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/026F5DE5-DF25-E511-9E69-02163E012661.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/027AEE2D-DD25-E511-A603-02163E01208E.root',
-      '/store/express/Run2015B/ExpressPhysics/FEVT/Express-v1/000/251/252/00000/02A95EFC-D325-E511-8101-02163E011AA5.root'
-    ]
+
+    #run 251168
+    process.GlobalTag.globaltag = cms.string('GR_P_V56::All')
+    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/168/00000"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
+
+    #run 251244
+    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/244/00000"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+
+    #run 251251
+    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/251/00000"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+
+    #run 251252
+    sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/252/00000"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+
+    # to add following runs: 251491, 251493, 251496, ..., 251500 
+    print process.source.fileNames
+    #print process.source.fileNames, dataSummary
+
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
@@ -559,4 +535,4 @@ if TRIGGER == "SingleMu":
        process.fakeRateZPlusProbe,
     ])
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpZ_Data_PromptReco.root"))
