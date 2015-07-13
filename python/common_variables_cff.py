@@ -165,24 +165,24 @@ HighPtTriggerFlags = cms.PSet(
    #Mu24_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu24_eta2p1_v*',1,0).empty()"),
    #Mu30      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty()"),
    #Mu30_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_eta2p1_v*',1,0).empty()"),
-   Mu40      = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty()"),
-   Mu40_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
+   #Mu40      = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty()"),
+   #Mu40_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
    #IsoMu15   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_v*',1,0).empty()"),
    #IsoMu15_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu15_eta2p1_v*',1,0).empty()"),
    #IsoMu17   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty()"),
-   IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
-   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
-   IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*',1,0).empty()"),
+   #IsoMu24   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
+   #IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
+   #IsoMu30   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_v*',1,0).empty()"),
    #IsoMu30_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty()"),
    #Mu15orMu17orMu20orMu24orMu30orMu40   = cms.string("!triggerObjectMatchesByPath('HLT_Mu15_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu17_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu24_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu24_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_IsoMu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu30_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu30_eta2p1_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu40_v*',1,0).empty() || !triggerObjectMatchesByPath('HLT_Mu40_eta2p1_v*',1,0).empty()"),
    #DoubleMu5 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu5_v*',1,0).empty()"),
    #DoubleMu7 = cms.string("!triggerObjectMatchesByPath('HLT_DoubleMu7_v*',1,0).empty()"),
-   DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
-   DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
+   #DoubleMu13Mu8_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_v*',1,0).empty()"),
+   #DoubleMu13Mu8_Mu8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonL3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltDiMuonL3p5PreFiltered8').empty()"),
 
    ## Heavily prescaled but still useful   
-   Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_v*',1,0).empty()"),
-   Mu8  = cms.string("!triggerObjectMatchesByPath('HLT_Mu8_v*',1,0).empty()"),
+   #Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_v*',1,0).empty()"),
+   #Mu8  = cms.string("!triggerObjectMatchesByPath('HLT_Mu8_v*',1,0).empty()"),
 
    # 2011 version
    # DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty()"),
@@ -190,24 +190,49 @@ HighPtTriggerFlags = cms.PSet(
    # DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty()"),
    # DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByFilter('hltL3Mu17FromDiMuonFiltered17').empty()")
 
+   # 2015 version
+   Mu20             = cms.string("!triggerObjectMatchesByPath('HLT_Mu20_v*',1,0).empty()"),
+   Mu50             = cms.string("!triggerObjectMatchesByPath('HLT_Mu50_v*',1,0).empty()"),
+   Mu45_eta2p1      = cms.string("!triggerObjectMatchesByPath('HLT_Mu45_eta2p1_v*',1,0).empty()"),
+   IsoMu20          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty()"),
+   IsoMu27          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu27_v*',1,0).empty()"),
+   IsoMu17_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_eta2p1_v*',1,0).empty()"),
+   IsoMu20_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu20_eta2p1_v*',1,0).empty()"),
+   IsoMu24_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_eta2p1_v*',1,0).empty()"),
+   IsoTkMu20        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_v*',1,0).empty()"),
+   IsoTkMu27        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu27_v*',1,0).empty()"),
+   IsoTkMu20_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_eta2p1_v*',1,0).empty()"),
+   IsoTkMu24_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu24_eta2p1_v*',1,0).empty()"),
 
    # To take care of the presence or not of the dz filter, we are requiring three flags for each of the main un-prescaled DoubleMuon Triggers
    # Mu17 leg, Mu8 leg, and (Mu17 leg && fired path)
 
-   DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty())"),
-   #DoubleMu17Mu8_Mu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty())"),
-   DoubleMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
-   DoubleMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"), 
+   #DoubleMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty())"),
+   ##DoubleMu17Mu8_Mu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_Mu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty())"),
+   #DoubleMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
+   #DoubleMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenL1f0L2pf0L3PreFiltered8').empty() || !triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"), 
 
 
-   DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty())"),
+   #DoubleMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && (!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty())"),
    #DoubleMu17TkMu8_TkMu8 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
-   DoubleMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
-   DoubleMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
+   #DoubleMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenL1f0L2f10L3Filtered17').empty() || !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
+   #DoubleMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
 
-   DoubleMu17TkMu8NoDZ_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_NoDZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
-   DoubleMu13Mu8NoDZ_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_NoDZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered13').empty()"),
-   DoubleMu13Mu8NoDZ_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"),
+   #DoubleMu17TkMu8NoDZ_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TkMu8_NoDZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sMu10MuOpenOR3p5L1f0L2f10L3Filtered17').empty()"),
+   #DoubleMu13Mu8NoDZ_Mu13 = cms.string("!triggerObjectMatchesByPath('HLT_Mu13_Mu8_NoDZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1DoubleMu10MuOpenOR3p5L1f0L2f10L3Filtered13').empty()"),
+   #DoubleMu13Mu8NoDZ_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"),
+
+   # 2015 version
+   DoubleIsoMu17Mu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
+   DoubleIsoMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
+   DoubleIsoMu17Mu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
+   DoubleIsoMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8').empty()"),
+
+   DoubleIsoMu17TkMu8_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
+   DoubleIsoMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
+   DoubleIsoMu17TkMu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
+   DoubleIsoMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
+
 )
 HighPtTriggerFlagsDebug = cms.PSet(
    # --- the ones commented out don't save tags ---
@@ -217,16 +242,20 @@ HighPtTriggerFlagsDebug = cms.PSet(
    #L1fL1sDoubleMu10MuOpenOR3p5L1Filtered0  = cms.string("!triggerObjectMatchesByFilter('hltL1fL1sDoubleMu10MuOpenOR3p5L1Filtered0').empty()"),
    #L1fL1sMu16Eta2p1L1Filtered0 = cms.string("!triggerObjectMatchesByFilter('hltL1fL1sMu16Eta2p1L1Filtered0').empty()"),
    #L1fL1sMu16L1Filtered0 = cms.string("!triggerObjectMatchesByFilter('hltL1fL1sMu16L1Filtered0').empty()"),
-   L1sMu16 = cms.string("!triggerObjectMatchesByFilter('hltL1sMu16').empty()"),
-   L1sMu16Eta2p1 = cms.string("!triggerObjectMatchesByFilter('hltL1sMu16Eta2p1').empty()"),
+   L1sMu16 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu16').empty()"),
+   L1sMu16Eta2p1 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu16eta2p1').empty()"),
+   L1sMu20 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu20').empty()"),
+   L1sMu25Eta2p1 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu25eta2p1').empty()"),
    L1sL1DoubleMu10MuOpen = cms.string("!triggerObjectMatchesByFilter('hltL1sL1DoubleMu10MuOpen').empty()"),
    L1sL1DoubleMu10MuOpenORDoubleMu103p5 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1DoubleMu10MuOpenORDoubleMu103p5').empty()"),
+   L1sL1DoubleMu103p5ORDoubleMu125 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1DoubleMu103p5ORDoubleMu125').empty()"),
    L2fL1DoubleMu10MuOpenL1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1DoubleMu10MuOpenL1f0L2Filtered10').empty()"),
    L2fL1DoubleMu10MuOpenOR3p5L1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1DoubleMu10MuOpenOR3p5L1f0L2Filtered10').empty()"),
    L2fL1sDoubleMu10MuOpenL1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu10MuOpenL1f0L2Filtered10').empty()"),
    L2fL1sDoubleMu10MuOpenOR3p5L1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu10MuOpenOR3p5L1f0L2Filtered10').empty()"),
-   L2fL1sMu16Eta2p1L1f0L2Filtered16Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu16Eta2p1L1f0L2Filtered16Q').empty()"),
-   L2fL1sMu16L1f0L2Filtered16Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu16L1f0L2Filtered16Q').empty()"),
+   L2fL1sMu16Eta2p1L1f0L2Filtered10Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu16Eta2p1L1f0L2Filtered10Q').empty()"),
+   L2fL1sMu16L1f0L2Filtered10Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu16L1f0L2Filtered10Q').empty()"),
+   L2fL1sDoubleMu103p5L1f0L2Filtered10OneMu = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu103p5L1f0L2Filtered10OneMu').empty()"),
    L2pfL1DoubleMu10MuOpenL1f0L2PreFiltered0 = cms.string("!triggerObjectMatchesByFilter('hltL2pfL1DoubleMu10MuOpenL1f0L2PreFiltered0').empty()"),
    L2pfL1DoubleMu10MuOpenOR3p5L1f0L2PreFiltered0 = cms.string("!triggerObjectMatchesByFilter('hltL2pfL1DoubleMu10MuOpenOR3p5L1f0L2PreFiltered0').empty()"),
    L3fL1sMu16Eta2p1L1f0L2f16QL3Filtered24Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered24Q').empty()"),
@@ -245,36 +274,66 @@ LowPtTriggerFlagsPhysics = cms.PSet(
 
 LowPtTriggerFlagsEfficienciesTag = cms.PSet(
    ## Mu + Track
+   ## 2012
    Mu5_Track2_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                    " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5Track2JpsiTrackMassFiltered')"),
    Mu5_Track3p5_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                    " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5Track3p5JpsiTrackMassFiltered')"),
    Mu7_Track7_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                    " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu7Track7JpsiTrackMassFiltered')"),
+
+   ## 2015
+   Mu7p5_Track2_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                     " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu7p5Track2JpsiTrackMassFiltered')"),
+   Mu7p5_Track3p5_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                       " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu7p5Track3p5JpsiTrackMassFiltered')"),
+   Mu7p5_Track7_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                     " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu7p5Track7JpsiTrackMassFiltered')"),
+
    ## Mu + L2Mu
+   ## 2012
    Mu5_L2Mu0_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                              " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5L2Mu0L3Filtered5')"),
    Mu5_L2Mu2_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                   " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5L2Mu2JpsiTrackMassFiltered')"),
    Mu5_L2Mu3_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
                                   " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu5L2Mu3JpsiTrackMassFiltered')"),
+   ## 2015
+   Mu7p5_L2Mu2_Jpsi_MU = cms.string("!triggerObjectMatchesByCollection('hltL3MuonCandidates').empty() && "+
+                                 " triggerObjectMatchesByCollection('hltL3MuonCandidates').at(0).hasFilterLabel('hltMu7p5L2Mu2JpsiTrackMassFiltered')"),
 )
 
 LowPtTriggerFlagsEfficienciesProbe = cms.PSet(
+
    ## Mu + Track
+   ## 2012
    Mu5_Track2_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').empty() && "+
                                    " triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').at(0).hasFilterLabel('hltMu5Track2JpsiTrackMassFiltered')"),
    Mu5_Track3p5_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').empty() && "+
-                                   " triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').at(0).hasFilterLabel('hltMu5Track3p5JpsiTrackMassFiltered')"),
+                                     " triggerObjectMatchesByCollection('hltMuTrackJpsiEffCtfTrackCands').at(0).hasFilterLabel('hltMu5Track3p5JpsiTrackMassFiltered')"),
    Mu7_Track7_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').empty() && "+
                                    " triggerObjectMatchesByCollection('hltMuTrackJpsiCtfTrackCands').at(0).hasFilterLabel('hltMu7Track7JpsiTrackMassFiltered')"),
+    
+   ## 2015
+   Mu7p5_Track2_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltTracksIter').empty() && " + 
+                                     " triggerObjectMatchesByCollection('hltTracksIter').at(0).hasFilterLabel('hltMu7p5Track2JpsiTrackMassFiltered')"),
+   Mu7p5_Track3p5_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltTracksIter').empty() && " + 
+                                       " triggerObjectMatchesByCollection('hltTracksIter').at(0).hasFilterLabel('hltMu7p5Track3p5JpsiTrackMassFiltered')"),
+   Mu7p5_Track7_Jpsi_TK = cms.string("!triggerObjectMatchesByCollection('hltTracksIter').empty() && " + 
+                                     " triggerObjectMatchesByCollection('hltTracksIter').at(0).hasFilterLabel('hltMu7p5Track7JpsiTrackMassFiltered')"),
+
    ## Mu + L2Mu
+   ## 2012
    Mu5_L2Mu0_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && "+
                              " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltDiMuonL2PreFiltered0')"),
    Mu5_L2Mu2_Jpsi_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && "+
                              " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltMu5L2Mu2JpsiTrackMassFiltered')"),
    Mu5_L2Mu3_Jpsi_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && "+
                              " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltMu5L2Mu3JpsiTrackMassFiltered')"),
+   ## 2012
+   Mu7p5_L2Mu2_Jpsi_L2 = cms.string("!triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() && " + 
+                                    " triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).hasFilterLabel('hltMu7p5L2Mu2JpsiTrackMassFiltered')"),
+
 )
 
 LowPtTriggerFlagsEfficiencies = cms.PSet(LowPtTriggerFlagsEfficienciesTag,LowPtTriggerFlagsEfficienciesProbe)
