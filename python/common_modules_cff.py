@@ -117,6 +117,11 @@ probeMuonsIsoSequence = cms.Sequence(
     ) * probeMuonsIsoValueMaps
 )
 
+muonMiniIso = cms.EDProducer("MuonMiniIso",
+    probes = cms.InputTag("probeMuons"),
+    pfCandidates = cms.InputTag("pfNoPileUpMVAIso"),
+)
+
 
 #########################################################################################
 ##        Other modules                                                                ##
