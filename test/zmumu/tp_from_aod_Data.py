@@ -170,7 +170,9 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
-        miniIso = cms.InputTag("muonMiniIso"), 
+        miniIsoCharged = cms.InputTag("muonMiniIsoCharged"), 
+        miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals"), 
+        miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     flags = cms.PSet(
@@ -243,7 +245,9 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
-    process.muonMiniIso 
+    process.muonMiniIsoCharged + 
+    process.muonMiniIsoNeutrals + 
+    process.muonMiniIsoPhotons 
 )
 
 process.tnpSimpleSequence = cms.Sequence(

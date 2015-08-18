@@ -39,6 +39,11 @@ private:
   // ----------member data ---------------------------
   const edm::InputTag probes_;    
   const edm::InputTag pfCandidates_;
+  double dRCandProbeVeto_;
+  double CandPtThreshold_;
+  double ChargedPVdZ_;
+  bool usePUcands_;
+  std::string CandPdgId_;
 
   /// Store extra information in a ValueMap
   template<typename Hand, typename T>
@@ -62,7 +67,12 @@ private:
 //
 MuonMiniIso::MuonMiniIso(const edm::ParameterSet& iConfig):
 probes_(iConfig.getParameter<edm::InputTag>("probes")),
-pfCandidates_(iConfig.getParameter<edm::InputTag>("pfCandidates"))
+pfCandidates_(iConfig.getParameter<edm::InputTag>("pfCandidates")),
+dRCandProbeVeto_(iConfig.getParameter<double>("dRCandProbeVeto")),
+CandPtThreshold_(iConfig.getParameter<double>("CandPtThreshold")),
+CandPdgId_(iConfig.getParameter<std::string>("CandPdgId"))
+// ChargedPVdZ_(iConfig.getParameter<double>>("ChargedPVdZ"))
+// usePUcands_(iConfig.getParameter<double>>("usePUcands"))
 {
   produces<edm::ValueMap<float> >();
 }
@@ -102,13 +112,33 @@ MuonMiniIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for (probe = probes->begin(); probe != endprobes; ++probe, ++imu) {
     const reco::Muon &mu = *probe;
 
+    // loop on PF candidates
     int ipf=0;
     for (iP = beginpf; iP != endpf; ++iP, ++ipf) {
       
-      if (iP->get()->particleId() == reco::PFCandidate::e || iP->get()->particleId() == reco::PFCandidate::mu) continue;
-
+      // check pf candidate threshold
+      if(iP->get()->pt() < CandPtThreshold_) continue;
+      
+      // check pf candidate pdgid
+      if(
+         ! ((CandPdgId_=="h" && iP->get()->particleId() == reco::PFCandidate::h) 
+         || (CandPdgId_=="h0" && iP->get()->particleId() == reco::PFCandidate::h0) 
+         || (CandPdgId_=="gamma" && iP->get()->particleId() == reco::PFCandidate::gamma))
+        ){
+        continue;
+      }
+      
+      // // check dz for charged candidates
+      // if(CandPdgId_=="h"){
+        // if(usePUcands_ && iP->get()->??? < ChargedPVdZ_) continue;
+        // else if(!usePUcands_ && iP->get()->??? > ChargedPVdZ_) continue;
+      // }
+      
       double dr = deltaR( *(iP->get() ) , mu );
+      // check dr min
+      if (dr < dRCandProbeVeto_) continue;
 
+      // miniiso definition
       if (mu.pt()<=50 && dr > 0.2) continue;
       if (50 < mu.pt() && mu.pt() < 200 && dr > 10/mu.pt()) continue;
       if (mu.pt()>200 && dr > 0.05) continue;
