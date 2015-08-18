@@ -119,32 +119,34 @@ probeMuonsIsoSequence = cms.Sequence(
 
 muonMiniIsoCharged = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
-    pfCandidates = cms.InputTag("pfNoPileUpMVAIso"),
+    pfCandidates = cms.InputTag("pfAllChargedHadronsPFBRECO"),
     dRCandProbeVeto = cms.double(0.0001),
     CandPtThreshold = cms.double(0.0),
-    CandPdgId = cms.vstring('h'), # 'h','gamma','h0' or leave empty for all
-    # ChargedPVdZ = cms.vdouble(0.1),
-    # usePUcands = cms.bool(False),
+    CandPdgId = cms.string('h'), # 'h','gamma','h0' or leave empty for all
+)
+
+muonMiniIsoPUCharged = cms.EDProducer("MuonMiniIso",
+    probes = cms.InputTag("probeMuons"),
+    pfCandidates = cms.InputTag("pfPileUpAllChargedParticlesPFBRECO"),
+    dRCandProbeVeto = cms.double(0.0001),
+    CandPtThreshold = cms.double(0.0),
+    CandPdgId = cms.string('h'), # 'h','gamma','h0' or leave empty for all
 )
 
 muonMiniIsoNeutrals = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
-    pfCandidates = cms.InputTag("pfNoPileUpMVAIso"),
+    pfCandidates = cms.InputTag("pfAllNeutralHadronsPFBRECO"),
     dRCandProbeVeto = cms.double(0.01),
     CandPtThreshold = cms.double(1.0),
-    CandPdgId = cms.vstring('gamma'), # 'h','gamma','h0' or leave empty for all
-    # ChargedPVdZ = cms.vdouble(0.1),
-    # usePUcands = cms.bool(False),
+    CandPdgId = cms.string('h0'), # 'h','gamma','h0' or leave empty for all
 )
 
 muonMiniIsoPhotons = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
-    pfCandidates = cms.InputTag("pfNoPileUpMVAIso"),
+    pfCandidates = cms.InputTag("pfAllPhotonsPFBRECO"),
     dRCandProbeVeto = cms.double(0.01),
     CandPtThreshold = cms.double(0.5),
-    CandPdgId = cms.vstring('gamma'), # 'h','gamma','h0' or leave empty for all
-    # ChargedPVdZ = cms.vdouble(0.1),
-    # usePUcands = cms.bool(False),
+    CandPdgId = cms.string('gamma'), # 'h','gamma','h0' or leave empty for all
 )
 
 
