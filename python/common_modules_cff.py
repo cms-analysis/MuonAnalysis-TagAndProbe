@@ -171,6 +171,11 @@ newTunePVals = cms.EDProducer("HighPtMuonsInfo",
     src = cms.InputTag("tpPairs"),
 )
 
+genWeightInfo = cms.EDProducer("GenWeightInfo",
+    pairTag= cms.InputTag("tpPairs"),
+    genInfoTag= cms.InputTag("generator")
+)
+
 l1hltprescale = cms.EDProducer("ComputeL1HLTPrescales",
     probes = cms.InputTag("tagMuons"),
     hltConfig = cms.string("HLT"),
