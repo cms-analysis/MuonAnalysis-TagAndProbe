@@ -43,7 +43,6 @@ private:
   double CandPtThreshold_;
   double ChargedPVdZ_;
   bool usePUcands_;
-  std::string CandPdgId_;
 
   /// Store extra information in a ValueMap
   template<typename Hand, typename T>
@@ -69,10 +68,7 @@ MuonMiniIso::MuonMiniIso(const edm::ParameterSet& iConfig):
 probes_(iConfig.getParameter<edm::InputTag>("probes")),
 pfCandidates_(iConfig.getParameter<edm::InputTag>("pfCandidates")),
 dRCandProbeVeto_(iConfig.getParameter<double>("dRCandProbeVeto")),
-CandPtThreshold_(iConfig.getParameter<double>("CandPtThreshold")),
-CandPdgId_(iConfig.getParameter<std::string>("CandPdgId"))
-// ChargedPVdZ_(iConfig.getParameter<double>>("ChargedPVdZ"))
-// usePUcands_(iConfig.getParameter<double>>("usePUcands"))
+CandPtThreshold_(iConfig.getParameter<double>("CandPtThreshold"))
 {
   produces<edm::ValueMap<float> >();
 }
@@ -118,21 +114,6 @@ MuonMiniIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       
       // check pf candidate threshold
       if(iP->get()->pt() < CandPtThreshold_) continue;
-      
-      // check pf candidate pdgid
-      if(
-         ! ((CandPdgId_=="h" && iP->get()->particleId() == reco::PFCandidate::h) 
-         || (CandPdgId_=="h0" && iP->get()->particleId() == reco::PFCandidate::h0) 
-         || (CandPdgId_=="gamma" && iP->get()->particleId() == reco::PFCandidate::gamma))
-        ){
-        continue;
-      }
-      
-      // // check dz for charged candidates
-      // if(CandPdgId_=="h"){
-        // if(usePUcands_ && iP->get()->??? < ChargedPVdZ_) continue;
-        // else if(!usePUcands_ && iP->get()->??? > ChargedPVdZ_) continue;
-      // }
       
       double dr = deltaR( *(iP->get() ) , mu );
       // check dr min
