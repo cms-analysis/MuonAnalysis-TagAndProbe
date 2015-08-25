@@ -241,16 +241,19 @@ if TRIGGER == "DoubleMu":
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 process.load("PhysicsTools.PatAlgos.recoLayer0.pfParticleSelectionForIso_cff")
 
+process.miniIsoSeq = cms.Sequence(
+    process.muonMiniIsoCharged + 
+    process.muonMiniIsoPUCharged + 
+    process.muonMiniIsoNeutrals + 
+    process.muonMiniIsoPhotons 
+)
+
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
-    process.muonMiniIsoCharged + 
-    process.muonMiniIsoPUCharged + 
-    process.muonMiniIsoNeutrals + 
-    process.muonMiniIsoPhotons 
 )
 
 process.tnpSimpleSequence = cms.Sequence(
@@ -276,6 +279,7 @@ process.tagAndProbe = cms.Path(
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence +
     process.pfParticleSelectionForIsoSequence +
+    process.miniIsoSeq +
     process.tnpSimpleSequence
 )
 
