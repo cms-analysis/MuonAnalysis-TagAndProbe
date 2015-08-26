@@ -242,6 +242,7 @@ process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
 process.load("PhysicsTools.PatAlgos.recoLayer0.pfParticleSelectionForIso_cff")
 
 process.miniIsoSeq = cms.Sequence(
+    process.pfParticleSelectionForIsoSequence +
     process.muonMiniIsoCharged + 
     process.muonMiniIsoPUCharged + 
     process.muonMiniIsoNeutrals + 
@@ -254,6 +255,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
+    process.miniIsoSeq
 )
 
 process.tnpSimpleSequence = cms.Sequence(
@@ -278,8 +280,6 @@ process.tagAndProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence +
-    process.pfParticleSelectionForIsoSequence +
-    process.miniIsoSeq +
     process.tnpSimpleSequence
 )
 
