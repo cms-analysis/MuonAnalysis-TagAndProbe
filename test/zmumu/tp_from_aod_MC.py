@@ -143,6 +143,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
+        PtRatio= cms.InputTag("AddPtRatio","PtRatio"),
         radialIso = cms.InputTag("radialIso"), 
         miniIsoCharged = cms.InputTag("muonMiniIsoCharged"), 
         miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged"), 
@@ -178,6 +179,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
+        PtRatio = cms.InputTag("AddPtRatio","PtRatio"),
         radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
@@ -231,8 +233,8 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
-    process.miniIsoSeq
-)
+    process.miniIsoSeq +
+    process.AddPtRatio
 
 process.tnpSimpleSequence = cms.Sequence(
     process.goodGenMuons +
@@ -248,6 +250,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.bestPairByZMass + 
     process.newTunePVals +
     process.muonDxyPVdzminTags +
+    process.AddPtRatio +
     process.tpTree
 )
 
