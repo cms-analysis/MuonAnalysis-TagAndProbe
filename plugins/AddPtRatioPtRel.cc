@@ -43,7 +43,7 @@ private:
   const edm::InputTag probes_;    
   const edm::InputTag jets_;    
   const double dRmax_;
-  const bool addLepToJet_;
+  const bool addLepToJetForPtRel_;
 };
 
 //
@@ -62,7 +62,7 @@ AddPtRatioPtRel::AddPtRatioPtRel(const edm::ParameterSet& iConfig):
 probes_(iConfig.getParameter<edm::InputTag>("probes")),
 jets_(iConfig.getParameter<edm::InputTag>("jets")),
 dRmax_(iConfig.getParameter<double>("dRmax")),
-addLepToJet_(iConfig.getParameter<double>("addLepToJet"))
+addLepToJetForPtRel_(iConfig.getParameter<bool>("addLepToJetForPtRel"))
 {
 
   //now do what ever initialization is needed
@@ -147,7 +147,7 @@ AddPtRatioPtRel::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     }else{
       
       ptratio.push_back(mupt_loop/jetpt_loop);
-      ptrel.push_back(jetmet::getPtRel(jetPt, jetEta, jetPhi, jetE, lepPx, lepPy, lepPz, addLepToJet_));
+      ptrel.push_back(jetmet::getPtRel(jetPt, jetEta, jetPhi, jetE, lepPx, lepPy, lepPz, addLepToJetForPtRel_));
 
     }
 

@@ -169,7 +169,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        PtRatioPtRel= cms.InputTag("AddPtRatioPtRel","PtRatioPtRel"),
+        PtRatio= cms.InputTag("AddPtRatioPtRel","PtRatio"),
+        PtRel= cms.InputTag("AddPtRatioPtRel","PtRel"),
         radialIso = cms.InputTag("radialIso"), 
         miniIsoCharged = cms.InputTag("muonMiniIsoCharged"), 
         miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged"), 
@@ -250,6 +251,9 @@ process.miniIsoSeq = cms.Sequence(
     process.muonMiniIsoPhotons 
 )
 
+process.load("JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff")
+process.ak4PFCHSJetsL1L2L3 = process.ak4PFCHSJetsL1.clone( correctors = ['ak4PFCHSL1FastL2L3'] )
+
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
@@ -257,6 +261,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
     process.miniIsoSeq +
+    process.ak4PFCHSJetsL1L2L3 +
     process.AddPtRatioPtRel
 )
 
