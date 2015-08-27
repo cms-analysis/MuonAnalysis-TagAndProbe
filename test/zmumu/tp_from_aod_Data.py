@@ -169,6 +169,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
+        PtRatioPtRel= cms.InputTag("AddPtRatioPtRel","PtRatioPtRel"),
         radialIso = cms.InputTag("radialIso"), 
         miniIsoCharged = cms.InputTag("muonMiniIsoCharged"), 
         miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged"), 
@@ -255,7 +256,8 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
-    process.miniIsoSeq
+    process.miniIsoSeq +
+    process.AddPtRatioPtRel
 )
 
 process.tnpSimpleSequence = cms.Sequence(
