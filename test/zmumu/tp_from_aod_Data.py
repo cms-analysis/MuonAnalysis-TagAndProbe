@@ -17,14 +17,14 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
 
     #run 251168
-    process.GlobalTag.globaltag = cms.string('GR_P_V56::All')
+    process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v1')
     sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/168/00000"
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
