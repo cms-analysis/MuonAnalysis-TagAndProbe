@@ -144,6 +144,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
+        miniIsoCharged = cms.InputTag("muonMiniIsoCharged"), 
+        miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged"), 
+        miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals"), 
+        miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     flags = cms.PSet(
@@ -213,13 +217,23 @@ if TRIGGER != "SingleMu":
 
 
 process.load("MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cfi")
+process.load("PhysicsTools.PatAlgos.recoLayer0.pfParticleSelectionForIso_cff")
+
+process.miniIsoSeq = cms.Sequence(
+    process.pfParticleSelectionForIsoSequence +
+    process.muonMiniIsoCharged + 
+    process.muonMiniIsoPUCharged + 
+    process.muonMiniIsoNeutrals + 
+    process.muonMiniIsoPhotons 
+)
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
-    process.muonDxyPVdzmin 
+    process.muonDxyPVdzmin + 
+    process.miniIsoSeq
 )
 
 process.tnpSimpleSequence = cms.Sequence(
