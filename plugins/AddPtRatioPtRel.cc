@@ -1,6 +1,7 @@
 // system include files
 #include <memory>
 #include <cmath>
+#include <TLorentzVector.h>
 
 // user include files
 #include "FWCore/Framework/interface/Frameworkfwd.h"
@@ -19,8 +20,6 @@
 #include "DataFormats/ParticleFlowCandidate/interface/PFCandidate.h"
 
 #include "DataFormats/Math/interface/deltaR.h"
-#include "../interface/PtRel.h"
-
 
 using namespace std;
 
@@ -43,7 +42,7 @@ private:
   const edm::InputTag probes_;    
   const edm::InputTag jets_;    
   const double dRmax_;
-  const bool addLepToJetForPtRel_;
+  const bool subLepFromJetForPtRel_;
 };
 
 //
@@ -62,7 +61,7 @@ AddPtRatioPtRel::AddPtRatioPtRel(const edm::ParameterSet& iConfig):
 probes_(iConfig.getParameter<edm::InputTag>("probes")),
 jets_(iConfig.getParameter<edm::InputTag>("jets")),
 dRmax_(iConfig.getParameter<double>("dRmax")),
-addLepToJetForPtRel_(iConfig.getParameter<bool>("addLepToJetForPtRel"))
+subLepFromJetForPtRel_(iConfig.getParameter<bool>("subLepFromJetForPtRel"))
 {
 
   //now do what ever initialization is needed
@@ -107,29 +106,19 @@ AddPtRatioPtRel::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   for( reco::CandidateView::const_iterator icand = probes->begin(); icand != probes->end(); ++ icand){
 
     //Initialise loop variables
-    double mupt_loop = 9999;
-    double jetpt_loop = -9999;
     float dR = 9999;
-    double lepPx = 9999, lepPy = 9999, lepPz = 9999;
-    double jetPt = 9999, jetEta = 9999, jetPhi = 9999, jetE = 9999;
-
+    TLorentzVector jet, mu;
+    
     for( std::vector<reco::PFJet>::const_iterator ijet = Jets->begin(); ijet != Jets->end(); ++ ijet){
 
       
-      if(dR > deltaR(*ijet, *icand)){
+      if(deltaR(*ijet, *icand) < dR){
 
         dR = deltaR(*ijet, *icand);
-        mupt_loop = icand->pt();
-        jetpt_loop = ijet->pt();
         
-        jetPt =  ijet->pt();
-        jetEta = ijet->eta();
-        jetPhi = ijet->phi();
-        jetE =   ijet->energy();
-        lepPx = icand->px();
-        lepPy = icand->py();
-        lepPz = icand->pz();
-        
+        jet.SetPtEtaPhiM(ijet->pt(),ijet->eta(),ijet->phi(),ijet->mass());
+        mu.SetPtEtaPhiM(icand->pt(),icand->eta(),icand->phi(),icand->mass());
+
       }
 
     }//end jet loop
@@ -146,8 +135,9 @@ AddPtRatioPtRel::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     }else{
       
-      ptratio.push_back(mupt_loop/jetpt_loop);
-      ptrel.push_back(jetmet::getPtRel(jetPt, jetEta, jetPhi, jetE, lepPx, lepPy, lepPz, addLepToJetForPtRel_));
+      if(subLepFromJetForPtRel_) jet -= mu;
+      ptratio.push_back(mu.Pt()/jet.Pt());
+      ptrel.push_back(mu.Perp(jet.Vect()));
 
     }
 

@@ -159,7 +159,7 @@ AddPtRatioPtRel = cms.EDProducer("AddPtRatioPtRel",
     probes = cms.InputTag("probeMuons"),
     jets = cms.InputTag("ak4PFCHSJetsL1L2L3"),
     dRmax = cms.double(0.4),
-    addLepToJetForPtRel = cms.bool(True)
+    subLepFromJetForPtRel = cms.bool(False)
 )
 
 
