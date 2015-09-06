@@ -3,21 +3,22 @@
 #include "TStopwatch.h"
 #include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
 
-void addEAIso() {
+void addEAMiniIso() {
     TTree *tIn  = (TTree *) gFile->Get("tpTree/fitter_tree");
     Float_t pt, eta, chHad, nHad, phot, rho;
     tIn->SetBranchAddress("pt", &pt);
     tIn->SetBranchAddress("eta", &eta);
-    tIn->SetBranchAddress("chargedHadIso04", &chHad);
-    tIn->SetBranchAddress("neutralHadIso04", &nHad);
-    tIn->SetBranchAddress("photonIso04",     &phot);
+    tIn->SetBranchAddress("miniIsoCharged", &chHad);
+    tIn->SetBranchAddress("miniIsoNeutrals", &nHad);
+    tIn->SetBranchAddress("miniIsoPhotons",     &phot);
     tIn->SetBranchAddress("kt6RhoNeu05",     &rho);
 
     TFile *fOut = new TFile("tnpZ_withEAIso.root", "RECREATE");
     fOut->mkdir("tpTree")->cd();
     TTree *tOut = tIn->CloneTree(0);
-    Float_t pfCombRelIso04EACorr;
-    tOut->Branch("pfCombRelIso04EACorr", &pfCombRelIso04EACorr, "pfCombRelIso04EACorr/F");
+    Float_t pfCombRelMiniIsoEACorr,pfCombAbsMiniIsoEACorr;
+    tOut->Branch("pfCombAbsMiniIsoEACorr", &pfCombAbsMiniIsoEACorr, "pfCombAbsMiniIsoEACorr/F");
+    tOut->Branch("pfCombRelMiniIsoEACorr", &pfCombRelMiniIsoEACorr, "pfCombRelMiniIsoEACorr/F");
 
     MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget = MuonEffectiveArea::kMuEAData2012; // or 2011
     MuonEffectiveArea::MuonEffectiveAreaType   effAreaType   = MuonEffectiveArea::kMuGammaAndNeutralHadronIso04;
@@ -28,12 +29,14 @@ void addEAIso() {
     for (int i = 0, n = tIn->GetEntries(); i < n; ++i) {
         tIn->GetEntry(i);
         Float_t ea_tot = MuonEffectiveArea::GetMuonEffectiveArea(effAreaType, fabs(eta), effAreaTarget);
-        pfCombRelIso04EACorr = (chHad + max(0.f, nHad + phot - ea_tot*rho))/pt;
+        pfCombAbsMiniIsoEACorr = (chHad + max(0.f, nHad + phot - ea_tot*rho));
+        pfCombRelMiniIsoEACorr = pfCombAbsMiniIsoEACorr/pt;
         if (i < 20) {
             printf("muon with pt = %.2f, eta = %+5.2f:", pt, eta);
             printf("   charged hadrons %6.3f, neutral hadrons %6.3f, photons %6.3f ", chHad, nHad, phot);
             printf("   rho %6.3f, ea %6.3f", rho, ea_tot);
-            printf("   pfCombRelIsoEAcorr %6.3f\n", pfCombRelIso04EACorr);
+            printf("   pfCombAbsIsoEAcorr %6.3f\n", pfCombAbsMiniIsoEACorr);
+            printf("   pfCombRelIsoEAcorr %6.3f\n", pfCombRelMiniIsoEACorr);
         }
         tOut->Fill();
         //if (i > 10000) break;
