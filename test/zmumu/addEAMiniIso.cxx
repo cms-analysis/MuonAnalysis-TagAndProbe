@@ -29,7 +29,8 @@ void addEAMiniIso() {
     for (int i = 0, n = tIn->GetEntries(); i < n; ++i) {
         tIn->GetEntry(i);
         Float_t ea_tot = MuonEffectiveArea::GetMuonEffectiveArea(effAreaType, fabs(eta), effAreaTarget);
-        pfCombAbsMiniIsoEACorr = (chHad + max(0.f, nHad + phot - ea_tot*rho));
+        
+        pfCombAbsMiniIsoEACorr = (chHad + max(0.0, nHad - rho * ea_tot * ((10.0/min(max(pt, 50),200))/0.3)**2)
         pfCombRelMiniIsoEACorr = pfCombAbsMiniIsoEACorr/pt;
         if (i < 20) {
             printf("muon with pt = %.2f, eta = %+5.2f:", pt, eta);
