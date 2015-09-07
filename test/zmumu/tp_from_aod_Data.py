@@ -17,14 +17,14 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
 
     #run 251168
-    process.GlobalTag.globaltag = cms.string('GR_P_V56::All')
+    process.GlobalTag.globaltag = cms.string('74X_dataRun2_Prompt_v1')
     sourcefilesfolder = "/store/data/Run2015B/SingleMuon/AOD/PromptReco-v1/000/251/168/00000"
     files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
     process.source.fileNames = [ sourcefilesfolder+"/"+f for f in files.split() ]
@@ -71,9 +71,13 @@ process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 
 
 if TRIGGER == "SingleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_IsoMu24_eta2p1_v*', 'HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu45_eta2p1_v*', 'HLT_Mu50_v*',
+                                                                  'HLT_IsoMu24_eta2p1_v*', 'HLT_IsoMu20_eta2p1_v*',
+                                                                  'HLT_IsoMu27_v*', 'HLT_IsoMu20_v*'  )
 elif TRIGGER == "DoubleMu":
-    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*', 'HLT_Mu17_TkMu8_NoDZ_v*', 'HLT_Mu13_Mu8_NoDZ_v*' )
+    process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*',
+                                                                  'HLT_Mu8_TrkIsoVVL_v*', 'HLT_Mu17_TrkIsoVVL_v*',
+                                                                  'HLT_Mu17_TkMu8_v*', 'HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_v*' )
 else:
     raise RuntimeError, "TRIGGER must be 'SingleMu' or 'DoubleMu'"
 
@@ -190,7 +194,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
      #   pt = cms.string("pt"),
      #   eta = cms.string("eta"),
      #   phi = cms.string("phi"),
-     #   nVertices   = cms.InputTag("nverticesModule"),
      #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
      #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
      #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
@@ -200,7 +203,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
      #   dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
         AllVariables,
         ExtraIsolationVariables,
-        MVAIsoVariablesPlain, 
+        MVAIsoVariablesPlain,
+        nVertices   = cms.InputTag("nverticesModule"),
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),

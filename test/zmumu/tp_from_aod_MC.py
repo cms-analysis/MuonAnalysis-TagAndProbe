@@ -165,7 +165,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
      #   pt = cms.string("pt"),
      #   eta = cms.string("eta"),
      #   phi = cms.string("phi"),
-     #   nVertices   = cms.InputTag("nverticesModule"),
      #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
      #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
      #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
@@ -176,6 +175,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         AllVariables,
         ExtraIsolationVariables,
         MVAIsoVariablesPlain, 
+        nVertices   = cms.InputTag("nverticesModule"),
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
@@ -194,6 +194,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
         probeMultiplicity_TMGM = cms.InputTag("probeMultiplicityTMGM"),
         probeMultiplicity_Pt10_M60140 = cms.InputTag("probeMultiplicityPt10M60140"),
+        ## Gen Weight variable
+        genWeight = cms.InputTag("genWeightInfo", "genWeight"),
         ## New TuneP variables
         newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
@@ -255,6 +257,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.probeMultiplicities + 
     process.bestPairByZMass + 
     process.newTunePVals +
+    process.genWeightInfo +
     process.muonDxyPVdzminTags +
     process.tpTree
 )
