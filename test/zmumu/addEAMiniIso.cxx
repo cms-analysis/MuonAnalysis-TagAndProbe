@@ -13,7 +13,7 @@ void addEAMiniIso() {
     tIn->SetBranchAddress("miniIsoPhotons",     &phot);
     tIn->SetBranchAddress("fixedGridRhoFastjetCentralNeutral",     &rho);
 
-    TFile *fOut = new TFile("tnpZ_withEAIso.root", "RECREATE");
+    TFile *fOut = new TFile("tnpZ_withEAMiniIso.root", "RECREATE");
     fOut->mkdir("tpTree")->cd();
     TTree *tOut = tIn->CloneTree(0);
     Float_t pfCombRelMiniIsoEACorr,pfCombAbsMiniIsoEACorr;
