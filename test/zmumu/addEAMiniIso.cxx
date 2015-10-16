@@ -2,7 +2,6 @@
 #include "TFile.h"
 #include "TStopwatch.h"
 #include "MuonEffectiveArea.h"
->>>>>>> 74X_orig
 
 void addEAMiniIso() {
     TTree *tIn  = (TTree *) gFile->Get("tpTree/fitter_tree");
