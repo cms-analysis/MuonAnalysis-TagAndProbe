@@ -1,7 +1,8 @@
 #include "TTree.h"
 #include "TFile.h"
 #include "TStopwatch.h"
-#include "Muon/MuonAnalysisTools/interface/MuonEffectiveArea.h"
+#include "MuonEffectiveArea.h"
+>>>>>>> 74X_orig
 
 void addEAMiniIso() {
     TTree *tIn  = (TTree *) gFile->Get("tpTree/fitter_tree");
@@ -11,17 +12,17 @@ void addEAMiniIso() {
     tIn->SetBranchAddress("miniIsoCharged", &chHad);
     tIn->SetBranchAddress("miniIsoNeutrals", &nHad);
     tIn->SetBranchAddress("miniIsoPhotons",     &phot);
-    tIn->SetBranchAddress("kt6RhoAll",     &rho);
+    tIn->SetBranchAddress("RhoNeu05",     &rho);
 
-    TFile *fOut = new TFile("tnpZ_withEAIso.root", "RECREATE");
+    TFile *fOut = new TFile("tnpZ_withEAMiniIso.root", "RECREATE");
     fOut->mkdir("tpTree")->cd();
     TTree *tOut = tIn->CloneTree(0);
     Float_t pfCombRelMiniIsoEACorr,pfCombAbsMiniIsoEACorr;
     tOut->Branch("pfCombAbsMiniIsoEACorr", &pfCombAbsMiniIsoEACorr, "pfCombAbsMiniIsoEACorr/F");
     tOut->Branch("pfCombRelMiniIsoEACorr", &pfCombRelMiniIsoEACorr, "pfCombRelMiniIsoEACorr/F");
 
-    MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget = MuonEffectiveArea::kMuEAData2012; // or 2011
-    MuonEffectiveArea::MuonEffectiveAreaType   effAreaType   = MuonEffectiveArea::kMuGammaAndNeutralHadronIso04;
+    MuonEffectiveArea::MuonEffectiveAreaTarget effAreaTarget = MuonEffectiveArea::kMuEASpring15_25ns; // new 2015
+    MuonEffectiveArea::MuonEffectiveAreaType   effAreaType   = MuonEffectiveArea::kMuMiniIso03;
 
     int step = tIn->GetEntries()/1000;
     double evDenom = 100.0/double(tIn->GetEntries());

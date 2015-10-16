@@ -5,7 +5,7 @@
 /**
   \brief    
 
-  \author   Clara Jorda (adapted and ruined by D. Trocino)
+  \author   Clara Jorda (adapted and ruined by D. Trocino), Luca Perrozzi
 */
 
 
@@ -79,6 +79,8 @@ ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
   produces<edm::ValueMap<float> >("RhoPU");
   produces<edm::ValueMap<float> >("RhoNeu05");
   produces<edm::ValueMap<float> >("RhoNeu1");
+  produces<edm::ValueMap<float> >("RhoCentralCalo");
+  
 }
 
 
@@ -102,6 +104,9 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
 
   edm::Handle<double> rhoAllCaloH;
   iEvent.getByLabel(InputTag("fixedGridRhoFastjetAllCalo", ""), rhoAllCaloH);
+
+  edm::Handle<double> rhoCentralCaloH;
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralCalo", ""), rhoCentralCaloH);
 
   edm::Handle<double> rhoPUH;
   iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralChargedPileUp", ""), rhoPUH);
@@ -135,6 +140,14 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   filler11.insert(probes, myRhosAllCalo.begin(), myRhosAllCalo.end());
   filler11.fill();
   iEvent.put(RhoAllCalo, "RhoAllCalo");
+
+  // Store rho
+  std::auto_ptr<ValueMap<float> > RhoCentralCalo(new ValueMap<float>());
+  ValueMap<float>::Filler filler110(*RhoCentralCalo);
+  std::vector<float> myRhosCentralCalo(probes->size(), *rhoCentralCaloH);
+  filler110.insert(probes, myRhosCentralCalo.begin(), myRhosCentralCalo.end());
+  filler110.fill();
+  iEvent.put(RhoCentralCalo, "RhoCentralCalo");
 
   // Store rho
   std::auto_ptr<ValueMap<float> > RhoPU(new ValueMap<float>());

@@ -121,6 +121,7 @@ muonMiniIsoCharged = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
     pfCandidates = cms.InputTag("pfAllChargedHadronsPFBRECO"),
     dRCandProbeVeto = cms.double(0.0001),
+    dRCandSoftActivityCone = cms.double(0.4),
     CandPtThreshold = cms.double(0.0),
 )
 
@@ -128,6 +129,7 @@ muonMiniIsoPUCharged = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
     pfCandidates = cms.InputTag("pfPileUpAllChargedParticlesPFBRECO"),
     dRCandProbeVeto = cms.double(0.0001),
+    dRCandSoftActivityCone = cms.double(0.4),
     CandPtThreshold = cms.double(0.0),
 )
 
@@ -135,6 +137,7 @@ muonMiniIsoNeutrals = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
     pfCandidates = cms.InputTag("pfAllNeutralHadronsPFBRECO"),
     dRCandProbeVeto = cms.double(0.01),
+    dRCandSoftActivityCone = cms.double(0.4),
     CandPtThreshold = cms.double(1.0),
 )
 
@@ -142,6 +145,7 @@ muonMiniIsoPhotons = cms.EDProducer("MuonMiniIso",
     probes = cms.InputTag("probeMuons"),
     pfCandidates = cms.InputTag("pfAllPhotonsPFBRECO"),
     dRCandProbeVeto = cms.double(0.01),
+    dRCandSoftActivityCone = cms.double(0.4),
     CandPtThreshold = cms.double(0.5),
 )
 
