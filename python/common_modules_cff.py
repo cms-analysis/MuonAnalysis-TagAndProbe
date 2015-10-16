@@ -1,6 +1,8 @@
 import FWCore.ParameterSet.Config as cms
 
 from MuonAnalysis.TagAndProbe.nearbyMuonsInfo_cfi import nearbyMuonsInfo as tagProbeSeparation
+from JetMETCorrections.Configuration.JetCorrectors_cff import ak4PFCHSL1FastL2L3CorrectorChain, ak4PFCHSL1FastL2L3Corrector
+from JetMETCorrections.Configuration.JetCorrectors_cff import ak4PFCHSL3AbsoluteCorrector, ak4PFCHSL2RelativeCorrector, ak4PFCHSL1FastjetCorrector
 
 #########################################################################################
 ##        Object counting modules                                                      ##
@@ -159,13 +161,22 @@ muonDxyPVdzmin = cms.EDProducer("MuonDxyPVdzmin",
 )
 muonDxyPVdzminTags = muonDxyPVdzmin.clone(probes = "tagMuons")
 
+process.jetAwareCleaner = cms.EDProducer("JetAwareCleaner",
+  RawJetCollection= cms.InputTag("ak4PFCHSJet"),
+  LeptonCollection= cms.InputTag("probeMuons"),
+  L1Corrector = cms.InputTag("ak4PFCHSL1FastjetCorrector"),
+  L1L2L3ResCorrector= cms.InputTag("ak4PFCHSL1FastL2L3Corrector"),
+  dRmax = cms.double(0.4),
+  dRCandProbeVeto = cms.double(0.0001)
+)
+
 AddPtRatioPtRel = cms.EDProducer("AddPtRatioPtRel",
     probes = cms.InputTag("probeMuons"),
-    jets = cms.InputTag("ak4PFCHSJetsL1L2L3"),
+    # jets = cms.InputTag("ak4PFCHSJetsL1L2L3"),
+    jets = cms.InputTag("jetAwareCleaner"),
     dRmax = cms.double(0.4),
     subLepFromJetForPtRel = cms.bool(False)
 )
-
 
 probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
     pairs = cms.InputTag("tpPairs"),

@@ -234,8 +234,8 @@ process.miniIsoSeq = cms.Sequence(
     process.muonMiniIsoPhotons 
 )
 
-process.load("JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff")
-process.ak4PFCHSJetsL1L2L3 = process.ak4PFCHSJetsL1.clone( correctors = ['ak4PFCHSL1FastL2L3'] )
+# process.load("JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff")
+# process.ak4PFCHSJetsL1L2L3 = process.ak4PFCHSJetsL1.clone( correctors = ['ak4PFCHSL1FastL2L3'] )
 
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
@@ -244,7 +244,8 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
     process.miniIsoSeq +
-    process.ak4PFCHSJetsL1L2L3 +
+    # process.ak4PFCHSJetsL1L2L3 +
+    process.ak4PFCHSL1FastL2L3CorrectorChain* process.jetAwareCleaner +
     process.AddPtRatioPtRel
 )
 
