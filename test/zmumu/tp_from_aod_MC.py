@@ -245,7 +245,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.muonDxyPVdzmin + 
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
-    process.ak4PFCHSL1FastL2L3CorrectorChain* process.jetAwareCleaner +
+    process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
     process.AddPtRatioPtRel
 )
 

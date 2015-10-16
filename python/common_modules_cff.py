@@ -161,8 +161,8 @@ muonDxyPVdzmin = cms.EDProducer("MuonDxyPVdzmin",
 )
 muonDxyPVdzminTags = muonDxyPVdzmin.clone(probes = "tagMuons")
 
-process.jetAwareCleaner = cms.EDProducer("JetAwareCleaner",
-  RawJetCollection= cms.InputTag("ak4PFCHSJet"),
+jetAwareCleaner = cms.EDProducer("JetAwareCleaner",
+  RawJetCollection= cms.InputTag("ak4PFJetsCHS"),
   LeptonCollection= cms.InputTag("probeMuons"),
   L1Corrector = cms.InputTag("ak4PFCHSL1FastjetCorrector"),
   L1L2L3ResCorrector= cms.InputTag("ak4PFCHSL1FastL2L3Corrector"),
