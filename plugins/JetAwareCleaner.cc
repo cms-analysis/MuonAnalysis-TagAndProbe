@@ -110,8 +110,10 @@ const edm::EventSetup & iSetup) const {
   for(unsigned int ij=0;ij<jets->size();ij++) {
     reco::PFJetRef jet(jets,ij);
     
-    double jecL1L2L3Res = correctorL1L2L3Res->correction(jet->p4());
-    double jecL1 = correctorL1->correction(jet->p4());
+    // double jecL1L2L3Res = correctorL1L2L3Res->correction(jet->p4());
+    // double jecL1 = correctorL1->correction(jet->p4());
+    double jecL1L2L3Res = 1;
+    double jecL1 = 1;
     
     reco::Candidate::LorentzVector p4J=jet->p4();
     bool mlep=false;
