@@ -122,6 +122,7 @@ const edm::EventSetup & iSetup) const {
         if( (p4J-(*leptons)[it->first].p4()).Rho()<dRCandProbeVeto_ ) { p4J=(*leptons)[it->first].p4(); break;} //protection against jets built only with a lepton
         p4J -= (*leptons)[it->first].p4()/jecL1;
         p4J *= jecL1L2L3Res;
+        p4J += (*leptons)[it->first].p4();
         break;
       }
     }//matched lepton loop
