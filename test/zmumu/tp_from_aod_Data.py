@@ -173,11 +173,17 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
+        PtRatio= cms.InputTag("AddPtRatioPtRel","PtRatio"),
+        PtRel= cms.InputTag("AddPtRatioPtRel","PtRel"),
         radialIso = cms.InputTag("radialIso"), 
-        miniIsoCharged = cms.InputTag("muonMiniIsoCharged"), 
-        miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged"), 
-        miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals"), 
-        miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons"), 
+        miniIsoCharged = cms.InputTag("muonMiniIsoCharged","miniIso"),
+        activity_miniIsoCharged = cms.InputTag("muonMiniIsoCharged","activity"),
+        miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","miniIso"),
+        activity_miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","activity"),
+        miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals","miniIso"),
+        activity_miniIsoNeutrals = cms.InputTag("muonMiniIsoNeutrals","activity"),
+        miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"),
+        activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"),
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     flags = cms.PSet(
@@ -253,13 +259,19 @@ process.miniIsoSeq = cms.Sequence(
     process.muonMiniIsoPhotons 
 )
 
+# process.load("JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff")
+# process.ak4PFCHSJetsL1L2L3 = process.ak4PFCHSJetsL1.clone( correctors = ['ak4PFCHSL1FastL2L3'] )
+
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
-    process.miniIsoSeq
+    process.miniIsoSeq +
+    # process.ak4PFCHSJetsL1L2L3 +
+    process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
+    process.AddPtRatioPtRel
 )
 
 process.tnpSimpleSequence = cms.Sequence(

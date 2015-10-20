@@ -40,6 +40,7 @@ private:
   const edm::InputTag probes_;    
   const edm::InputTag pfCandidates_;
   double dRCandProbeVeto_;
+  double dRCandSoftActivityCone_;
   double CandPtThreshold_;
   double ChargedPVdZ_;
   bool usePUcands_;
@@ -68,9 +69,11 @@ MuonMiniIso::MuonMiniIso(const edm::ParameterSet& iConfig):
 probes_(iConfig.getParameter<edm::InputTag>("probes")),
 pfCandidates_(iConfig.getParameter<edm::InputTag>("pfCandidates")),
 dRCandProbeVeto_(iConfig.getParameter<double>("dRCandProbeVeto")),
+dRCandSoftActivityCone_(iConfig.getParameter<double>("dRCandSoftActivityCone")),
 CandPtThreshold_(iConfig.getParameter<double>("CandPtThreshold"))
 {
-  produces<edm::ValueMap<float> >();
+  produces<edm::ValueMap<float> >("miniIso");
+  produces<edm::ValueMap<float> >("activity");
 }
 
 
@@ -102,6 +105,7 @@ MuonMiniIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   unsigned int n = probes->size();
   
   std::vector<float> iso(n,0);
+  std::vector<float> activity(n,0);
 
   // loop on PROBES
   unsigned int imu = 0;
@@ -119,17 +123,26 @@ MuonMiniIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       // check dr min
       if (dr < dRCandProbeVeto_) continue;
 
-      // miniiso definition
-      if (mu.pt()<=50 && dr > 0.2) continue;
-      if (50 < mu.pt() && mu.pt() < 200 && dr > 10/mu.pt()) continue;
-      if (mu.pt()>200 && dr > 0.05) continue;
+      // miniiso and soft activity definitions
+      if (dr > dRCandSoftActivityCone_) continue;
       
-      iso[imu] += iP->get()->pt();
+      if ( (mu.pt()<=50 && dr <= 0.2) 
+        || (50 < mu.pt() && mu.pt() < 200 && dr <= 10/mu.pt())
+        || (mu.pt()>200 && dr <= 0.05) ){
+        
+        iso[imu] += iP->get()->pt();
+        
+      }else{
+        
+        activity[imu] += iP->get()->pt();
+        
+      }
       
     }
   }// end loop on probes
 
-  storeMap(iEvent, probes, iso, "");
+  storeMap(iEvent, probes, iso, "miniIso");
+  storeMap(iEvent, probes, activity, "activity");
 }
 
 template<typename Hand, typename T>
