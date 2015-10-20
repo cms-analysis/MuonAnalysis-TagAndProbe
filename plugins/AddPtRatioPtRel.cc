@@ -135,8 +135,8 @@ AddPtRatioPtRel::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     }else{
       
-      if(subLepFromJetForPtRel_) jet -= mu;
       ptratio.push_back(mu.Pt()/jet.Pt());
+      if(subLepFromJetForPtRel_) jet -= mu;
       ptrel.push_back(mu.Perp(jet.Vect()));
 
     }

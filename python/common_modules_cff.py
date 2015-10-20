@@ -175,7 +175,7 @@ AddPtRatioPtRel = cms.EDProducer("AddPtRatioPtRel",
     # jets = cms.InputTag("ak4PFCHSJetsL1L2L3"),
     jets = cms.InputTag("jetAwareCleaner"),
     dRmax = cms.double(0.4),
-    subLepFromJetForPtRel = cms.bool(False)
+    subLepFromJetForPtRel = cms.bool(True)
 )
 
 probeMultiplicity = cms.EDProducer("ProbeMulteplicityProducer",
