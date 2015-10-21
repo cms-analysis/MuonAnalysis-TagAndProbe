@@ -5,7 +5,7 @@
 /**
   \brief    
 
-  \author   Clara Jorda (adapted and ruined by D. Trocino)
+  \author   Clara Jorda (adapted and ruined by D. Trocino), Luca Perrozzi
 */
 
 
@@ -74,11 +74,12 @@ ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
   probesLabel(iConfig.getParameter<edm::InputTag>("probes"))
 {
 
-  produces<edm::ValueMap<float> >("RhoAllCalo");
-  produces<edm::ValueMap<float> >("RhoAll");
-  produces<edm::ValueMap<float> >("RhoPU");
-  produces<edm::ValueMap<float> >("RhoNeu05");
-  produces<edm::ValueMap<float> >("RhoNeu1");
+  produces<edm::ValueMap<float> >("fixedGridRhoFastjetAllCalo");
+  produces<edm::ValueMap<float> >("fixedGridRhoFastjetAll");
+  produces<edm::ValueMap<float> >("fixedGridRhoFastjetCentralChargedPileUp");
+  produces<edm::ValueMap<float> >("fixedGridRhoFastjetCentralNeutral");
+  produces<edm::ValueMap<float> >("fixedGridRhoFastjetCentralCalo");
+  
 }
 
 
@@ -97,20 +98,20 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   iEvent.getByLabel(probesLabel, probes);
   
   // Rho values
-  edm::Handle<double> rhoAllH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAll", ""), rhoAllH);
+  edm::Handle<double> fixedGridRhoFastjetAllH;
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAll", ""), fixedGridRhoFastjetAllH);
 
-  edm::Handle<double> rhoAllCaloH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAllCalo", ""), rhoAllCaloH);
+  edm::Handle<double> fixedGridRhoFastjetAllCaloH;
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAllCalo", ""), fixedGridRhoFastjetAllCaloH);
 
-  edm::Handle<double> rhoPUH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralChargedPileUp", ""), rhoPUH);
+  edm::Handle<double> fixedGridRhoFastjetCentralCaloH;
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralCalo", ""), fixedGridRhoFastjetCentralCaloH);
+
+  edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralChargedPileUp", ""), fixedGridRhoFastjetCentralChargedPileUpH);
   
-  edm::Handle<double> rhoNeu05H;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralNeutral", ""), rhoNeu05H);
-  
-  edm::Handle<double> rhoNeu1H;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAll", ""), rhoNeu1H); //MM FIXME, was tight in 53X
+  edm::Handle<double> fixedGridRhoFastjetCentralNeutralH;
+  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralNeutral", ""), fixedGridRhoFastjetCentralNeutralH);
 
 
   // Prepare vector for output 
@@ -121,44 +122,45 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   View<pat::Muon>::const_iterator probe;
 
   // Store rho
-  std::auto_ptr<ValueMap<float> > RhoAll(new ValueMap<float>());
-  ValueMap<float>::Filler filler1(*RhoAll);
-  std::vector<float> myRhosAll(probes->size(), *rhoAllH);
-  filler1.insert(probes, myRhosAll.begin(), myRhosAll.end());
+  std::auto_ptr<ValueMap<float> > fixedGridRhoFastjetAll(new ValueMap<float>());
+  ValueMap<float>::Filler filler1(*fixedGridRhoFastjetAll);
+  std::vector<float> myfixedGridRhoFastjetAll(probes->size(), *fixedGridRhoFastjetAllH);
+  filler1.insert(probes, myfixedGridRhoFastjetAll.begin(), myfixedGridRhoFastjetAll.end());
   filler1.fill();
-  iEvent.put(RhoAll, "RhoAll");
+  iEvent.put(fixedGridRhoFastjetAll, "fixedGridRhoFastjetAll");
 
   // Store rho
-  std::auto_ptr<ValueMap<float> > RhoAllCalo(new ValueMap<float>());
-  ValueMap<float>::Filler filler11(*RhoAllCalo);
-  std::vector<float> myRhosAllCalo(probes->size(), *rhoAllCaloH);
-  filler11.insert(probes, myRhosAllCalo.begin(), myRhosAllCalo.end());
+  std::auto_ptr<ValueMap<float> > fixedGridRhoFastjetAllCalo(new ValueMap<float>());
+  ValueMap<float>::Filler filler11(*fixedGridRhoFastjetAllCalo);
+  std::vector<float> myfixedGridRhoFastjetAllCalo(probes->size(), *fixedGridRhoFastjetAllCaloH);
+  filler11.insert(probes, myfixedGridRhoFastjetAllCalo.begin(), myfixedGridRhoFastjetAllCalo.end());
   filler11.fill();
-  iEvent.put(RhoAllCalo, "RhoAllCalo");
+  iEvent.put(fixedGridRhoFastjetAllCalo, "fixedGridRhoFastjetAllCalo");
 
   // Store rho
-  std::auto_ptr<ValueMap<float> > RhoPU(new ValueMap<float>());
-  ValueMap<float>::Filler filler12(*RhoPU);
-  std::vector<float> myRhosPU(probes->size(), *rhoPUH);
-  filler12.insert(probes, myRhosPU.begin(), myRhosPU.end());
+  std::auto_ptr<ValueMap<float> > fixedGridRhoFastjetCentralCalo(new ValueMap<float>());
+  ValueMap<float>::Filler filler110(*fixedGridRhoFastjetCentralCalo);
+  std::vector<float> myfixedGridRhoFastjetCentralCalo(probes->size(), *fixedGridRhoFastjetCentralCaloH);
+  filler110.insert(probes, myfixedGridRhoFastjetCentralCalo.begin(), myfixedGridRhoFastjetCentralCalo.end());
+  filler110.fill();
+  iEvent.put(fixedGridRhoFastjetCentralCalo, "fixedGridRhoFastjetCentralCalo");
+
+  // Store rho
+  std::auto_ptr<ValueMap<float> > fixedGridRhoFastjetCentralChargedPileUp(new ValueMap<float>());
+  ValueMap<float>::Filler filler12(*fixedGridRhoFastjetCentralChargedPileUp);
+  std::vector<float> myfixedGridRhoFastjetCentralChargedPileUp(probes->size(), *fixedGridRhoFastjetCentralChargedPileUpH);
+  filler12.insert(probes, myfixedGridRhoFastjetCentralChargedPileUp.begin(), myfixedGridRhoFastjetCentralChargedPileUp.end());
   filler12.fill();
-  iEvent.put(RhoPU, "RhoPU");
+  iEvent.put(fixedGridRhoFastjetCentralChargedPileUp, "fixedGridRhoFastjetCentralChargedPileUp");
 
   // Store rho
-  std::auto_ptr<ValueMap<float> > RhoNeu05(new ValueMap<float>());
-  ValueMap<float>::Filler filler13(*RhoNeu05);
-  std::vector<float> myRhosNeu05(probes->size(), *rhoNeu05H);
-  filler13.insert(probes, myRhosNeu05.begin(), myRhosNeu05.end());
+  std::auto_ptr<ValueMap<float> > fixedGridRhoFastjetCentralNeutral(new ValueMap<float>());
+  ValueMap<float>::Filler filler13(*fixedGridRhoFastjetCentralNeutral);
+  std::vector<float> myfixedGridRhoFastjetCentralNeutral(probes->size(), *fixedGridRhoFastjetCentralNeutralH);
+  filler13.insert(probes, myfixedGridRhoFastjetCentralNeutral.begin(), myfixedGridRhoFastjetCentralNeutral.end());
   filler13.fill();
-  iEvent.put(RhoNeu05, "RhoNeu05");
+  iEvent.put(fixedGridRhoFastjetCentralNeutral, "fixedGridRhoFastjetCentralNeutral");
 
-  // Store rho
-  std::auto_ptr<ValueMap<float> > RhoNeu1(new ValueMap<float>());
-  ValueMap<float>::Filler filler14(*RhoNeu1);
-  std::vector<float> myRhosNeu1(probes->size(), *rhoNeu1H);
-  filler14.insert(probes, myRhosNeu1.begin(), myRhosNeu1.end());
-  filler14.fill();
-  iEvent.put(RhoNeu1, "RhoNeu1");
 }
 
 void 
