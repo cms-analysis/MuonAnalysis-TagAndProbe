@@ -143,6 +143,10 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
     Loose       = cms.string("isLooseMuon()"),
     Medium      = cms.string("isPFMuon && innerTrack.validFraction >= 0.8 && ( isGlobalMuon && globalTrack.normalizedChi2 < 3 && combinedQuality.chi2LocalPosition < 12 && combinedQuality.trkKink < 20 && segmentCompatibility >= 0.303 || segmentCompatibility >= 0.451 )"),
+    HighPt = cms.string("isGlobalMuon && isTrackerMuon &&  globalTrack.hitPattern.numberOfValidMuonHits > 0 && "+
+                        "numberOfMatchedStations > 1 && track.hitPattern.numberOfValidPixelHits > 0 && "+
+                        "track.hitPattern.trackerLayersWithMeasurement > 5 && abs(dB) < 0.2 && "+
+                        "(tunePMuonBestTrack.ptError / tunePMuonBestTrack.pt) < 0.3"),
     HWWID =  cms.string("( ((isGlobalMuon() && "
                         "    globalTrack.normalizedChi2 <10 &&" +
                         "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
