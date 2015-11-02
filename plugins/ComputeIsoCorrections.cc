@@ -55,7 +55,11 @@ private:
 
   // ----------member data ---------------------------
   const edm::EDGetTokenT<edm::View<pat::Muon>> probesLabel;
-
+  edm::EDGetTokenT<double> fixedGridRhoFastjetAllCalo_;
+  edm::EDGetTokenT<double> fixedGridRhoFastjetAll_;
+  edm::EDGetTokenT<double> fixedGridRhoFastjetCentralChargedPileUp_;
+  edm::EDGetTokenT<double> fixedGridRhoFastjetCentralNeutral_;
+  edm::EDGetTokenT<double> fixedGridRhoFastjetCentralCalo_;
 };
 
 //
@@ -71,7 +75,12 @@ private:
 // constructors and destructor
 //
 ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
-  probesLabel(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("probes")))
+  probesLabel(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("probes"))),
+  fixedGridRhoFastjetAllCalo_(consumes<double>(edm::InputTag("fixedGridRhoFastjetAllCalo"))),
+  fixedGridRhoFastjetAll_(consumes<double>(edm::InputTag("fixedGridRhoFastjetAll"))),
+  fixedGridRhoFastjetCentralChargedPileUp_(consumes<double>(edm::InputTag("fixedGridRhoFastjetCentralChargedPileUp"))),
+  fixedGridRhoFastjetCentralNeutral_(consumes<double>(edm::InputTag("fixedGridRhoFastjetCentralNeutral"))),
+  fixedGridRhoFastjetCentralCalo_(consumes<double>(edm::InputTag("fixedGridRhoFastjetCentralCalo"))) 
 {
 
   produces<edm::ValueMap<float> >("fixedGridRhoFastjetAllCalo");
@@ -99,19 +108,19 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
   
   // Rho values
   edm::Handle<double> fixedGridRhoFastjetAllH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAll", ""), fixedGridRhoFastjetAllH);
+  iEvent.getByToken(fixedGridRhoFastjetAll_, fixedGridRhoFastjetAllH);
 
   edm::Handle<double> fixedGridRhoFastjetAllCaloH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetAllCalo", ""), fixedGridRhoFastjetAllCaloH);
+  iEvent.getByToken(fixedGridRhoFastjetAllCalo_, fixedGridRhoFastjetAllCaloH);
 
   edm::Handle<double> fixedGridRhoFastjetCentralCaloH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralCalo", ""), fixedGridRhoFastjetCentralCaloH);
+  iEvent.getByToken(fixedGridRhoFastjetCentralCalo_, fixedGridRhoFastjetCentralCaloH);
 
   edm::Handle<double> fixedGridRhoFastjetCentralChargedPileUpH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralChargedPileUp", ""), fixedGridRhoFastjetCentralChargedPileUpH);
+  iEvent.getByToken(fixedGridRhoFastjetCentralChargedPileUp_, fixedGridRhoFastjetCentralChargedPileUpH);
   
   edm::Handle<double> fixedGridRhoFastjetCentralNeutralH;
-  iEvent.getByLabel(InputTag("fixedGridRhoFastjetCentralNeutral", ""), fixedGridRhoFastjetCentralNeutralH);
+  iEvent.getByToken(fixedGridRhoFastjetCentralNeutral_, fixedGridRhoFastjetCentralNeutralH);
 
 
   // Prepare vector for output 
