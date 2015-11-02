@@ -34,8 +34,8 @@ private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   // ----------member data ---------------------------
-  edm::InputTag probesLabel_;
-  edm::InputTag logErrorLabel_;
+  edm::EDGetTokenT<edm::View<reco::Candidate>> probesLabel_;
+  edm::EDGetTokenT<std::vector<edm::ErrorSummaryEntry>> logErrorLabel_;
 
   std::map<std::string, std::set<std::string> > counters_;
 
@@ -43,8 +43,8 @@ private:
 };
 
 ComputeLogErrorTotals::ComputeLogErrorTotals(const edm::ParameterSet& iConfig):
-  probesLabel_(iConfig.getParameter<edm::InputTag>("probes")),
-  logErrorLabel_(iConfig.getParameter<edm::InputTag>("logErrors"))
+  probesLabel_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("probes"))),
+  logErrorLabel_(consumes<std::vector<edm::ErrorSummaryEntry>>(iConfig.getParameter<edm::InputTag>("logErrors")))
 {
     edm::ParameterSet idps = iConfig.getParameter<edm::ParameterSet>("counters");
     std::vector<std::string> names = idps.getParameterNamesForType<std::vector<std::string> >();
@@ -64,10 +64,10 @@ void ComputeLogErrorTotals::produce(edm::Event& iEvent, const edm::EventSetup& i
 
   // Read input
   Handle<View<reco::Candidate> > probes;
-  iEvent.getByLabel(probesLabel_, probes);
+  iEvent.getByToken(probesLabel_, probes);
 
   edm::Handle<std::vector<edm::ErrorSummaryEntry> >  errors;
-  iEvent.getByLabel(logErrorLabel_,errors);
+  iEvent.getByToken(logErrorLabel_,errors);
 
   // Compare severity level of error with ELseveritylevel instance el : "-e" should be the lowest error
   edm::ELseverityLevel el("-e");

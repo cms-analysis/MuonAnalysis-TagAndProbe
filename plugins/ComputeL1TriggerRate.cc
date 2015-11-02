@@ -29,15 +29,15 @@ private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   // ----------member data ---------------------------
-  const edm::InputTag probesLabel_;
-  const edm::InputTag scalersLabel_;
+  const edm::EDGetTokenT<edm::View<reco::Candidate>> probesLabel_;
+  const edm::EDGetTokenT<std::vector<Level1TriggerScalers>> scalersLabel_;
 
   void writeGlobalFloat(edm::Event &iEvent, const edm::Handle<edm::View<reco::Candidate> > &probes, const double value, const std::string &label) ;
 };
 
 ComputeL1TriggerRate::ComputeL1TriggerRate(const edm::ParameterSet& iConfig):
-  probesLabel_(iConfig.getParameter<edm::InputTag>("probes")),
-  scalersLabel_(iConfig.getParameter<edm::InputTag>("scalers"))
+  probesLabel_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("probes"))),
+  scalersLabel_(consumes<std::vector<Level1TriggerScalers>>(iConfig.getParameter<edm::InputTag>("scalers")))
 {
   produces<edm::ValueMap<float> >();
   produces<edm::ValueMap<float> >("bx");
@@ -52,10 +52,10 @@ void ComputeL1TriggerRate::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
   // Read input
   Handle<View<reco::Candidate> > probes;
-  iEvent.getByLabel(probesLabel_, probes);
+  iEvent.getByToken(probesLabel_, probes);
 
   edm::Handle<std::vector<Level1TriggerScalers> > scalers; 
-  iEvent.getByLabel(scalersLabel_, scalers); 
+  iEvent.getByToken(scalersLabel_, scalers); 
 
   writeGlobalFloat(iEvent, probes, scalers->empty() ? -1 : scalers->front().gtTriggersRate(), "");
   writeGlobalFloat(iEvent, probes, iEvent.bunchCrossing(), "bx");

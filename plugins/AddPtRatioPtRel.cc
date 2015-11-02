@@ -39,8 +39,8 @@ private:
   virtual void endJob();
 
   // ----------member data ---------------------------
-  const edm::InputTag probes_;    
-  const edm::InputTag jets_;    
+  const edm::EDGetTokenT<edm::View<reco::Candidate>> probes_;    
+  const edm::EDGetTokenT<std::vector<reco::PFJet>> jets_;    
   const double dRmax_;
   const bool subLepFromJetForPtRel_;
 };
@@ -58,8 +58,8 @@ private:
 // constructors and destructor
 //
 AddPtRatioPtRel::AddPtRatioPtRel(const edm::ParameterSet& iConfig):
-probes_(iConfig.getParameter<edm::InputTag>("probes")),
-jets_(iConfig.getParameter<edm::InputTag>("jets")),
+probes_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("probes"))),
+jets_(consumes<std::vector<reco::PFJet>>(iConfig.getParameter<edm::InputTag>("jets"))),
 dRmax_(iConfig.getParameter<double>("dRmax")),
 subLepFromJetForPtRel_(iConfig.getParameter<bool>("subLepFromJetForPtRel"))
 {
@@ -93,11 +93,11 @@ AddPtRatioPtRel::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   using namespace edm;
 
   Handle<View<reco::Candidate> > probes;
-  iEvent.getByLabel(probes_, probes);
+  iEvent.getByToken(probes_, probes);
 
   //Aussi  mettre jet dans le fichier de configuration
   Handle<std::vector<reco::PFJet> > Jets;
-  iEvent.getByLabel(jets_, Jets);
+  iEvent.getByToken(jets_, Jets);
   //iEvent.getByLabel("ak4PFJetsCHS", Jets);
 
   //Output

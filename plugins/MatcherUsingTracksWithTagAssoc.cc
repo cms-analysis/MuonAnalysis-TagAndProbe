@@ -38,10 +38,10 @@ namespace pat {
 
     private:
       /// Labels for input collections
-      edm::InputTag src_, matched_;
+      edm::EDGetTokenT<edm::View<reco::Candidate>> src_, matched_;
 
       /// Tags to preselect probes on 
-      edm::InputTag tags_;
+      edm::EDGetTokenT<edm::View<reco::Candidate>> tags_;
       double deltaZ_;
 
       /// The real workhorse
@@ -63,9 +63,9 @@ namespace pat {
 } // namespace
 
 pat::MatcherUsingTracksWithTagAssoc::MatcherUsingTracksWithTagAssoc(const edm::ParameterSet & iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src")),
-    matched_(iConfig.getParameter<edm::InputTag>("matched")),
-    tags_(iConfig.getParameter<edm::InputTag>("tags")),
+    src_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("src"))),
+    matched_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("matched"))),
+    tags_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("tags"))),
     deltaZ_(iConfig.getParameter<double>("tagDeltaZ")),
     algo_(iConfig),
     dontFailOnMissingInput_(iConfig.existsAs<bool>("dontFailOnMissingInput") ? iConfig.getParameter<bool>("dontFailOnMissingInput") : false)
@@ -101,9 +101,9 @@ pat::MatcherUsingTracksWithTagAssoc::produce(edm::Event & iEvent, const edm::Eve
 
     Handle<View<reco::Candidate> > src, matched, tags;
 
-    iEvent.getByLabel(src_, src);
-    iEvent.getByLabel(matched_, matched);
-    iEvent.getByLabel(tags_, tags);
+    iEvent.getByToken(src_, src);
+    iEvent.getByToken(matched_, matched);
+    iEvent.getByToken(tags_, tags);
 
     // declare loop variables and some intermediate stuff
     View<reco::Candidate>::const_iterator itsrc, edsrc = src->end(); 

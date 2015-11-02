@@ -65,7 +65,7 @@ class InefficiencyCreator : public edm::EDProducer {
         virtual void produce(edm::Event&, const edm::EventSetup&);
 
         /// The RECO objects
-        edm::InputTag src_;
+        edm::EDGetTokenT<edm::View<T>> src_;
 
         typedef StringObjectFunction<T> Function;
         /// The Probability
@@ -79,7 +79,7 @@ class InefficiencyCreator : public edm::EDProducer {
 
 template<typename T>
 InefficiencyCreator<T>::InefficiencyCreator(const edm::ParameterSet &iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src")),
+    src_(consumes<edm::View<T>>(iConfig.getParameter<edm::InputTag>("src"))),
     probability_(iConfig.getParameter<std::string>("probability"))
 {
   if ( ! rng_.isAvailable()) {
@@ -114,7 +114,7 @@ void
 InefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     edm::Handle<edm::View<T> > src; 
-    iEvent.getByLabel(src_, src);
+    iEvent.getByToken(src_, src);
 
     CLHEP::HepRandomEngine& engine = rng_->getEngine( iEvent.streamID() );
 

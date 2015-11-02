@@ -32,7 +32,7 @@ class HighPtMuonsInfo : public edm::EDProducer {
 
       virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
     private:
-        edm::InputTag src_;
+        edm::EDGetTokenT<edm::View<reco::Candidate>> src_;
 
         /// Write a ValueMap<float> in the event
         void writeValueMap(edm::Event &iEvent,
@@ -43,7 +43,7 @@ class HighPtMuonsInfo : public edm::EDProducer {
 };
 
 HighPtMuonsInfo::HighPtMuonsInfo(const edm::ParameterSet & iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src"))
+    src_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("src")))
 {
     produces<edm::ValueMap<float> >("pt");
     produces<edm::ValueMap<float> >("ptRelError");
@@ -57,7 +57,7 @@ HighPtMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
     using namespace std;
 
     Handle<View<reco::Candidate> > src;
-    iEvent.getByLabel(src_, src);
+    iEvent.getByToken(src_, src);
 
     size_t n = src->size();
     std::vector<float> pt(n,0), ptRelError(n,0), mass(n, -999), trackType(n,-999);

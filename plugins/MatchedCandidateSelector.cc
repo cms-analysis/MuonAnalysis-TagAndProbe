@@ -38,12 +38,13 @@ class MatchedCandidateSelector : public edm::EDProducer {
         virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
 
     private:
-        edm::InputTag src_, match_;
+        edm::EDGetTokenT<edm::View<reco::Candidate>> src_;
+        edm::EDGetTokenT<edm::ValueMap<reco::CandidatePtr>> match_;
 };
 
 MatchedCandidateSelector::MatchedCandidateSelector(const edm::ParameterSet & iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src")), 
-    match_(iConfig.getParameter<edm::InputTag>("match")) 
+    src_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("src"))), 
+    match_(consumes<edm::ValueMap<reco::CandidatePtr>>(iConfig.getParameter<edm::InputTag>("match"))) 
 {
     produces<reco::CandidateBaseRefVector>();
     produces<reco::CandidateBaseRefVector>("unmatched");
@@ -54,9 +55,9 @@ MatchedCandidateSelector::produce(edm::Event & iEvent, const edm::EventSetup & i
     using namespace edm;
 
     Handle<View<reco::Candidate> > src;
-    iEvent.getByLabel(src_, src);
+    iEvent.getByToken(src_, src);
     Handle<ValueMap<reco::CandidatePtr> > match;
-    iEvent.getByLabel(match_, match);
+    iEvent.getByToken(match_, match);
 
     std::auto_ptr<reco::CandidateBaseRefVector >  out( new reco::CandidateBaseRefVector());
     std::auto_ptr<reco::CandidateBaseRefVector >  fail(new reco::CandidateBaseRefVector());

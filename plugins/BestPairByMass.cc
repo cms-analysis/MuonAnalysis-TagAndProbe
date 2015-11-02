@@ -51,7 +51,7 @@ class BestPairByMass : public edm::EDProducer {
         virtual void produce(edm::Event&, const edm::EventSetup&);
 
         /// The Tags
-        edm::InputTag pairs_;
+        edm::EDGetTokenT<edm::View<reco::Candidate>> pairs_;
 
         /// Mass value and window
         double mass_;
@@ -61,7 +61,7 @@ class BestPairByMass : public edm::EDProducer {
 };
 
 BestPairByMass::BestPairByMass(const edm::ParameterSet &iConfig) :
-    pairs_(iConfig.getParameter<edm::InputTag>("pairs")),
+    pairs_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("pairs"))),
     mass_(iConfig.getParameter<double>("mass"))
 {
     produces<edm::RefToBaseVector<reco::Candidate> >();
@@ -75,7 +75,7 @@ void
 BestPairByMass::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     edm::Handle<edm::View<reco::Candidate> > pairs; 
-    iEvent.getByLabel(pairs_, pairs);
+    iEvent.getByToken(pairs_, pairs);
 
     // Filter and fill
     size_t i, n = pairs->size(); 

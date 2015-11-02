@@ -41,7 +41,7 @@ private:
   virtual void endJob() ;
 
   // ----------member data ---------------------------
-  const edm::InputTag probes_;    
+  const edm::EDGetTokenT<edm::View<reco::Muon>> probes_;    
 };
 
 //
@@ -57,7 +57,7 @@ private:
 // constructors and destructor
 //
 MuonDxyPVdzmin::MuonDxyPVdzmin(const edm::ParameterSet& iConfig):
-probes_(iConfig.getParameter<edm::InputTag>("probes"))
+probes_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("probes")))
 
 {
   produces<edm::ValueMap<float> >("dxyBS");
@@ -87,7 +87,7 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // read input
   Handle<View<reco::Muon> > probes;
-  iEvent.getByLabel(probes_,  probes);
+  iEvent.getByToken(probes_,  probes);
   
   edm::Handle<std::vector<reco::Vertex> > primaryVerticesHandle;
   iEvent.getByLabel("offlinePrimaryVertices", primaryVerticesHandle);

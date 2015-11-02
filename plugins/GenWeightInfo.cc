@@ -34,8 +34,8 @@ public:
 
 private:
 
-  edm::InputTag m_genInfoTag;
-  edm::InputTag m_pairTag;
+  edm::EDGetTokenT<GenEventInfoProduct> m_genInfoTag;
+  edm::EDGetTokenT<edm::View<reco::Candidate>> m_pairTag;
 
   /// Write a ValueMap<float> in the event
   void writeValueMap(edm::Event &ev, const edm::Handle<edm::View<reco::Candidate> > & handle,
@@ -45,8 +45,8 @@ private:
 
 
 GenWeightInfo::GenWeightInfo(const edm::ParameterSet & iConfig) :
-  m_genInfoTag(iConfig.getParameter<edm::InputTag>("genInfoTag")),
-  m_pairTag(iConfig.getParameter<edm::InputTag>("pairTag"))
+  m_genInfoTag(consumes<GenEventInfoProduct>(iConfig.getParameter<edm::InputTag>("genInfoTag"))),
+  m_pairTag(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("pairTag")))
 {
   
   produces<edm::ValueMap<float> >("genWeight");
@@ -61,13 +61,13 @@ void GenWeightInfo::produce(edm::Event & ev, const edm::EventSetup & iSetup)
   if (!ev.isRealData())
     {
       edm::Handle<GenEventInfoProduct> genInfo;
-      ev.getByLabel(m_genInfoTag, genInfo);
+      ev.getByToken(m_genInfoTag, genInfo);
 
       weight = genInfo->weight();
     } 
   
   edm::Handle<edm::View<reco::Candidate> > pairs;
-  ev.getByLabel(m_pairTag, pairs);
+  ev.getByToken(m_pairTag, pairs);
 
   size_t n = pairs->size();
   std::vector<float> genWeight(n,0);

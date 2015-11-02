@@ -54,7 +54,7 @@ private:
   virtual void endJob() ;
 
   // ----------member data ---------------------------
-  const edm::InputTag probesLabel;
+  const edm::EDGetTokenT<edm::View<pat::Muon>> probesLabel;
 
 };
 
@@ -71,7 +71,7 @@ private:
 // constructors and destructor
 //
 ComputeIsoCorrections::ComputeIsoCorrections(const edm::ParameterSet& iConfig):
-  probesLabel(iConfig.getParameter<edm::InputTag>("probes"))
+  probesLabel(consumes<edm::View<pat::Muon>>(iConfig.getParameter<edm::InputTag>("probes")))
 {
 
   produces<edm::ValueMap<float> >("fixedGridRhoFastjetAllCalo");
@@ -95,7 +95,7 @@ void ComputeIsoCorrections::produce(edm::Event& iEvent, const edm::EventSetup& i
 
   // Read input
   Handle<View<pat::Muon> > probes;
-  iEvent.getByLabel(probesLabel, probes);
+  iEvent.getByToken(probesLabel, probes);
   
   // Rho values
   edm::Handle<double> fixedGridRhoFastjetAllH;
