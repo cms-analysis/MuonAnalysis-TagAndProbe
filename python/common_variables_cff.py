@@ -143,6 +143,10 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
     Loose       = cms.string("isLooseMuon()"),
     Medium      = cms.string("isPFMuon && innerTrack.validFraction >= 0.8 && ( isGlobalMuon && globalTrack.normalizedChi2 < 3 && combinedQuality.chi2LocalPosition < 12 && combinedQuality.trkKink < 20 && segmentCompatibility >= 0.303 || segmentCompatibility >= 0.451 )"),
+    HighPt = cms.string("isGlobalMuon && isTrackerMuon &&  globalTrack.hitPattern.numberOfValidMuonHits > 0 && "+
+                        "numberOfMatchedStations > 1 && track.hitPattern.numberOfValidPixelHits > 0 && "+
+                        "track.hitPattern.trackerLayersWithMeasurement > 5 && abs(dB) < 0.2 && "+
+                        "(tunePMuonBestTrack.ptError / tunePMuonBestTrack.pt) < 0.3"),
     HWWID =  cms.string("( ((isGlobalMuon() && "
                         "    globalTrack.normalizedChi2 <10 &&" +
                         "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
@@ -280,6 +284,15 @@ HighPtTriggerFlagsDebug = cms.PSet(
    L3fL1sMu16L1f0L2f10QL3Filtered18QL3pfhcalOldIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered18QL3pfhcalOldIsoRhoFilteredHB0p21HE0p22').empty()"),
    L3crIsoL1sMu16L1f0L2f10QL3f18QL3OldCaloIsotrkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3crIsoL1sMu16L1f0L2f10QL3f18QL3OldCaloIsotrkIsoFiltered0p09').empty()"),
    L3fL1sMu16f0TkFiltered18Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered18Q').empty()"),
+   #add the muon 20 isolation varibles
+   L3fL1sMu16L1f0L2f10QL3Filtered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20Q').empty()"),
+   L3fL1sMu16L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p13EE0p10').empty()"),
+   L3fL1sMu16L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFiltered0p23').empty()"),
+   L3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09').empty()"),
+   L3fL1sMu16f0TkFiltered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20Q').empty()"),
+   L3fL1sMu16f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p13EE0p10').empty()"),
+   L3fL1sMu16f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfhcalIsoRhoFiltered0p23').empty()"),
+   L3fL1sMu16L1f0Tkf20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0Tkf20QL3trkIsoFiltered0p09').empty()"),
 
 )
 

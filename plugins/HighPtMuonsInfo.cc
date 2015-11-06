@@ -40,6 +40,8 @@ class HighPtMuonsInfo : public edm::EDProducer {
                 const std::vector<float> & values,
                 const std::string    & label) const ;
 
+        reco::Muon::MuonTrackTypePair getMuonTrackTypePair(const reco::Muon & mu) const;
+
 };
 
 HighPtMuonsInfo::HighPtMuonsInfo(const edm::ParameterSet & iConfig) :
@@ -69,11 +71,11 @@ HighPtMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
 
         const reco::Muon *mu1 = dynamic_cast<const reco::Muon *>(&*d1.masterClone());
         if (mu1 == 0) throw cms::Exception("CorruptData") << "First daughter of candidate is not a ShallowClone of a reco::Muon\n";
-        reco::Muon::MuonTrackTypePair tuneP1 = muon::tevOptimized(*mu1, 200, 40., 17., 0.25);
+        reco::Muon::MuonTrackTypePair tuneP1 = getMuonTrackTypePair(*mu1);
 
         const reco::Muon *mu2 = dynamic_cast<const reco::Muon *>(&*d2.masterClone());
         if (mu2 == 0) throw cms::Exception("CorruptData") << "Second daughter of candidate is not a ShallowClone of a reco::Muon\n";
-        reco::Muon::MuonTrackTypePair tuneP2 = muon::tevOptimized(*mu2, 200, 40., 17., 0.25);
+        reco::Muon::MuonTrackTypePair tuneP2 = getMuonTrackTypePair(*mu2);
 
         // Momentum and relative uncertainty
         pt[i] = tuneP2.first->pt();
@@ -115,6 +117,27 @@ HighPtMuonsInfo::writeValueMap(edm::Event &iEvent,
     filler.fill();
     iEvent.put(valMap, label);
 }
+
+reco::Muon::MuonTrackTypePair 
+HighPtMuonsInfo::getMuonTrackTypePair(const reco::Muon & mu) const
+{
+
+  reco::Muon::MuonTrackTypePair trackTypePair;
+  
+  if (mu.tunePMuonBestTrack().isAvailable())
+      trackTypePair = std::make_pair(mu.tunePMuonBestTrack(),mu.tunePMuonBestTrackType());
+  else if(mu.innerTrack().isAvailable())
+      trackTypePair = std::make_pair(mu.innerTrack(),reco::Muon::InnerTrack);
+  else
+      trackTypePair = std::make_pair(mu.outerTrack(),reco::Muon::OuterTrack);
+  
+  return trackTypePair;
+  
+}
+
+
+
+
 
 
 #include "FWCore/Framework/interface/MakerMacros.h"
