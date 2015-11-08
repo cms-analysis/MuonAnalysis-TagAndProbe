@@ -488,6 +488,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.preTkMatchSequenceZ +
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
+        process.nverticesModule + process.l1rate +
         process.tpTreeL1
     )
 
