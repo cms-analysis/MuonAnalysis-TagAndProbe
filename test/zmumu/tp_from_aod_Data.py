@@ -216,8 +216,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
-        #l1rate = cms.InputTag("l1rate"),
-        #bx     = cms.InputTag("l1rate","bx"),
+        l1rate = cms.InputTag("l1rate"),
+        bx     = cms.InputTag("l1rate","bx"),
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
     ),
@@ -284,7 +284,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.extraProbeVariablesSeq +
     process.probeMultiplicities + 
-    #process.l1rate +
+    process.l1rate +
     #process.l1hltprescale + 
     process.bestPairByZMass + 
     process.newTunePVals +
@@ -364,8 +364,8 @@ process.tpTreeSta = process.tpTree.clone(
         neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
         photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
-        #l1rate = cms.InputTag("l1rate"),
-        #bx     = cms.InputTag("l1rate","bx"),
+        l1rate = cms.InputTag("l1rate"),
+        bx     = cms.InputTag("l1rate","bx"),
     ),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30ModuleSta"),
@@ -387,7 +387,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.nverticesModule +
     process.staToTkMatchSequenceZ +
     process.njets30ModuleSta +
-    #process.l1rate +
+    process.l1rate +
     process.tpTreeSta
 )
 
@@ -488,6 +488,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.preTkMatchSequenceZ +
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
+        process.nverticesModule + process.l1rate +
         process.tpTreeL1
     )
 
