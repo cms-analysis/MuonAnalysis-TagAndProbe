@@ -38,7 +38,7 @@ private:
 
   // ----------member data ---------------------------
   const edm::EDGetTokenT<edm::View<reco::Muon>> probes_;    
-  const edm::EDGetTokenT<edm::View<reco::PFCandidate>> pfCandidates_;
+  const edm::EDGetTokenT<PFCollection> pfCandidates_;
   double dRCandProbeVeto_;
   double dRCandSoftActivityCone_;
   double CandPtThreshold_;
@@ -67,7 +67,7 @@ private:
 //
 MuonMiniIso::MuonMiniIso(const edm::ParameterSet& iConfig):
 probes_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("probes"))),
-pfCandidates_(consumes<edm::View<reco::PFCandidate>>(iConfig.getParameter<edm::InputTag>("pfCandidates"))),
+pfCandidates_(consumes<PFCollection>(iConfig.getParameter<edm::InputTag>("pfCandidates"))),
 dRCandProbeVeto_(iConfig.getParameter<double>("dRCandProbeVeto")),
 dRCandSoftActivityCone_(iConfig.getParameter<double>("dRCandSoftActivityCone")),
 CandPtThreshold_(iConfig.getParameter<double>("CandPtThreshold"))

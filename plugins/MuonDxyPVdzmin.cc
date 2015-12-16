@@ -42,6 +42,8 @@ private:
 
   // ----------member data ---------------------------
   const edm::EDGetTokenT<edm::View<reco::Muon>> probes_;    
+  const edm::EDGetTokenT<std::vector<reco::Vertex>> vertexes_;    
+  const edm::EDGetTokenT<reco::BeamSpot> bs_;    
 };
 
 //
@@ -57,8 +59,9 @@ private:
 // constructors and destructor
 //
 MuonDxyPVdzmin::MuonDxyPVdzmin(const edm::ParameterSet& iConfig):
-probes_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("probes")))
-
+probes_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("probes"))),
+vertexes_(consumes<std::vector<reco::Vertex>>(edm::InputTag("offlinePrimaryVertices"))),
+bs_(consumes<reco::BeamSpot>(edm::InputTag("offlineBeamSpot")))
 {
   produces<edm::ValueMap<float> >("dxyBS");
   produces<edm::ValueMap<float> >("dxyPVdzmin");
@@ -90,10 +93,10 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   iEvent.getByToken(probes_,  probes);
   
   edm::Handle<std::vector<reco::Vertex> > primaryVerticesHandle;
-  iEvent.getByLabel("offlinePrimaryVertices", primaryVerticesHandle);
+  iEvent.getByToken(vertexes_, primaryVerticesHandle);
       
   edm::Handle<reco::BeamSpot> recoBeamSpotHandle;
-  iEvent.getByLabel("offlineBeamSpot" ,recoBeamSpotHandle);
+  iEvent.getByToken(bs_,recoBeamSpotHandle);
   reco::BeamSpot bs = *recoBeamSpotHandle;
   math::XYZPoint BSPosition;
   BSPosition = bs.position();
