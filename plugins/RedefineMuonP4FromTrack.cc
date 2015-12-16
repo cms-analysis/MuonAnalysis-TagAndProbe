@@ -28,14 +28,14 @@ class RedefineMuonP4FromTrackT : public edm::EDProducer {
 
     private:
       enum TkType { TrackerTk, MuonTk, GlobalTk } ;
-      edm::InputTag src_;
+      edm::EDGetTokenT<edm::View<T>> src_;
       TkType        track_;
       
 };
 
 template<typename T>
 RedefineMuonP4FromTrackT<T>::RedefineMuonP4FromTrackT(const edm::ParameterSet & iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src"))
+    src_(consumes<edm::View<T>>(iConfig.getParameter<edm::InputTag>("src")))
 {
     std::string track = iConfig.getParameter<std::string>("track");
     if (track == "tracker" || track == "inner" || track == "silicon") track_ = TrackerTk;
@@ -52,7 +52,7 @@ RedefineMuonP4FromTrackT<T>::produce(edm::Event & iEvent, const edm::EventSetup 
     using namespace std;
 
     Handle<View<T> >      src;
-    iEvent.getByLabel(src_, src);
+    iEvent.getByToken(src_, src);
 
     auto_ptr<vector<T> >  out(new vector<T>());
     out->reserve(src->size());

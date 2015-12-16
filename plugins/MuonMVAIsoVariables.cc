@@ -36,12 +36,12 @@ private:
   virtual void endJob() ;
 
   // ----------member data ---------------------------
-  const edm::InputTag probes_;    
+  const edm::EDGetTokenT<edm::View<reco::Muon>> probes_;    
   const bool doOverlapRemoval_;
-  const edm::InputTag goodElectrons_;    
-  const edm::InputTag goodMuons_;    
-  const edm::InputTag pfCandidates_;
-  const edm::InputTag vertices_;
+  const edm::EDGetTokenT<edm::View<reco::GsfElectron>> goodElectrons_;    
+  const edm::EDGetTokenT<edm::View<reco::Muon>> goodMuons_;    
+  const edm::EDGetTokenT<edm::View<reco::PFCandidate>> pfCandidates_;
+  const edm::EDGetTokenT<reco::VertexCollection> vertices_;
   const double dzCut_, photonPtMin_, neutralHadPtMin_;
 
   /// Store extra information in a ValueMap
@@ -65,12 +65,12 @@ private:
 // constructors and destructor
 //
 MuonMVAIsoVariables::MuonMVAIsoVariables(const edm::ParameterSet& iConfig):
-    probes_(iConfig.getParameter<edm::InputTag>("probes")),
+    probes_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("probes"))),
     doOverlapRemoval_(iConfig.getParameter<bool>("doOverlapRemoval")),
-    goodElectrons_(doOverlapRemoval_ ? iConfig.getParameter<edm::InputTag>("goodElectrons") : edm::InputTag("NONE")),
-    goodMuons_(doOverlapRemoval_ ? iConfig.getParameter<edm::InputTag>("goodMuons") : edm::InputTag("NONE")),
-    pfCandidates_(iConfig.getParameter<edm::InputTag>("pfCandidates")),
-    vertices_(iConfig.getParameter<edm::InputTag>("vertices")),
+    goodElectrons_(consumes<edm::View<reco::GsfElectron>>(doOverlapRemoval_ ? iConfig.getParameter<edm::InputTag>("goodElectrons") : edm::InputTag("NONE"))),
+    goodMuons_(consumes<edm::View<reco::Muon>>(doOverlapRemoval_ ? iConfig.getParameter<edm::InputTag>("goodMuons") : edm::InputTag("NONE"))),
+    pfCandidates_(consumes<edm::View<reco::PFCandidate>>(iConfig.getParameter<edm::InputTag>("pfCandidates"))),
+    vertices_(consumes<reco::VertexCollection>(iConfig.getParameter<edm::InputTag>("vertices"))),
     dzCut_(iConfig.getParameter<double>("dzCut")),
     photonPtMin_(iConfig.getParameter<double>("photonPtMin")),
     neutralHadPtMin_(iConfig.getParameter<double>("neutralHadPtMin"))
@@ -116,19 +116,19 @@ MuonMVAIsoVariables::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // read input
   Handle<View<reco::Muon> > probes;
-  iEvent.getByLabel(probes_, probes);
+  iEvent.getByToken(probes_, probes);
 
   Handle<View<reco::GsfElectron> > goodElectrons;
   Handle<View<reco::Muon> >        goodMuons;
   if (doOverlapRemoval_) {
-      iEvent.getByLabel(goodMuons_,     goodMuons);
-      iEvent.getByLabel(goodElectrons_, goodElectrons);
+      iEvent.getByToken(goodMuons_,     goodMuons);
+      iEvent.getByToken(goodElectrons_, goodElectrons);
   }
 
   Handle<View<reco::PFCandidate> > pfCandidates;
   Handle<reco::VertexCollection  > vertices;
-  iEvent.getByLabel(pfCandidates_, pfCandidates);
-  iEvent.getByLabel(vertices_, vertices);
+  iEvent.getByToken(pfCandidates_, pfCandidates);
+  iEvent.getByToken(vertices_, vertices);
   const reco::Vertex &vtx = !vertices->empty() ? vertices->at(0) : reco::Vertex();
 
   View<reco::Muon>::const_iterator probe, endprobes=probes->end();

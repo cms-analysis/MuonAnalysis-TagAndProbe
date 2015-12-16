@@ -32,16 +32,16 @@ class ObjectCleanedMultiplicityCounter : public edm::EDProducer {
         virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
 
     private:
-        edm::InputTag pairs_;            
-        edm::InputTag objects_; 
+        edm::EDGetTokenT<edm::View<reco::Candidate>> pairs_;            
+        edm::EDGetTokenT<edm::View<T>> objects_; 
         StringCutObjectSelector<T,true> objCut_; // lazy parsing, to allow cutting on variables not in reco::Candidate class
         double objDR2Tag_, objDR2Probe_;
 };
 
 template<typename T>
 ObjectCleanedMultiplicityCounter<T>::ObjectCleanedMultiplicityCounter(const edm::ParameterSet & iConfig) :
-    pairs_(iConfig.getParameter<edm::InputTag>("pairs")),
-    objects_(iConfig.getParameter<edm::InputTag>("objects")),
+    pairs_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("pairs"))),
+    objects_(consumes<edm::View<T>>(iConfig.getParameter<edm::InputTag>("objects"))),
     objCut_(iConfig.existsAs<std::string>("objectSelection") ? iConfig.getParameter<std::string>("objectSelection") : "", true),
     objDR2Tag_(std::pow(iConfig.getParameter<double>("minTagObjDR"),2)),
     objDR2Probe_(std::pow(iConfig.getParameter<double>("minProbeObjDR"),2))
@@ -63,8 +63,8 @@ ObjectCleanedMultiplicityCounter<T>::produce(edm::Event & iEvent, const edm::Eve
     // read input
     Handle<View<reco::Candidate> > pairs;
     Handle<View<T> > objects;
-    iEvent.getByLabel(pairs_,  pairs);
-    iEvent.getByLabel(objects_, objects);
+    iEvent.getByToken(pairs_,  pairs);
+    iEvent.getByToken(objects_, objects);
     
     // fill
     std::vector<const T *> selObjs;

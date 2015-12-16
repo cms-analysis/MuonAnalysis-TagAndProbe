@@ -1,3 +1,4 @@
+#if 0
 // system include files
 #include <memory>
 #include <cmath>
@@ -30,7 +31,7 @@ private:
   virtual void beginRun(edm::Run&, edm::EventSetup const&);
 
   // ----------member data ---------------------------
-  const edm::InputTag probesLabel_;
+  const edm::EDGetTokenT<edm::View<reco::Candidate>> probesLabel_;
   const std::string hltConfigLabel_;
   std::vector<std::string> hltPaths_;
   HLTConfigProvider hltConfig_;
@@ -39,7 +40,7 @@ private:
 };
 
 ComputeL1HLTPrescales::ComputeL1HLTPrescales(const edm::ParameterSet& iConfig):
-  probesLabel_(iConfig.getParameter<edm::InputTag>("probes")),
+  probesLabel_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("probes"))),
   hltConfigLabel_(iConfig.getParameter<std::string>("hltConfig")),
   hltPaths_(iConfig.getParameter<std::vector<std::string> >("hltPaths"))
 {
@@ -60,7 +61,7 @@ void ComputeL1HLTPrescales::produce(edm::Event& iEvent, const edm::EventSetup& i
 
   // Read input
   Handle<View<reco::Candidate> > probes;
-  iEvent.getByLabel(probesLabel_, probes);
+  iEvent.getByToken(probesLabel_, probes);
 
   if(!hltConfig_.inited()) {
     for(unsigned int j=0; j<hltPaths_.size(); ++j) {
@@ -113,3 +114,4 @@ void ComputeL1HLTPrescales::writeGlobalFloat(edm::Event &iEvent, const edm::Hand
 
 // Define this module as plugin
 DEFINE_FWK_MODULE(ComputeL1HLTPrescales);
+#endif

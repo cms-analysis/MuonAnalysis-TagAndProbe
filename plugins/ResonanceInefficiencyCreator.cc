@@ -69,10 +69,10 @@ class ResonanceInefficiencyCreator : public edm::EDProducer {
         virtual void produce(edm::Event&, const edm::EventSetup&);
 
         /// The RECO objects
-        edm::InputTag src_;
+        edm::EDGetTokenT<edm::View<T>> src_;
 
         /// The Tags
-        edm::InputTag tags_;
+        edm::EDGetTokenT<edm::View<reco::Candidate>> tags_;
 
         /// Mass value and window
         double mass_, massMin_, massMax_;
@@ -97,8 +97,8 @@ class ResonanceInefficiencyCreator : public edm::EDProducer {
 
 template<typename T>
 ResonanceInefficiencyCreator<T>::ResonanceInefficiencyCreator(const edm::ParameterSet &iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src")),
-    tags_(iConfig.getParameter<edm::InputTag>("tags")),
+    src_(consumes<edm::View<T>>(iConfig.getParameter<edm::InputTag>("src"))),
+    tags_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("tags"))),
     mass_(iConfig.getParameter<double>("mass")),
     massMin_(iConfig.getParameter<double>("massMin")),
     massMax_(iConfig.getParameter<double>("massMax")),
@@ -146,10 +146,10 @@ void
 ResonanceInefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 {
     edm::Handle<edm::View<T> > src; 
-    iEvent.getByLabel(src_, src);
+    iEvent.getByToken(src_, src);
 
     edm::Handle<edm::View<reco::Candidate> > tags; 
-    iEvent.getByLabel(tags_, tags);
+    iEvent.getByToken(tags_, tags);
 
     CLHEP::HepRandomEngine& engine = rng_->getEngine( iEvent.streamID() );
 

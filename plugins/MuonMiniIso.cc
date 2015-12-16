@@ -37,8 +37,8 @@ private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
 
   // ----------member data ---------------------------
-  const edm::InputTag probes_;    
-  const edm::InputTag pfCandidates_;
+  const edm::EDGetTokenT<edm::View<reco::Muon>> probes_;    
+  const edm::EDGetTokenT<edm::View<reco::PFCandidate>> pfCandidates_;
   double dRCandProbeVeto_;
   double dRCandSoftActivityCone_;
   double CandPtThreshold_;
@@ -66,8 +66,8 @@ private:
 // constructors and destructor
 //
 MuonMiniIso::MuonMiniIso(const edm::ParameterSet& iConfig):
-probes_(iConfig.getParameter<edm::InputTag>("probes")),
-pfCandidates_(iConfig.getParameter<edm::InputTag>("pfCandidates")),
+probes_(consumes<edm::View<reco::Muon>>(iConfig.getParameter<edm::InputTag>("probes"))),
+pfCandidates_(consumes<edm::View<reco::PFCandidate>>(iConfig.getParameter<edm::InputTag>("pfCandidates"))),
 dRCandProbeVeto_(iConfig.getParameter<double>("dRCandProbeVeto")),
 dRCandSoftActivityCone_(iConfig.getParameter<double>("dRCandSoftActivityCone")),
 CandPtThreshold_(iConfig.getParameter<double>("CandPtThreshold"))
@@ -94,11 +94,11 @@ MuonMiniIso::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
   // read input
   Handle<View<reco::Muon> > probes;
-  iEvent.getByLabel(probes_, probes);
+  iEvent.getByToken(probes_, probes);
 
   //Handle<View<reco::PFCandidate> > pfCandidates;
   Handle<PFCollection> pfCandidates;
-  iEvent.getByLabel(pfCandidates_, pfCandidates);
+  iEvent.getByToken(pfCandidates_, pfCandidates);
 
   View<reco::Muon>::const_iterator probe, endprobes=probes->end();
   PFCollection::const_iterator iP, beginpf = pfCandidates->begin(), endpf=pfCandidates->end();

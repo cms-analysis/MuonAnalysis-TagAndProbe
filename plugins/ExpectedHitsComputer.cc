@@ -49,7 +49,7 @@ public:
   virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
 
 private:
-  edm::InputTag input_;
+  edm::EDGetTokenT<edm::View<reco::RecoCandidate>> input_;
   bool useGsfTrack_;
   StringCutObjectSelector<reco::Candidate,true> objCut_; 
   std::string thePropName;      
@@ -58,7 +58,7 @@ private:
 };
 
 ExpectedHitsComputer::ExpectedHitsComputer(const edm::ParameterSet & iConfig) :
-  input_(iConfig.getParameter<edm::InputTag>("inputColl")),
+  input_(consumes<edm::View<reco::RecoCandidate>>(iConfig.getParameter<edm::InputTag>("inputColl"))),
   useGsfTrack_(iConfig.getParameter<bool>("useGsfTrack")),
   objCut_(iConfig.existsAs<std::string>("objectSelection") ? iConfig.getParameter<std::string>("objectSelection") : "", true)
 {
@@ -103,7 +103,7 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
 
   // read input
   Handle<View<reco::RecoCandidate> > inputCands;
-  iEvent.getByLabel(input_,  inputCands);
+  iEvent.getByToken(input_,  inputCands);
 
   // prepare vector for output    
   std::vector<int> innerValues;

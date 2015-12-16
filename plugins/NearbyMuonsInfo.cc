@@ -40,7 +40,7 @@ class NearbyMuonsInfo : public edm::EDProducer {
       virtual void produce(edm::Event & iEvent, const edm::EventSetup & iSetup);
       virtual void beginRun(const edm::Run & iRun, const edm::EventSetup & iSetup);
     private:
-        edm::InputTag src_;
+        edm::EDGetTokenT<edm::View<reco::Candidate>> src_;
         PropagateToMuon prop1_, prop2_;
 
         /// Write a ValueMap<float> in the event
@@ -52,7 +52,7 @@ class NearbyMuonsInfo : public edm::EDProducer {
 };
 
 NearbyMuonsInfo::NearbyMuonsInfo(const edm::ParameterSet & iConfig) :
-    src_(iConfig.getParameter<edm::InputTag>("src")),
+    src_(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("src"))),
     prop1_(iConfig.getParameter<edm::ParameterSet>("propM1")),
     prop2_(iConfig.getParameter<edm::ParameterSet>("propM2"))
 {
@@ -81,7 +81,7 @@ NearbyMuonsInfo::produce(edm::Event & iEvent, const edm::EventSetup & iSetup) {
     using namespace std;
 
     Handle<View<reco::Candidate> > src;
-    iEvent.getByLabel(src_, src);
+    iEvent.getByToken(src_, src);
     edm::ESHandle<MagneticField> theMF;
     iSetup.get<IdealMagneticFieldRecord>().get(theMF);
 
