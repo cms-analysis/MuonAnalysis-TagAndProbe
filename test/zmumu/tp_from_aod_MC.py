@@ -10,7 +10,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -18,18 +18,17 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
-if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('MCRUN2_74_V9')
+if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
     process.source.fileNames = [
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0CE0AB97-2E1A-E511-A324-0025905A607E.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/0E3FF274-2C1A-E511-9FC5-0025905A60D2.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/68042E12-471B-E511-B16E-0025905A60B4.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/860D8B15-251A-E511-B97A-0025905A612C.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/8A3792A9-141B-E511-8931-0025905A6084.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/A2D65BC4-141B-E511-8A1A-002618943875.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B4DFF255-4A1A-E511-81FA-0025905A48E4.root',
-        # '/store/relval/CMSSW_7_4_6/RelValZMM_13/GEN-SIM-RECO/PU50ns_MCRUN2_74_V8-v2/00000/B6B36157-4A1A-E511-9FFA-003048FF86CA.root'
-        'root://cmsxrootd.fnal.gov//store/mc/RunIISpring15DR74/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/Asympt25ns_MCRUN2_74_V9-v3/10000/383E068B-D013-E511-838D-002590D9D8AA.root'
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56C948BE-CD9C-E511-9349-002590596468.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56F71722-CC9C-E511-9FCF-0CC47A4D7668.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/6090AA28-CC9C-E511-931E-003048FFD756.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/942C06FC-CC9C-E511-BD1B-0CC47A4D765E.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/A68E95F5-CF9C-E511-9F00-0CC47A4D7668.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/CCD157ED-CA9C-E511-A54E-0CC47A78A446.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F44985F2-CA9C-E511-A9F3-0CC47A4C8E2A.root',
+      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F453A13A-D09C-E511-9A18-0CC47A4D765E.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -334,6 +333,7 @@ process.tpTreeSta = process.tpTree.clone(
         pt = cms.string("pt"),
         eta = cms.string("eta"),
         phi = cms.string("phi"),
+        vz = cms.string("vz"), #Z point of closest approach of the track to the beam line 
         nVertices = cms.InputTag("nverticesModule"),
         combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
         chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
@@ -467,6 +467,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
         process.genToTkMatch + process.genToTkMatchNoZ +
         process.genToTkMatch0 + process.genToTkMatchNoZ0 +
         process.probeMuonsMCMatchGen +
+        process.nverticesModule +
         process.tpTreeGen
     )
 
@@ -530,6 +531,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
         process.probeMuonsMCMatchL1 +
+        process.nverticesModule +
         process.tpTreeL1
     )
 
