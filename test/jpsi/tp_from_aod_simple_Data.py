@@ -1,5 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
+import subprocess
+
 process = cms.Process("TagProbe")
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -18,6 +20,7 @@ process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 # process.Tracer = cms.Service('Tracer')
+datafile = open('Run2015D_Charmonium_AOD_16Dec2015-v1_run260627.txt', 'r')
 
 import os
 if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
@@ -59,6 +62,12 @@ elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
         '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/642ACBD2-A127-E511-A59E-02163E0123F1.root',
         '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/F24C3492-9627-E511-AEC5-02163E011C7F.root'
     ]
+elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
+
+    process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
+    process.source.fileNames = cms.untracked.vstring(datafile.read().splitlines())
+    print process.source.fileNames
+
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 

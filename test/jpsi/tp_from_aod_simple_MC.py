@@ -10,7 +10,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 10
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(20) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
@@ -227,7 +227,7 @@ process.tnpSimpleSequence = cms.Sequence(
 
 process.tagAndProbe = cms.Path( 
     process.fastFilter +
-    #process.HLTBoth    +
+    process.HLTBoth    +
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence *
     process.tnpSimpleSequence
@@ -317,7 +317,13 @@ process.RandomNumberGeneratorService.tkTracksNoJPsi      = cms.PSet( initialSeed
 process.RandomNumberGeneratorService.tkTracksNoBestJPsi  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
 
 if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
-    process.pCutTracks0 = process.pCutTracks.clone(src = 'earlyGeneralTracks')
+    process.tracksNoMuonSeeded = cms.EDFilter("TrackSelector",
+      src = cms.InputTag("generalTracks"),
+      cut = cms.string(" || ".join("isAlgoInMask('%s')" % a for a in [
+                    'initialStep', 'lowPtTripletStep', 'pixelPairStep', 'detachedTripletStep',
+                    'mixedTripletStep', 'pixelLessStep', 'tobTecStep', 'jetCoreRegionalStep' ] ) )
+    )
+    process.pCutTracks0 = process.pCutTracks.clone(src = 'tracksNoMuonSeeded')
     process.tkTracks0 = process.tkTracks.clone(src = 'pCutTracks0')
     process.tkTracksNoJPsi0 = process.tkTracksNoJPsi.clone(src = 'tkTracks0')
     process.tkTracksNoBestJPsi0 = process.tkTracksNoBestJPsi.clone(src = 'tkTracks0')
@@ -325,7 +331,7 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.RandomNumberGeneratorService.tkTracksNoBestJPsi0  = cms.PSet( initialSeed = cms.untracked.uint32(81) )
     process.preTkMatchSequenceJPsi.replace(
             process.tkTracksNoJPsi, process.tkTracksNoJPsi +
-            process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoJPsi0 +process.tkTracksNoBestJPsi0
+            process.tracksNoMuonSeeded + process.pCutTracks0 + process.tkTracks0 + process.tkTracksNoJPsi0 +process.tkTracksNoBestJPsi0
     )
     process.staToTkMatch0 = process.staToTkMatch.clone(matched = 'tkTracks0')
     process.staToTkMatchNoJPsi0 = process.staToTkMatchNoJPsi.clone(matched = 'tkTracksNoJPsi0')
@@ -342,7 +348,7 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
 
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
-#    process.HLTMu      +
+    process.HLTBoth      +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
@@ -407,6 +413,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
     )
     process.tagAndProbeTkGen = cms.Path(
         process.fastFilter +
+        process.HLTMu + 
         process.probeGen +
         process.tpPairsTkGen +
         process.preTkMatchSequenceJPsi +
@@ -471,6 +478,7 @@ if True: # turn on for tracking efficiency using L1 seeds
     )
     process.tagAndProbeTkL1 = cms.Path(
         process.fastFilter +
+        process.HLTMu + 
         process.probeL1 +
         process.tpPairsTkL1 +
         process.preTkMatchSequenceJPsi +
@@ -551,7 +559,7 @@ process.schedule = cms.Schedule(
    #process.fakeRateZPlusProbe,
 )
 
-process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC_prova.root"))
+process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC.root"))
 
 # use this if you want to compute also 'unbiased' efficiencies, 
 # - you have to remove all filters

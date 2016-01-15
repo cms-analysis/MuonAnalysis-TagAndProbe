@@ -467,6 +467,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
         process.genToTkMatch + process.genToTkMatchNoZ +
         process.genToTkMatch0 + process.genToTkMatchNoZ0 +
         process.probeMuonsMCMatchGen +
+        process.nverticesModule +
         process.tpTreeGen
     )
 
@@ -530,6 +531,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
         process.probeMuonsMCMatchL1 +
+        process.nverticesModule +
         process.tpTreeL1
     )
 
