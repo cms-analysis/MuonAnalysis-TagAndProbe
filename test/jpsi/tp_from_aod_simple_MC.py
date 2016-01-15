@@ -5,7 +5,7 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 10
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
@@ -40,6 +40,14 @@ elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     process.source.fileNames = [
         'file:data2015/RelValBoostedJPsi_7_3_0_pre1/Reference_PU35/RECO_1.root',
     ]
+elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
+    process.source.fileNames = [
+        '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/007508E4-EDB4-E511-AA41-B083FED00118.root',
+        '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/0256E6F9-2FB5-E511-9570-002590FD5A52.root',
+        '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/02916244-E3B4-E511-8842-0026189438FA.root',
+    ]
+    
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
