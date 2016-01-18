@@ -243,6 +243,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
         newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
         newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     pairFlags = cms.PSet(
         BestZ = cms.InputTag("bestPairByZMass"),
@@ -295,6 +296,7 @@ process.tnpSimpleSequence = cms.Sequence(
     #process.l1hltprescale + 
     process.bestPairByZMass + 
     process.newTunePVals +
+    process.addEventInfo +
     process.muonDxyPVdzminTags +
     process.tpTree
 )
