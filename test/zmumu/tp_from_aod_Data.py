@@ -227,6 +227,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         bx     = cms.InputTag("l1rate","bx"),
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -243,7 +244,6 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
         newTuneP_probe_trackType     = cms.InputTag("newTunePVals", "trackType"),
         newTuneP_mass                = cms.InputTag("newTunePVals", "mass"),
-        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     pairFlags = cms.PSet(
         BestZ = cms.InputTag("bestPairByZMass"),
@@ -292,11 +292,11 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.extraProbeVariablesSeq +
     process.probeMultiplicities + 
+    process.addEventInfo +
     process.l1rate +
     #process.l1hltprescale + 
     process.bestPairByZMass + 
     process.newTunePVals +
-    process.addEventInfo +
     process.muonDxyPVdzminTags +
     process.tpTree
 )
@@ -375,6 +375,7 @@ process.tpTreeSta = process.tpTree.clone(
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30ModuleSta"),
@@ -396,6 +397,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.nverticesModule +
     process.staToTkMatchSequenceZ +
     process.njets30ModuleSta +
+    process.addEventInfo +
     process.l1rate +
     process.tpTreeSta
 )

@@ -40,7 +40,7 @@ public:
 private:
 
   edm::EDGetTokenT<LumiScalersCollection> m_lumiScalerTag;
-  edm::EDGetTokenT<edm::View<reco::Candidate> > m_pairTag;
+  edm::EDGetTokenT<edm::View<reco::Candidate> > m_muonTag;
   
   /// Write a ValueMap<T> in the event
   template<typename T> void writeValueMap(edm::Event &ev, const edm::Handle<edm::View<reco::Candidate> > & handle,
@@ -50,7 +50,7 @@ private:
 
 AdditionalEventInfo::AdditionalEventInfo(const edm::ParameterSet & iConfig) :
   m_lumiScalerTag(consumes<LumiScalersCollection>(iConfig.getParameter<edm::InputTag>("lumiScalerTag"))),
-  m_pairTag(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("pairTag")))
+  m_muonTag(consumes<edm::View<reco::Candidate>>(iConfig.getParameter<edm::InputTag>("muonTag")))
 {
   
   // produces<edm::ValueMap<ULong64_t> >("orbit");
@@ -79,30 +79,21 @@ void AdditionalEventInfo::produce(edm::Event & ev, const edm::EventSetup & iSetu
       else
 	{
 	  throw cms::Exception("CorruptData") << 
-	    "[AdditionalEventInfo::produce] AdditionalEventInfo requires a valid LumiScalerCollecion InpuTag \n";
+	    "[AdditionalEventInfo::produce] AdditionalEventInfo requires a valid LumiScalerCollecion InpuTag" << std::endl;
 	}
     } 
   
-  edm::Handle<edm::View<reco::Candidate> > pairs;
-  ev.getByToken(m_pairTag, pairs);
+  edm::Handle<edm::View<reco::Candidate> > muons;
+  ev.getByToken(m_muonTag, muons);
 
-  size_t n = pairs->size();
+  size_t n = muons->size();
   
-  // std::vector<ULong64_t> orbits(n,0);
-  std::vector<float> instLumis(n,0.);
+  // std::vector<ULong64_t> orbits(n, orbit);
+  std::vector<float> instLumis(n, instLumi);
   
-  for (size_t iPair = 0; iPair < n; ++iPair)
-    {
-      const reco::Candidate & pair = (*pairs)[iPair];
-      if (pair.numberOfDaughters() != 2) throw cms::Exception("CorruptData") << 
-					   "[AdditionalEventInfo::produce] AdditionalEventInfo should be used on composite candidates with two daughters, this one has " << pair.numberOfDaughters() << "\n";
-      
-      //orbits[iPair]    = orbit;
-      instLumis[iPair] = instLumi;
-    }
 
-  // writeValueMap<ULong64_t>(ev, pairs, orbits, "orbit");
-  writeValueMap<float>(ev, pairs, instLumis, "instLumi");
+  // writeValueMap<ULong64_t>(ev, muons, orbits, "orbit");
+  writeValueMap<float>(ev, muons, instLumis, "instLumi");
 
 }
 

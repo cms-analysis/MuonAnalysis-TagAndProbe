@@ -214,7 +214,7 @@ splitTrackTagger = cms.EDProducer("NearbyCandCountComputer",
 #numberOfLostHits('MISSING_INNER_HITS')
 
 addEventInfo = cms.EDProducer("AdditionalEventInfo",
-    pairTag= cms.InputTag("tpPairs"),
+    muonTag= cms.InputTag("tagMuons"),
     lumiScalerTag= cms.InputTag("scalersRawToDigi")
 )
 
