@@ -19,8 +19,6 @@ process.load('Configuration.StandardSequences.MagneticField_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
-datafile = open('Run2015D_SingleMuon_AOD_16Dec2015-v1_run260627.txt', 'r')
-
 import os
 if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
 
@@ -50,10 +48,19 @@ if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     #print process.source.fileNames, dataSummary
 
 if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
-    
     process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
-    process.source.fileNames = cms.untracked.vstring(datafile.read().splitlines())
-    print process.source.fileNames
+    process.source.fileNames = [
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/00A3E567-75A8-E511-AD0D-0CC47A4D769E.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/06CC1B3A-FDA7-E511-B02B-00259073E388.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/0A9FEDA2-6DA8-E511-A451-002590596490.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/0AEF074D-EBA7-E511-B229-0002C94CDAF4.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/12998942-7BA8-E511-B1AA-003048FFCB84.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/145E4DB2-EFA7-E511-8E21-00266CF3DFE0.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/148E0F6C-EEA7-E511-A70E-0090FAA588B4.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/149A16F7-6DA8-E511-8A40-003048FFCC0A.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/18D542EB-FAA7-E511-A011-00259073E4E8.root',
+            '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/24537A2D-0BA8-E511-8D7C-20CF300E9ECF.root',
+    ]
 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -227,6 +234,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         bx     = cms.InputTag("l1rate","bx"),
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -291,6 +299,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.njets30Module +
     process.extraProbeVariablesSeq +
     process.probeMultiplicities + 
+    process.addEventInfo +
     process.l1rate +
     #process.l1hltprescale + 
     process.bestPairByZMass + 
@@ -373,6 +382,7 @@ process.tpTreeSta = process.tpTree.clone(
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     pairVariables = cms.PSet(
         nJets30 = cms.InputTag("njets30ModuleSta"),
@@ -394,6 +404,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.nverticesModule +
     process.staToTkMatchSequenceZ +
     process.njets30ModuleSta +
+    process.addEventInfo +
     process.l1rate +
     process.tpTreeSta
 )
