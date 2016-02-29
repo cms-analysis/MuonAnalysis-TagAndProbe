@@ -1,4 +1,4 @@
-void subTree(TString dir="tpTree", TString cut="(tag_IsoMu24_eta2p1 || tag_IsoMu24) && tag_combRelIso < 0.15", TString newFile="subTree_IsoMu24.root") {
+void subTree(TString dir="tpTree", TString cut="tag_IsoMu20 && tag_combRelIsoPF04dBeta < 0.15", TString newFile="subTree_IsoMu20.root") {
     TTree *in  = (TTree *)gFile->Get(dir+"/fitter_tree");
     TFile *fout = new TFile(newFile, "RECREATE");
     TDirectory *dout = fout->mkdir(dir); dout->cd();

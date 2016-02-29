@@ -54,7 +54,8 @@ void plotUtil() { }
 
 /* Other useful plotting macros */
 
-TString preliminary = ""; //"CMS Preliminary"
+TString cmslabel = ""; //"CMS Preliminary"
+TString cmsconditionslabel = ""; //"CMS Preliminary"
 TString retitle = "", retitleX = "";
 TString datalbl = "Data, xx nb^{-1}", reflbl = "Simulation";
 bool autoScale = false;
@@ -69,8 +70,8 @@ bool doSquare = false;
 bool doSanity = false;
 double yMax = 1.0;
 double yMin = 0.0;
-double yMaxR = 1.5;
-double yMinR = 0.5;
+double yMaxR = 1.005;
+double yMinR = 0.975;
 double yMaxD = +0.5;
 double yMinD = -0.5;
 TString extraSpam = "";
@@ -81,10 +82,10 @@ int fillColorRef_FillMC = 65;
 
 double cmsprel_xoffs = 0;
 double cmsprel_yoffs = 0;
-void cmsprelim(double xoffs=-99,double yoffs=-99) {
+void printcmsprelim(double xoffs=-99,double yoffs=-99) {
     if (xoffs == -99) xoffs = cmsprel_xoffs;
     if (yoffs == -99) yoffs = cmsprel_yoffs;
-    TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.40 : .55),yoffs+.16,xoffs+.94,yoffs+.21,"NDC");
+    TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.60 : .75),yoffs+.16,xoffs+.94,yoffs+.21,"NDC");
     cmsprel->SetTextSize(doSquare ? 0.040 : 0.05);
     cmsprel->SetFillColor(0);
     cmsprel->SetFillStyle(0);
@@ -92,21 +93,36 @@ void cmsprelim(double xoffs=-99,double yoffs=-99) {
     cmsprel->SetLineColor(0);
     cmsprel->SetTextAlign(12);
     cmsprel->SetTextFont(42);
-    cmsprel->AddText(preliminary);
+    cmsprel->AddText(cmslabel);
+    cmsprel->Draw("same");
+}
+
+void printcmsconditionslabel(double xoffs=-99,double yoffs=-99) {
+    if (xoffs == -99) xoffs = cmsprel_xoffs;
+    if (yoffs == -99) yoffs = cmsprel_yoffs;
+    TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.53 : .65),yoffs+.96,xoffs+.94,yoffs+.99,"NDC");
+    cmsprel->SetTextSize(doSquare ? 0.040 : 0.05);
+    cmsprel->SetFillColor(0);
+    cmsprel->SetFillStyle(0);
+    cmsprel->SetLineStyle(2);
+    cmsprel->SetLineColor(0);
+    cmsprel->SetTextAlign(12);
+    cmsprel->SetTextFont(42);
+    cmsprel->AddText(cmsconditionslabel);
     cmsprel->Draw("same");
 }
 
 double doLegend_xoffs = 0;
 double doLegend_yoffs = 0;
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TString lab2) {
-    double legend_y_offset = doLegend_yoffs+(preliminary != "" ? 0.07 : 0);
+    double legend_y_offset = doLegend_yoffs+(cmslabel != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .12 : .18);
     double cmsprel_y_offs = cmsprel_yoffs;
     if (g1->GetY()[g1->GetN()-1] < 0.4) {
         legend_y_offset = 0.70 - legend_y_size;
         cmsprel_y_offs = 0.70;
     }
-    TLegend *leg = new TLegend(doLegend_xoffs+(doSquare ? .62 : .68),.15 + legend_y_offset,doLegend_xoffs+.92,.15 + legend_y_size + legend_y_offset);
+    TLegend *leg = new TLegend(doLegend_xoffs+(doSquare ? .50 : .68),.15 + legend_y_offset,doLegend_xoffs+.92,.15 + legend_y_size + legend_y_offset);
     if (extraSpam != "") {
         leg->SetHeader(extraSpam);
         //leg->AddEntry("", extraSpam, "");
@@ -117,11 +133,12 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TStrin
     leg->SetTextFont(42);
     leg->SetShadowColor(0);
     leg->SetFillColor(0);
-    if (preliminary != "") cmsprelim(cmsprel_xoffs, cmsprel_y_offs);
+    if (cmslabel != "") printcmsprelim(cmsprel_xoffs, cmsprel_y_offs);
+    if (cmsconditionslabel != "") printcmsconditionslabel(cmsprel_xoffs, cmsprel_y_offs);
     leg->Draw();
 }
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3, TString lab1, TString lab2, TString lab3) {
-    double legend_y_offset = doLegend_yoffs+(preliminary != "" ? 0.07 : 0);
+    double legend_y_offset = doLegend_yoffs+(cmslabel != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .17 : .23);
     //if (g1->GetY()[g1->GetN()-1] < 0.4) {
     //    legend_y_offset = 0.75 - legend_y_size;
@@ -138,11 +155,12 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g
     leg->SetTextFont(42);
     leg->SetShadowColor(0);
     leg->SetFillColor(0);
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
     leg->Draw();
 }
 void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g3, TGraphAsymmErrors *g4, TString lab1, TString lab2, TString lab3, TString lab4) {
-    double legend_y_offset = (preliminary != "" ? 0.07 : 0);
+    double legend_y_offset = (cmslabel != "" ? 0.07 : 0);
     double legend_y_size   = (extraSpam == "" ? .22 : .28);
     if (g1->GetY()[g1->GetN()-1] < 0.4) {
         legend_y_offset = 0.75 - legend_y_size;
@@ -160,7 +178,8 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TGraphAsymmErrors *g
     leg->SetTextFont(42);
     leg->SetShadowColor(0);
     leg->SetFillColor(0);
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
     leg->Draw();
 }
 
@@ -382,7 +401,8 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
         frame->GetYaxis()->SetRangeUser(yMinR,yMaxR);
     }
     if (datalbl) reTitleTAxis(frame->GetYaxis(), datalbl+" / "+reflbl+" ratio");
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
     if (doSquare) squareCanvas(gPad);
     if (yMaxR - yMinR < 0.05) frame->GetYaxis()->SetTitleOffset(1.6);
     gPad->SetLogx(doLogX && (frame->GetXaxis()->GetXmin() > 0));
@@ -439,7 +459,8 @@ void doDiff(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, con
     diff.Draw("P SAME");
     frame->GetXaxis()->SetTitle(xtitle); //diff.GetXaxis()->SetMoreLogLabels(1);
     if (datalbl) reTitleTAxis(frame->GetYaxis(), datalbl+" - "+reflbl+" difference");
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
     if (doSquare) squareCanvas(gPad);
     gPad->SetLogx(doLogX && (frame->GetXaxis()->GetXmin() > 0));
     gPad->Print(prefix+alias+"_diff.png");
@@ -513,6 +534,7 @@ void refstackNamed(TDirectory *fit, TDirectory *refd, TString alias, TString fit
     }
     hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
     if (datalbl) doLegend(hfit,href,datalbl,reflbl);
+    if (cmsconditionslabel != "") printcmsconditionslabel();
    
     if (doSquare) squareCanvas(pref);
     maybeLogX(pref, href); 
@@ -663,7 +685,8 @@ TGraphAsymmErrors *single( TDirectory *fit, TString alias, TString fitname) {
 
     setRangeY(pfit, yMin, yMax);
     if (doSquare) squareCanvas(pfit);
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
     maybeLogX(pfit, hfit); 
     pfit->Print(prefix+alias+".png"); 
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
@@ -714,7 +737,8 @@ void single2D( TDirectory *fit, TString alias, TString fitname) {
     c1->SetRightMargin(0.14);
     hfit->Draw();
     if (doSquare) squareCanvas(c1);
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
     pfit->Print(prefix+alias+".png"); 
     if (doPdf) pfit->Print(prefix+alias+".pdf"); 
     if (doEps) pfit->Print(prefix+alias+".eps");
