@@ -46,8 +46,7 @@ if "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
     # to add following runs: 251491, 251493, 251496, ..., 251500 
     print process.source.fileNames
     #print process.source.fileNames, dataSummary
-
-if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
+elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
     process.source.fileNames = [
             '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/00A3E567-75A8-E511-AD0D-0CC47A4D769E.root',
@@ -61,7 +60,11 @@ if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
             '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/18D542EB-FAA7-E511-A011-00259073E4E8.root',
             '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/24537A2D-0BA8-E511-8D7C-20CF300E9ECF.root',
     ]
-
+elif "CMSSW_8_0_"in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('80X_dataRun2_v4')
+    process.source.fileNames = [
+        '/store/relval/CMSSW_8_0_0_pre6/SingleMuon/RECO/80X_dataRun2_v4_RelVal_sigMu2015HLHT-v1/10000/00574F9E-85D5-E511-A29D-0025905964A2.root'
+    ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
@@ -86,7 +89,6 @@ process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 
 if TRIGGER == "SingleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu45_eta2p1_v*', 'HLT_Mu50_v*',
-                                                                  'HLT_IsoMu24_eta2p1_v*', 'HLT_IsoMu20_eta2p1_v*',
                                                                   'HLT_IsoMu27_v*', 'HLT_IsoMu20_v*'  )
 elif TRIGGER == "DoubleMu":
     process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu8_v*', 'HLT_Mu17_v*',

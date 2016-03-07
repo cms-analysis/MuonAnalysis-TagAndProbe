@@ -18,17 +18,16 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
-if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
+if "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v4')
     process.source.fileNames = [
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56C948BE-CD9C-E511-9349-002590596468.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/56F71722-CC9C-E511-9FCF-0CC47A4D7668.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/6090AA28-CC9C-E511-931E-003048FFD756.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/942C06FC-CC9C-E511-BD1B-0CC47A4D765E.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/A68E95F5-CF9C-E511-9F00-0CC47A4D7668.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/CCD157ED-CA9C-E511-A54E-0CC47A78A446.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F44985F2-CA9C-E511-A9F3-0CC47A4C8E2A.root',
-      '/store/relval/CMSSW_7_6_2/RelValZMM_13/GEN-SIM-RECO/PU25ns_76X_mcRun2_asymptotic_v12-v1/00000/F453A13A-D09C-E511-9A18-0CC47A4D765E.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/382BADA2-A3DA-E511-9E07-0CC47A4D769E.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/6200B483-9EDA-E511-A354-0CC47A4D7636.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/70B70BFF-32DB-E511-A4C6-0CC47A4C8E1C.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80CC4165-9FDA-E511-815B-0CC47A78A4A0.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80F7131A-33DB-E511-A2B5-0CC47A4D75F6.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/8AC339C5-A0DA-E511-9B02-0CC47A4C8E96.root',
+        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/D279741B-9EDA-E511-A88D-0025905A6110.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
