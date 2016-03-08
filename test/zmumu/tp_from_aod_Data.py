@@ -150,6 +150,10 @@ process.tagMuons = cms.EDFilter("PATMuonSelector",
                      " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
                      " && pfIsolationR04().sumChargedHadronPt/pt < 0.2"),
 )
+process.pseudoTag = cms.EDFilter("MuonSelector",
+    src = cms.InputTag("muons"),
+    cut = cms.string("pt > 15 && isGlobalMuon && numberOfMatchedStations >= 2 && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
+)
 if TRIGGER == "DoubleMu":
     process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
                             " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
@@ -332,6 +336,8 @@ process.muonsSta = cms.EDProducer("RedefineMuonP4FromTrack",
 ## Match to trigger, to measure the efficiency of HLT tracking
 from PhysicsTools.PatAlgos.tools.helpers import *
 process.patMuonsWithTriggerSequenceSta = cloneProcessingSnippet(process, process.patMuonsWithTriggerSequence, "Sta")
+process.patMuonsWithTriggerSequenceSta.replace(process.patTriggerFullSta, process.patTriggerFull)
+process.patTriggerSta.src = 'patTriggerFull'
 process.muonMatchHLTL2Sta.maxDeltaR = 0.5
 process.muonMatchHLTL3Sta.maxDeltaR = 0.5
 massSearchReplaceAnyInputTag(process.patMuonsWithTriggerSequenceSta, "mergedMuons", "muonsSta")
@@ -341,10 +347,19 @@ process.probeMuonsSta = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTriggerSta"),
     cut = cms.string("outerTrack.isNonnull"), # no real cut now
 )
+process.pseudoProbeSta = cms.EDFilter("MuonSelector",
+    src = cms.InputTag("muonsSta"),
+    cut = cms.string("outerTrack.isNonnull"),
+)
+
 
 process.tpPairsSta = process.tpPairs.clone(decay = "tagMuons@+ probeMuonsSta@-", cut = '40 < mass < 150')
 
 process.onePairSta = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairsSta"), minNumber = cms.uint32(1))
+
+process.pseudoPairsSta = process.tpPairsSta.clone(decay = "pseudoTag@+ pseudoProbeSta@-")
+process.onePseudoPairSta = process.onePairSta.clone(src = 'pseudoPairsSta')
+process.fastPseudoTnPSta = cms.Sequence(process.pseudoTag + process.muonsSta + process.pseudoProbeSta + process.pseudoPairsSta + process.onePseudoPairSta)
 
 process.staToTkMatch.maxDeltaR     = 0.3
 process.staToTkMatch.maxDeltaPtRel = 2.
@@ -445,6 +460,8 @@ if True:
 
 process.tagAndProbeSta = cms.Path( 
     process.fastFilter +
+    process.fastPseudoTnPSta +
+    process.mergedMuons * process.patMuonsWithTriggerSequence +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
@@ -457,6 +474,7 @@ if True: # turn on for tracking efficiency using L1 seeds
         cut = cms.string("pt >= 5 && abs(eta) < 2.4"),
     )
     process.tpPairsTkL1 = process.tpPairs.clone(decay = "tagMuons@+ probeL1@-", cut = 'mass > 30')
+    process.onePairTkL1 = process.onePair.clone(src = 'tpPairsTkL1')
     process.l1ToTkMatch    = process.staToTkMatch.clone(src = "probeL1", srcTrack="none")
     process.l1ToTkMatchNoZ = process.staToTkMatchNoZ.clone(src = "probeL1", srcTrack="none")
     process.l1ToTkMatch0    = process.staToTkMatch0.clone(src = "probeL1", srcTrack="none")
@@ -501,10 +519,18 @@ if True: # turn on for tracking efficiency using L1 seeds
         pairFlags = cms.PSet(),
         allProbes     = cms.InputTag("probeL1"),
     )
+    process.pseudoPairsTkL1 = process.tpPairsSta.clone(decay = "pseudoTag@+ probeL1@-", cut = 'mass > 30')
+    process.onePseudoPairTkL1 = process.onePairSta.clone(src = 'pseudoPairsTkL1')
+    process.fastPseudoTnPTkL1 = cms.Sequence(process.pseudoTag + process.probeL1 + process.pseudoPairsTkL1 + process.onePseudoPairTkL1)
     process.tagAndProbeTkL1 = cms.Path(
         process.fastFilter +
+        process.fastPseudoTnPTkL1 +
+        process.mergedMuons * process.patMuonsWithTriggerSequence +
+        process.tagMuons + 
+        process.oneTag     +
         process.probeL1 +
         process.tpPairsTkL1 +
+        process.onePairTkL1    +
         process.preTkMatchSequenceZ +
         process.l1ToTkMatch + process.l1ToTkMatchNoZ +
         process.l1ToTkMatch0 + process.l1ToTkMatchNoZ0 +
@@ -549,23 +575,27 @@ process.fakeRateZPlusProbeTree = process.tpTree.clone(
 
 process.fakeRateJetPlusProbe = cms.Path(
     #process.fastFilterFake +
+    process.jetPlusProbeSequenceFast +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
-    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.tagMuons + process.probeMuons + 
     process.jetPlusProbeSequence +
+    process.extraProbeVariablesSeq + 
     process.fakeRateJetPlusProbeTree
 )
 process.fakeRateWPlusProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
-    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.tagMuons + process.probeMuons + 
     process.wPlusProbeSequence +
+    process.extraProbeVariablesSeq + 
     process.fakeRateWPlusProbeTree
 )
 process.fakeRateZPlusProbe = cms.Path(
     process.fastFilter +
     process.mergedMuons * process.patMuonsWithTriggerSequence +
-    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq + 
+    process.tagMuons + process.probeMuons + 
     process.zPlusProbeSequence +
+    process.extraProbeVariablesSeq + 
     process.fakeRateZPlusProbeTree
 )
 

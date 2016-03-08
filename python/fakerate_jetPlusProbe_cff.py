@@ -18,11 +18,13 @@ jetPlusProbe = cms.EDProducer("CandViewShallowCloneCombiner",
     checkCharge = cms.bool(False),
     checkOverlap = cms.bool(False)
 )
+jetPlusPseudoProbe = jetPlusProbe.clone(decay ="leadingJet muons")
 
 jetPlusProbeFilter = cms.EDFilter("CandViewCountFilter",
     src = cms.InputTag("jetPlusProbe"),
     minNumber = cms.uint32(1),
 )
+jetPlusPseudoProbeFilter = jetPlusProbeFilter.clone(src = 'jetPlusPseudoProbe')
 
 diLepVetoForJets = cms.EDFilter("CandViewSelector",
     src = cms.InputTag("diMuPairs"),
@@ -40,6 +42,14 @@ wMuNuVeto = cms.EDFilter("CandViewCountFilter",
 )
 
 jetPlusProbeVetoSequence = cms.Sequence(~diLepVetoForJets + wMuNuForVeto * ~wMuNuVeto)
+
+wMuNuForVetoPseudo = wMuNuForVeto.clone(decay = 'muons pfMet')
+wMuNuVetoPseudo = wMuNuVeto.clone(src = 'wMuNuForVetoPseudo')
+
+jetPlusProbeSequenceFast = cms.Sequence(
+    realJets * leadingJet * jetPlusPseudoProbe * jetPlusPseudoProbeFilter + wMuNuForVetoPseudo * ~wMuNuVetoPseudo
+)
+
 
 jetPlusProbeSequence = cms.Sequence(
     probeRecoMuons * diMuPairs +
