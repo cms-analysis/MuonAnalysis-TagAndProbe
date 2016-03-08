@@ -9,6 +9,7 @@
   <use   name="DataFormats/Candidate"/>
   <use   name="DataFormats/MuonReco"/>
   <use   name="DataFormats/PatCandidates"/>
+  <use   name="DataFormats/HeavyIonEvent"/>
   <use   name="FWCore/Framework"/>
   <use   name="FWCore/MessageLogger"/>
   <use   name="FWCore/ParameterSet"/>
