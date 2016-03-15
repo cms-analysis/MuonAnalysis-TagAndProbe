@@ -82,7 +82,7 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
     SaveWorkspace = cms.bool(False),
 
     Variables = cms.PSet(
-        mass   = cms.vstring("Tag-Probe Mass", "2.0", "4.3", "GeV/c^{2}"),
+        mass   = cms.vstring("Tag-Probe Mass", "2.3", "4.3", "GeV/c^{2}"),
         pt     = cms.vstring("Probe p_{T}", "0", "1000", "GeV/c"),
         p      = cms.vstring("Probe p", "0", "1000", "GeV/c"),
         eta    = cms.vstring("Probe #eta", "-2.5", "2.5", ""),

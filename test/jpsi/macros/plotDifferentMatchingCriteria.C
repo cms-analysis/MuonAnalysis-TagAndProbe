@@ -62,8 +62,10 @@ void plotSingleDelta(TString plotName, TString binName, TString xAxisName, TStri
   TCanvas *c1 = new TCanvas();
   c1->cd();
   TLegend *leg;
-  if (!fake.Contains("fake")) leg = new TLegend(.42, .15, .72, .35 );
-  if (fake.Contains("fake")) leg = new TLegend(.42, .75, .72, .93 );
+  if (!fake.Contains("fake")) leg = new TLegend(.30, .20, .75, .45 );
+  if (fake.Contains("fake")) leg = new TLegend(.30, .65, .75, .90 );
+  leg->SetTextSize(0.04);
+  leg->SetTextFont(42);
 
   for(unsigned int n = 0; n < matches.size() ; ++n){
     TString fileName = "../plots/Run2015D_16Dec2015-v1_Json_vs_JPsiPt8_" + matches.at(n) + "/fits.root";
@@ -98,7 +100,7 @@ void plotSingleDelta(TString plotName, TString binName, TString xAxisName, TStri
       if (graphName.Contains("fit_")) {
         g1->GetYaxis()->SetTitle("Raw data efficiency");
         if (graphName.Contains("_fake")) {
-          yMin = 0.0; yMax = 1.2;
+          yMin = 0.0; yMax = 1.5;
           g1->GetYaxis()->SetTitle("Data Fake match rate");
         }
         g1->GetYaxis()->SetRangeUser(yMin, yMax);

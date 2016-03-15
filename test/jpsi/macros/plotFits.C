@@ -1,12 +1,12 @@
 #include "../plotUtil_Tracking.cxx"
 
-void plotFits(TString FileName = "../fits/Run2015D_16Dec2015-v1_Json/TnP_Tracking_dr030e015_TestData_Run2015D_16Dec2015-v1_Json_four.root"){
+void plotFits(TString FileName = "../fits/Run2015D_16Dec2015-v1_Json/TnP_Tracking_dr010e010_TestData_Run2015D_16Dec2015-v1_Json_aetaet1et2et3phivtx.root"){
 
   cmslabel = "CMS Preliminary";
   cmsconditionslabel = "#sqrt{s} = 13 TeV, L = 2.23 fb^{-1}";
 
   TFile miofile(FileName,"read");
-  TCanvas *c1 = (TCanvas*)miofile.Get("tpTreeSta/eff_four_dr030e015/abseta_bin0__pt_bin0__MuX_L2Mu0_L2_pass__outerValidHits_pass__tag_Mu5_L2Mu0_Mu_pass__gaussPlusCubic/fit_canvas");
+  TCanvas *c1 = (TCanvas*)miofile.Get("tpTreeSta/eff_abseta_dr010e010/abseta_bin0__pt_bin0__MuX_L2Mu0_L2_pass__outerValidHits_pass__tag_Mu5_L2Mu0_Mu_pass__gaussPlusCubic/fit_canvas");
   TCanvas *c_pf = new TCanvas("c_pf");
   TObject *obj; 
   TIter next(c1->GetListOfPrimitives());
