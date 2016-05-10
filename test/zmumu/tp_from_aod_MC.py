@@ -87,12 +87,10 @@ process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 process.tagMuons = cms.EDFilter("PATMuonSelector",
     src = cms.InputTag("patMuonsWithTrigger"),
     cut = cms.string("pt > 15 && "+MuonIDFlags.Tight2012.value()+
-                     " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
                      " && pfIsolationR04().sumChargedHadronPt/pt < 0.2"),
 )
 if TRIGGER != "SingleMu":
     process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
-                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
                             " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
 
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
