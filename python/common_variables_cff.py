@@ -222,6 +222,7 @@ HighPtTriggerFlags = cms.PSet(
    IsoTkMu27        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu27_v*',1,0).empty()"),
    IsoTkMu20_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_eta2p1_v*',1,0).empty()"),
    IsoTkMu24_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu24_eta2p1_v*',1,0).empty()"),
+   HLT_TkMu50 = cms.string("!triggerObjectMatchesByPath('HLT_TkMu50_v*',1,0).empty()"),
 
    # To take care of the presence or not of the dz filter, we are requiring three flags for each of the main un-prescaled DoubleMuon Triggers
    # Mu17 leg, Mu8 leg, and (Mu17 leg && fired path)
