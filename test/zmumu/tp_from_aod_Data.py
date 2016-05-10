@@ -61,10 +61,12 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
             '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/24537A2D-0BA8-E511-8D7C-20CF300E9ECF.root',
     ]
 elif "CMSSW_8_0_"in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('80X_dataRun2_v4')
-    process.source.fileNames = [
-        '/store/relval/CMSSW_8_0_0_pre6/SingleMuon/RECO/80X_dataRun2_v4_RelVal_sigMu2015HLHT-v1/10000/00574F9E-85D5-E511-A29D-0025905964A2.root'
-    ]
+    process.GlobalTag.globaltag = cms.string('80X_dataRun2_Express_v7')
+
+    sourcefilesfolder = "/store/express/Run2016B/ExpressPhysics/FEVT/Express-v1/000/272/818/00000/"
+    files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", sourcefilesfolder ])
+    process.source.fileNames.extend( [ sourcefilesfolder+"/"+f for f in files.split() ] )
+
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
@@ -137,6 +139,7 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
+useL1Stage2Candidates(process)
 #useExtendedL1Match(process)
 #addHLTL1Passthrough(process)
 
