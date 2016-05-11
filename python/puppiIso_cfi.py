@@ -158,7 +158,6 @@ def load_pfParticle_sequence(proc, withLeptons):
         return pfParticlesForPUPPINoLep
 
 def load_fullPFpuppiIsolation(proc):
-    print "coucou"
     proc.pfParticlesPUPPILeptons = load_pfParticle_sequence(proc, True)
 
     muon_src, cone_size = 'probeMuons', 0.4
