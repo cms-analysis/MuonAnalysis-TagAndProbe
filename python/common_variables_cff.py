@@ -97,6 +97,8 @@ StaOnlyVariables = cms.PSet(
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
+    l1eta  = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').eta"),
+    l1phi  = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').phi"),
     l1q  = cms.string("userInt('muonL1Info:quality')"),
     l1dr = cms.string("userFloat('muonL1Info:deltaR')"),
     l1dphi = cms.string("userFloat('muonL1Info:deltaPhi')"),
