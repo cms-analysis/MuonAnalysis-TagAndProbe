@@ -70,8 +70,8 @@ bool doSquare = false;
 bool doSanity = false;
 double yMax = 1.0;
 double yMin = 0.0;
-double yMaxR = 1.005;
-double yMinR = 0.975;
+double yMaxR = 1.010;
+double yMinR = 0.900;
 double yMaxD = +0.5;
 double yMinD = -0.5;
 TString extraSpam = "";
@@ -100,7 +100,7 @@ void printcmsprelim(double xoffs=-99,double yoffs=-99) {
 void printcmsconditionslabel(double xoffs=-99,double yoffs=-99) {
     if (xoffs == -99) xoffs = cmsprel_xoffs;
     if (yoffs == -99) yoffs = cmsprel_yoffs;
-    TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.53 : .65),yoffs+.96,xoffs+.94,yoffs+.99,"NDC");
+    TPaveText *cmsprel = new TPaveText(xoffs+(doSquare ? 0.50 : .65),yoffs+.96,xoffs+.94,yoffs+.99,"NDC");
     cmsprel->SetTextSize(doSquare ? 0.040 : 0.05);
     cmsprel->SetFillColor(0);
     cmsprel->SetFillStyle(0);
@@ -122,7 +122,7 @@ void doLegend(TGraphAsymmErrors *g1, TGraphAsymmErrors *g2, TString lab1, TStrin
         legend_y_offset = 0.70 - legend_y_size;
         cmsprel_y_offs = 0.70;
     }
-    TLegend *leg = new TLegend(doLegend_xoffs+(doSquare ? .50 : .68),.15 + legend_y_offset,doLegend_xoffs+.92,.15 + legend_y_size + legend_y_offset);
+    TLegend *leg = new TLegend(doLegend_xoffs+(doSquare ? .62 : .68),.15 + legend_y_offset,doLegend_xoffs+.92,.15 + legend_y_size + legend_y_offset);
     if (extraSpam != "") {
         leg->SetHeader(extraSpam);
         //leg->AddEntry("", extraSpam, "");
@@ -363,8 +363,13 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
     if (hfit->GetN() == 0 || href->GetN() == 0) return;
     size_t nNZD = 0; // non-zero-denominator
     for (size_t i = 0, n = hfit->GetN(); i < n; ++i) {
-        int j = findBin(href,hfit->GetX()[i]); if (j == -1) continue ;
+        int j = findBin(href, hfit->GetX()[i]); 
+	if (j == -1) continue ;
         if (fabs(href->GetY()[j]) > 0.05) nNZD++;
+    }
+    if (nNZD == 0){ 
+      std::cerr << "ERROR: ratio plot empty because all zero-denominator" << std::endl;
+      return;
     }
     TGraphAsymmErrors ratio(nNZD);
     double max = 0.0049, min = -0.0049;
@@ -373,9 +378,9 @@ void doRatio(TGraphAsymmErrors *hfit, TGraphAsymmErrors *href, TString alias, co
         if (fabs(href->GetY()[j]) < 0.05) continue; else ++k;
         double r   = hfit->GetY()[i]/href->GetY()[j];
         double rup = (hfit->GetY()[i] == 0 ? hfit->GetErrorYhigh(i)/(href->GetY()[j]) :
-                                             r*TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(j)/href->GetY()[j]));
+          r*TMath::Hypot(hfit->GetErrorYhigh(i)/hfit->GetY()[i], href->GetErrorYlow(j)/href->GetY()[j]));
         double rdn = (hfit->GetY()[i] == 0 ? 0 :
-                                             r*TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(j)/href->GetY()[j]));
+          r*TMath::Hypot(hfit->GetErrorYlow(i)/hfit->GetY()[i],  href->GetErrorYhigh(j)/href->GetY()[j]));
         max = TMath::Max(max, (r-1+rup));
         min = TMath::Min(min, (r-1-rdn));
         ratio.SetPoint(k-1, hfit->GetX()[i], r);
@@ -533,7 +538,7 @@ void refstackNamed(TDirectory *fit, TDirectory *refd, TString alias, TString fit
         pref->Draw( "" );
     }
     hfit->Draw(doFillMC ? "P0Sames" : "P SAME");
-    if (datalbl) doLegend(hfit,href,datalbl,reflbl);
+//    if (datalbl) doLegend(hfit,href,datalbl,reflbl);
     if (cmsconditionslabel != "") printcmsconditionslabel();
    
     if (doSquare) squareCanvas(pref);
@@ -542,7 +547,10 @@ void refstackNamed(TDirectory *fit, TDirectory *refd, TString alias, TString fit
     if (doPdf) gPad->Print(prefix+alias+".pdf");
     if (doEps) gPad->Print(prefix+alias+".eps");
 
-    if (fOut) { fOut->WriteTObject(hfit,"fit_"+alias, "Overwrite"); fOut->WriteTObject(href,"ref_"+alias, "Overwrite"); }
+    if (fOut) { 
+      fOut->WriteTObject(hfit,"fit_"+alias, "Overwrite"); 
+      fOut->WriteTObject(href,"ref_"+alias, "Overwrite"); 
+    }
     if (doTxt)  printGraph(hfit,"fit_"+alias);
     if (doTxt)  printGraph(href,"ref_"+alias);
     if (doTxt)  printGraphs(hfit, href, alias);

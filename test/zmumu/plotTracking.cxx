@@ -13,7 +13,7 @@ void plotTracking_(TString match) ;
 TGraphAsymmErrors* corrsingle(TDirectory *fit, TDirectory *fake, TString alias, TString fitname, bool print=true) ;
 TGraphAsymmErrors* biasCorrection(TGraphAsymmErrors *fit0, TGraphAsymmErrors *fit1, TGraphAsymmErrors *ratioSP) ;
 
-void plotTracking(TString scenario="data",TString match="dr030e030") {
+void plotTracking(TString scenario="data",bool DataVsMCcomparison = false, TString match="dr030e030") {
     prefix = prefix+scenario+"/";
     basedir  = "tpTreeSta";
     basedir2 = "tpTreeSta";
@@ -34,23 +34,24 @@ void plotTracking(TString scenario="data",TString match="dr030e030") {
     doPdf = true;
     doSquare = true; yMin = 0.949; yMax = 1.009;
     doFillMC = true;
-    datalbl = "Data, 2012";
+    datalbl = "Data, 2015";
     reflbl  = "Simulation";
-    preliminary = "CMS Simulation, #sqrt{s} = 13 TeV";
+    cmslabel = "CMS Simulation, #sqrt{s} = 13 TeV";
 
     if (scenario.Contains("74X")) {
         datalbl = "74X Data";
         reflbl  = "53X Data";
         lineColorRef_FillMC = 100;
         fillColorRef_FillMC = 207;
-        preliminary = "Run2012D";
+        cmslabel = "Run2012D";
         prefix = "plots/";
     }
     if (scenario.Contains("_vs_")) {
+        cmslabel = "CMS Preliminary";
         datalbl = "Modified";
         reflbl  = "Reference";
         prefix = "plots/"+scenario+"/";
-        yMin = 999;
+        yMin = 0.0;
         if (scenario.Contains("_L1_vs_")) {
             basedir  = "tpTreeL1";
             basedir2 = "tpTreeL1";
@@ -65,31 +66,50 @@ void plotTracking(TString scenario="data",TString match="dr030e030") {
                 datalbl = "Tag & L1";
             }
         }
+        if (DataVsMCcomparison == true) {
+            cmslabel = "CMS Preliminary";
+//	    cmsconditionslabel = "#sqrt{s} = 13 TeV, L = 25.12 pb^{-1}, BX = 50ns";
+            cmsconditionslabel = "#sqrt{s} = 13 TeV, L = 2.23 fb^{-1}";	    
+            datalbl = "Data, 2015";
+            reflbl = "Simulation";
+            yMin = 0.90;
+        }
+	if (scenario.Contains("_vs_Early")){
+          cmslabel = "CMS Preliminary";
+	  cmsconditionslabel = "run #254833";
+          datalbl = "generalTracks";
+          reflbl  = "earlyGeneralTracks";
+	}
+
     }
 
-    gSystem->mkdir(prefix,true);
-    gSystem->Exec("mkdir -p "+prefix);
-    gSystem->Exec("cp /afs/cern.ch/user/g/gpetrucc/php/index.php "+prefix+"/");
-    fOut = TFile::Open(prefix+"/fits.root","UPDATE");
-    plotTracking_(match);
-    prefix += "tk0/";
-    gSystem->Exec("mkdir -p "+prefix);
-    gSystem->Exec("cp /afs/cern.ch/user/g/gpetrucc/php/index.php "+prefix+"/");
-    fOut = TFile::Open(prefix+"/fits.root","UPDATE");
-    if (scenario.Contains("_vs_")) {
-        lineColorRef_FillMC =  kViolet-2;
-        fillColorRef_FillMC =  kViolet-2;
+    if( match == "dr030e030"){
+      gSystem->mkdir(prefix,true);
+      gSystem->Exec("mkdir -p "+prefix);
+      gSystem->Exec("cp /afs/cern.ch/user/g/gpetrucc/php/index.php "+prefix+"/");
+      fOut = TFile::Open(prefix+"/fits.root","UPDATE");
+      plotTracking_(match);
     }
-    plotTracking_("tk0_"+match);
+    if( match != "dr030e030"){
+      prefix += match+"/";
+      gSystem->Exec("mkdir -p "+prefix);
+      gSystem->Exec("cp /afs/cern.ch/user/g/gpetrucc/php/index.php "+prefix);
+      fOut = TFile::Open(prefix+"fits.root","UPDATE");
+      if (scenario.Contains("_vs_")) {
+          lineColorRef_FillMC =  kViolet-2;
+          fillColorRef_FillMC =  kViolet-2;
+      }
+      plotTracking_(match);
+    }
 }
 
 void plotTracking_(TString match) {
-    const int nplots = 9;
-    const char *plots[nplots] = { "eff_aeta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two"};
-    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta" };
-    const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|" };
-    const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    ""  }; 
-    const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" };
+    const int nplots = 15;
+    const char *plots[nplots] = { "eff_aeta",    "eff_1",    "efft_1",    "eff_eta",  "eff_eta2", "eff_eta3",  "eff",       "eff_vtx",             "eff_two", 	"eff_phi", 	"eff_eph", 	"eff_eph", 	"eff_vz", "eff_bx"};//, 	"eff_eph"};
+    const char * vars[nplots] = { "abseta",      "eta",      "eta",       "eta",      "eta",      "eta",       "eta",       "tag_nVertices",       "abseta", 	"phi",		 "phi", 	"phi", "tag_vz", "tag_bx"};//,		"phi"};
+    const char *xvars[nplots] = { "muon |#eta|", "muon #eta","muon #eta", "muon #eta","muon #eta","muon #eta", "muon #eta", "N(primary vertices)", "muon |#eta|", "muon #phi" ,	"muon #phi", 	"muon #phi", "z_{vtx}", "BX"};//, 	"muon #phi"};
+    const char *bincs[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"",		"_eta_bin0", 	"_eta_bin1", "", ""};//, 	"_eta_bin2"}; 
+    const char *binls[nplots] = { "",            "",         "",          "",         "",         "",          "",          "",                    "" , 	"", 		"#eta < 0.0", 	"#eta > 0.0", "", ""};//,"#eta > 1"};
     bool  has10files = (gNFiles == 10);
     bool  has9files = (gNFiles == 9);
     bool  has8files = (gNFiles >= 8);
@@ -114,7 +134,7 @@ void plotTracking_(TString match) {
             double yMin0 = yMin;; yMax = 1.009;
             retitle = "Raw efficiency";
             if (fit_0 && ref_0) refstack(fit_0, ref_0, plotname+binName, varname+"_PLOT"+binCut);
-            retitle = "Fake rate";
+            retitle = "Fake matching rate";
             yMin = 0.0; yMax = 0.7;
             if (fit_1 && ref_1) refstack(fit_1, ref_1, plotname+binName+"_fake", varname+"_PLOT"+binCut);
             yMin = yMin0;
@@ -152,6 +172,7 @@ void plotTracking_(TString match) {
                 corr->Draw("P SAME");
                 if (datalbl) doLegend(corr,cref,datalbl,reflbl);
                 c1->Print(prefix+plotname+binName+"_corr"+".png");
+                if (fOut) { fOut->WriteTObject(corr,plotname+binName+"_corr", "Overwrite"); }
                 if (doPdf) c1->Print(prefix+plotname+binName+"_corr"+".pdf");
                 if (doTxt)  printGraph(corr,"fit_"+plotname+binName+"_corr");
                 if (doTxt)  printGraph(cref,"ref_"+plotname+binName+"_corr");
@@ -192,7 +213,7 @@ void plotTracking_(TString match) {
                     cref->Draw(doFillMC ? "E2" : "P");
                     corr0->Draw("P SAME");
                     corr->Draw("P SAME");
-                    //if (datalbl) doLegend(corr,cref,datalbl,reflbl);
+                    if (datalbl) doLegend(corr,cref,datalbl,reflbl);
                     c1->Print(prefix+plotname+binName+"_corr4"+".png"); 
                     if (doPdf) c1->Print(prefix+plotname+binName+"_corr4"+".pdf");
 
@@ -353,7 +374,8 @@ TGraphAsymmErrors* corrsingle(TDirectory *fit, TDirectory *fake, TString alias, 
     if (retitle != "") out->GetYaxis()->SetTitle(retitle);
     
     if (doSquare) squareCanvas(c1);
-    if (preliminary != "") cmsprelim();
+    if (cmslabel != "") printcmsprelim();
+    if (cmsconditionslabel != "") printcmsconditionslabel();
 
     if (print) {
         c1->Print(prefix+alias+".png");

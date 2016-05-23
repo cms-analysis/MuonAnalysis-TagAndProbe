@@ -9,13 +9,14 @@ print "Will run scenario ", scenario
 doEta = True
 doVtx = True
 
+#----------------------------------------------------------------------------------------#
 CONSTRAINTS = cms.PSet(
     outerValidHits = cms.vstring("pass"),
     #tag_IsoMu24_eta2p1 = cms.vstring("pass"),
     #tag_combRelIso = cms.vdouble(-1,0.15),
 )
 ONE_BIN = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
+    pt = cms.vdouble( 15, 120 ),
     eta = cms.vdouble(-2.4, 2.4),
 )
 ONE_BIN1= cms.PSet(CONSTRAINTS,
@@ -28,52 +29,83 @@ ONE_BIN1_TP= cms.PSet(CONSTRAINTS,
     eta = cms.vdouble(-2.1, 2.1),
 )
 TWO_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
+    pt = cms.vdouble( 15, 120 ),
     abseta = cms.vdouble(0, 1.2, 2.4),
 )
-
+FOUR_BINS = cms.PSet(CONSTRAINTS,
+    pt = cms.vdouble( 15, 120 ),
+    abseta = cms.vdouble(0, 1.0, 1.5, 2.0, 2.4),
+)
+#----------------------------------------------------------------------------------------#
 ETA_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
-    #eta = cms.vdouble(-2.4,-2.1,-1.6,-1.1,-0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4)
+    pt = cms.vdouble( 15, 120 ),
     #eta = cms.vdouble(*[-2.4+0.1*x for x in range(0,49)])
-    eta = cms.vdouble(*[-2.4+0.2*x for x in range(0,25)])
+    #eta = cms.vdouble(*[-2.4+0.2*x for x in range(0,25)])
+    eta = cms.vdouble(*[-2.4+0.4*x for x in range(0,12)])
 )
 AETA_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
-    abseta = cms.vdouble(0, 0.6, 1.1, 1.6, 2.1, 2.4),
+    pt = cms.vdouble( 15, 120 ),
+    abseta = cms.vdouble(0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2, 2.4),
+)
+AETA_EPS_BINS = cms.PSet(CONSTRAINTS,
+    pt = cms.vdouble( 15, 120 ),
+    abseta = cms.vdouble(0, 0.2, 0.4, 0.6, 0.8, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.2),
 )
 
 ETA2_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
+    pt = cms.vdouble( 15, 120 ),
     eta = cms.vdouble(-2.4,-2.1,-1.6,-1.1,-0.6, 0, 0.6, 1.1, 1.6, 2.1, 2.4),
 )
 ETA3_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
+    pt = cms.vdouble( 15, 120 ),
     eta = cms.vdouble(-2.4, -2.1, -1.6, -1.2, -0.9, -0.6, -0.3, -0.2, 0.2, 0.3, 0.6, 0.9, 1.2, 1.6, 2.1, 2.4),
 )
-
+#----------------------------------------------------------------------------------------#
 ETA_PHI_BINS = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 20, 120 ),
-    eta = cms.vdouble(-2.4,-1.9,1.9,2.4),
-    phi = cms.vdouble(*[-3.14+6.28*x/8 for x in range(0,9)]),
+    pt = cms.vdouble( 15, 120 ),
+#    phi = cms.vdouble(*[-3.14+6.28*x/8 for x in range(0,9)]),
+    phi = cms.vdouble(-3.14, -2.5, -2, -1.25, -0.63, 0, 0.63, 1.25, 2., 2.5, 3.14),
+    eta = cms.vdouble(-2.4, 0.0, 2.4)
 )
-
+PHI_BINS = ONE_BIN.clone(
+    phi = cms.vdouble(-3.14, -2.5, -2, -1.25, -0.63, 0, 0.63, 1.25, 2., 2.5, 3.14)
+)
+#----------------------------------------------------------------------------------------#
 VTX_BINS = ONE_BIN.clone(
     tag_nVertices = cms.vdouble(*[2*i+0.5 for i in xrange(15)])
 )
 VTX_BINS.tag_nVertices += [30.5, 35.5]
 
+VTX_EPS_BINS = ONE_BIN.clone(
+    tag_nVertices = cms.vdouble(9.5, 11.5, 13.5, 15.5, 17.5, 19.5, 21.5, 23.5, 25.5, 27.5, 29.5)
+)
+ZVTX_BINS = ONE_BIN.clone(
+    pt = cms.vdouble( 15, 120 ),
+    tag_vz = cms.vdouble(-15, -7, -5, -3, -1, 1, 3, 5, 7, 15)
+)
+#----------------------------------------------------------------------------------------#
+LUMI_BINS = ONE_BIN.clone(
+    pt = cms.vdouble( 15, 120 ),
+    lumi = cms.vdouble(0, 200, 400, 600, 800, 1000, 1200, 1400, 1600, 1800, 2000)
+)
+BX_BINS = ONE_BIN.clone(
+    pt = cms.vdouble( 15, 120 ),
+    tag_bx = cms.vdouble(1, 39, 141, 260, 370, 1154, 1264, 2048, 2158, 3052, 3122)
+)
 RUN_BINS_ALL = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 10, 120 ),
+    pt = cms.vdouble( 15, 120 ),
     run = cms.vdouble(190000, 191280, 192000, 193200, 194000, 194500, 195500, 196100, 197000),
 )
 RUN_BINS_ETA_PHI = cms.PSet(CONSTRAINTS,
-    pt = cms.vdouble( 20, 120 ),
+    pt = cms.vdouble( 15, 120 ),
     eta = cms.vdouble(-2.4,-1.9,1.9,2.4),
     phi = cms.vdouble(-3.14, -1.57, 0, 1.57, 3.14),
     run = cms.vdouble(190000, 192000, 193200, 194500, 195500, 197000),
 )
-
+PT_BINS = cms.PSet(CONSTRAINTS,
+    pt = cms.vdouble( 0, 5, 10, 12, 20, 30, 50, 100 ),
+    eta = cms.vdouble(-2.4, 2.4)
+)
 
 process = cms.Process("TagProbe")
 
@@ -105,8 +137,11 @@ Template = cms.EDAnalyzer("TagProbeFitTreeAnalyzer",
         tk0_deltaR_NoZ   = cms.vstring("Unmatch #Delta R",    "0", "1000", ""),
         tk0_deltaEta_NoZ = cms.vstring("Unmatch #Delta #eta", "0", "1000", ""),
         tag_nVertices = cms.vstring("Number of vertices", "0", "999", ""),
+        tag_vz = cms.vstring("Z point of closest approach of track and beam line", "-15", "15", ""),
+        tag_bx = cms.vstring("Bunch crossing", "0", "4000", ""),
         #tag_combRelIso = cms.vstring("Number of vertices", "-1", "999", ""),
         run    = cms.vstring("Run Number", "132440", "999999", ""),
+        lumi   = cms.vstring("Instantaneous Luminosity", "0", "2000", ""),
     ),
 
     Categories = cms.PSet(
@@ -149,8 +184,8 @@ process.TnP_Tracking = Template.clone(
     Efficiencies = cms.PSet()
 )
 
-if "74X" in scenario:
-    process.TnP_Tracking.InputFileNames = [ "tnpZ_tracking_74X.root" ]
+if "TestData_" in scenario:
+    process.TnP_Tracking.InputFileNames = [ "tnpZ_Data_%s.root" % ("_".join(scenario.replace("TestData_","").split("_")[:-1]),) ]
 if "TestMC_" in scenario:
     process.TnP_Tracking.InputFileNames = [ "tnpZ_MC_%s.root" % ("_".join(scenario.replace("TestMC_","").split("_")[:-1]),) ]
 if "TestMCGen_" in scenario:
@@ -160,6 +195,11 @@ if "TestMCGen_" in scenario:
     del process.TnP_Tracking.Variables.staValidStations
 if "TestMCL1_" in scenario:
     process.TnP_Tracking.InputFileNames = [ "tnpZ_MC_%s.root" % ("_".join(scenario.replace("TestMCL1_","").split("_")[:-1]),) ]
+    process.TnP_Tracking.InputDirectoryName = "tpTreeL1"
+    del process.TnP_Tracking.Categories.outerValidHits
+    del process.TnP_Tracking.Variables.staValidStations
+if "TestDataL1_" in scenario:
+    process.TnP_Tracking.InputFileNames = [ "tnpZ_Data_%s.root" % ("_".join(scenario.replace("TestDataL1_","").split("_")[:-1]),) ]
     process.TnP_Tracking.InputDirectoryName = "tpTreeL1"
     del process.TnP_Tracking.Categories.outerValidHits
     del process.TnP_Tracking.Variables.staValidStations
@@ -184,18 +224,46 @@ for (dr,de) in matches:
         if de < dr:
             setattr(module.Cuts, "deta_cut", cms.vstring(tk+"_deltaEta"+X, tk+"_deltaEta"+X, str(de)))
             common.EfficiencyCategoryAndState += [ "deta_cut","below" ]
-        if "avg" in scenario: setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
-        if "_av1" in scenario: setattr(module.Efficiencies, "eff_1_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN1))
-        if "tav1" in scenario: setattr(module.Efficiencies, "efft_1_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN1_TP))
-        if "_eta" in scenario: setattr(module.Efficiencies, "eff_eta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
-        if "aeta" in scenario: setattr(module.Efficiencies, "eff_aeta_"+label, cms.PSet(common, BinnedVariables = AETA_BINS))
-        if "et2" in scenario: setattr(module.Efficiencies, "eff_eta2_"+label, cms.PSet(common, BinnedVariables = ETA2_BINS))
-        if "et3" in scenario: setattr(module.Efficiencies, "eff_eta3_"+label, cms.PSet(common, BinnedVariables = ETA3_BINS))
-        if "vtx" in scenario: setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
-        if "two" in scenario: setattr(module.Efficiencies, "eff_two_"+label, cms.PSet(common, BinnedVariables = TWO_BINS))
-        if "eph" in scenario: setattr(module.Efficiencies, "eff_eph_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
-        if "run" in scenario: setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS_ALL))
-        if "rep" in scenario: setattr(module.Efficiencies, "eff_rep_"+label, cms.PSet(common, BinnedVariables = RUN_BINS_ETA_PHI))
+        if "avg" in scenario: 
+	  setattr(module.Efficiencies, "eff_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN))
+        if "_av1" in scenario: 
+	  setattr(module.Efficiencies, "eff_1_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN1))
+        if "tav1" in scenario: 
+	  setattr(module.Efficiencies, "efft_1_"    +label, cms.PSet(common, BinnedVariables = ONE_BIN1_TP))
+        if "aeta" in scenario: 
+	  setattr(module.Efficiencies, "eff_aeta_"+label, cms.PSet(common, BinnedVariables = AETA_BINS))
+        if "eps" in scenario: 
+	  setattr(module.Efficiencies, "eff_aeta_eps_"+label, cms.PSet(common, BinnedVariables = AETA_EPS_BINS))
+        if "et1" in scenario: 
+	  setattr(module.Efficiencies, "eff_eta_"+label, cms.PSet(common, BinnedVariables = ETA_BINS))
+        if "et2" in scenario: 
+	  setattr(module.Efficiencies, "eff_eta2_"+label, cms.PSet(common, BinnedVariables = ETA2_BINS))
+        if "et3" in scenario: 
+	  setattr(module.Efficiencies, "eff_eta3_"+label, cms.PSet(common, BinnedVariables = ETA3_BINS))
+        if "vtx" in scenario: 
+	  setattr(module.Efficiencies, "eff_vtx_"+label, cms.PSet(common, BinnedVariables = VTX_BINS))
+        if "vtxz" in scenario: 
+	  setattr(module.Efficiencies, "eff_vz_"+label, cms.PSet(common, BinnedVariables = ZVTX_BINS))
+        if "bx" in scenario: 
+	  setattr(module.Efficiencies, "eff_bx_"+label, cms.PSet(common, BinnedVariables = BX_BINS))
+        if "lumi" in scenario: 
+	  setattr(module.Efficiencies, "eff_lumi_"+label, cms.PSet(common, BinnedVariables = LUMI_BINS))
+        if "eps" in scenario: 
+	  setattr(module.Efficiencies, "eff_vtx_eps_"+label, cms.PSet(common, BinnedVariables = VTX_EPS_BINS))
+        if "phi" in scenario: 
+	  setattr(module.Efficiencies, "eff_phi_"+label, cms.PSet(common, BinnedVariables = PHI_BINS))
+        if "two" in scenario: 
+	  setattr(module.Efficiencies, "eff_two_"+label, cms.PSet(common, BinnedVariables = TWO_BINS))
+        if "four" in scenario: 
+	  setattr(module.Efficiencies, "eff_four_"+label, cms.PSet(common, BinnedVariables = FOUR_BINS))
+        if "eph" in scenario: 
+	  setattr(module.Efficiencies, "eff_eph_"+label, cms.PSet(common, BinnedVariables = ETA_PHI_BINS))
+        if "run" in scenario: 
+	  setattr(module.Efficiencies, "eff_run_"+label, cms.PSet(common, BinnedVariables = RUN_BINS_ALL))
+        if "rep" in scenario: 
+ 	  setattr(module.Efficiencies, "eff_rep_"+label, cms.PSet(common, BinnedVariables = RUN_BINS_ETA_PHI))
+        if "pt" in scenario: 
+ 	  setattr(module.Efficiencies, "eff_pt_"+label, cms.PSet(common, BinnedVariables = PT_BINS))
         setattr(process,"TnP_Tracking_"+label, module)
         setattr(process,"p_TnP_Tracking_"+label, cms.Path(module))
         if module.InputDirectoryName.value() == "tpTreeGen":
