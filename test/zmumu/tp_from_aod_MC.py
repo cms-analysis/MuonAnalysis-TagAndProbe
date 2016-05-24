@@ -155,6 +155,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"), 
         activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
+        mt  = cms.InputTag("probeMetMt","mt"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -186,6 +187,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
         radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
+        met = cms.InputTag("tagMetMt","met"),
+        mt  = cms.InputTag("tagMetMt","mt"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -242,6 +245,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
+    process.probeMetMt + process.tagMetMt +
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
