@@ -12,7 +12,7 @@ process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
@@ -179,6 +179,10 @@ process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
 from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
 process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
 
+from MuonAnalysis.TagAndProbe.puppiIso_cfi import load_fullPFpuppiIsolation
+process.fullPuppIsolationSequence = load_fullPFpuppiIsolation(process)
+from MuonAnalysis.TagAndProbe.puppiIso_cff import PuppiIsolationVariables
+
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -187,7 +191,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
-        MVAIsoVariablesPlain, 
+        PuppiIsolationVariables,
+        MVAIsoVariablesPlain,
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
@@ -205,6 +210,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","miniIso"),
         activity_miniIsoPhotons = cms.InputTag("muonMiniIsoPhotons","activity"),
         nSplitTk  = cms.InputTag("splitTrackTagger"),
+        mt  = cms.InputTag("probeMetMt","mt"),
     ),
     flags = cms.PSet(
        TrackQualityFlags,
@@ -241,6 +247,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         #mu17ps = cms.InputTag("l1hltprescale","HLTMu17TotalPrescale"), 
         #mu8ps  = cms.InputTag("l1hltprescale","HLTMu8TotalPrescale"), 
         instLumi = cms.InputTag("addEventInfo", "instLumi"),
+        met = cms.InputTag("tagMetMt","met"),
+        mt  = cms.InputTag("tagMetMt","mt"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
     pairVariables = cms.PSet(
@@ -289,10 +297,12 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
+    process.probeMetMt + process.tagMetMt +
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel
+    process.AddPtRatioPtRel +
+    process.fullPuppIsolationSequence 
 )
 
 process.tnpSimpleSequence = cms.Sequence(
