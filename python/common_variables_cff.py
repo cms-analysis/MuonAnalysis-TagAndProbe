@@ -296,7 +296,7 @@ HighPtTriggerFlagsDebug = cms.PSet(
    hltL3fL1sMu10lqL1f0L2f10L3Filtered17 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10lqL1f0L2f10L3Filtered17').empty()"),
    hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4').empty()"),
 
-   #add the muon 20 isolation varibles
+   #add the muon 20 isolation variables
    L2fL1sMu18L1f0L2Filtered10Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu18L1f0L2Filtered10Q').empty()"),
    hltL3fL1sMu18L1f0L2f10QL3Filtered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0L2f10QL3Filtered20Q').empty()"),
    hltL3fL1sMu18L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()"),
@@ -306,6 +306,9 @@ HighPtTriggerFlagsDebug = cms.PSet(
    hltL3fL1sMu18f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()"),
    hltL3fL1sMu18f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()"),
    hltL3fL1sMu18L1f0Tkf20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0Tkf20QL3trkIsoFiltered0p09').empty()"),
+
+   #matching to muon leg of HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v*
+   Mu23_TrkIsoVVL = cms.string("!triggerObjectMatchesByFilter('hltMu23TrkIsoVVLEle8CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23').empty()"),
    
 )
 
