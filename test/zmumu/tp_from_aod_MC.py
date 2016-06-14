@@ -5,12 +5,12 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 1000
+process.MessageLogger.cerr.FwkReport.reportEvery = 100
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -21,13 +21,21 @@ import os
 if "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v4')
     process.source.fileNames = [
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/382BADA2-A3DA-E511-9E07-0CC47A4D769E.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/6200B483-9EDA-E511-A354-0CC47A4D7636.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/70B70BFF-32DB-E511-A4C6-0CC47A4C8E1C.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80CC4165-9FDA-E511-815B-0CC47A78A4A0.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80F7131A-33DB-E511-A2B5-0CC47A4D75F6.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/8AC339C5-A0DA-E511-9B02-0CC47A4C8E96.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/D279741B-9EDA-E511-A88D-0025905A6110.root',
+#/tmp/folguera/eos/cms/store/relval/CMSSW_8_0_1/
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/0452AB5D-ACE9-E511-BEAC-0CC47A78A33E.root',
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/1A2382F4-ACE9-E511-A148-0CC47A78A42E.root',
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/5CBBDEAE-ACE9-E511-ABBF-0025905B8566.root',
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/965040AB-ACE9-E511-877E-0025905A607E.root',
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/D09E013D-76EA-E511-96CE-0025905A610A.root',
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/D0C30359-ACE9-E511-B353-0025905A6064.root',
+        'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/EA27D60F-77EA-E511-BB23-0026189437F8.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/382BADA2-A3DA-E511-9E07-0CC47A4D769E.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/6200B483-9EDA-E511-A354-0CC47A4D7636.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/70B70BFF-32DB-E511-A4C6-0CC47A4C8E1C.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80CC4165-9FDA-E511-815B-0CC47A78A4A0.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80F7131A-33DB-E511-A2B5-0CC47A4D75F6.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/8AC339C5-A0DA-E511-9B02-0CC47A4C8E96.root',
+##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/D279741B-9EDA-E511-A88D-0025905A6110.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -124,10 +132,6 @@ process.probeMuonsMCMatch = process.tagMuonsMCMatch.clone(src = "probeMuons", ma
 
 from MuonAnalysis.TagAndProbe.muon.tag_probe_muon_extraIso_cff import ExtraIsolationVariables
 
-process.load("MuonAnalysis.TagAndProbe.mvaIsoVariables_cff")
-from MuonAnalysis.TagAndProbe.mvaIsoVariables_cff import MVAIsoVariablesPlain, MVAIsoVariablesPlainTag
-process.load("MuonAnalysis.TagAndProbe.radialIso_cfi")
-
 process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     # choice of tag and probe pairs, and arbitration
     tagProbePairs = cms.InputTag("tpPairs"),
@@ -136,15 +140,15 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
     variables = cms.PSet(
         AllVariables,
         ExtraIsolationVariables,
-        MVAIsoVariablesPlain, 
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
-        PtRatio= cms.InputTag("AddPtRatioPtRel","PtRatio"),
-        PtRel= cms.InputTag("AddPtRatioPtRel","PtRel"),
-        radialIso = cms.InputTag("radialIso"), 
+        JetPtRatio= cms.InputTag("AddLeptonJetRelatedVariables","JetPtRatio"),
+        JetPtRel= cms.InputTag("AddLeptonJetRelatedVariables","JetPtRel"),
+        JetNDauCharged= cms.InputTag("AddLeptonJetRelatedVariables","JetNDauCharged"),
+        JetBTagCSV= cms.InputTag("AddLeptonJetRelatedVariables","JetBTagCSV"),
         miniIsoCharged = cms.InputTag("muonMiniIsoCharged","miniIso"), 
         activity_miniIsoCharged = cms.InputTag("muonMiniIsoCharged","activity"), 
         miniIsoPUCharged = cms.InputTag("muonMiniIsoPUCharged","miniIso"), 
@@ -162,28 +166,14 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
        HighPtTriggerFlagsDebug,
     ),
     tagVariables = cms.PSet(
-     #   TriggerVariables, 
-     #   MVAIsoVariablesPlainTag, 
-     #   pt = cms.string("pt"),
-     #   eta = cms.string("eta"),
-     #   phi = cms.string("phi"),
-     #   combRelIso = cms.string("(isolationR03.emEt + isolationR03.hadEt + isolationR03.sumPt)/pt"),
-     #   chargedHadIso04 = cms.string("pfIsolationR04().sumChargedHadronPt"),
-     #   neutralHadIso04 = cms.string("pfIsolationR04().sumNeutralHadronEt"),
-     #   photonIso04 = cms.string("pfIsolationR04().sumPhotonEt"),
-     #   combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
-     #   combRelIsoPF03dBeta = IsolationVariables.combRelIsoPF03dBeta,
-     #   dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
         AllVariables,
         ExtraIsolationVariables,
-        MVAIsoVariablesPlain, 
         nVertices   = cms.InputTag("nverticesModule"),
         isoTrk03Abs = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsIsoFromDepsTk"),
         isoTrk03Rel = cms.InputTag("probeMuonsIsoValueMaps","probeMuonsRelIsoFromDepsTk"),
         dxyBS = cms.InputTag("muonDxyPVdzminTags","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzminTags","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzminTags","dzPV"),
-        radialIso = cms.InputTag("radialIso"), 
         nSplitTk  = cms.InputTag("splitTrackTagger"),
     ),
     tagFlags = cms.PSet(HighPtTriggerFlags,HighPtTriggerFlagsDebug),
@@ -238,13 +228,12 @@ process.miniIsoSeq = cms.Sequence(
 process.extraProbeVariablesSeq = cms.Sequence(
     process.probeMuonsIsoSequence +
     process.computeCorrectedIso + 
-    process.mvaIsoVariablesSeq * process.mvaIsoVariablesTag * process.radialIso +
     process.splitTrackTagger +
     process.muonDxyPVdzmin + 
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
     process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddPtRatioPtRel
+    process.AddLeptonJetRelatedVariables
 )
 
 process.tnpSimpleSequence = cms.Sequence(

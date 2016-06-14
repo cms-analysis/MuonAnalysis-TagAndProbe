@@ -170,10 +170,12 @@ jetAwareCleaner = cms.EDProducer("JetAwareCleaner",
   dRCandProbeVeto = cms.double(0.0001)
 )
 
-AddPtRatioPtRel = cms.EDProducer("AddPtRatioPtRel",
-    probes = cms.InputTag("probeMuons"),
-    # jets = cms.InputTag("ak4PFCHSJetsL1L2L3"),
-    jets = cms.InputTag("jetAwareCleaner"),
+AddLeptonJetRelatedVariables = cms.EDProducer("AddLeptonJetRelatedVariables",
+    RawJetCollection= cms.InputTag("ak4PFJetsCHS"),
+    L1Corrector = cms.InputTag("ak4PFCHSL1FastjetCorrector"),
+    L1L2L3ResCorrector= cms.InputTag("ak4PFCHSL1FastL2L3Corrector"),
+    pfCandidates = cms.InputTag("pfAllChargedHadronsPFBRECO"),
+    LeptonCollection = cms.InputTag("probeMuons"),
     dRmax = cms.double(0.4),
     subLepFromJetForPtRel = cms.bool(True)
 )
