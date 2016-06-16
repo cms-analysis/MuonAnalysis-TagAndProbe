@@ -581,14 +581,14 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPs
 # - you have to remove all filters
 # - you have to remove trigger requirements on the probes (but you can add a flag for them in the tree)
 # note that it will be *much* slower and make a *much* bigger output tree!
-if False:
+if True:
     process.tagAndProbe.remove(process.oneTag)
     process.tagAndProbe.remove(process.onePair)
     process.tagAndProbe.remove(process.HLTBoth)
     process.tpTree.flags.TP_Probe_Cut = cms.string(process.probeMuons.cut.value())
     process.probeMuons.cut = "track.isNonnull"
     process.tpTree.makeMCUnbiasTree = True
-if False:
+if True:
     process.tagAndProbeSta.remove(process.oneTag)
     process.tagAndProbeSta.remove(process.onePairSta)
     process.tagAndProbeSta.remove(process.HLTMu)
