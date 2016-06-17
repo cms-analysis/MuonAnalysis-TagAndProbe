@@ -61,6 +61,8 @@ private:
   edm::EDGetTokenT<reco::VertexCollection> vertexes_;
   edm::EDGetTokenT<reco::JetTagCollection> bTagCollectionTag_;
   edm::EDGetTokenT<PFCollection> pfCandidates_;
+
+
   const double dRmax_;
   const bool subLepFromJetForPtRel_;
 };
@@ -99,7 +101,7 @@ AddLeptonJetRelatedVariables::AddLeptonJetRelatedVariables(const edm::ParameterS
   bTagCollectionTag_ = consumes<reco::JetTagCollection>(edm::InputTag("pfCombinedInclusiveSecondaryVertexV2BJetTags"));
   
   vertexes_ = consumes<reco::VertexCollection>(edm::InputTag("offlinePrimaryVertices"));
-  
+
   //now do what ever initialization is needed
   produces<edm::ValueMap<float> >("JetPtRatio");
   produces<edm::ValueMap<float> >("JetPtRel");
@@ -152,10 +154,9 @@ AddLeptonJetRelatedVariables::produce(edm::Event& iEvent, const edm::EventSetup&
   iEvent.getByToken(vertexes_, PVs);
   reco::VertexRef PV(PVs.id());
   reco::VertexRefProd PVRefProd(PVs);
-  
+
   //Output
   std::vector<double > ptratio,ptrel,nchargeddaughers,btagcsv;
-  
   for( reco::CandidateView::const_iterator icand = leptons->begin(); icand != leptons->end(); ++ icand){
 
     //Initialise loop variables
@@ -166,59 +167,42 @@ AddLeptonJetRelatedVariables::produce(edm::Event& iEvent, const edm::EventSetup&
     double jecL1L2L3Res = 1.;
     double jecL1 = 1.;
     
-    for(unsigned int ij=0;ij<jets->size();ij++) {
-      reco::PFJetRef ijet(jets,ij);
-      
+    for (reco::JetTagCollection::const_iterator tagI = bTags.begin(); 
+	 tagI != bTags.end(); ++tagI) {
+
       // for each muon with the lepton 
-      if(deltaR(*ijet, *icand) < dR){
-	dR = deltaR(*ijet, *icand);
+      if(deltaR(*(tagI->first), *icand) > dR) continue;  
+      dR = deltaR(*(tagI->first), *icand);
+      
+      mu  = icand->p4(); 
+      jet = tagI->first->p4();
 
-	mu  = icand->p4(); 
-	jet = ijet->p4();
+      jecL1L2L3Res = correctorL1L2L3Res->correction(*(tagI->first));
+      jecL1 = correctorL1->correction(*(tagI->first));
 
-	jecL1L2L3Res = correctorL1L2L3Res->correction(*ijet);
-	jecL1 = correctorL1->correction(*ijet);
-
-	// Match to b-jet
-	float dRJetBjet = 9999.;
-	for (reco::JetTagCollection::const_iterator tagI = bTags.begin(); 
-	     tagI != bTags.end(); ++tagI) {
-	  
-	  if (deltaR(*ijet, *(tagI->first)) < dRJetBjet) 
-	    bjet = tagI->second;
-	}
+      // Get b-jet info
+      bjet = tagI->second;
+      unsigned int ic=0;
+      for (PFCollection::const_iterator iP = pfCandidates->begin(); iP !=pfCandidates->end(); ++iP){
+	ic++;
+	const reco::PFCandidate *pfcand = iP->get();
+	if (pfcand->charge()==0) continue;
+	if (deltaR(*tagI->first,*pfcand) > 0.4) continue;	
+	if (!pfcand->bestTrack()) continue;
+	if (!pfcand->bestTrack()->quality(reco::Track::highPurity)) continue;
+	if (pfcand->bestTrack()->pt()<1.) continue;
+	if (pfcand->bestTrack()->hitPattern().numberOfValidHits()<8) continue;
+	if (pfcand->bestTrack()->hitPattern().numberOfValidPixelHits()<2) continue;
+	if (pfcand->bestTrack()->normalizedChi2()>=5) continue;
 	
-	const std::vector<reco::CandidatePtr> & cands = ijet->daughterPtrVector();
+	PV = reco::VertexRef(PVs, 0);
+	math::XYZPoint PVpos = PV->position();
 
-	for (std::vector<reco::CandidatePtr>::const_iterator cand = cands.begin(); 
-	     cand != cands.end(); ++cand ){
-	  
-	  const reco::Candidate *pfcand = cand->get();
-	  if (pfcand->charge()==0) continue;
-	  
-	  // Check if comes from PV: 
-	  bool matched = false;
-	  for (PFCollection::const_iterator iP = pfCandidates->begin(); iP !=pfCandidates->end(); ++iP){
-	    if ( deltaR( *(iP->get()), *pfcand)  < 0.1) matched = true;  
-	  }
-	  if (!matched) continue;
-	  
-	  if (!pfcand->bestTrack()) continue;
-	  if (pfcand->bestTrack()->pt()<1.) continue;
-	  if (pfcand->bestTrack()->hitPattern().numberOfValidHits()<8) continue;
-	  if (pfcand->bestTrack()->hitPattern().numberOfValidPixelHits()<2) continue;
-	  if (pfcand->bestTrack()->normalizedChi2()>=5) continue;
-	  
-	  PV = reco::VertexRef(PVs, 0);
-	  math::XYZPoint PVpos = PV->position();
-
-	  if (std::fabs(pfcand->bestTrack()->dxy(PVpos)) > 0.2) continue;
-	  if (std::fabs(pfcand->bestTrack()->dz(PVpos)) > 17) continue;
-	  nchdaugthers++;
-	}
+	if (std::fabs(pfcand->bestTrack()->dxy(PVpos)) > 0.2) continue;
+	if (std::fabs(pfcand->bestTrack()->dz(PVpos)) > 17) continue;
+	nchdaugthers++;
       }
-    }//end jet loop
-    
+    }    
     //
     //Fill the pt ratio and pt rel
     //
@@ -230,7 +214,6 @@ AddLeptonJetRelatedVariables::produce(edm::Event& iEvent, const edm::EventSetup&
       nchargeddaughers.push_back(-1);
     }
     else{
-      // CLEAN JET... 
       if ((jet-mu).Rho()<0.0001) 
 	jet=mu; 
       else {
@@ -240,29 +223,32 @@ AddLeptonJetRelatedVariables::produce(edm::Event& iEvent, const edm::EventSetup&
       }
       ptratio.push_back(mu.pt()/jet.pt());
       TLorentzVector tmp_mu, tmp_jet;
-      tmp_mu.SetPtEtaPhiM(mu.pt(),mu.eta(),mu.phi(),mu.mass());
-      tmp_jet.SetPtEtaPhiM(jet.pt(),jet.eta(),jet.phi(),jet.mass());
-      ptrel.push_back(tmp_mu.Perp(tmp_jet.Vect()));
+      tmp_mu.SetPxPyPzE(mu.px(),mu.py(),mu.pz(),mu.E());
+      tmp_jet.SetPxPyPzE(jet.px(),jet.py(),jet.pz(),jet.E());
+      if ((tmp_jet-tmp_mu).Rho()<0.0001)  ptrel.push_back(0.);
+      else 	                          ptrel.push_back(tmp_mu.Perp((tmp_jet-tmp_mu).Vect()));
       btagcsv.push_back(bjet);
       nchargeddaughers.push_back(nchdaugthers);
     }
+
+    //    printf ("muon: %4.2f %4.2f %4.2f %4.2f %4.2f %4.2f %4.2f\n", mu.pt(),mu.eta(),mu.phi(), ptrel.back(), ptratio.back(), nchargeddaughers.back(), btagcsv.back());
 
 
   }//end muon loop
   
   
   /// Filling variables previously computed
-  std::auto_ptr<ValueMap<float> > JetPtRatio(new ValueMap<float>());
-  ValueMap<float>::Filler filler(*JetPtRatio);
-  filler.insert(leptons, ptratio.begin(), ptratio.end()); 
-  filler.fill();
-  iEvent.put(JetPtRatio,"JetPtRatio");
-
-  std::auto_ptr<ValueMap<float> > JetPtRel(new ValueMap<float>());
-  ValueMap<float>::Filler filler1(*JetPtRel);
-  filler1.insert(leptons, ptrel.begin(), ptrel.end()); 
-  filler1.fill();
-  iEvent.put(JetPtRel,"JetPtRel");
+   std::auto_ptr<ValueMap<float> > JetPtRatio(new ValueMap<float>());
+   ValueMap<float>::Filler filler(*JetPtRatio);
+   filler.insert(leptons, ptratio.begin(), ptratio.end()); 
+   filler.fill();
+   iEvent.put(JetPtRatio,"JetPtRatio");
+ 
+   std::auto_ptr<ValueMap<float> > JetPtRel(new ValueMap<float>());
+   ValueMap<float>::Filler filler1(*JetPtRel);
+   filler1.insert(leptons, ptrel.begin(), ptrel.end()); 
+   filler1.fill();
+   iEvent.put(JetPtRel,"JetPtRel");
 
   std::auto_ptr<ValueMap<float> > JetNDauCharged(new ValueMap<float>());
   ValueMap<float>::Filler filler2(*JetNDauCharged);

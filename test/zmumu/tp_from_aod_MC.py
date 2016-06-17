@@ -4,13 +4,13 @@ process = cms.Process("TagProbe")
 
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
-process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(False) )
+process.MessageLogger.cerr.FwkReport.reportEvery = 10
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
 )
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(1000))
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(50))
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_38T_cff')
@@ -18,8 +18,9 @@ process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condD
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
+
 if "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v4')
+    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v6')
     process.source.fileNames = [
 #/tmp/folguera/eos/cms/store/relval/CMSSW_8_0_1/
         'root://eoscms.cern.ch///eos/cms/store/relval/CMSSW_8_0_1/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v6_gcc530-v2/10000/0452AB5D-ACE9-E511-BEAC-0CC47A78A33E.root',
@@ -38,6 +39,7 @@ if "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
 ##        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/D279741B-9EDA-E511-A88D-0025905A6110.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
+
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
 TRIGGER="SingleMu"
@@ -145,6 +147,8 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         dxyBS = cms.InputTag("muonDxyPVdzmin","dxyBS"),
         dxyPVdzmin = cms.InputTag("muonDxyPVdzmin","dxyPVdzmin"),
         dzPV = cms.InputTag("muonDxyPVdzmin","dzPV"),
+#        JetPtRatio= cms.InputTag("AddPtRatioPtRel","JetPtRatio"),
+#        JetPtRel= cms.InputTag("AddPtRatioPtRel","JetPtRel"),
         JetPtRatio= cms.InputTag("AddLeptonJetRelatedVariables","JetPtRatio"),
         JetPtRel= cms.InputTag("AddLeptonJetRelatedVariables","JetPtRel"),
         JetNDauCharged= cms.InputTag("AddLeptonJetRelatedVariables","JetNDauCharged"),
@@ -220,7 +224,9 @@ process.miniIsoSeq = cms.Sequence(
     process.muonMiniIsoPUCharged + 
     process.muonMiniIsoNeutrals + 
     process.muonMiniIsoPhotons 
-)
+    )
+
+#process.load('JetMETCorrections.Configuration.JetCorrectors_cff')
 
 # process.load("JetMETCorrections.Configuration.JetCorrectionProducersAllAlgos_cff")
 # process.ak4PFCHSJetsL1L2L3 = process.ak4PFCHSJetsL1.clone( correctors = ['ak4PFCHSL1FastL2L3'] )
@@ -232,8 +238,7 @@ process.extraProbeVariablesSeq = cms.Sequence(
     process.muonDxyPVdzmin + 
     process.miniIsoSeq +
     # process.ak4PFCHSJetsL1L2L3 +
-    process.ak4PFCHSL1FastL2L3CorrectorChain * process.jetAwareCleaner +
-    process.AddLeptonJetRelatedVariables
+    process.ak4PFCHSL1FastL2L3CorrectorChain * process.AddLeptonJetRelatedVariables  
 )
 
 process.tnpSimpleSequence = cms.Sequence(
