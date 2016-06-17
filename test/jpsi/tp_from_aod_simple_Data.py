@@ -74,6 +74,20 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
         '/store/data/Run2015D/Charmonium/AOD/16Dec2015-v1/50000/10438105-95AE-E511-ADCD-0090FAA59634.root',
         '/store/data/Run2015D/Charmonium/AOD/16Dec2015-v1/50000/1077A155-AAAE-E511-A1C7-0CC47A4DEF3E.root',
     ]
+elif "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('80X_dataRun2_Prompt_v8')
+    process.source.fileNames = [
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/14E579B3-271A-E611-911E-02163E013584.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/16AF8745-341A-E611-B3B8-02163E01445A.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/1C630207-251A-E611-998D-02163E012060.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/22864C86-231A-E611-8273-02163E01399D.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/2C503BDA-201A-E611-ACB0-02163E013552.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/36311B60-1B1A-E611-95A9-02163E01388A.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/36FEDDF5-221A-E611-AFC4-02163E011C3C.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/428BEE0E-291A-E611-9E57-02163E0139AB.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/4C09E5EA-1E1A-E611-82A2-02163E011C17.root',
+        '/store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/273/158/00000/500CE06C-1D1A-E611-B138-02163E014265.root',
+    ]
 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 

@@ -47,6 +47,12 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
         '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/0256E6F9-2FB5-E511-9570-002590FD5A52.root',
         '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/02916244-E3B4-E511-8842-0026189438FA.root',
     ]
+elif "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_v3')
+    process.source.fileNames = [
+        '/store/mc/RunIISpring16DR80/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/70000/DE3ACB51-BC16-E611-BDF3-001E67505815.root',
+        '/store/mc/RunIISpring16DR80/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/70000/FC820F64-7316-E611-8FF3-02163E0141AD.root'
+    ]
     
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 

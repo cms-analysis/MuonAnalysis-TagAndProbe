@@ -34,6 +34,7 @@
 #include <iomanip>
 #include <algorithm>
 #include <cassert>
+#include <Rtypes.h>
 
 /// utility: deltaPhi (unsigned)
 inline float dphi(float phi1, float phi2) {
@@ -52,7 +53,7 @@ struct Item {
         tag_pt(tagpt), tag_eta(tageta), tag_phi(tagphi), probe_pt(probept), probe_eta(probeeta), probe_phi(probephi),
         count(1) {}
 
-    unsigned int event; 
+    ULong64_t event; 
     float tag_pt, tag_eta, tag_phi, probe_pt, probe_eta, probe_phi; 
     mutable unsigned int count; 
 
@@ -379,7 +380,7 @@ int main(int argc, char **argv) {
 
         if (nshared1 == nshared2) break;
 
-        std::cout << "Swaping trees before repeating." << std::endl;
+        std::cout << "Swapping trees before repeating." << std::endl;
         std::swap(t1,t2);
         std::swap(f1,f2);
         std::swap(ok1,ok2);

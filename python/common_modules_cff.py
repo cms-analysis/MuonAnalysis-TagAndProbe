@@ -252,3 +252,14 @@ goodGenMuons = cms.EDFilter("GenParticleSelector",
     cut = cms.string("abs(pdgId) == 13 && pt > 3 && abs(eta) < 2.4 && status == 1 && isPromptFinalState")
 )
 
+############## 
+## MET & MT 
+#############
+tagMetMt = cms.EDProducer("MuonMetMT",
+    probes = cms.InputTag("tagMuons"),
+    met = cms.InputTag("pfMet"),
+)
+probeMetMt = cms.EDProducer("MuonMetMT",
+    probes = cms.InputTag("probeMuons"),
+    met = cms.InputTag("pfMet"),
+)
