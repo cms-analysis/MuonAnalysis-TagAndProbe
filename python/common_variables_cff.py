@@ -97,8 +97,11 @@ StaOnlyVariables = cms.PSet(
 )
 L1Variables = cms.PSet(
     l1pt = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').pt"),
+    l1eta  = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').eta"),
+    l1phi  = cms.string("? userCand('muonL1Info').isNull ? 0 : userCand('muonL1Info').phi"),
     l1q  = cms.string("userInt('muonL1Info:quality')"),
     l1dr = cms.string("userFloat('muonL1Info:deltaR')"),
+    l1dphi = cms.string("userFloat('muonL1Info:deltaPhi')"),
     #l1ptByQ = cms.string("? userCand('muonL1Info:ByQ').isNull ? 0 : userCand('muonL1Info:ByQ').pt"),
     #l1qByQ  = cms.string("userInt('muonL1Info:qualityByQ')"),
     #l1drByQ = cms.string("userFloat('muonL1Info:deltaRByQ')"),
@@ -209,6 +212,7 @@ HighPtTriggerFlags = cms.PSet(
    IsoMu18          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu18_v*',1,0).empty()"),
    IsoMu20          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu20_v*',1,0).empty()"),
    IsoMu22          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu22_v*',1,0).empty()"),
+   IsoMu24          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu24_v*',1,0).empty()"),
    IsoMu27          = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu27_v*',1,0).empty()"),
    IsoMu17_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu17_eta2p1_v*',1,0).empty()"),
    IsoMu20_eta2p1   = cms.string("!triggerObjectMatchesByPath('HLT_IsoMu20_eta2p1_v*',1,0).empty()"),
@@ -217,9 +221,11 @@ HighPtTriggerFlags = cms.PSet(
    IsoTkMu18        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu18_v*',1,0).empty()"),
    IsoTkMu20        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_v*',1,0).empty()"),
    IsoTkMu22        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu22_v*',1,0).empty()"),
+   IsoTkMu24        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu24_v*',1,0).empty()"),
    IsoTkMu27        = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu27_v*',1,0).empty()"),
    IsoTkMu20_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu20_eta2p1_v*',1,0).empty()"),
    IsoTkMu24_eta2p1 = cms.string("!triggerObjectMatchesByPath('HLT_IsoTkMu24_eta2p1_v*',1,0).empty()"),
+   HLT_TkMu50 = cms.string("!triggerObjectMatchesByPath('HLT_TkMu50_v*',1,0).empty()"),
 
    # To take care of the presence or not of the dz filter, we are requiring three flags for each of the main un-prescaled DoubleMuon Triggers
    # Mu17 leg, Mu8 leg, and (Mu17 leg && fired path)
@@ -240,15 +246,15 @@ HighPtTriggerFlags = cms.PSet(
    #DoubleMu13Mu8NoDZ_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1DoubleMu10MuOpenOR3p5L1f0L2pf0L3PreFiltered8').empty()"),
 
    # 2015 version
-   DoubleIsoMu17Mu8dZ_Mu17leg = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
-   DoubleIsoMu17Mu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
-   DoubleIsoMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10OneMuL3Filtered17').empty()"),
-   DoubleIsoMu17Mu8_IsoMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8').empty()"),
-   DoubleIsoMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu103p5L1f0L2pf0L3PreFiltered8').empty()"),
+   DoubleIsoMu17Mu8dZ_Mu17leg = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
+   DoubleIsoMu17Mu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
+   DoubleIsoMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
+   DoubleIsoMu17Mu8_IsoMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()"),
+   DoubleIsoMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()"),
 
-   DoubleIsoMu17TkMu8dZ_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
-   DoubleIsoMu17TkMu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
-   DoubleIsoMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu103p5L1f0L2f10L3Filtered17').empty()"),
+   DoubleIsoMu17TkMu8dZ_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
+   DoubleIsoMu17TkMu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
+   DoubleIsoMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_IsoMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
    DoubleIsoMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
 
@@ -261,22 +267,20 @@ HighPtTriggerFlagsDebug = cms.PSet(
    #L1fL1sDoubleMu10MuOpenOR3p5L1Filtered0  = cms.string("!triggerObjectMatchesByFilter('hltL1fL1sDoubleMu10MuOpenOR3p5L1Filtered0').empty()"),
    #L1fL1sMu16Eta2p1L1Filtered0 = cms.string("!triggerObjectMatchesByFilter('hltL1fL1sMu16Eta2p1L1Filtered0').empty()"),
    #L1fL1sMu16L1Filtered0 = cms.string("!triggerObjectMatchesByFilter('hltL1fL1sMu16L1Filtered0').empty()"),
-   L1sMu16 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu16').empty()"),
+   L1sMu16 = cms.string("!triggerObjectMatchesByFilter('hltL1sSingleMu16').empty()"),
    L1sMu16Eta2p1 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu16eta2p1').empty()"),
-   L1sMu20 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu20').empty()"),
+   L1sMu18 = cms.string("!triggerObjectMatchesByFilter('hltL1sSingleMu18').empty()"),
+   L1sMu20 = cms.string("!triggerObjectMatchesByFilter('hltL1sSingleMu20').empty()"),
    L1sMu25Eta2p1 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1SingleMu25eta2p1').empty()"),
-   L1sL1DoubleMu10MuOpen = cms.string("!triggerObjectMatchesByFilter('hltL1sL1DoubleMu10MuOpen').empty()"),
-   L1sL1DoubleMu10MuOpenORDoubleMu103p5 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1DoubleMu10MuOpenORDoubleMu103p5').empty()"),
-   L1sL1DoubleMu103p5ORDoubleMu125 = cms.string("!triggerObjectMatchesByFilter('hltL1sL1DoubleMu103p5ORDoubleMu125').empty()"),
-   L2fL1DoubleMu10MuOpenL1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1DoubleMu10MuOpenL1f0L2Filtered10').empty()"),
-   L2fL1DoubleMu10MuOpenOR3p5L1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1DoubleMu10MuOpenOR3p5L1f0L2Filtered10').empty()"),
-   L2fL1sDoubleMu10MuOpenL1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu10MuOpenL1f0L2Filtered10').empty()"),
-   L2fL1sDoubleMu10MuOpenOR3p5L1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu10MuOpenOR3p5L1f0L2Filtered10').empty()"),
-   L2fL1sMu16Eta2p1L1f0L2Filtered10Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu16Eta2p1L1f0L2Filtered10Q').empty()"),
-   L2fL1sMu16L1f0L2Filtered10Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu16L1f0L2Filtered10Q').empty()"),
-   L2fL1sDoubleMu103p5L1f0L2Filtered10OneMu = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu103p5L1f0L2Filtered10OneMu').empty()"),
-   L2pfL1DoubleMu10MuOpenL1f0L2PreFiltered0 = cms.string("!triggerObjectMatchesByFilter('hltL2pfL1DoubleMu10MuOpenL1f0L2PreFiltered0').empty()"),
-   L2pfL1DoubleMu10MuOpenOR3p5L1f0L2PreFiltered0 = cms.string("!triggerObjectMatchesByFilter('hltL2pfL1DoubleMu10MuOpenOR3p5L1f0L2PreFiltered0').empty()"),
+   L2pfL1sDoubleMu114L1f0L2PreFiltered0 = cms.string("!triggerObjectMatchesByFilter('hltL2pfL1sDoubleMu114L1f0L2PreFiltered0').empty()"),
+   L2fL1sDoubleMu114L1f0L2Filtered10OneMu = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu114L1f0L2Filtered10OneMu').empty()"),
+   L3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8 = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()"),
+   L3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
+   DiMuonGlb17Glb8RelTrkIsoFiltered0p4 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty()"),
+   L2fL1sDoubleMu114L1f0OneMuL2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sDoubleMu114L1f0OneMuL2Filtered10').empty()"),
+   L3fL1sDoubleMu114L1f0L2f10L3Filtered17 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
+   DiMuonGlbFiltered17TrkFiltered8 = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
+   DiMuonGlb17Trk8RelTrkIsoFiltered0p4 = cms.string("!triggerObjectMatchesByFilter('L2pfL1DoubleMu10MuOpenOR3p5L1f0L2PreFiltered0').empty()"),
    L3fL1sMu16Eta2p1L1f0L2f16QL3Filtered24Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16Eta2p1L1f0L2f16QL3Filtered24Q').empty()"),
    L3fL1sMu16L1f0L2f16QL3Filtered24Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f16QL3Filtered24Q').empty()"),
    L3fL1sMu16L1f0L2f10QL3Filtered18Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered18Q').empty()"),
@@ -287,16 +291,25 @@ HighPtTriggerFlagsDebug = cms.PSet(
    L3fL1sMu16L1f0L2f10QL3Filtered18QL3pfhcalOldIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered18QL3pfhcalOldIsoRhoFilteredHB0p21HE0p22').empty()"),
    L3crIsoL1sMu16L1f0L2f10QL3f18QL3OldCaloIsotrkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3crIsoL1sMu16L1f0L2f10QL3f18QL3OldCaloIsotrkIsoFiltered0p09').empty()"),
    L3fL1sMu16f0TkFiltered18Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered18Q').empty()"),
-   #add the muon 20 isolation varibles
-   L3fL1sMu16L1f0L2f10QL3Filtered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20Q').empty()"),
-   L3fL1sMu16L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p13EE0p10').empty()"),
-   L3fL1sMu16L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFiltered0p23').empty()"),
-   L3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3crIsoL1sMu16L1f0L2f10QL3f20QL3trkIsoFiltered0p09').empty()"),
-   L3fL1sMu16f0TkFiltered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20Q').empty()"),
-   L3fL1sMu16f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p13EE0p10').empty()"),
-   L3fL1sMu16f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()||!triggerObjectMatchesByFilter('hltL3fL1sMu16f0TkFiltered20QL3pfhcalIsoRhoFiltered0p23').empty()"),
-   L3fL1sMu16L1f0Tkf20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16L1f0Tkf20QL3trkIsoFiltered0p09').empty()"),
+   #add the control path HLT_Mu17_TrkIsoVVL
+   hltL2fL1sMu10lqL1f0L2Filtered10 = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu10lqL1f0L2Filtered10').empty()"),
+   hltL3fL1sMu10lqL1f0L2f10L3Filtered17 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu10lqL1f0L2f10L3Filtered17').empty()"),
+   hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu1lqL1f0L2f10L3Filtered17TkIsoFiltered0p4').empty()"),
 
+   #add the muon 20 isolation variables
+   L2fL1sMu18L1f0L2Filtered10Q = cms.string("!triggerObjectMatchesByFilter('hltL2fL1sMu18L1f0L2Filtered10Q').empty()"),
+   hltL3fL1sMu18L1f0L2f10QL3Filtered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0L2f10QL3Filtered20Q').empty()"),
+   hltL3fL1sMu18L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0L2f10QL3Filtered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()"),
+   hltL3fL1sMu18L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0L2f10QL3Filtered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()"),
+   hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3crIsoL1sMu18L1f0L2f10QL3f20QL3trkIsoFiltered0p09').empty()"),
+   hltL3fL1sMu18f0TkFiltered20Q = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18f0TkFiltered20Q').empty()"),
+   hltL3fL1sMu18f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18f0TkFiltered20QL3pfecalIsoRhoFilteredEB0p11EE0p08').empty()"),
+   hltL3fL1sMu18f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18f0TkFiltered20QL3pfhcalIsoRhoFilteredHB0p21HE0p22').empty()"),
+   hltL3fL1sMu18L1f0Tkf20QL3trkIsoFiltered0p09 = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu18L1f0Tkf20QL3trkIsoFiltered0p09').empty()"),
+
+   #matching to muon leg of HLT_Mu23_TrkIsoVVL_Ele8_CaloIdL_TrackIdL_IsoVL_v*
+   Mu23_TrkIsoVVL = cms.string("!triggerObjectMatchesByFilter('hltMu23TrkIsoVVLEle8CaloIdLTrackIdLIsoVLMuonlegL3IsoFiltered23').empty()"),
+   
 )
 
 

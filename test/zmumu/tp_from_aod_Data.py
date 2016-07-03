@@ -61,10 +61,21 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
             '/store/data/Run2015D/SingleMuon/AOD/16Dec2015-v1/10000/24537A2D-0BA8-E511-8D7C-20CF300E9ECF.root',
     ]
 elif "CMSSW_8_0_"in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('80X_dataRun2_v4')
+    process.GlobalTag.globaltag = cms.string('80X_dataRun2_Prompt_v8')
+
     process.source.fileNames = [
-        '/store/relval/CMSSW_8_0_0_pre6/SingleMuon/RECO/80X_dataRun2_v4_RelVal_sigMu2015HLHT-v1/10000/00574F9E-85D5-E511-A29D-0025905964A2.root'
-    ]
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/04883977-C22C-E611-AAD1-02163E013421.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/061E458C-E12C-E611-9961-02163E0133BB.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/0ACAF05A-E42C-E611-ACB4-02163E0134FA.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/100E452F-CC2C-E611-A998-02163E0143D0.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/10DE2766-CE2C-E611-9736-02163E01349C.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/12611BC4-E82C-E611-89F6-02163E012627.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/1C72C7C7-EB2C-E611-8DD9-02163E01368B.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/1CC274BA-D82C-E611-9D95-02163E014652.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/1EA9E0BA-E72C-E611-8447-02163E0133D0.root',
+        '/store/data/Run2016B/SingleMuon/AOD/PromptReco-v2/000/274/420/00000/1EEDFD5A-E62C-E611-A07A-02163E0128B3.root',
+        ]
+ 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
@@ -137,6 +148,7 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
+useL1Stage2Candidates(process)
 #useExtendedL1Match(process)
 #addHLTL1Passthrough(process)
 
