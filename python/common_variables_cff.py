@@ -149,6 +149,7 @@ MuonIDFlags = cms.PSet(
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && track.hitPattern.numberOfValidPixelHits > 0"),
     Loose       = cms.string("isLooseMuon()"),
     Medium      = cms.string("isPFMuon && innerTrack.validFraction >= 0.8 && ( isGlobalMuon && globalTrack.normalizedChi2 < 3 && combinedQuality.chi2LocalPosition < 12 && combinedQuality.trkKink < 20 && segmentCompatibility >= 0.303 || segmentCompatibility >= 0.451 )"),
+    Medium2016      = cms.string("isPFMuon && innerTrack.validFraction >= 0.49 && ( isGlobalMuon && globalTrack.normalizedChi2 < 3 && combinedQuality.chi2LocalPosition < 12 && combinedQuality.trkKink < 20 && segmentCompatibility >= 0.303 || segmentCompatibility >= 0.451 )"),
     HighPt = cms.string("isGlobalMuon && isTrackerMuon &&  globalTrack.hitPattern.numberOfValidMuonHits > 0 && "+
                         "numberOfMatchedStations > 1 && track.hitPattern.numberOfValidPixelHits > 0 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && abs(dB) < 0.2 && "+
@@ -249,14 +250,20 @@ HighPtTriggerFlags = cms.PSet(
    DoubleIsoMu17Mu8dZ_Mu17leg = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_Mu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
    DoubleIsoMu17Mu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
    DoubleIsoMu17Mu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10OneMuL3Filtered17').empty()"),
-   DoubleIsoMu17Mu8_IsoMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()"),
-   DoubleIsoMu17Mu8_Mu8leg = cms.string("!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()"),
+   DoubleIsoMu17Mu8_IsoMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Glb8RelTrkIsoFiltered0p4').empty() && (!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()||!triggerObjectMatchesByFilter('hltL2pfL1sDoubleMu114ORDoubleMu125L1f0L2PreFiltered0').empty())"),
+   DoubleIsoMu17Mu8_Mu8leg = cms.string("(!triggerObjectMatchesByFilter('hltL3pfL1sDoubleMu114L1f0L2pf0L3PreFiltered8').empty()||!triggerObjectMatchesByFilter('hltL2pfL1sDoubleMu114ORDoubleMu125L1f0L2PreFiltered0').empty())"),
 
    DoubleIsoMu17TkMu8dZ_Mu17 = cms.string("!triggerObjectMatchesByPath('HLT_Mu17_TrkIsoVVL_TkMu8_TrkIsoVVL_DZ_v*',1,0).empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_IsoMu17leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_Mu17leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sDoubleMu114L1f0L2f10L3Filtered17').empty()"),
    DoubleIsoMu17TkMu8_IsoMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlb17Trk8RelTrkIsoFiltered0p4').empty() && !triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
    DoubleIsoMu17TkMu8_TkMu8leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered17TrkFiltered8').empty()"),
+     
+                              
+   #monitoring of the Mu30TkMu11 path
+   DoubleMu30TkMu11 = cms.string("!triggerObjectMatchesByPath('HLT_Mu30_TkMu11_v*',1,0).empty()"),
+   DoubleMu30TkMu11_Mu30leg = cms.string("!triggerObjectMatchesByFilter('hltL3fL1sMu16orMu25L1f0L2f25L3Filtered30').empty()"),
+   DoubleMu30TkMu11_TkMu11leg = cms.string("!triggerObjectMatchesByFilter('hltDiMuonGlbFiltered30TrkFiltered11').empty()"),
 
 )
 HighPtTriggerFlagsDebug = cms.PSet(
