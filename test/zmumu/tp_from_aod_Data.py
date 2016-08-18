@@ -109,7 +109,7 @@ elif TRIGGER == "DoubleMu":
 else:
     raise RuntimeError, "TRIGGER must be 'SingleMu' or 'DoubleMu'"
 
-process.triggerResultsFilter.l1tResults = "gtDigis"
+process.triggerResultsFilter.l1tResults = "gtStage2Digis"
 process.triggerResultsFilter.throw = False
 process.triggerResultsFilter.hltResults = cms.InputTag("TriggerResults","","HLT")
 
