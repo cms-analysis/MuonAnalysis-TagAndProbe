@@ -139,6 +139,7 @@ process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
+useL1Stage2Candidates(process)
 #useExtendedL1Match(process)
 #addHLTL1Passthrough(process)
 
