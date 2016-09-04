@@ -52,6 +52,7 @@ private:
   virtual void produce(edm::Event&, const edm::EventSetup&);
   virtual void endJob();
   
+
   // ----------auxiliary functions -------------------  
   // ----------member data ---------------------------
   edm::EDGetTokenT<reco::PFJetCollection> jetCollectionTag_;
@@ -65,6 +66,9 @@ private:
 
   const double dRmax_;
   const bool subLepFromJetForPtRel_;
+
+  template<typename Hand, typename T>
+  void storeMap(edm::Event &iEvent, const Hand & handle, const std::vector<T> & values, const std::string    & label) const ; 
 };
 
 //
@@ -238,29 +242,10 @@ AddLeptonJetRelatedVariables::produce(edm::Event& iEvent, const edm::EventSetup&
   
   
   /// Filling variables previously computed
-   std::auto_ptr<ValueMap<float> > JetPtRatio(new ValueMap<float>());
-   ValueMap<float>::Filler filler(*JetPtRatio);
-   filler.insert(leptons, ptratio.begin(), ptratio.end()); 
-   filler.fill();
-   iEvent.put(JetPtRatio,"JetPtRatio");
- 
-   std::auto_ptr<ValueMap<float> > JetPtRel(new ValueMap<float>());
-   ValueMap<float>::Filler filler1(*JetPtRel);
-   filler1.insert(leptons, ptrel.begin(), ptrel.end()); 
-   filler1.fill();
-   iEvent.put(JetPtRel,"JetPtRel");
-
-  std::auto_ptr<ValueMap<float> > JetNDauCharged(new ValueMap<float>());
-  ValueMap<float>::Filler filler2(*JetNDauCharged);
-  filler2.insert(leptons, nchargeddaughers.begin(), nchargeddaughers.end()); 
-  filler2.fill();
-  iEvent.put(JetNDauCharged,"JetNDauCharged");
-
-  std::auto_ptr<ValueMap<float> > JetBTagCSV(new ValueMap<float>());
-  ValueMap<float>::Filler filler3(*JetBTagCSV);
-  filler3.insert(leptons, btagcsv.begin(), btagcsv.end()); 
-  filler3.fill();
-  iEvent.put(JetBTagCSV,"JetBTagCSV");
+  storeMap(iEvent, leptons, ptratio, "JetPtRatio");
+  storeMap(iEvent, leptons, ptrel, "JetPtRel");
+  storeMap(iEvent, leptons, nchargeddaughers, "JetNDauCharged");
+  storeMap(iEvent, leptons, btagcsv, "JetBTagCSV");
 
 }
 
@@ -277,6 +262,21 @@ void
 AddLeptonJetRelatedVariables::endJob() 
 {
 }
+
+template<typename Hand, typename T>
+void
+AddLeptonJetRelatedVariables::storeMap(edm::Event &iEvent,
+		    const Hand & handle,
+		    const std::vector<T> & values,
+		    const std::string    & label) const {
+  using namespace edm; using namespace std;
+  auto_ptr<ValueMap<T> > valMap(new ValueMap<T>());
+  typename edm::ValueMap<T>::Filler filler(*valMap);
+  filler.insert(handle, values.begin(), values.end());
+  filler.fill();
+  iEvent.put(valMap, label);
+}
+
 
 //define this as a plug-in
 DEFINE_FWK_MODULE(AddLeptonJetRelatedVariables);
