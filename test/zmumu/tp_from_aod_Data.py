@@ -150,10 +150,9 @@ process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 useL1Stage2Candidates(process)
+appendL1MatchingAlgo(process)
 #useExtendedL1Match(process)
 #addHLTL1Passthrough(process)
-
-
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
 

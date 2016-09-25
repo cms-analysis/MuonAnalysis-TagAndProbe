@@ -102,9 +102,9 @@ L1Variables = cms.PSet(
     l1q  = cms.string("userInt('muonL1Info:quality')"),
     l1dr = cms.string("userFloat('muonL1Info:deltaR')"),
     l1dphi = cms.string("userFloat('muonL1Info:deltaPhi')"),
-    #l1ptByQ = cms.string("? userCand('muonL1Info:ByQ').isNull ? 0 : userCand('muonL1Info:ByQ').pt"),
-    #l1qByQ  = cms.string("userInt('muonL1Info:qualityByQ')"),
-    #l1drByQ = cms.string("userFloat('muonL1Info:deltaRByQ')"),
+    l1ptByQ = cms.string("? userCand('muonL1InfoQuality').isNull ? 0 : userCand('muonL1InfoQuality').pt"),
+    l1qByQ  = cms.string("userInt('muonL1InfoQuality:quality')"),
+    l1drByQ = cms.string("userFloat('muonL1InfoQuality:deltaR')"),
 )
 L2Variables = cms.PSet(
     l2pt  = cms.string("? triggerObjectMatchesByCollection('hltL2MuonCandidates').empty() ? 0 : triggerObjectMatchesByCollection('hltL2MuonCandidates').at(0).pt"),
