@@ -160,7 +160,7 @@ AddLeptonJetRelatedVariables::produce(edm::Event& iEvent, const edm::EventSetup&
   reco::VertexRefProd PVRefProd(PVs);
 
   //Output
-  std::vector<double > ptratio,ptrel,nchargeddaughers,btagcsv;
+  std::vector<float> ptratio,ptrel,nchargeddaughers,btagcsv;
   for( reco::CandidateView::const_iterator icand = leptons->begin(); icand != leptons->end(); ++ icand){
 
     //Initialise loop variables
