@@ -154,6 +154,10 @@ MuonIDFlags = cms.PSet(
                         "numberOfMatchedStations > 1 && track.hitPattern.numberOfValidPixelHits > 0 && "+
                         "track.hitPattern.trackerLayersWithMeasurement > 5 && abs(dB) < 0.2 && "+
                         "(tunePMuonBestTrack.ptError / tunePMuonBestTrack.pt) < 0.3"),
+    tkHighPt  = cms.string("isTrackerMuon &&  track.isNonnull && "+
+                        "numberOfMatchedStations > 1 && track.hitPattern.numberOfValidPixelHits > 0 && "+
+                        "track.hitPattern.trackerLayersWithMeasurement > 5 && abs(dB) < 0.2 && "+
+                        "(tunePMuonBestTrack.ptError / tunePMuonBestTrack.pt) < 0.3"),
     HWWID =  cms.string("( ((isGlobalMuon() && "
                         "    globalTrack.normalizedChi2 <10 &&" +
                         "    globalTrack.hitPattern.numberOfValidMuonHits > 0 && " + 
