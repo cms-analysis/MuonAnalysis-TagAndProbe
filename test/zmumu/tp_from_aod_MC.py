@@ -77,7 +77,8 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-#useExtendedL1Match(process) #MM no idea what the sequence did, not available since git migration
+#useL1Stage2Candidates(process)
+#appendL1MatchingAlgo(process)
 #addHLTL1Passthrough(process)
 #changeTriggerProcessName(process, "*") # auto-guess
 
