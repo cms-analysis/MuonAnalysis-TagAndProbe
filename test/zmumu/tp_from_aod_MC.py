@@ -477,7 +477,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
 
 if True: # turn on for tracking efficiency using L1 seeds
     process.probeL1 = cms.EDFilter("CandViewSelector",
-        src = cms.InputTag("gmtStage2Digis:Muon:HLT2"),
+        src = cms.InputTag("gmtStage2Digis:Muon"),
         cut = cms.string("pt >= 5 && abs(eta) < 2.4"),
     )
     process.tpPairsTkL1 = process.tpPairs.clone(decay = "tagMuons@+ probeL1@-", cut = 'mass > 30')
