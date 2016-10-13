@@ -19,15 +19,13 @@ process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 import os
 if "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v4')
+    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v14')
     process.source.fileNames = [
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/382BADA2-A3DA-E511-9E07-0CC47A4D769E.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/6200B483-9EDA-E511-A354-0CC47A4D7636.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/70B70BFF-32DB-E511-A4C6-0CC47A4C8E1C.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80CC4165-9FDA-E511-815B-0CC47A78A4A0.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/80F7131A-33DB-E511-A2B5-0CC47A4D75F6.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/8AC339C5-A0DA-E511-9B02-0CC47A4C8E96.root',
-        '/store/relval/CMSSW_8_0_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_80X_mcRun2_asymptotic_v4-v1/10000/D279741B-9EDA-E511-A88D-0025905A6110.root',
+        '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40001/3459A4AB-D85C-E611-81F5-02163E011488.root',
+        '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40001/8AB9296A-C55C-E611-9291-02163E012E69.root',
+        '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40001/9A8A076A-C55C-E611-BE5A-02163E012E69.root',
+        '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40002/4AC3D851-C45C-E611-8BFD-02163E012E69.root',
+        '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40003/ACAA69A9-D85C-E611-983F-02163E011488.root',
     ]
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -77,10 +75,12 @@ process.muonMatchHLTL2.maxDeltaR = 0.3 # Zoltan tuning - it was 0.5
 process.muonMatchHLTL3.maxDeltaR = 0.1
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-#useL1Stage2Candidates(process)
-#appendL1MatchingAlgo(process)
+useL1Stage2Candidates(process)
+appendL1MatchingAlgo(process)
 #addHLTL1Passthrough(process)
+changeTriggerProcessName(process, "HLT2") # auto-guess
 #changeTriggerProcessName(process, "*") # auto-guess
+
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
 process.load("MuonAnalysis.TagAndProbe.common_modules_cff")
@@ -475,7 +475,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
 
 if True: # turn on for tracking efficiency using L1 seeds
     process.probeL1 = cms.EDFilter("CandViewSelector",
-        src = cms.InputTag("l1extraParticles"),
+        src = cms.InputTag("gmtStage2Digis:Muon:HLT2"),
         cut = cms.string("pt >= 5 && abs(eta) < 2.4"),
     )
     process.tpPairsTkL1 = process.tpPairs.clone(decay = "tagMuons@+ probeL1@-", cut = 'mass > 30')
@@ -489,8 +489,8 @@ if True: # turn on for tracking efficiency using L1 seeds
         arbitration   = "OneProbe",
         variables = cms.PSet(
             KinematicVariables, 
-            bx = cms.string("bx"),
-            quality = cms.string("gmtMuonCand.quality"),
+            ## bx = cms.string("bx"),
+            ## quality = cms.string("hwQual"),
             ## track matching variables
             tk_deltaR     = cms.InputTag("l1ToTkMatch","deltaR"),
             tk_deltaEta   = cms.InputTag("l1ToTkMatch","deltaEta"),
