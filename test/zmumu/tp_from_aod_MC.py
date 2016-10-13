@@ -198,8 +198,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
         probeMultiplicity_TMGM = cms.InputTag("probeMultiplicityTMGM"),
         probeMultiplicity_Pt10_M60140 = cms.InputTag("probeMultiplicityPt10M60140"),
-        ## Gen Weight variable
-        genWeight = cms.InputTag("genWeightInfo", "genWeight"),
+        ## Gen related variables
+        genWeight    = cms.InputTag("genAdditionalInfo", "genWeight"),
+        truePileUp   = cms.InputTag("genAdditionalInfo", "truePileUp"),
+        actualPileUp = cms.InputTag("genAdditionalInfo", "actualPileUp"),
         ## New TuneP variables
         newTuneP_probe_pt            = cms.InputTag("newTunePVals", "pt"),
         newTuneP_probe_sigmaPtOverPt = cms.InputTag("newTunePVals", "ptRelError"),
@@ -262,7 +264,7 @@ process.tnpSimpleSequence = cms.Sequence(
     process.probeMultiplicities + 
     process.bestPairByZMass + 
     process.newTunePVals +
-    process.genWeightInfo +
+    process.genAdditionalInfo +
     process.muonDxyPVdzminTags +
     process.tpTree
 )
