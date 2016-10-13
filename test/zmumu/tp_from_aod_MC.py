@@ -78,8 +78,7 @@ changeRecoMuonInput(process, "mergedMuons")
 useL1Stage2Candidates(process)
 appendL1MatchingAlgo(process)
 #addHLTL1Passthrough(process)
-changeTriggerProcessName(process, "HLT2") # auto-guess
-#changeTriggerProcessName(process, "*") # auto-guess
+changeTriggerProcessName(process, "*") # auto-guess
 
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *
