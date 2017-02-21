@@ -390,7 +390,7 @@ if False: # turn on for tracking efficiency using L1 seeds
         allProbes     = cms.InputTag("probeL1"),
     )
     process.tagAndProbeTkL1 = cms.Path(
-        process.HLTBoth    +
+        process.HLTMu + 
         process.fastFilter +
         process.probeL1 +
         process.tpPairsTkL1 +
@@ -399,6 +399,7 @@ if False: # turn on for tracking efficiency using L1 seeds
         process.l1ToTkMatchNoJPsi + process.l1ToTkMatchNoBestJPsi +
         process.l1ToTkMatch0 + 
         process.l1ToTkMatchNoJPsi0 + process.l1ToTkMatchNoBestJPsi0 +
+        process.nverticesModule +
         process.tpTreeL1
     )
 
