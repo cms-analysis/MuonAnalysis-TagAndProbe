@@ -1,7 +1,5 @@
 import FWCore.ParameterSet.Config as cms
 
-import subprocess
-
 process = cms.Process("TagProbe")
 
 process.load('Configuration.StandardSequences.Services_cff')
@@ -16,51 +14,12 @@ process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
 process.load('Configuration.StandardSequences.MagneticField_cff')
-process.load("Configuration.StandardSequences.FrontierConditions_GlobalTag_cff")
+process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 # process.Tracer = cms.Service('Tracer')
 import os
-if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_R_53_V7::All')
-    process.source.fileNames = [
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/B0C8994D-2CC7-E111-B04E-0025901D6288.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/76FB8276-3AC7-E111-A52E-001D09F297EF.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/76E299E2-2FC7-E111-B2CC-001D09F28F25.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/5C0AD4DE-4AC7-E111-9C14-001D09F23A20.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/4E4682A9-30C7-E111-9A8C-003048F1C420.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/3669603F-2FC7-E111-8935-003048D2BE06.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/0E9130E2-2FC7-E111-9494-001D09F26509.root',
-        '/store/data/Run2012C/MuOnia/AOD/PromptReco-v1/000/198/208/02CA3FBC-2DC7-E111-9CA1-003048D2BB90.root',
-    ]
-elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V39_AN1::All')
-    process.source.fileNames = [
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/645E9BE9-FC87-E111-9D30-5404A63886C5.root',
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/60C36C17-0188-E111-8B3D-5404A638868F.root',
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5E384785-F087-E111-A8CB-BCAEC518FF80.root',
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5C605E9F-F887-E111-A540-00237DDC5CB0.root',
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5C0DCA92-CE87-E111-A539-5404A63886C6.root',
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5A856F46-1888-E111-A3A5-BCAEC5329700.root',
-        '/store/data/Run2012A/MuOnia/AOD/PromptReco-v1/000/191/226/5271187F-DF87-E111-ADDB-BCAEC518FF7C.root',
-    ]
-elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('GR_P_V56::All')
-    process.source.fileNames = [
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/164/00000/56BA3AC3-A226-E511-98BB-02163E0133B5.root',
-	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/167/00000/FED37D13-A826-E511-8641-02163E01386E.root',
-	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/168/00000/1602316B-CF26-E511-BCBA-02163E011BF3.root',
-	'/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/168/00000/86456DCF-D026-E511-A8E2-02163E011D37.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/162/00000/E855BF93-4227-E511-8207-02163E011976.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/244/00000/4ADDEB99-6727-E511-BEF2-02163E011955.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/244/00000/C6DB3E01-8327-E511-B696-02163E0139CF.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/244/00000/FC4B5FE2-8A27-E511-A0DD-02163E014729.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/251/00000/7097B2BC-8E27-E511-80E1-02163E0138B3.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/0067F5A4-9A27-E511-B904-02163E01267F.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/642ACBD2-A127-E511-A59E-02163E0123F1.root',
-        '/store/data/Run2015B/Charmonium/AOD/PromptReco-v1/000/251/252/00000/F24C3492-9627-E511-AEC5-02163E011C7F.root'
-    ]
-elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
+if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_dataRun2_v15')
     process.source.fileNames = [
         '/store/data/Run2015D/Charmonium/AOD/16Dec2015-v1/50000/0013A0EA-94AE-E511-9B84-001E67398683.root',
@@ -75,23 +34,23 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
         '/store/data/Run2015D/Charmonium/AOD/16Dec2015-v1/50000/1077A155-AAAE-E511-A1C7-0CC47A4DEF3E.root',
     ]
 elif "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('80X_dataRun2_Prompt_v9')
+    process.GlobalTag.globaltag = cms.string('80X_dataRun2_2016SeptRepro_v4')
     process.source.fileNames = [
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/0645C458-9731-E611-BE85-02163E01466B.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/2AFCDB80-9A31-E611-A6AF-02163E01347E.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/5427165D-A231-E611-BFF6-02163E01273F.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/6848311F-AE31-E611-B032-02163E011F8C.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/7084CDFE-9831-E611-A940-02163E0146A0.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/740BC96E-9831-E611-9203-02163E011F87.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/82A366D4-9931-E611-BB5E-02163E011DC5.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/B8CEAB02-9831-E611-9E77-02163E0134BC.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/D4805CD1-9531-E611-B434-02163E01339C.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/D604489F-9C31-E611-A0A1-02163E0135A8.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/EA753A39-9531-E611-8F4F-02163E014775.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/EC93E1BC-9F31-E611-8538-02163E0146B6.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/F2E77417-9431-E611-A181-02163E011EB0.root',
-        'root://cms-xrd-global.cern.ch//store/data/Run2016B/Charmonium/AOD/PromptReco-v2/000/274/959/00000/F460DF68-9E31-E611-96DF-02163E011F4D.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/0006BA63-7097-E611-BBE8-001E67E71412.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/0018FFBA-5B94-E611-AD99-008CFAFBF52E.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/003343EB-7496-E611-B5EC-848F69FD2997.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/0060EAA8-9197-E611-9D75-001E67E59BE3.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/00E2CD87-9798-E611-8CA4-848F69FD4598.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/020BB297-5B97-E611-82B5-848F69FD4541.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/04CA2B1A-0897-E611-A716-0025907FD242.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/06069075-3C97-E611-92D8-008CFA00018C.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/061698EB-E096-E611-840C-848F69FD3EC9.root',
+        '/store/data/Run2016G/Charmonium/AOD/23Sep2016-v1/100000/062B282E-8097-E611-9710-001E67E6F86E.root',
     ]
+    #process.source.fileNames = [ 'file:/tmp/gpetrucc/0006BA63-7097-E611-BBE8-001E67E71412.root' ]
+    import FWCore.PythonUtilities.LumiList as LumiList
+    json = '/afs/cern.ch/cms/CAF/CMSCOMM/COMM_DQM/certification/Collisions16/13TeV/ReReco/Final/Cert_271036-284044_13TeV_23Sep2016ReReco_Collisions16_JSON.txt'
+    process.source.lumisToProcess = LumiList.LumiList(filename = json).getVLuminosityBlockRange()
 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
@@ -140,7 +99,7 @@ process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
 useL1Stage2Candidates(process)
-#useExtendedL1Match(process)
+appendL1MatchingAlgo(process)
 #addHLTL1Passthrough(process)
 
 
@@ -196,6 +155,7 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         nVertices = cms.InputTag("nverticesModule"),
         l1rate = cms.InputTag("l1rate"),
         bx     = cms.InputTag("l1rate","bx"),
+        instLumi = cms.InputTag("addEventInfo", "instLumi"),
     ),
     tagFlags     = cms.PSet(
         HighPtTriggerFlags,
@@ -236,13 +196,14 @@ process.tnpSimpleSequence = cms.Sequence(
     process.computeCorrectedIso + 
     process.probeMultiplicity + 
     process.splitTrackTagger +
+    process.addEventInfo +
     process.l1rate +
     process.tpTree
 )
 
 process.tagAndProbe = cms.Path( 
-    process.fastFilter +
     process.HLTBoth    +
+    process.fastFilter +
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence *
     process.tnpSimpleSequence
@@ -292,8 +253,8 @@ process.tpTreeSta = process.tpTree.clone(
         tk_deltaEta_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi","deltaEta"),
     ),
     flags = cms.PSet(
+        LowPtTriggerFlagsEfficienciesProbe,
         outerValidHits = cms.string("outerTrack.numberOfValidHits > 0"),
-        Mu5_L2Mu3_Jpsi_L2 = LowPtTriggerFlagsEfficienciesProbe.Mu5_L2Mu3_Jpsi_L2,
         TM  = cms.string("isTrackerMuon"),
         Glb = cms.string("isGlobalMuon"),
     ),
@@ -309,7 +270,8 @@ process.tpTreeSta = process.tpTree.clone(
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
     ),
     tagFlags = cms.PSet(
-        Mu5_L2Mu3_Jpsi_MU = LowPtTriggerFlagsEfficienciesTag.Mu5_L2Mu3_Jpsi_MU,
+        LowPtTriggerFlagsEfficienciesTag,
+        LowPtTriggerFlagsEfficienciesProbe,
     ),
     pairVariables = cms.PSet(),
     pairFlags     = cms.PSet(),
@@ -323,6 +285,7 @@ process.tnpSimpleSequenceSta = cms.Sequence(
     process.onePairSta      +
     process.nverticesModule +
     process.staToTkMatchSequenceJPsi +
+    process.addEventInfo +
     process.l1rate +
     process.tpTreeSta
 )
@@ -366,8 +329,8 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.tpTreeSta.variables.tk0_deltaEta_NoBestJPsi = cms.InputTag("staToTkMatchNoBestJPsi0","deltaEta")
 
 process.tagAndProbeSta = cms.Path( 
-    process.fastFilter +
     process.HLTMu      +
+    process.fastFilter +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
@@ -427,6 +390,7 @@ if False: # turn on for tracking efficiency using L1 seeds
         allProbes     = cms.InputTag("probeL1"),
     )
     process.tagAndProbeTkL1 = cms.Path(
+        process.HLTMu + 
         process.fastFilter +
         process.probeL1 +
         process.tpPairsTkL1 +
@@ -435,6 +399,7 @@ if False: # turn on for tracking efficiency using L1 seeds
         process.l1ToTkMatchNoJPsi + process.l1ToTkMatchNoBestJPsi +
         process.l1ToTkMatch0 + 
         process.l1ToTkMatchNoJPsi0 + process.l1ToTkMatchNoBestJPsi0 +
+        process.nverticesModule +
         process.tpTreeL1
     )
 

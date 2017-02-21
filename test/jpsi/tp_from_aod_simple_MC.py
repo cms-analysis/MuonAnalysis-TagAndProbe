@@ -5,7 +5,7 @@ process = cms.Process("TagProbe")
 process.load('Configuration.StandardSequences.Services_cff')
 process.load('FWCore.MessageService.MessageLogger_cfi')
 process.options   = cms.untracked.PSet( wantSummary = cms.untracked.bool(True) )
-process.MessageLogger.cerr.FwkReport.reportEvery = 100
+process.MessageLogger.cerr.FwkReport.reportEvery = 1000
 
 process.source = cms.Source("PoolSource", 
     fileNames = cms.untracked.vstring(),
@@ -13,34 +13,14 @@ process.source = cms.Source("PoolSource",
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )    
 
 process.load('Configuration.StandardSequences.GeometryRecoDB_cff')
-process.load('Configuration.StandardSequences.MagneticField_cff')
+process.load('Configuration.StandardSequences.MagneticField_38T_cff')
 process.load('Configuration.StandardSequences.FrontierConditions_GlobalTag_condDBv2_cff')
 process.load("Configuration.StandardSequences.Reconstruction_cff")
 
 # process.Tracer = cms.Service('Tracer')
 
 import os
-if   "CMSSW_5_3_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START53_V14::All')
-    process.source.fileNames = [
-        '/store/relval/CMSSW_5_3_6-START53_V14/RelValJpsiMM/GEN-SIM-RECO/v2/00000/C475A7F8-352A-E211-91A9-001A92971B68.root',
-        '/store/relval/CMSSW_5_3_6-START53_V14/RelValJpsiMM/GEN-SIM-RECO/v2/00000/C2D08A6A-322A-E211-AC25-0030486792AC.root',
-    ]
-elif "CMSSW_5_2_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('START52_V5::All')
-    process.source.fileNames = [
-        '/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/E8286D9A-077A-E111-813F-0018F3D095EA.root',
-        '/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/C033D80B-077A-E111-8951-003048678B08.root',
-        '/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/B837A248-2C7A-E111-BA34-003048678FB8.root',
-        '/store/relval/CMSSW_5_2_3/RelValJpsiMM/GEN-SIM-RECO/START52_V5-v1/0043/304746CC-097A-E111-A71F-003048FFD76E.root',
-    ]
-elif "CMSSW_7_4_" in os.environ['CMSSW_VERSION']:
-    from Configuration.AlCa.GlobalTag_condDBv2 import GlobalTag
-    process.GlobalTag = GlobalTag(process.GlobalTag, 'auto:run2_mc', '')
-    process.source.fileNames = [
-        'file:data2015/RelValBoostedJPsi_7_3_0_pre1/Reference_PU35/RECO_1.root',
-    ]
-elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
+if "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
     process.GlobalTag.globaltag = cms.string('76X_mcRun2_asymptotic_v12')
     process.source.fileNames = [
         '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/007508E4-EDB4-E511-AA41-B083FED00118.root',
@@ -48,10 +28,9 @@ elif "CMSSW_7_6_" in os.environ['CMSSW_VERSION']:
         '/store/mc/RunIIFall15DR76/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/00000/02916244-E3B4-E511-8842-0026189438FA.root',
     ]
 elif "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
-    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_2016_v3')
+    process.GlobalTag.globaltag = cms.string('80X_mcRun2_asymptotic_v14')
     process.source.fileNames = [
-        '/store/mc/RunIISpring16DR80/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/70000/DE3ACB51-BC16-E611-BDF3-001E67505815.root',
-        '/store/mc/RunIISpring16DR80/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PUSpring16_80X_mcRun2_asymptotic_2016_v3-v1/70000/FC820F64-7316-E611-8FF3-02163E0141AD.root'
+        '/store/mc/RunIISummer16DR80Premix/JpsiToMuMu_JpsiPt8_TuneCUEP8M1_13TeV-pythia8/AODSIM/PUMoriond17_80X_mcRun2_asymptotic_2016_TrancheIV_v6-v1/120000/00FF525A-5FC5-E611-873F-00259073E3E0.root'
     ]
     
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
@@ -78,7 +57,6 @@ process.load("HLTrigger.HLTfilters.triggerResultsFilter_cfi")
 process.triggerResultsFilter.triggerConditions = cms.vstring( 'HLT_Mu*_L2Mu*' )
 process.triggerResultsFilter.l1tResults = ''
 process.triggerResultsFilter.throw = True
-#process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "REDIGI38XPU" )
 process.triggerResultsFilter.hltResults = cms.InputTag( "TriggerResults", "", "HLT" )
 process.HLTMu   = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu*' ])
 process.HLTBoth = process.triggerResultsFilter.clone(triggerConditions = [ 'HLT_Mu*_L2Mu*', 'HLT_Mu*_Track*_Jpsi*' ])
@@ -109,7 +87,8 @@ process.load("MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff")
 ## with some customization
 from MuonAnalysis.MuonAssociators.patMuonsWithTrigger_cff import *
 changeRecoMuonInput(process, "mergedMuons")
-#useExtendedL1Match(process) #MM no idea what the sequence did, not available
+useL1Stage2Candidates(process)
+appendL1MatchingAlgo(process)
 #addHLTL1Passthrough(process)
 #changeTriggerProcessName(process, "*") # auto-guess
 
@@ -121,12 +100,6 @@ process.tagMuons = cms.EDFilter("PATMuonSelector",
     cut = cms.string("(isGlobalMuon || numberOfMatchedStations > 1) && pt > 5 && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"),
 )
 
-if TRIGGER != "SingleMu":
-    process.tagMuons.cut = ("pt > 6 && (isGlobalMuon || isTrackerMuon) && isPFMuon "+
-                            " && !triggerObjectMatchesByCollection('hltL3MuonCandidates').empty()"+
-                            " && pfIsolationR04().sumChargedHadronPt/pt < 0.2")
-
-
 process.oneTag  = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tagMuons"), minNumber = cms.uint32(1))
 
 process.probeMuons = cms.EDFilter("PATMuonSelector",
@@ -136,7 +109,6 @@ process.probeMuons = cms.EDFilter("PATMuonSelector",
 
 process.tpPairs = cms.EDProducer("CandViewShallowCloneCombiner",
     cut = cms.string('2.8 < mass < 3.4 && abs(daughter(0).vz - daughter(1).vz) < 1'),
-
     decay = cms.string('tagMuons@+ probeMuons@-')
 )
 process.onePair = cms.EDFilter("CandViewCountFilter", src = cms.InputTag("tpPairs"), minNumber = cms.uint32(1))
@@ -204,6 +176,10 @@ process.tpTree = cms.EDAnalyzer("TagProbeFitTreeProducer",
         drVtx         = cms.InputTag("tagProbeSeparation", "drVtx"),
         dz            = cms.string("daughter(0).vz - daughter(1).vz"),
         probeMultiplicity = cms.InputTag("probeMultiplicity"),
+        ## Gen related variables
+        genWeight    = cms.InputTag("genAdditionalInfo", "genWeight"),
+        truePileUp   = cms.InputTag("genAdditionalInfo", "truePileUp"),
+        actualPileUp = cms.InputTag("genAdditionalInfo", "actualPileUp"),
     ),
     pairFlags = cms.PSet(),
     isMC           = cms.bool(True),
@@ -235,13 +211,14 @@ process.tnpSimpleSequence = cms.Sequence(
     process.computeCorrectedIso + 
     process.probeMultiplicity + 
     process.splitTrackTagger +
+    process.genAdditionalInfo +
     process.l1rate +
     process.tpTree
 )
 
 process.tagAndProbe = cms.Path( 
-    process.fastFilter +
     process.HLTBoth    +
+    process.fastFilter +
     process.mergedMuons                 *
     process.patMuonsWithTriggerSequence *
     process.tnpSimpleSequence
@@ -290,8 +267,8 @@ process.tpTreeSta = process.tpTree.clone(
         tk_deltaEta_NoBestJPsi   = cms.InputTag("staToTkMatchNoBestJPsi","deltaEta"),
     ),
     flags = cms.PSet(
+        LowPtTriggerFlagsEfficienciesProbe,
         outerValidHits = cms.string("outerTrack.numberOfValidHits > 0"),
-        Mu5_L2Mu3_Jpsi_L2 = LowPtTriggerFlagsEfficienciesProbe.Mu5_L2Mu3_Jpsi_L2,
         TM  = cms.string("isTrackerMuon"),
         Glb = cms.string("isGlobalMuon"),
     ),
@@ -307,7 +284,8 @@ process.tpTreeSta = process.tpTree.clone(
         combRelIsoPF04dBeta = IsolationVariables.combRelIsoPF04dBeta,
     ),
     tagFlags = cms.PSet(
-        Mu5_L2Mu3_Jpsi_MU = LowPtTriggerFlagsEfficienciesTag.Mu5_L2Mu3_Jpsi_MU,
+        LowPtTriggerFlagsEfficienciesTag,
+        LowPtTriggerFlagsEfficienciesProbe,
     ),
     pairVariables = cms.PSet(),
     pairFlags     = cms.PSet(),
@@ -361,8 +339,8 @@ if True: # turn on for tracking efficiency from RECO/AOD + earlyGeneralTracks
     process.tpTreeSta.variables.tk0_deltaEta_NoBestJPsi = cms.InputTag("staToTkMatchNoBestJPsi0","deltaEta")
 
 process.tagAndProbeSta = cms.Path( 
-    process.fastFilter +
     process.HLTBoth      +
+    process.fastFilter +
     process.muonsSta                       +
     process.patMuonsWithTriggerSequenceSta +
     process.tnpSimpleSequenceSta
@@ -426,8 +404,8 @@ if True: # turn on for tracking efficiency using gen particles as probe
         probeMatches  = cms.InputTag("probeMuonsMCMatchGen"),
     )
     process.tagAndProbeTkGen = cms.Path(
-        process.fastFilter +
         process.HLTMu + 
+        process.fastFilter +
         process.probeGen +
         process.tpPairsTkGen +
         process.preTkMatchSequenceJPsi +
@@ -438,7 +416,7 @@ if True: # turn on for tracking efficiency using gen particles as probe
         process.tpTreeGen
     )
 
-if True: # turn on for tracking efficiency using L1 seeds
+if False: # turn on for tracking efficiency using L1 seeds
     process.probeL1 = cms.EDFilter("CandViewSelector",
         src = cms.InputTag("l1extraParticles"),
         cut = cms.string("pt >= 2 && abs(eta) < 2.4"),
@@ -492,8 +470,8 @@ if True: # turn on for tracking efficiency using L1 seeds
         probeMatches  = cms.InputTag("probeMuonsMCMatchL1"),
     )
     process.tagAndProbeTkL1 = cms.Path(
-        process.fastFilter +
         process.HLTMu + 
+        process.fastFilter +
         process.probeL1 +
         process.tpPairsTkL1 +
         process.preTkMatchSequenceJPsi +
@@ -506,73 +484,11 @@ if True: # turn on for tracking efficiency using L1 seeds
         process.tpTreeL1
     )
 
-##    _____     _          ____       _            
-##   |  ___|_ _| | _____  |  _ \ __ _| |_ ___  ___ 
-##   | |_ / _` | |/ / _ \ | |_) / _` | __/ _ \/ __|
-##   |  _| (_| |   <  __/ |  _ < (_| | ||  __/\__ \
-##   |_|  \__,_|_|\_\___| |_| \_\__,_|\__\___||___/
-##                                                 
-##   
-#process.load("MuonAnalysis.TagAndProbe.fakerate_all_cff")
-#
-#process.fakeRateJetPlusProbeTree = process.tpTree.clone(
-#    tagProbePairs = 'jetPlusProbe',
-#    arbitration   = 'None',
-#    tagVariables = process.JetPlusProbeTagVariables,
-#    tagFlags = cms.PSet(),
-#    pairVariables = cms.PSet(deltaPhi = cms.string("deltaPhi(daughter(0).phi, daughter(1).phi)")),
-#    pairFlags     = cms.PSet(),
-#    isMC = False, # MC matches not in place for FR yet
-#)
-#process.fakeRateWPlusProbeTree = process.tpTree.clone(
-#    tagProbePairs = 'wPlusProbe',
-#    arbitration   = 'None',
-#    tagVariables = process.WPlusProbeTagVariables,
-#    tagFlags = cms.PSet(),
-#    pairVariables = cms.PSet(),
-#    pairFlags     = cms.PSet(SameSign = cms.string('daughter(0).daughter(0).charge == daughter(1).charge')),
-#    isMC = False, # MC matches not in place for FR yet
-#)
-#process.fakeRateZPlusProbeTree = process.tpTree.clone(
-#    tagProbePairs = 'zPlusProbe',
-#    arbitration   = 'None',
-#    tagVariables  = process.ZPlusProbeTagVariables,
-#    tagFlags      = cms.PSet(),
-#    pairVariables = cms.PSet(),
-#    pairFlags     = cms.PSet(),
-#    isMC = False, # MC matches not in place for FR yet
-#)
-#
-#process.fakeRateJetPlusProbe = cms.Path(
-#    process.fastFilter +
-#    process.mergedMuons * process.patMuonsWithTriggerSequence +
-#    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
-#    process.jetPlusProbeSequence +
-#    process.fakeRateJetPlusProbeTree
-#)
-#process.fakeRateWPlusProbe = cms.Path(
-#    process.fastFilter +
-#    process.mergedMuons * process.patMuonsWithTriggerSequence +
-#    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
-#    process.wPlusProbeSequence +
-#    process.fakeRateWPlusProbeTree
-#)
-#process.fakeRateZPlusProbe = cms.Path(
-#    process.fastFilter +
-#    process.mergedMuons * process.patMuonsWithTriggerSequence +
-#    process.tagMuons + process.probeMuons + process.extraProbeVariablesSeq +
-#    process.zPlusProbeSequence +
-#    process.fakeRateZPlusProbeTree
-#)
-
 process.schedule = cms.Schedule(
    process.tagAndProbe,
    process.tagAndProbeSta,
    process.tagAndProbeTkGen,
-   process.tagAndProbeTkL1,
-   #process.fakeRateJetPlusProbe,
-   #process.fakeRateWPlusProbe,
-   #process.fakeRateZPlusProbe,
+   #process.tagAndProbeTkL1,
 )
 
 process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPsi_MC.root"))
@@ -581,39 +497,17 @@ process.TFileService = cms.Service("TFileService", fileName = cms.string("tnpJPs
 # - you have to remove all filters
 # - you have to remove trigger requirements on the probes (but you can add a flag for them in the tree)
 # note that it will be *much* slower and make a *much* bigger output tree!
-if True:
+if False:
     process.tagAndProbe.remove(process.oneTag)
     process.tagAndProbe.remove(process.onePair)
     process.tagAndProbe.remove(process.HLTBoth)
     process.tpTree.flags.TP_Probe_Cut = cms.string(process.probeMuons.cut.value())
     process.probeMuons.cut = "track.isNonnull"
     process.tpTree.makeMCUnbiasTree = True
-if True:
+if False:
     process.tagAndProbeSta.remove(process.oneTag)
     process.tagAndProbeSta.remove(process.onePairSta)
     process.tagAndProbeSta.remove(process.HLTMu)
     process.tpTreeSta.flags.TP_Probe_Cut = cms.string(process.probeMuonsSta.cut.value())
     process.probeMuonsSta.cut = "outerTrack.isNonnull"
     process.tpTreeSta.makeMCUnbiasTree = True
-
-
-if True: # enable and do cmsRun tp_from_aod_MC.py /eos/path/to/run/on [ extra_postfix ] to run on all files in that eos path 
-    import sys
-    args = sys.argv[1:]
-    if (sys.argv[0] == "cmsRun"): args = sys.argv[2:]
-    scenario = args[0] if len(args) > 0 else ""
-    if scenario:
-        if scenario.startswith("/"):
-            import subprocess
-	    #files in eos
-            files = subprocess.check_output([ "/afs/cern.ch/project/eos/installation/0.3.15/bin/eos.select", "ls", scenario ])
-            process.source.fileNames = [ scenario+"/"+f for f in files.split() ]
-	    #files in local
-            #files = subprocess.check_output([ "ls", scenario ])
-            #process.source.fileNames = [ "file:"+scenario+"/"+f for f in files.split() ]
-            import os.path
-            process.TFileService.fileName = "tnpJPsi_MC_%s.root" % os.path.basename(scenario)
-        else:
-            process.TFileService.fileName = "tnpJPsi_MC_%s.root" % scenario
-    if len(args) > 1:
-        process.TFileService.fileName = process.TFileService.fileName.value().replace(".root", ".%s.root" % args[1])
