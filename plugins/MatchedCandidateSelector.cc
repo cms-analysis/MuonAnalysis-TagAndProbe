@@ -59,15 +59,15 @@ MatchedCandidateSelector::produce(edm::Event & iEvent, const edm::EventSetup & i
     Handle<ValueMap<reco::CandidatePtr> > match;
     iEvent.getByToken(match_, match);
 
-    std::auto_ptr<reco::CandidateBaseRefVector >  out( new reco::CandidateBaseRefVector());
-    std::auto_ptr<reco::CandidateBaseRefVector >  fail(new reco::CandidateBaseRefVector());
+    std::unique_ptr<reco::CandidateBaseRefVector >  out( new reco::CandidateBaseRefVector());
+    std::unique_ptr<reco::CandidateBaseRefVector >  fail(new reco::CandidateBaseRefVector());
     for (size_t i = 0, n = src->size(); i < n; ++i) {
         reco::CandidateBaseRef cbr = src->refAt(i);
         if ((*match)[cbr].isNonnull()) out->push_back(cbr); else fail->push_back(cbr);
     }
 
-    iEvent.put(out);
-    iEvent.put(fail, "unmatched");
+    iEvent.put(std::move(out));
+    iEvent.put(std::move(fail), "unmatched");
 }
 
 #include "FWCore/Framework/interface/MakerMacros.h"

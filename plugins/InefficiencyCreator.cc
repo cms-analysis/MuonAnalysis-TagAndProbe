@@ -119,9 +119,9 @@ InefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
     CLHEP::HepRandomEngine& engine = rng_->getEngine( iEvent.streamID() );
 
     // Prepare output
-    std::auto_ptr<PlainVecT>   vec;
-    std::auto_ptr<RefVecT>     refvec;
-    std::auto_ptr<RefBaseVecT> rbvec;
+    std::unique_ptr<PlainVecT>   vec;
+    std::unique_ptr<RefVecT>     refvec;
+    std::unique_ptr<RefBaseVecT> rbvec;
     switch (outputMode_) {
         case Values:   vec.reset(new PlainVecT());      break;
         case Refs:     refvec.reset(new RefVecT());     break;
@@ -144,9 +144,9 @@ InefficiencyCreator<T>::produce(edm::Event& iEvent, const edm::EventSetup& iSetu
 
     /// Write out output
     switch (outputMode_) {
-        case Values:   iEvent.put(vec);    break;
-        case Refs:     iEvent.put(refvec); break;
-        case RefBases: iEvent.put(rbvec);  break;
+        case Values:   iEvent.put(std::move(vec));    break;
+        case Refs:     iEvent.put(std::move(refvec)); break;
+        case RefBases: iEvent.put(std::move(rbvec));  break;
     }
 
 }

@@ -135,8 +135,8 @@ const edm::EventSetup & iSetup) const {
     jetCol->push_back(cleanJet);
   }//jet loop
   
-  std::auto_ptr<std::vector<reco::PFJet> > recoCleanedJets(jetCol);
-  iEvent.put(recoCleanedJets);
+  std::unique_ptr<std::vector<reco::PFJet> > recoCleanedJets(jetCol);
+  iEvent.put(std::move(recoCleanedJets));
 
 }
 

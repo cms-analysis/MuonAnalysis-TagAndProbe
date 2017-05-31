@@ -62,12 +62,12 @@ void ComputeL1TriggerRate::produce(edm::Event& iEvent, const edm::EventSetup& iS
 }
 
 void ComputeL1TriggerRate::writeGlobalFloat(edm::Event &iEvent, const edm::Handle<edm::View<reco::Candidate> > &probes, const double value, const std::string &label) { 
-  std::auto_ptr<edm::ValueMap<float> > out(new edm::ValueMap<float>());
+  std::unique_ptr<edm::ValueMap<float> > out(new edm::ValueMap<float>());
   edm::ValueMap<float>::Filler filler(*out);
   std::vector<float> values(probes->size(), value);
   filler.insert(probes, values.begin(), values.end());
   filler.fill();
-  iEvent.put(out, label);
+  iEvent.put(std::move(out), label);
 }
 
 // Define this module as plugin

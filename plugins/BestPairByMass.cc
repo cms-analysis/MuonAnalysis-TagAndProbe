@@ -112,12 +112,12 @@ BestPairByMass::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
 
     }
 
-    std::auto_ptr<edm::RefToBaseVector<reco::Candidate> > out(new edm::RefToBaseVector<reco::Candidate>());
+    std::unique_ptr<edm::RefToBaseVector<reco::Candidate> > out(new edm::RefToBaseVector<reco::Candidate>());
     for (it = pairs->begin(), i = 0; it != ed; ++it, ++i) {
         if (marked[i] == 1) out->push_back(pairs->refAt(i));
     }
  
-    iEvent.put(out);
+    iEvent.put(std::move(out));
 }
 
 DEFINE_FWK_MODULE(BestPairByMass);

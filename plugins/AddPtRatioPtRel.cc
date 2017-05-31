@@ -145,17 +145,17 @@ AddPtRatioPtRel::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }//end muon loop
 
 
-  std::auto_ptr<ValueMap<float> > PtRatio(new ValueMap<float>());
+  std::unique_ptr<ValueMap<float> > PtRatio(new ValueMap<float>());
   ValueMap<float>::Filler filler(*PtRatio);
   filler.insert(probes, ptratio.begin(), ptratio.end()); 
   filler.fill();
-  iEvent.put(PtRatio,"PtRatio");
+  iEvent.put(std::move(PtRatio),"PtRatio");
 
-  std::auto_ptr<ValueMap<float> > PtRel(new ValueMap<float>());
+  std::unique_ptr<ValueMap<float> > PtRel(new ValueMap<float>());
   ValueMap<float>::Filler filler1(*PtRel);
   filler1.insert(probes, ptrel.begin(), ptrel.end()); 
   filler1.fill();
-  iEvent.put(PtRel,"PtRel");
+  iEvent.put(std::move(PtRel),"PtRel");
 
 
 }

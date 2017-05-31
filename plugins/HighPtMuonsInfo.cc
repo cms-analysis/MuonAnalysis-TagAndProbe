@@ -111,11 +111,11 @@ HighPtMuonsInfo::writeValueMap(edm::Event &iEvent,
 {
     using namespace edm; 
     using namespace std;
-    auto_ptr<ValueMap<float> > valMap(new ValueMap<float>());
+    unique_ptr<ValueMap<float> > valMap(new ValueMap<float>());
     edm::ValueMap<float>::Filler filler(*valMap);
     filler.insert(handle, values.begin(), values.end());
     filler.fill();
-    iEvent.put(valMap, label);
+    iEvent.put(std::move(valMap), label);
 }
 
 reco::Muon::MuonTrackTypePair 

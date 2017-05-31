@@ -65,11 +65,11 @@ HeavyIonCentralityBinInfo::produce(edm::Event& iEvent, const edm::EventSetup& iS
 
    vector<float> values(src->size(), (float)hiBin);
 
-   auto_ptr<ValueMap<float> > valMap(new ValueMap<float>());
+   unique_ptr<ValueMap<float> > valMap(new ValueMap<float>());
    ValueMap<float>::Filler filler(*valMap);
    filler.insert(src, values.begin(), values.end());
    filler.fill();
-   iEvent.put(valMap);
+   iEvent.put(std::move(valMap));
  
 }
 

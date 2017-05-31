@@ -93,11 +93,11 @@ ObjectCleanedMultiplicityCounter<T>::produce(edm::Event & iEvent, const edm::Eve
     }
 
     // convert into ValueMap and store
-    std::auto_ptr<ValueMap<float> > valMap(new ValueMap<float>());
+    std::unique_ptr<ValueMap<float> > valMap(new ValueMap<float>());
     ValueMap<float>::Filler filler(*valMap);
     filler.insert(pairs, values.begin(), values.end());
     filler.fill();
-    iEvent.put(valMap);
+    iEvent.put(std::move(valMap));
 }
 
 
