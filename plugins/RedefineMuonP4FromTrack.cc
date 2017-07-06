@@ -54,7 +54,7 @@ RedefineMuonP4FromTrackT<T>::produce(edm::Event & iEvent, const edm::EventSetup 
     Handle<View<T> >      src;
     iEvent.getByToken(src_, src);
 
-    auto_ptr<vector<T> >  out(new vector<T>());
+    unique_ptr<vector<T> >  out(new vector<T>());
     out->reserve(src->size());
 
     for (typename View<T>::const_iterator it = src->begin(), ed = src->end(); it != ed; ++it) {
@@ -74,7 +74,7 @@ RedefineMuonP4FromTrackT<T>::produce(edm::Event & iEvent, const edm::EventSetup 
         mu.setP4(reco::Candidate::PolarLorentzVector(trk.pt(), trk.eta(), trk.phi(), original.mass()));
     }
 
-    iEvent.put(out);
+    iEvent.put(std::move(out));
 }
 
 typedef RedefineMuonP4FromTrackT<reco::Muon> RedefineMuonP4FromTrack;

@@ -227,8 +227,8 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   }
     
   // convert into ValueMap and store
-  std::auto_ptr<ValueMap<int> > valMapInner(new ValueMap<int>());
-  std::auto_ptr<ValueMap<int> > valMapOuter(new ValueMap<int>());
+  std::unique_ptr<ValueMap<int> > valMapInner(new ValueMap<int>());
+  std::unique_ptr<ValueMap<int> > valMapOuter(new ValueMap<int>());
 
   ValueMap<int>::Filler fillerInner(*valMapInner);
   ValueMap<int>::Filler fillerOuter(*valMapOuter);
@@ -239,8 +239,8 @@ ExpectedHitsComputer::produce(edm::Event & iEvent, const edm::EventSetup & iSetu
   fillerInner.fill();
   fillerOuter.fill();
 
-  iEvent.put(valMapInner,"in");
-  iEvent.put(valMapOuter,"out");
+  iEvent.put(std::move(valMapInner),"in");
+  iEvent.put(std::move(valMapOuter),"out");
 }
 
 

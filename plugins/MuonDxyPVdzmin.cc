@@ -168,9 +168,9 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   }// end loop on probes
 
   // convert into ValueMap and store
-  std::auto_ptr<ValueMap<float> > dxyBS(new ValueMap<float>());
-  std::auto_ptr<ValueMap<float> > dxyPVdzmin(new ValueMap<float>());
-  std::auto_ptr<ValueMap<float> > dzPV(new ValueMap<float>());
+  std::unique_ptr<ValueMap<float> > dxyBS(new ValueMap<float>());
+  std::unique_ptr<ValueMap<float> > dxyPVdzmin(new ValueMap<float>());
+  std::unique_ptr<ValueMap<float> > dzPV(new ValueMap<float>());
   ValueMap<float>::Filler filler0(*dxyBS);
   ValueMap<float>::Filler filler1(*dxyPVdzmin);
   ValueMap<float>::Filler filler2(*dzPV);
@@ -181,9 +181,9 @@ MuonDxyPVdzmin::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
   filler1.fill();
   filler2.fill();
 
-  iEvent.put(dxyBS, "dxyBS");
-  iEvent.put(dxyPVdzmin, "dxyPVdzmin");
-  iEvent.put(dzPV, "dzPV");
+  iEvent.put(std::move(dxyBS), "dxyBS");
+  iEvent.put(std::move(dxyPVdzmin), "dxyPVdzmin");
+  iEvent.put(std::move(dzPV), "dzPV");
 
 }
 

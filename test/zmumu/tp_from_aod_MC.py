@@ -27,6 +27,11 @@ if "CMSSW_8_0_" in os.environ['CMSSW_VERSION']:
         '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40002/4AC3D851-C45C-E611-8BFD-02163E012E69.root',
         '/store/mc/RunIISpring16reHLT80/DYJetsToLL_M-50_TuneCUETP8M1_13TeV-amcatnloFXFX-pythia8/AODSIM/PUSpring16RAWAODSIM_reHLT_80X_mcRun2_asymptotic_v14-v1/40003/ACAA69A9-D85C-E611-983F-02163E011488.root',
     ]
+elif "CMSSW_9_2_" in os.environ['CMSSW_VERSION']:
+    process.GlobalTag.globaltag = cms.string('91X_mcRun2_asymptotic_v3')
+    process.source.fileNames = [
+        '/store/relval/CMSSW_9_2_0/RelValZMM_13/GEN-SIM-RECO/PU25ns_91X_mcRun2_asymptotic_v3-v1/10000/0471AF1A-F53C-E711-A012-0CC47A7C345E.root'
+    ] 
 else: raise RuntimeError, "Unknown CMSSW version %s" % os.environ['CMSSW_VERSION']
 
 ## SELECT WHAT DATASET YOU'RE RUNNING ON
@@ -78,7 +83,7 @@ changeRecoMuonInput(process, "mergedMuons")
 useL1Stage2Candidates(process)
 appendL1MatchingAlgo(process)
 #addHLTL1Passthrough(process)
-changeTriggerProcessName(process, "*") # auto-guess
+changeTriggerProcessName(process, "HLT")
 
 
 from MuonAnalysis.TagAndProbe.common_variables_cff import *

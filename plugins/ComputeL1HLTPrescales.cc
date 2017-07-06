@@ -104,12 +104,12 @@ void ComputeL1HLTPrescales::beginRun(edm::Run& iRun, edm::EventSetup const& iSet
 }
 
 void ComputeL1HLTPrescales::writeGlobalFloat(edm::Event &iEvent, const edm::Handle<edm::View<reco::Candidate> > &probes, const float value, const std::string &label) { 
-  std::auto_ptr<edm::ValueMap<float> > out(new edm::ValueMap<float>());
+  std::unique_ptr<edm::ValueMap<float> > out(new edm::ValueMap<float>());
   edm::ValueMap<float>::Filler filler(*out);
   std::vector<float> values(probes->size(), value);
   filler.insert(probes, values.begin(), values.end());
   filler.fill();
-  iEvent.put(out, label);
+  iEvent.put(std::move(std::move(out), label));
 }
 
 // Define this module as plugin

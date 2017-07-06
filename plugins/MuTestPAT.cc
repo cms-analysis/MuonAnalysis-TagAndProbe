@@ -155,8 +155,8 @@ MuTestPAT::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
       patCorrMuons->push_back(myMuon);
     }
 
-  std::auto_ptr<std::vector<pat::Muon> > ptr(patCorrMuons);
-  iEvent.put(ptr);
+  std::unique_ptr<std::vector<pat::Muon> > ptr(patCorrMuons);
+  iEvent.put(std::move(ptr));
 }
 
 // ------------ method called once each job just before starting event loop  ------------

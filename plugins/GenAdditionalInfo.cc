@@ -120,11 +120,11 @@ template<typename T> void GenAdditionalInfo::writeValueMap(edm::Event & ev, cons
 						       const std::vector<T> & values, const std::string & label) const 
 {
   
-  std::auto_ptr<edm::ValueMap<T> > valMap(new edm::ValueMap<T>());
+  std::unique_ptr<edm::ValueMap<T> > valMap(new edm::ValueMap<T>());
   typename edm::ValueMap<T>::Filler filler(*valMap);
   filler.insert(handle, values.begin(), values.end());
   filler.fill();
-  ev.put(valMap, label);
+  ev.put(std::move(valMap), label);
   
 }
 
